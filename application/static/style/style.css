@@ -1,0 +1,83 @@
+:root {
+    --red: #d50000;
+    --orange: #ff9900;
+
+    --cursive: 'Satisfy', cursive;
+    --sansserif: 'Inclusive Sans', sans-serif;
+}
+
+html, body {
+    margin: 0;
+    font-size: 20px !important;
+    font-family: var(--sansserif);
+}
+
+nav {
+    height: 10vh;
+    padding-top: 3vh;
+    text-align: center;
+    background-color: var(--red);
+}
+
+nav span {
+    font-size: 45px;
+    color: white;
+    font-family: var(--cursive);
+    text-shadow: var(--orange) 2px 3px 2px;
+}
+
+nav span:hover {
+    cursor: pointer;
+}
+
+main {
+    padding: 0vh 5vw 10vh 5vw;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+h1 {
+    font-size: 45px;
+    font-family: var(--cursive);
+}
+
+.button {
+    width: 70%;
+    margin-top: 30px;
+    padding: 10px 30px;
+
+    border: 2px solid black;
+    border-radius: 10px;
+
+    text-decoration: none;
+    color: black;
+    background-color: var(--orange);
+}
+
+.button:hover {
+    cursor: pointer;
+}
+
+form {
+    width: 100%;
+}
+
+input[type=checkbox] {
+    height: 20px;
+    width: 20px;
+}
+
+input[type=date], input[type=text] {
+    width: 20vw;
+    height: 5vh;
+
+    margin: 10px;
+
+    border: 2px solid black;
+    border-radius: 5px;
+
+    font-size: 17px;
+}

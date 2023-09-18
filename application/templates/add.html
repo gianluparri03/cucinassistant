@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block imports %}
+    <script>
+        let i = 0;
+
+        function submit() {
+            document.forms[0].submit();
+        }
+
+        function addInput() {
+            let div = document.createElement('div');
+            div.innerHTML = '<input type="text" name="' + i + '-name" required>';
+
+            {% if date %}
+                div.innerHTML += '<input type="date" name="' + i++ + '-date" required>';
+            {% endif %}
+
+            document.forms[0].appendChild(div);
+        }
+
+        window.onload = addInput;
+    </script>
+{% endblock %}
+
+{% block content %}
+    <h1>Aggiunta elementi</h1>
+
+    <form method="POST"></form>
+
+    <a href=".." class="button">Indietro</a>
+    <a href="javascript:addInput()" class="button">Aggiungi un altro prodotto</a>
+    <a href="javascript:submit()" class="button">Salva</a>
+{% endblock %}
