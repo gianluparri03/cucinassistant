@@ -13,17 +13,21 @@ except DBError:
 
 @app.route('/list', methods=['GET', 'POST'])
 def list_route():
+    def get_items():
+        cursor.execute('SELECT * FROM list;')
+        return cursor.fetchall()
+
     # If the method is GET, displays the list
     if request.method == 'GET':
-        cursor.execute('SELECT * FROM list;')
-        items = cursor.fetchall()
-        return render_template('list.html', items=items)
+        return render_template('list.html', items=get_items())
 
     # Tries to delete the selected items
     try:
         cursor.executemany('DELETE FROM list WHERE id = ?;', [(i, ) for i in request.form.keys()])
-    except:
-        pass
+    except Exception as e:
+        cursor.execute('SELECT * FROM list;')
+        items = cursor.fetchall()
+        return render_template('list.html', items=get_items(), error=str(e)), 400
 
     return redirect('/list/')
 
@@ -34,10 +38,10 @@ def list_add_route():
         return render_template('add.html', date=False)
 
     # Otherwise, tries to add the new items
-    items = [(i,) for i in request.form.values()]
     try:
+        items = [(i, ) for i in request.form.values()]
         cursor.executemany('INSERT INTO list (name) VALUES (?);', items)
-    except:
-        pass
+    except Exception as e:
+        return render_template('add.html', error=str(e)), 400
 
     return redirect('/list/')

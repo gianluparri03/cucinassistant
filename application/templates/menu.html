@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block imports %}
+    <script>
+        function start_editing() {
+            // Enables the checkboxes and the controls
+            for (i of document.getElementsByTagName('input')) { i.disabled = false; }
+            for (i of document.getElementsByClassName('non-editing')) i.style.display = 'none';
+            for (i of document.getElementsByClassName('editing')) i.style.display = 'block';
+        }
+
+        function submit() {
+            document.forms[0].submit();
+        }
+
+        window.onload = function () {
+            for (i of document.getElementsByClassName('non-editing')) i.style.display = 'block';
+            for (i of document.getElementsByClassName('editing')) i.style.display = 'none';
+        }
+    </script>
+{% endblock %}
+
+{% block content %}
+    <h1>Menu della settimana</h1>
+
+
+    <form method="POST">
+        <div class="menu-entry">
+            <b>Lunedi</b>
+            <input type="text" name="0" value="{{ items[0] }}" disabled>
+            <input type="text" name="1" value="{{ items[1] }}" disabled>
+        </div>
+
+        <div class="menu-entry">
+            <b>Martedi</b>
+            <input type="text" name="2" value="{{ items[2] }}" disabled>
+            <input type="text" name="3" value="{{ items[3] }}" disabled>
+        </div>
+
+        <div class="menu-entry">
+            <b>Mercoledi</b>
+            <input type="text" name="4" value="{{ items[4] }}" disabled>
+            <input type="text" name="5" value="{{ items[5] }}" disabled>
+        </div>
+
+        <div class="menu-entry">
+            <b>Giovedi</b>
+            <input type="text" name="6" value="{{ items[6] }}" disabled>
+            <input type="text" name="7" value="{{ items[7] }}" disabled>
+        </div>
+
+        <div class="menu-entry">
+            <b>Venerdi</b>
+            <input type="text" name="8" value="{{ items[8] }}" disabled>
+            <input type="text" name="9" value="{{ items[9] }}" disabled>
+        </div>
+
+        <div class="menu-entry">
+            <b>Sabato</b>
+            <input type="text" name="10"value="{{ items[10] }}" disabled>
+            <input type="text" name="11"value="{{ items[11] }}" disabled>
+        </div>
+
+        <div class="menu-entry">
+            <b>Domenica</b>
+            <input type="text" name="12"value="{{ items[12] }}" disabled>
+            <input type="text" name="13"value="{{ items[13] }}" disabled>
+        </div>
+
+        <a href="javascript:start_editing()" class="non-editing button">Modifica</a>
+        <a href="javascript:location.reload()" class="editing button">Annulla</a>
+        <a href="javascript:submit()" class="editing button">Salva</a>
+    </form>
+{% endblock %}

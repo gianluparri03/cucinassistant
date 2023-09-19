@@ -71,7 +71,7 @@ input[type=checkbox] {
 }
 
 input[type=date], input[type=text] {
-    width: 20vw;
+    width: 80%;
     height: 5vh;
 
     margin: 10px;
@@ -80,4 +80,13 @@ input[type=date], input[type=text] {
     border-radius: 5px;
 
     font-size: 17px;
+}
+
+.menu-entry {
+    margin-bottom: 40px;
+}
+
+.menu-entry b {
+    width: 10vw;
+    display: block;
 }

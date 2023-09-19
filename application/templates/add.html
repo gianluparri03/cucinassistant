@@ -13,9 +13,10 @@
             div.innerHTML = '<input type="text" name="' + i + '-name" required>';
 
             {% if date %}
-                div.innerHTML += '<input type="date" name="' + i++ + '-date" required>';
+                div.innerHTML += '<input type="date" name="' + i + '-date" required>';
             {% endif %}
 
+            i++;
             document.forms[0].appendChild(div);
         }
 

@@ -20,3 +20,4 @@ def home_route():
 
 from .list import *
 from .expirations import *
+from .menu import *
