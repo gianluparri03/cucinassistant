@@ -15,3 +15,4 @@ from .auth import *
 from .menu import *
 from .list import *
 from .settings import *
+from .other import *

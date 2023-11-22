@@ -4,26 +4,7 @@ services:
   application:
     build: .
     restart: always
-    depends_on:
-      database:
-        condition: service_healthy
     ports:
       - "8010:80"
     healthcheck:
       test: curl --fail localhost || exit 1
-
-  database:
-    image: mariadb:10.8.8-jammy
-    restart: always
-    volumes:
-      - database:/var/lib/mysql
-    environment:
-      MARIADB_RANDOM_ROOT_PASSWORD: 1
-      MARIADB_USER: cucinassistant
-      MARIADB_PASSWORD: cucinassistant
-      MARIADB_DATABASE: cucinassistant
-    healthcheck:
-     test: mysqladmin ping --silent
-
-volumes:
-  database:

@@ -1,5 +1,5 @@
-from json import load, dump
 from hashlib import sha256
+from json import load, dump
 from os import remove as os_remove
 
 
@@ -70,3 +70,7 @@ class User:
         # Updates the user's data
         data = self.read_data() | {part_name: part_data}
         write_file(self.username, data)
+
+    @staticmethod
+    def get_number():
+        return len(read_file(USERS_FILE))

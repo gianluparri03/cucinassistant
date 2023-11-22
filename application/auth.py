@@ -50,8 +50,3 @@ def logout_route(user, error=''):
     # Logs out
     session.pop('username', None)
     return redirect('/login')
-
-@app.route('/')
-@login_required
-def index_route(user):
-    return render_template('home.html')

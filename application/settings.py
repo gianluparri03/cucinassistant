@@ -1,7 +1,7 @@
 from . import app
 from .auth import login_required
 
-from flask import Flask, render_template, redirect
+from flask import render_template, redirect
 
 
 @app.route('/impostazioni/')
