@@ -1,47 +1,33 @@
-from . import app, cursor
+from . import app
+from .auth import login_required
 
+from json import load, dump
 from flask import render_template, request, redirect
-from mariadb import Error as DBError
 
 
-# Ensures the table exists
-try:
-    cursor.execute('SELECT * FROM list;')
-except DBError:
-    cursor.execute('CREATE TABLE list (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100) UNIQUE NOT NULL);')
+@app.route('/spesa/', methods=['GET', 'POST'])
+@app.route('/idee/', methods=['GET', 'POST'])
+@login_required
+def list_route(user, error=''):
+    section = str(request.url_rule).split('/')[1]
+    list = user.read_data(section)
 
+    if request.method == 'GET' or error:
+        # Displays the list if the method is GET or if there is an errror
+        return render_template('list.html', list=enumerate(list), section=section, error=error)
+    else:
+        # Saves the updated data (if valid)
+        data = request.form
+        if 'add' in data.keys() and data['add']:
+            list.extend(map(lambda s: s.strip(), data['add'].split('\n')))
+        elif 'remove' in data.keys() and data['remove']:
+            for element in set(map(lambda s: s.strip(), data['remove'].split('\n'))):
+                if element and element in list:
+                    list.remove(element)
+                elif element:
+                    return list_route('Elemento non in lista')
+        else:
+            return list_route('Richiesta sconosciuta')
 
-@app.route('/list', methods=['GET', 'POST'])
-def list_route():
-    def get_items():
-        cursor.execute('SELECT * FROM list;')
-        return cursor.fetchall()
-
-    # If the method is GET, displays the list
-    if request.method == 'GET':
-        return render_template('list.html', items=get_items())
-
-    # Tries to delete the selected items
-    try:
-        cursor.executemany('DELETE FROM list WHERE id = ?;', [(i, ) for i in request.form.keys()])
-    except Exception as e:
-        cursor.execute('SELECT * FROM list;')
-        items = cursor.fetchall()
-        return render_template('list.html', items=get_items(), error=str(e)), 400
-
-    return redirect('/list/')
-
-@app.route('/list/add', methods=['GET', 'POST'])
-def list_add_route():
-    # If the method is GET, displays the form
-    if request.method == 'GET':
-        return render_template('add.html', date=False)
-
-    # Otherwise, tries to add the new items
-    try:
-        items = [(i, ) for i in request.form.values()]
-        cursor.executemany('INSERT INTO list (name) VALUES (?);', items)
-    except Exception as e:
-        return render_template('add.html', error=str(e)), 400
-
-    return redirect('/list/')
+        user.update_data(section, list)
+        return redirect('.')

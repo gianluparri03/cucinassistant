@@ -1,5 +1,5 @@
 from . import app
-from .models import User
+from .user import User
 
 from functools import wraps
 from flask import render_template, request, redirect, session
@@ -31,12 +31,6 @@ def login_route(error=''):
         session['username'] = data['username']
         return redirect('/')
 
-@app.route('/logout/')
-def logout_route(error=''):
-    # Logs out
-    session.pop('username', None)
-    return redirect('/login')
-
 
 def login_required(func):
     @wraps(func)
@@ -48,3 +42,16 @@ def login_required(func):
             return redirect('/login')
     
     return inner
+
+
+@app.route('/logout/')
+@login_required
+def logout_route(user, error=''):
+    # Logs out
+    session.pop('username', None)
+    return redirect('/login')
+
+@app.route('/')
+@login_required
+def index_route(user):
+    return render_template('home.html')

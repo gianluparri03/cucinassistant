@@ -1,5 +1,6 @@
 from json import load, dump
 from hashlib import sha256
+from os import remove as os_remove
 
 
 BASE_FOLDER = 'data/'
@@ -43,13 +44,22 @@ class User:
 
         # Creates the files
         write_file(USERS_FILE, users)
-        write_file(username, {"menu": [""] * 14})
+        write_file(username, {"menu": [""] * 14, "spesa": [], "idee": []})
 
     @staticmethod # Returns an error
     def check(username, password):
+        # Checks if the credentials are valid
         data = read_file(USERS_FILE).get(username)
         if not data or User.hash_password(password) != data[1]:
             return 'Credenziali non valide'
+
+    def delete(self):
+        # Deletes the user
+        write_file(USERS_FILE, {k: v for k, v in read_file(USERS_FILE).items() if k != self.username})
+        try:
+            os_remove(BASE_FOLDER + self.username + '.json')
+        except OSError:
+            pass
 
     def read_data(self, part=""):
         # Reads the user's data

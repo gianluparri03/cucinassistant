@@ -4,11 +4,11 @@
 
 {% block imports %}
     <script>
-        function start_editing() {
+        function edit() {
             // Enables the checkboxes and the controls
-            for (i of document.getElementsByTagName('textarea')) { i.disabled = false; }
-            for (i of document.getElementsByClassName('non-editing')) i.style.display = 'none';
-            for (i of document.getElementsByClassName('editing')) i.style.display = 'block';
+            $('textarea').attr('disabled', false);
+            $('.non-editing').remove();
+            $('.editing').css('display', 'block');
         }
     </script>
 {% endblock %}
@@ -59,9 +59,10 @@
             <textarea disabled name="e13">{{ menu[13] }}</textarea>
         </div>
 
-        <a href="javascript:start_editing()" class="non-editing button">Modifica</a>
-        <a href="javascript:location.reload()" class="editing button">Annulla</a>
-		<a href="javascript:submit()" class="editing button">Salva</a>
-		<a href="javascript:window.print()" class="non-editing button">Scarica</a>
+        <button class="non-editing" onclick="edit()" type="button">Modifica</button>
+        <button class="non-editing" onclick="window.print()" type="button">Scarica</button>
+
+        <button class="editing" onclick="location.reload()" type="button">Annulla</button>
+        <button class="editing">Salva</button>
     </form>
 {% endblock %}

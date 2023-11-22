@@ -3,28 +3,28 @@
 {% set title = 'Login' if login else 'Registrazione' %}
 
 {% block content %}
-	<h1>{{ title }}</h1>
+    <h1>{{ title }}</h1>
 
     <form method="POST">
-		<label for="username">Nome utente</label>
-		<input type="text" name="username" required>
+        <label for="username">Nome utente</label>
+        <input type="text" name="username" required>
 
-		{% if not login %}
-			<label for="email">Email</label>
-			<input type="email" name="email" required>
-		{% endif %}
+        {% if not login %}
+            <label for="email">Email</label>
+            <input type="email" name="email" required>
+        {% endif %}
 
-		<label for="password">Password</label>
-		<input type="password" name="password" required>
+        <label for="password">Password</label>
+        <input type="password" name="password" required>
 
-		<input type="submit" value="{{ 'Login' if login else 'Registrati' }}">
-	</form>
+        <input type="submit" value="{{ 'Login' if login else 'Registrati' }}">
+    </form>
 
-	<hr>
+    <hr>
 
-	{% if login %}
-		<span>Non sei registrato ma vuoi un account? <a href="/registrazione">Registrati</a></span>
-	{% else %}
-		<span>Hai gi&agrave; un account? <a href="/login">Login</a></span>
-	{% endif %}
+    {% if login %}
+        <span>Non sei registrato ma vuoi un account? <a href="/registrazione">Registrati</a></span>
+    {% else %}
+        <span>Hai gi&agrave; un account? <a href="/login">Login</a></span>
+    {% endif %}
 {% endblock %}

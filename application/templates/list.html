@@ -1,46 +1,56 @@
 {% extends "base.html" %}
 
+{% set title = section.title() %}
+
 {% block imports %}
     <script>
-        function start_editing() {
-            // Enables the checkboxes and the controls
-            for (i of document.getElementsByTagName('input')) { i.disabled = false; i.checked = false; }
-            for (i of document.getElementsByClassName('non-editing')) i.style.display = 'none';
-            for (i of document.getElementsByClassName('editing')) i.style.display = 'block';
+        function start_adding() {
+            $('.non-editing, .editing-r').remove();
+            $('.editing, .editing-a').css('display', 'block');
         }
 
-        function abort() {
-            // Disables the checkboxes and the controls
-            for (i of document.getElementsByTagName('input')) { i.disabled = true; i.checked = false; }
-            for (i of document.getElementsByClassName('non-editing')) i.style.display = 'block';
-            for (i of document.getElementsByClassName('editing')) i.style.display = 'none';
+        function start_removing() {
+            $('.non-editing, .editing-a').remove();
+            $('.editing, .editing-r').css('display', 'block');
+            $('input[type=checkbox]').attr('disabled', false);
         }
 
-        function submit() {
-            document.forms[0].submit();
+        window.onload = function() {
+            for (input of document.getElementsByTagName('input')) {
+                input.onclick = function(click) {
+                    $('textarea').text($('textarea').text() + "\n" + click.target.name);
+                }
+            }
         }
-
-        window.onload = abort;
     </script>
 {% endblock %}
 
 {% block content %}
-    <h1>Lista della spesa</h1>
+    <h1>Lista dell{{ 'a spesa' if section == 'spesa' else 'e idee'}}</h1>
 
     <form method="POST">
-        {% for i in items %}
-            <div>
-                <input type="checkbox" id="{{ i[0] }}" name="{{ i[0] }}">
-                <label for="{{ i[0] }}">{{ i[1] }}</label>
-            </div>
-        {% else %}
-            <i>La lista della spesa &egrave; vuota.</i>
-        {% endfor %}
+        <div class="editing-r">
+            <textarea name="remove" hidden></textarea>
 
-        <a href="add" class="non-editing button">Aggiungi prodotti</a>
-        <a href="javascript:start_editing()" class="non-editing button">Rimuovi prodotti</a>
+            {% for i, e in list %}
+                <div>
+                    <input type="checkbox" id="e{{ i }}" autocomplete="off" name="{{ e }}" disabled>
+                    <label for="e{{ i }}" name="{{ e }}">{{ e }}</label>
+                </div>
+            {% else %}
+                <i>La lista &egrave; vuota.</i>
+            {% endfor %}
+        </div>
 
-        <a href="javascript:abort()" class="editing button">Annulla</a>
-        <a href="javascript:submit()" class="editing button">Salva</a>
+        <div class="editing editing-a">
+            <textarea name="add"></textarea>
+        </div>
+
+        <button class="non-editing" onclick="start_adding()" type="button">Aggiungi</button>
+        <button class="non-editing" onclick="start_removing()" type="button">Rimuovi</button>
+        <button class="non-editing" onclick="window.print()" type="button">Scarica</button>
+
+        <button class="editing">Salva</button>
+        <button class="editing" onclick="location.reload()" type="button">Annulla</button>
     </form>
 {% endblock %}

@@ -1,18 +1,17 @@
 from uuid import uuid4
 from os import environ
-from flask import Flask, render_template
+from flask import Flask, render_template, session
 
 
 # Creates the application
 app = Flask(__name__)
 app.secret_key = str(uuid4())
 
-# from .list import *
-# from .expirations import *
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
+
 from .auth import *
 from .menu import *
-
-@app.route('/')
-@login_required
-def index_route(user):
-    return render_template('home.html')
+from .list import *
+from .settings import *

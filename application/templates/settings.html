@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% set title = 'Home' %}
+
+{% block imports %}
+    <script>
+        function delete_account() {
+            // Makes the request to delete the account
+            if (prompt("Sei davvero sicuro di voler eliminare l'account? Scrivi 'Si sono sicuro' per confermare.") == "Si sono sicuro") {
+                document.forms[0].action += 'elimina_account/';
+                document.forms[0].submit();
+            }
+        }
+
+        function change_password() {
+            prompt("WIP");
+        }
+    </script>
+{% endblock %}
+
+{% block content %}
+    <form method="POST" hidden></form>
+
+    <button onclick="window.open('mailto:gianlucaparri03@gmail.com?subject=[CucinAssistant] Bug / Richiesta')" class="button">Segnalazione bug / Richieste</button>
+    <button onclick="location.href = '/logout/'">Logout</a>
+    <button onclick="change_password()">Cambio password</a>
+    <button onclick="delete_account()">Eliminazione account</a>
+{% endblock %}
