@@ -4,3 +4,6 @@ env
 
 *__pycache__
 *.swp
+
+data/*
+!data/.keep

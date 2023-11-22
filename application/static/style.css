@@ -9,11 +9,11 @@
 html, body {
     margin: 0;
     font-size: 20px !important;
-    font-family: var(--sansserif);
+    font-family: var(--sansserif) !important;
 }
 
 nav {
-    height: 10vh;
+    height: max(10vh, 60px);
     padding-top: 3vh;
     text-align: center;
     background-color: var(--red);
@@ -44,23 +44,6 @@ h1 {
     font-family: var(--cursive);
 }
 
-.button {
-    width: 70%;
-    margin-top: 30px;
-    padding: 10px 30px;
-
-    border: 2px solid black;
-    border-radius: 10px;
-
-    text-decoration: none;
-    color: black;
-    background-color: var(--orange);
-}
-
-.button:hover {
-    cursor: pointer;
-}
-
 form {
     width: 100%;
 }
@@ -70,23 +53,40 @@ input[type=checkbox] {
     width: 20px;
 }
 
-input[type=date], input[type=text] {
-    width: 80%;
+input[type=date], input[type=text], input[type=password], input[type=submit], .button {
+	display: block;
+
+    width: 80vw;
     height: 5vh;
 
     margin: 10px;
+	padding: 10px;
 
     border: 2px solid black;
     border-radius: 5px;
+	box-sizing: border-box;
 
     font-size: 17px;
+    font-family: var(--sansserif) !important;
 }
 
-.menu-entry {
-    margin-bottom: 40px;
+.button, input[type=submit] {
+    text-decoration: none;
+    color: black;
+    background-color: var(--orange);
 }
 
-.menu-entry b {
-    width: 10vw;
-    display: block;
+.button:hover, input[type=submit]:hover {
+    cursor: pointer;
+}
+
+textarea {
+	width: 80vw;
+	height: 8vh;
+	margin: 10px;
+	resize: none;
+}
+
+.editing {
+	display: none;
 }

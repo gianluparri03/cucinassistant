@@ -1,23 +1,18 @@
+from uuid import uuid4
 from os import environ
-from mariadb import connect
 from flask import Flask, render_template
 
 
 # Creates the application
 app = Flask(__name__)
-app.url_map.strict_slashes = False
+app.secret_key = str(uuid4())
 
-# Connects to the db
-host = 'database' if environ.get('PRODUCTION') == 'true' else '127.0.0.1'
-conn = connect(host=host, user='cucinassistant', password='cucinassistant', database='cucinassistant')
-conn.autocommit = True
-cursor = conn.cursor()
-
+# from .list import *
+# from .expirations import *
+from .auth import *
+from .menu import *
 
 @app.route('/')
-def home_route():
+@login_required
+def index_route(user):
     return render_template('home.html')
-
-from .list import *
-from .expirations import *
-from .menu import *

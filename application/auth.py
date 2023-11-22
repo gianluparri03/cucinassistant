@@ -1,0 +1,50 @@
+from . import app
+from .models import User
+
+from functools import wraps
+from flask import render_template, request, redirect, session
+
+
+@app.route('/login', methods=['GET', 'POST'])
+@app.route('/registrazione', methods=['GET', 'POST'])
+def login_route(error=''):
+    is_login = str(request.url_rule).startswith('/login')
+
+    if request.method == 'GET' or error:
+        # Returns the login page if it is a GET request (or a response to a POST)
+        return render_template('login.html', login=is_login, error=error)
+    else:
+        # Ensures the request is valid
+        data = request.form
+        if not data.get('username') or not data.get('password') or (not is_login and not data.get('email')):
+            return login_route('Dati mancanti')
+
+        # Checks for errors
+        if is_login:
+            if (err := User.check(data['username'], data['password'])):
+                return login_route(err)
+        else:
+            if (err := User.create(data['username'], data['email'], data['password'])):
+                return login_route(err)
+
+        # Saves the session, then returns to the homepage
+        session['username'] = data['username']
+        return redirect('/')
+
+@app.route('/logout/')
+def logout_route(error=''):
+    # Logs out
+    session.pop('username', None)
+    return redirect('/login')
+
+
+def login_required(func):
+    @wraps(func)
+    def inner(*args, **kwargs):
+        # Proceed only if logged in
+        if (username := session.get('username')):
+            return func(User(username), *args, **kwargs)
+        else:
+            return redirect('/login')
+    
+    return inner
