@@ -5,18 +5,19 @@ from os import remove as os_remove
 
 BASE_FOLDER = 'data/'
 USERS_FILE  = '_users'
+get_filename = lambda f: BASE_FOLDER + f + '.json'
 
 def read_file(filename):
     # Reads the given file
     try:
-        with open(BASE_FOLDER + filename + '.json') as f:
+        with open(get_filename(filename)) as f:
             return load(f)
     except FileNotFoundError:
         return {}
 
 def write_file(filename, content):
     # Writes the given content in the given file
-    with open(BASE_FOLDER + filename + '.json', 'w') as f:
+    with open(get_filename(filename), 'w') as f:
         dump(content, f)
 
 
@@ -44,7 +45,7 @@ class User:
 
         # Creates the files
         write_file(USERS_FILE, users)
-        write_file(username, {"menu": [""] * 14, "spesa": [], "idee": []})
+        write_file(username, {"menu": [""] * 14, "spesa": [], "idee": [], "scadenze": []})
 
     @staticmethod # Returns an error
     def check(username, password):
@@ -57,7 +58,7 @@ class User:
         # Deletes the user
         write_file(USERS_FILE, {k: v for k, v in read_file(USERS_FILE).items() if k != self.username})
         try:
-            os_remove(BASE_FOLDER + self.username + '.json')
+            os_remove(get_filename(self.username))
         except OSError:
             pass
 
@@ -71,6 +72,5 @@ class User:
         data = self.read_data() | {part_name: part_data}
         write_file(self.username, data)
 
-    @staticmethod
-    def get_number():
-        return len(read_file(USERS_FILE))
+def get_users_number():
+    return len(read_file(USERS_FILE))

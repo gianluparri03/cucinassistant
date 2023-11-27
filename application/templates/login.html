@@ -18,6 +18,10 @@
         <input type="password" name="password" required>
 
         <input type="submit" value="{{ 'Login' if login else 'Registrati' }}">
+
+        {% if login %} 
+            <a href="mailto:gianlucaparri03@gmail.com?subject=[CucinAssistant] Reset Password">Password dimenticata?</a>
+        {% endif %}
     </form>
 
     <hr>

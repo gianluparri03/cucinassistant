@@ -11,8 +11,6 @@ app.secret_key = str(uuid4())
 def make_session_permanent():
     session.permanent = True
 
+
 from .auth import *
-from .menu import *
-from .list import *
-from .settings import *
-from .other import *
+from .sections import *

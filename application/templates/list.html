@@ -7,7 +7,29 @@
         function start_adding() {
             $('.non-editing, .editing-r').remove();
             $('.editing, .editing-a').css('display', 'block');
+            {% if section == 'scadenze' %} add_element(); {% endif %}
         }
+
+        {% if section == 'scadenze' %}
+            let i = 0;
+
+            function add_element() {
+                let div = '<div class="new-element">'
+                div += `<input type="text" id="${i}-name" required>`;
+                div += `<input type="date" name="${i}-date" required>`;
+                div += '</div>';
+
+                $('#new-elements').append(div);
+                i++;
+            }
+
+            function remove_element() {
+                if (i > 0) {
+                    $('#new-elements').find('div:last').remove();
+                    i--;
+                }
+            }
+        {% endif %}
 
         function start_removing() {
             $('.non-editing, .editing-a').remove();
@@ -15,18 +37,29 @@
             $('input[type=checkbox]').attr('disabled', false);
         }
 
-        window.onload = function() {
-            for (input of document.getElementsByTagName('input')) {
-                input.onclick = function(click) {
-                    $('textarea').text($('textarea').text() + "\n" + click.target.name);
-                }
+        function submit() {
+            if ($('.editing-a')[0]) {
+                {% if section == 'scadenze' %}
+                    let text = '';
+                    for (div of $('.new-element')) text += '\n' + div.children[0].value + " " + div.children[1].value;
+                    $('textarea').text(text);
+                {% endif %}
+            } else {
+                let text = '';
+                for (input of $('input')) if (input.checked) text += '\n' + input.name;
+                $('textarea').text(text);
             }
+
+            $('input').remove();
+            return true;
         }
+
+        window.onload = function() { document.forms[0].onsubmit = submit; }
     </script>
 {% endblock %}
 
 {% block content %}
-    <h1>Lista dell{{ 'a spesa' if section == 'spesa' else 'e idee'}}</h1>
+    <h1>{{ section.title() }}</h1>
 
     <form method="POST">
         <div class="editing-r">
@@ -34,23 +67,32 @@
 
             {% for i, e in list %}
                 <div>
-                    <input type="checkbox" id="e{{ i }}" autocomplete="off" name="{{ e }}" disabled>
-                    <label for="e{{ i }}" name="{{ e }}">{{ e }}</label>
+                    <input type="checkbox" id="e{{ i }}" autocomplete="off" name="{{ i }}" disabled>
+
+                    <label for="e{{ i }}" name="{{ i }}">
+                        {% if section == 'scadenze' %} {{ e[0] }} [{{ e[1] }}]
+                        {% else %} {{ e }} {% endif %}
+                    </label>
                 </div>
             {% else %}
                 <i>La lista &egrave; vuota.</i>
             {% endfor %}
         </div>
 
-        <div class="editing editing-a">
-            <textarea name="add"></textarea>
+        <div id="new-elements" class="editing editing-a">
+            <textarea name="add" {{ 'hidden' if section == 'scadenze' }}></textarea>
         </div>
 
         <button class="non-editing" onclick="start_adding()" type="button">Aggiungi</button>
-        <button class="non-editing" onclick="start_removing()" type="button">Rimuovi</button>
-        <button class="non-editing" onclick="window.print()" type="button">Scarica</button>
+        {% if list %} <button class="non-editing" onclick="start_removing()" type="button">Rimuovi</button>
+        <button class="non-editing" onclick="window.print()" type="button">Scarica</button> {% endif %}
 
         <button class="editing">Salva</button>
         <button class="editing" onclick="location.reload()" type="button">Annulla</button>
+
+        {% if section == 'scadenze' %}
+            <button class="editing editing-a" onclick="add_element()" type="button">Aggiungi elemento</button>
+            <button class="editing editing-a" onclick="remove_element()" type="button">Rimuovi elemento</button>
+        {% endif %}
     </form>
 {% endblock %}

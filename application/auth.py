@@ -1,8 +1,20 @@
 from . import app
-from .user import User
+from .data import User, get_users_number
 
 from functools import wraps
 from flask import render_template, request, redirect, session
+
+
+def login_required(func):
+    @wraps(func)
+    def inner(*args, **kwargs):
+        # Proceed only if logged in
+        if (username := session.get('username')):
+            return func(User(username), *args, **kwargs)
+        else:
+            return redirect('/login')
+    
+    return inner
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -31,22 +43,24 @@ def login_route(error=''):
         session['username'] = data['username']
         return redirect('/')
 
-
-def login_required(func):
-    @wraps(func)
-    def inner(*args, **kwargs):
-        # Proceed only if logged in
-        if (username := session.get('username')):
-            return func(User(username), *args, **kwargs)
-        else:
-            return redirect('/login')
-    
-    return inner
-
-
 @app.route('/logout/')
 @login_required
 def logout_route(user, error=''):
     # Logs out
     session.pop('username', None)
     return redirect('/login')
+
+@app.route('/impostazioni/')
+@login_required
+def settings_route(user):
+    return render_template('settings.html')
+
+@app.route('/impostazioni/elimina_account/', methods=['POST'])
+@login_required
+def delete_account_route(user):
+    user.delete()
+    return redirect('/login')
+
+@app.route('/statistiche')
+def stats_route():
+    return render_template('stats.html', n_users=get_users_number())
