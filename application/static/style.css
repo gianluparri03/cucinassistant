@@ -1,92 +1,126 @@
+/* --- VARIABLES --------------------- */
 :root {
     --red: #d50000;
     --orange: #ff9900;
+    --background: #f9f9f9;
+    --section: #e1e1e1;
+    --text: #4a4a4a;
 
     --cursive: 'Satisfy', cursive;
     --sansserif: 'Inclusive Sans', sans-serif;
 }
 
-html, body {
-    margin: 0;
-    font-size: 20px !important;
-    font-family: var(--sansserif) !important;
+
+/* --- GENERAL ELEMENTS -------------- */
+* {
+    font-family: var(--sansserif);
 }
 
+a, a:visited {
+    color: var(--orange);
+    text-decoration: underline;
+}
+
+a:hover {
+    color: var(--red);
+    border-bottom: none;
+}
+
+textarea {
+    resize: none;
+}
+
+/* --- NAV, MAIN AND FOOTER ---------- */
 nav {
-    height: max(10vh, 60px);
-    padding-top: 3vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    padding: 20px 0;
+
     text-align: center;
     background-color: var(--red);
+
+    cursor: pointer;
 }
 
-nav span {
+#logo {
     font-size: 45px;
     color: white;
     font-family: var(--cursive);
     text-shadow: var(--orange) 2px 3px 2px;
 }
 
-nav span:hover {
-    cursor: pointer;
-}
-
 main {
-    padding: 0vh 5vw 10vh 5vw;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
+    margin: 130px auto;
 }
 
-h1 {
-    font-size: 45px;
-    font-family: var(--cursive);
-}
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
 
-form {
     width: 100%;
+    padding: 10px 30px;
+    box-sizing: border-box;
+
+    color: white;
+    background-color: var(--red);
 }
 
-input[type=checkbox] {
-    height: 20px;
-    width: 20px;
+footer #timestamp {
+    display: none;
 }
 
-input[type=date], input[type=text], input[type=password], input[type=submit], .button {
-	display: block;
-
-    width: 80vw;
-    height: 5vh;
-
-    margin: 10px;
-	padding: 10px;
-
-    border: 2px solid black;
-    border-radius: 5px;
-	box-sizing: border-box;
-
-    font-size: 17px;
-    font-family: var(--sansserif) !important;
+footer a:hover {
+    color: white;
 }
 
-.button, input[type=submit] {
-    text-decoration: none;
-    color: black;
-    background-color: var(--orange);
-}
 
-.button:hover, input[type=submit]:hover {
-    cursor: pointer;
-}
-
-textarea {
-	width: 80vw;
-	height: 8vh;
-	margin: 10px;
-	resize: none;
-}
-
+/* --- FORM -------------------------- */
 .editing {
-	display: none;
+    display: none;
+}
+
+label {
+    display: inline-block;
+}
+
+input[type=text] {
+    margin-right: 5px;
+}
+
+input[type=number] {
+    width: 40%;
+}
+
+.button-line {
+    margin-bottom: 5px;
+}
+
+
+/* --- PRINT ------------------------- */
+@media print {
+    @page {
+        margin: 0;
+    }
+
+    * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    footer {
+        position: sticky;
+        width: 100%;
+    }
+
+    .button-line, footer #links {
+        display: none;
+    }
+
+    footer #timestamp {
+        display: block;
+    }
 }

@@ -7,14 +7,18 @@
         function edit() {
             $('textarea').attr('disabled', false);
             $('.non-editing').remove();
-            $('.editing').css('display', 'block');
+            $('.editing').css('display', 'inline');
+        }
+
+        window.onload = function() {
+            for (ta of $('textarea')) {
+                ta.style.height = (ta.scrollHeight + 10) + 'px';
+            }
         }
     </script>
 {% endblock %}
 
 {% block content %}
-    <h1>Menu della settimana</h1>
-
     <form method="POST" autocomplete="off">
         <div class="menu-entry">
             <b>Lunedi</b>
@@ -58,10 +62,12 @@
             <textarea disabled name="e13">{{ menu[13] }}</textarea>
         </div>
 
-        <button class="non-editing" onclick="edit()" type="button">Modifica</button>
-        <button class="non-editing" onclick="window.print()" type="button">Scarica</button>
+        <div class="button-line"> 
+            <button class="non-editing" onclick="edit()" type="button">Modifica</button>
+            <button class="non-editing" onclick="download()" type="button">Scarica</button>
 
-        <button class="editing" onclick="location.reload()" type="button">Annulla</button>
-        <button class="editing">Salva</button>
+            <button class="editing" onclick="location.reload()" type="button">Annulla</button>
+            <button class="editing">Salva</button>
+        </div>
     </form>
 {% endblock %}

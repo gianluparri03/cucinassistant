@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 
-{% set title = section.title() %}
 {% set is_scadenze = section == 'scadenze' %}
 {% set is_quantita = section == 'quantita' %}
 {% set is_simple = not is_scadenze and not is_quantita %}
+
+{% set title = 'Quantità' if is_quantita else section.title() %}
 
 {% block imports %}
     <script>
@@ -11,7 +12,7 @@
 
         function start_adding() {
             $('.non-editing, .editing-e').remove();
-            $('.editing, .editing-a').css('display', 'block');
+            $('.editing, .editing-a').css('display', 'inline-block');
             add_element();
         }
 
@@ -38,7 +39,7 @@
 
         function start_editing() {
             $('.non-editing, .editing-a').remove();
-            $('.editing, .editing-e').css('display', 'block');
+            $('.editing, .editing-e').css('display', 'inline-block');
             {% if not is_quantita %} $('input[type=checkbox]').attr('disabled', false); {% endif %}
         }
 
@@ -74,8 +75,6 @@
 {% endblock %}
 
 {% block content %}
-    <h1>{{ section.title() }}</h1>
-
     <form method="POST">
         <div class="editing-e">
             {% if is_quantita %}
@@ -112,16 +111,20 @@
             <textarea name="add" hidden></textarea>
         </div>
 
-        <button class="non-editing" onclick="start_adding()" type="button">Aggiungi</button>
-        {% if list %}
-            <button class="non-editing" onclick="start_editing()" type="button">{{ 'Modifica' if is_quantita else 'Rimuovi' }}</button>
-            <button class="non-editing" onclick="window.print()" type="button">Scarica</button>
-        {% endif %}
+        <div class="button-line">
+            <button class="non-editing" onclick="start_adding()" type="button">Aggiungi</button>
+            {% if list %}
+                <button class="non-editing" onclick="start_editing()" type="button">{{ 'Modifica' if is_quantita else 'Rimuovi' }}</button>
+                <button class="non-editing" onclick="download()" type="button">Scarica</button>
+            {% endif %}
 
-        <button class="editing">Salva</button>
-        <button class="editing" onclick="location.reload()" type="button">Annulla</button>
+            <button class="editing">Salva</button>
+            <button class="editing" onclick="location.reload()" type="button">Annulla</button>
+        </div>
 
-        <button class="editing editing-a" onclick="add_element()" type="button">Aggiungi elemento</button>
-        <button class="editing editing-a" onclick="remove_element()" type="button">Rimuovi elemento</button>
+        <div class="button-line">
+            <button class="editing editing-a" onclick="add_element()" type="button">Aggiungi elemento</button>
+            <button class="editing editing-a" onclick="remove_element()" type="button">Rimuovi elemento</button>
+        </div>
     </form>
 {% endblock %}

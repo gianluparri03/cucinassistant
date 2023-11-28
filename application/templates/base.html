@@ -10,33 +10,48 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-        <!-- <link href="https://fonts.googleapis.com/css2?family=Inclusive+Sans&family=Satisfy&display=swap" rel="stylesheet"> -->
-        <!-- <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> -->
-        <!-- <link rel="stylesheet" href="{{ url_for('static', filename='print.css') }}" media="print"> -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inclusive+Sans&family=Satisfy&display=swap">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='sakura.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
         <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"></script>
+        <script>
+            function download() {
+                let now = new Date();
+                let pad = (num) => ((num < 10) ? '0' : '') + num;
+                let timestamp = pad(now.getDate()) + '/' + pad(now.getMonth()+1) + '/' + now.getFullYear();
+                timestamp += ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+                $('#timestamp').text(timestamp);
+
+                window.print();
+            }
+        </script>
         {% block imports %} {% endblock %}
 
         {% if error %} <script> alert('{{ error }}'); </script> {% endif %}
-        <style> .editing { display: none; } </style>
     </head>
 
     <body>
         <nav onclick="location.href = '/'">
-            <span>CucinAssistant</span>
+            <span id="logo">CucinAssistant</span>
         </nav>
 
         <main>
+            <h1>{{ title }}</h1>
+
             {% block content %} {% endblock %}
         </main>
 
         <footer>
-            <span>CucinAssistant &copy; 2023, Gianluca Parri</span>
-            <span>
+            <div>CucinAssistant &copy; 2023, Gianluca Parri</div>
+            <div id="timestamp"></div>
+
+            <div id="links">
                 <a href="mailto:gianlucaparri03@gmail.com?subject=[CucinAssistant]">Contatti</a>
                 <a href="https://github.com/gianluparri03/cucinassistant">GitHub</a>
                 <a href="/statistiche">Statistiche</a>
-            </span>
+            </div>
         </footer>
     </body>
 </html>

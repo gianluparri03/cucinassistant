@@ -16,7 +16,9 @@
 {% block content %}
     <form method="POST" hidden></form>
 
-    <button onclick="location.href = '/logout/'">Logout</a>
-    <button onclick="location.href = 'mailto:gianlucaparri03@gmail.com?subject=[CucinAssistant] Cambio Password';">Cambio password</button>
-    <button onclick="delete_account()">Eliminazione account</a>
+    <ul>
+        <li><a href="/logout/">Logout</a></li>
+        <li><a href="mailto:gianlucaparri03@gmail.com?subject=[CucinAssistant] Cambio Password';">Cambio password</a></li>
+        <li><a onclick="delete_account()">Eliminazione account</a></li>
+    </ul>
 {% endblock %}

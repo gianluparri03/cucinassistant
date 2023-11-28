@@ -3,8 +3,6 @@
 {% set title = 'Login' if login else 'Registrazione' %}
 
 {% block content %}
-    <h1>{{ title }}</h1>
-
     <form method="POST">
         <label for="username">Nome utente</label>
         <input type="text" name="username" required>
@@ -20,15 +18,15 @@
         <input type="submit" value="{{ 'Login' if login else 'Registrati' }}">
 
         {% if login %} 
-            <a href="mailto:gianlucaparri03@gmail.com?subject=[CucinAssistant] Reset Password">Password dimenticata?</a>
+            <div><a href="mailto:gianlucaparri03@gmail.com?subject=[CucinAssistant] Reset Password">Password dimenticata?</a></div>
         {% endif %}
     </form>
 
     <hr>
 
     {% if login %}
-        <span>Non sei registrato ma vuoi un account? <a href="/registrazione">Registrati</a></span>
+        <div>Non sei registrato ma vuoi un account? <a href="/registrazione">Registrati</a></span>
     {% else %}
-        <span>Hai gi&agrave; un account? <a href="/login">Login</a></span>
+        <div>Hai gi&agrave; un account? <a href="/login">Login</a></span>
     {% endif %}
 {% endblock %}
