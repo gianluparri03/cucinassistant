@@ -5,15 +5,15 @@
 {% block content %}
     <form method="POST">
         <label for="username">Nome utente</label>
-        <input type="text" name="username" required>
+        <input type="text" name="username" required> <br>
 
         {% if not login %}
             <label for="email">Email</label>
-            <input type="email" name="email" required>
+            <input type="email" name="email" required> <br>
         {% endif %}
 
         <label for="password">Password</label>
-        <input type="password" name="password" required>
+        <input type="password" name="password" required> <br>
 
         <input type="submit" value="{{ 'Login' if login else 'Registrati' }}">
 

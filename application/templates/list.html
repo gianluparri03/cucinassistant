@@ -111,7 +111,7 @@
             <textarea name="add" hidden></textarea>
         </div>
 
-        <div class="button-line">
+        <div>
             <button class="non-editing" onclick="start_adding()" type="button">Aggiungi</button>
             {% if list %}
                 <button class="non-editing" onclick="start_editing()" type="button">{{ 'Modifica' if is_quantita else 'Rimuovi' }}</button>
@@ -122,7 +122,7 @@
             <button class="editing" onclick="location.reload()" type="button">Annulla</button>
         </div>
 
-        <div class="button-line">
+        <div>
             <button class="editing editing-a" onclick="add_element()" type="button">Aggiungi elemento</button>
             <button class="editing editing-a" onclick="remove_element()" type="button">Rimuovi elemento</button>
         </div>

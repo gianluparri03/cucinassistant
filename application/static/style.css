@@ -8,6 +8,8 @@
 
     --cursive: 'Satisfy', cursive;
     --sansserif: 'Inclusive Sans', sans-serif;
+
+    --base-size: 2rem;
 }
 
 
@@ -29,6 +31,28 @@ a:hover {
 textarea {
     resize: none;
 }
+
+
+button {
+    margin: 5px 0;
+    border: 2px solid var(--text);
+    border-radius: 8px;
+}
+
+button:hover {
+    border-color: var(--text);
+}
+
+menu {
+    padding-left: 0;
+}
+
+menu button {
+    width: 70%;
+    height: 50px;
+    text-align: left;
+}
+
 
 /* --- NAV, MAIN AND FOOTER ---------- */
 nav {
@@ -67,6 +91,7 @@ footer {
 
     color: white;
     background-color: var(--red);
+    font-size: 80%;
 }
 
 footer #timestamp {
@@ -93,10 +118,6 @@ input[type=text] {
 
 input[type=number] {
     width: 40%;
-}
-
-.button-line {
-    margin-bottom: 5px;
 }
 
 

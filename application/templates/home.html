@@ -3,11 +3,12 @@
 {% set title = 'Home' %}
 
 {% block content %}
-    <ul>
-        <li><a href="/menu/">Menu della settimana</a></li>
-        <li><a href="/spesa/">Lista della spesa</a></li>
-        <li><a href="/idee/">Idee</a></li>
-        <li><a href="/scadenze">Scadenze</a></li>
-        <li><a href="/quantita">Quantit&agrave;</a></li>
-    </ul>
+    <menu>
+        <button onclick="location.href='/menu/'">Menu della settimana</button> <br>
+        <button onclick="location.href='/spesa/'">Lista della spesa</button> <br>
+        <button onclick="location.href='/idee/'">Idee</button> <br>
+        <button onclick="location.href='/scadenze'">Scadenze</button> <br>
+        <button onclick="location.href='/quantita'">Quantit&agrave;</button> <br>
+        <button onclick="location.href='/impostazioni'">Impostazioni</button> <br>
+    </menu>
 {% endblock %}
