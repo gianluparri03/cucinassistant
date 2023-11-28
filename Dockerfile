@@ -4,9 +4,11 @@ WORKDIR /cucinassistant
 COPY application/ application/
 
 COPY requirements.txt .
-RUN apk add curl
 RUN pip install -r requirements.txt
 
 COPY run.py .
+RUN mkdir data/
+
 ENV PRODUCTION=true
-CMD gunicorn -w 3 --threads 5 -b :80 application:app
+CMD export SECRET=`python -c 'import uuid; print(uuid.uuid4())'` && \
+    gunicorn -w 3 --threads 5 -b :80 application:app

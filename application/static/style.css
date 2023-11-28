@@ -18,6 +18,10 @@
     font-family: var(--sansserif);
 }
 
+h1 {
+    font-family: var(--cursive);
+}
+
 a, a:visited {
     color: var(--orange);
     text-decoration: underline;
@@ -31,7 +35,6 @@ a:hover {
 textarea {
     resize: none;
 }
-
 
 button {
     margin: 5px 0;

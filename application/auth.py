@@ -8,7 +8,6 @@ from flask import render_template, request, redirect, session
 def login_required(func):
     @wraps(func)
     def inner(*args, **kwargs):
-        # Proceed only if logged in
         if (username := session.get('username')):
             return func(User(username), *args, **kwargs)
         else:
@@ -46,7 +45,6 @@ def login_route(error=''):
 @app.route('/logout/')
 @login_required
 def logout_route(user, error=''):
-    # Logs out
     session.pop('username', None)
     return redirect('/login')
 
@@ -59,7 +57,7 @@ def settings_route(user):
 @login_required
 def delete_account_route(user):
     user.delete()
-    return redirect('/login')
+    return logout_route()
 
 @app.route('/statistiche')
 def stats_route():

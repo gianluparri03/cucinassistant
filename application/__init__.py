@@ -5,11 +5,15 @@ from flask import Flask, render_template, session
 
 # Creates the application
 app = Flask(__name__)
-app.secret_key = str(uuid4())
+app.secret_key = 'cucinassistant' if not environ.get('PRODUCTION') else environ['SECRET']
 
 @app.before_request
 def make_session_permanent():
     session.permanent = True
+
+@app.route('/session')
+def session_route():
+    return app.secret_key
 
 
 from .auth import *
