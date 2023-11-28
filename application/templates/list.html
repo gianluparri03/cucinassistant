@@ -1,54 +1,69 @@
 {% extends "base.html" %}
 
 {% set title = section.title() %}
+{% set is_scadenze = section == 'scadenze' %}
+{% set is_quantita = section == 'quantita' %}
+{% set is_simple = not is_scadenze and not is_quantita %}
 
 {% block imports %}
     <script>
+        let i = 0;
+
         function start_adding() {
-            $('.non-editing, .editing-r').remove();
+            $('.non-editing, .editing-e').remove();
             $('.editing, .editing-a').css('display', 'block');
-            {% if section == 'scadenze' %} add_element(); {% endif %}
+            add_element();
         }
 
-        {% if section == 'scadenze' %}
-            let i = 0;
+        function add_element() {
+            let div = '<div class="new-element">'
+            div += `<input type="text" id="${i}-name" required>`;
 
-            function add_element() {
-                let div = '<div class="new-element">'
-                div += `<input type="text" id="${i}-name" required>`;
+            {% if is_scadenze %}
                 div += `<input type="date" name="${i}-date" required>`;
-                div += '</div>';
+            {% elif is_quantita %}
+                div += `<input type="number" name="${i}-qty" min="0" required>`;
+            {% endif %}
 
-                $('#new-elements').append(div);
-                i++;
+            $('#new-elements').append(div + '</div>');
+            i++;
+        }
+
+        function remove_element() {
+            if (i > 0) {
+                $('#new-elements').find('div:last').remove();
+                i--;
             }
+        }
 
-            function remove_element() {
-                if (i > 0) {
-                    $('#new-elements').find('div:last').remove();
-                    i--;
+        function start_editing() {
+            $('.non-editing, .editing-a').remove();
+            $('.editing, .editing-e').css('display', 'block');
+            {% if not is_quantita %} $('input[type=checkbox]').attr('disabled', false); {% endif %}
+        }
+
+        {% if is_quantita %}
+            function edit(i, sign) {
+                let delta = prompt('Inserisci la quantita da ' + ((sign == '+') ? 'aggiungere' : 'sottrarre'));
+                if (delta) {
+                    $('#edit-id').text(i);
+                    $('#edit-delta').text(sign + delta);
+                    document.forms[0].submit();
                 }
             }
         {% endif %}
 
-        function start_removing() {
-            $('.non-editing, .editing-a').remove();
-            $('.editing, .editing-r').css('display', 'block');
-            $('input[type=checkbox]').attr('disabled', false);
-        }
-
         function submit() {
+            let text = '';
+
             if ($('.editing-a')[0]) {
-                {% if section == 'scadenze' %}
-                    let text = '';
-                    for (div of $('.new-element')) text += '\n' + div.children[0].value + " " + div.children[1].value;
-                    $('textarea').text(text);
-                {% endif %}
+                for (div of $('.new-element')) text += '\n' + div.children[0].value {% if not is_simple %} + " " + div.children[1].value {% endif %};
             } else {
-                let text = '';
-                for (input of $('input')) if (input.checked) text += '\n' + input.name;
-                $('textarea').text(text);
+                {% if not is_quantita %}
+                    for (input of $('input')) if (input.checked) text += '\n' + input.name;
+                {% endif %}
             }
+            $('textarea').text(text);
 
             $('input').remove();
             return true;
@@ -62,16 +77,30 @@
     <h1>{{ section.title() }}</h1>
 
     <form method="POST">
-        <div class="editing-r">
-            <textarea name="remove" hidden></textarea>
+        <div class="editing-e">
+            {% if is_quantita %}
+                <textarea id="edit-id" name="edit-id" hidden></textarea>
+                <textarea id="edit-delta" name="edit-delta" hidden></textarea>
+            {% else %}
+                <textarea name="remove" hidden></textarea>
+            {% endif %}
 
             {% for i, e in list %}
                 <div>
                     <input type="checkbox" id="e{{ i }}" autocomplete="off" name="{{ i }}" disabled>
 
                     <label for="e{{ i }}" name="{{ i }}">
-                        {% if section == 'scadenze' %} {{ e[0] }} [{{ e[1] }}]
-                        {% else %} {{ e }} {% endif %}
+                        {% if is_quantita %}
+                            <span>{{ e[0] }}</span>
+                            <input type="number" value="{{ e[1] }}" disabled>
+                            <button class="editing editing-e" onclick="edit({{ i }}, '-');" type="button">-</button>
+                            <button class="editing editing-e" onclick="edit({{ i }}, '+');" type="button">+</button>
+                        {% elif is_scadenze %}
+                            <span>{{ e[0] }}</span>
+                            <input type="date" value="{{ e[1] }}" disabled>
+                        {% else %}
+                            <span>{{ e }}</span>
+                        {% endif %}
                     </label>
                 </div>
             {% else %}
@@ -80,19 +109,19 @@
         </div>
 
         <div id="new-elements" class="editing editing-a">
-            <textarea name="add" {{ 'hidden' if section == 'scadenze' }}></textarea>
+            <textarea name="add" hidden></textarea>
         </div>
 
         <button class="non-editing" onclick="start_adding()" type="button">Aggiungi</button>
-        {% if list %} <button class="non-editing" onclick="start_removing()" type="button">Rimuovi</button>
-        <button class="non-editing" onclick="window.print()" type="button">Scarica</button> {% endif %}
+        {% if list %}
+            <button class="non-editing" onclick="start_editing()" type="button">{{ 'Modifica' if is_quantita else 'Rimuovi' }}</button>
+            <button class="non-editing" onclick="window.print()" type="button">Scarica</button>
+        {% endif %}
 
         <button class="editing">Salva</button>
         <button class="editing" onclick="location.reload()" type="button">Annulla</button>
 
-        {% if section == 'scadenze' %}
-            <button class="editing editing-a" onclick="add_element()" type="button">Aggiungi elemento</button>
-            <button class="editing editing-a" onclick="remove_element()" type="button">Rimuovi elemento</button>
-        {% endif %}
+        <button class="editing editing-a" onclick="add_element()" type="button">Aggiungi elemento</button>
+        <button class="editing editing-a" onclick="remove_element()" type="button">Rimuovi elemento</button>
     </form>
 {% endblock %}

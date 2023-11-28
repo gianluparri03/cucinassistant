@@ -1,6 +1,8 @@
 # CucinAssistant
 
-Una piattaforma web (multiutente) creata per gestire
+**WIP**
+
+Una piattaforma web (multiutente) creata per gestire:
 
 - Lista della spesa
 - Lista delle idee

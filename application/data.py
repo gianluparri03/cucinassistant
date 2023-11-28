@@ -45,7 +45,7 @@ class User:
 
         # Creates the files
         write_file(USERS_FILE, users)
-        write_file(username, {"menu": [""] * 14, "spesa": [], "idee": [], "scadenze": []})
+        write_file(username, {"menu": [""] * 14, "spesa": [], "idee": [], "scadenze": [], "quantita": []})
 
     @staticmethod # Returns an error
     def check(username, password):

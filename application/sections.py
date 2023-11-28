@@ -14,6 +14,7 @@ def home_route(user):
 @app.route('/spesa/', methods=['GET', 'POST'])
 @app.route('/idee/', methods=['GET', 'POST'])
 @app.route('/scadenze/', methods=['GET', 'POST'])
+@app.route('/quantita/', methods=['GET', 'POST'])
 @login_required
 def list_route(user, error=''):
     section = str(request.url_rule).split('/')[1]
@@ -29,30 +30,33 @@ def list_route(user, error=''):
 
         # Adds the new elements to the old list
         if 'add' in data.keys() and data['add']:
-            if section == 'scadenze':
-                # Ensures the dates are valid and sorted in the 'scadenze' sections
+            filter = {'scadenze': lambda d: datetime.strptime(d, '%Y-%m-%d'), 'quantita': int}
+            if section in filter:
+                # Ensures the items data are valid in 'scadenze' and 'quantita'
                 parsed = []
                 try:
                     for element in parse('add'):
-                        *name, date = element.split(' ')
-                        datetime.strptime(date, '%Y-%m-%d')
-                        parsed.append((' '.join(name), date))
+                        *name, data = element.split(' ')
+                        filter[section](data)
+                        parsed.append((' '.join(name), data))
                 except ValueError:
                     return list_route('Elemento non valido')
 
                 list.extend(parsed)
-                list.sort(key=lambda e: e[1])
+                list.sort(key=lambda e: e[1] if section == 'scadenze' else e[0])
             else:
                 list.extend(parse('add'))
+                if section != 'menu':
+                    list.sort()
 
         # Or remove some items
-        elif 'remove' in data.keys() and data['remove']:
-            # Ensures the indexes are integers
+        elif 'remove' in data.keys() and data['remove'] and section != 'quantita':
+            # Ensures the ids are integers
             elements = parse('remove')
             if not all(e.isnumeric() for e in elements):
                 return list_route('Elemento non valido')
 
-            # Ensures the indexes are valid
+            # Ensures the ids are valid
             elements = sorted(map(int, elements), reverse=True)
             if elements[0] >= len(list):
                 return list_route('Elemento non in lista')
@@ -60,6 +64,27 @@ def list_route(user, error=''):
             # Removes them
             for element in elements:
                 list.pop(element)
+
+        # Or remove some items
+        elif all((k in data.keys() and data[k]) for k in ('edit-id', 'edit-delta')) and section == 'quantita':
+            index = data['edit-id'].strip()
+            delta = data['edit-delta'].strip()
+
+            # Ensures the values are valid
+            if not index.isnumeric():
+                return list_route('Elemento non valido')
+            elif int(index) >= len(list):
+                return list_route('Elemento non in lista')
+            elif not delta[1:].isnumeric() or (delta[0] != '-' and delta[0] != '+'):
+                return list_route('Valore non valido')
+
+            # Updates the item
+            index = int(index)
+            if (new := eval(list[index][1] + delta)) > 0:
+                list[index][1] = str(new)
+            else:
+                list.pop(index)
+
         else:
             return list_route('Richiesta sconosciuta')
 
