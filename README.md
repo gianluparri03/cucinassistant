@@ -8,11 +8,14 @@ Una piattaforma web (multiutente) creata per gestire:
 - Quantità
 - Scadenze
 
+## Utilizzo
+
+Una versione di CucinAssistant è disponibile online su [ca.gianlucaparri.me](https://ca.gianlucaparri.me).
+È disponibile anche un tutorial a [questo link](https://docs.google.com/document/d/1wdu6EWt6kdYuRwVaS9MB8RHxPKAgI4LEX194pqmAUQ4/edit?usp=sharing).
+
 ## Installazione
 
-Una versione di CucinAssistant è disponibile online per il pubblico (controllare su github per il link).
-
-Se si vuole hostare la propria istanza, CucinAssistant può essere eseguito in due modi:
+Se si vuole hostare la propria istanza, CucinAssistant può essere installato in due modi:
 
 1. **Docker**
 
