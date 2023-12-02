@@ -19,7 +19,7 @@ Se si vuole hostare la propria istanza, CucinAssistant può essere installato in
 
 1. **Docker**
 
-Scaricando l'immagine da github con `docker pull ghcr.io/gianluparri03/cucinassistant`.
+Scaricando l'immagine da github con `docker pull git.github.com/gianluparri03/cucinassistant`.
 Il server rimarrà in ascolto sulla porta `80` del container.
 
 
@@ -40,7 +40,8 @@ essere effettuato da un amministratore che ha accesso al server (le password rim
 
 ## Crediti
 
-Questo sito web utilizza [sakura](https://github.com/oxalorg/sakura) come framework css.
+Questo sito web utilizza [sakura](https://github.com/oxalorg/sakura) come framework css e [Inclusive Sans](https://fonts.google.com/specimen/Inclusive+Sans?query=inclusive+sans)
+e [Satisfy](https://fonts.google.com/specimen/Satisfy?query=satisfy) come fonts.
 
 ## Altro
 
