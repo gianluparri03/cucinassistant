@@ -11,10 +11,6 @@ app.secret_key = 'cucinassistant' if not environ.get('PRODUCTION') else environ[
 def make_session_permanent():
     session.permanent = True
 
-@app.route('/session')
-def session_route():
-    return app.secret_key
-
 
 from .auth import *
 from .sections import *
