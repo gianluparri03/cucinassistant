@@ -66,10 +66,13 @@ nav {
     width: 100%;
     padding: 20px 0;
 
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
     text-align: center;
     background-color: var(--red);
-
-    cursor: pointer;
 }
 
 #logo {
@@ -77,6 +80,16 @@ nav {
     color: white;
     font-family: var(--cursive);
     text-shadow: var(--orange) 2px 3px 2px;
+}
+
+nav img {
+    width: 3rem;
+    margin: 0 40px;
+    padding: 0;
+}
+
+nav img:hover {
+    cursor: pointer;
 }
 
 main {

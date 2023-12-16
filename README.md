@@ -42,6 +42,7 @@ essere effettuato da un amministratore che ha accesso al server (le password rim
 
 Questo sito web utilizza [sakura](https://github.com/oxalorg/sakura) come framework css e [Inclusive Sans](https://fonts.google.com/specimen/Inclusive+Sans?query=inclusive+sans)
 e [Satisfy](https://fonts.google.com/specimen/Satisfy?query=satisfy) come fonts.
+Sono utilizzate anche due icone di [FontAwesome](https://fontawesome.com/v5/).
 
 ## Altro
 

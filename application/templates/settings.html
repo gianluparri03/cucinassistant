@@ -3,6 +3,8 @@
 {% set title = 'Impostazioni' %}
 
 {% block imports %}
+    <style> #settings { opacity: 0; } </style>
+
     <script>
         function delete_account() {
             if (prompt("Sei davvero sicuro di voler eliminare l'account? Scrivi 'Si sono sicuro' per confermare.") == "Si sono sicuro") {

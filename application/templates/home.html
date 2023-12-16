@@ -2,6 +2,8 @@
 
 {% set title = 'Home' %}
 
+{% block imports %} <style> #home { opacity: 0; } </style> {% endblock %}
+
 {% block content %}
     <menu>
         <button onclick="location.href='/menu/'">Menu della settimana</button> <br>

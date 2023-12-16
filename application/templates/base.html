@@ -9,7 +9,7 @@
         <meta name="owner" content="Parri Gianluca">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.png') }}">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='logo.png') }}">
         <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
 
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inclusive+Sans&family=Satisfy&display=swap">
@@ -28,6 +28,10 @@
 
                 window.print();
             }
+
+            if (typeof navigator.serviceWorker !== 'undefined') {
+                navigator.serviceWorker.register("{{ url_for('static', filename='sw.js') }}");
+            }
         </script>
         {% block imports %} {% endblock %}
 
@@ -35,8 +39,10 @@
     </head>
 
     <body>
-        <nav onclick="location.href = '/'">
+        <nav>
+            <img id="home" onclick="location.href = '/'" src="{{ url_for('static', filename='icon_home.svg') }}">
             <span id="logo">CucinAssistant</span>
+            <img id="settings" onclick="location.href = '/impostazioni/'" src="{{ url_for('static', filename='icon_settings.svg') }}">
         </nav>
 
         <main>

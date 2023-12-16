@@ -2,6 +2,8 @@
 
 {% set title = 'Login' if login else 'Registrazione' %}
 
+{% block imports %} <style> #home, #settings { opacity: 0; } </style> {% endblock %}
+
 {% block content %}
     <form method="POST">
         <label for="username">Nome utente</label>
