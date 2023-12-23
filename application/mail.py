@@ -37,7 +37,6 @@ class Email:
         if config:
             for recipient in recipients:
                 self.msg['To'] = recipient
-                print(self.msg.as_string())
                 mail.sendmail(config['Address'], recipient, self.msg.as_string())
 
 

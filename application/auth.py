@@ -12,41 +12,59 @@ def login_required(func):
         if (username := session.get('username')):
             return func(User(username), *args, **kwargs)
         else:
-            return redirect('/login')
+            return redirect('/account/login')
     
     return inner
 
 
-@app.route('/login', methods=['GET', 'POST'])
-@app.route('/registrazione', methods=['GET', 'POST'])
-def login_route(error=''):
-    is_login = str(request.url_rule).startswith('/login')
-
+@app.route('/account/login', methods=['GET', 'POST'])
+def signin_route(error=''):
     if request.method == 'GET' or error:
         # Returns the login page if it is a GET request (or a response to a POST)
-        return render_template('login.html', login=is_login, error=error, can_reset=bool(config))
+        return render_template('login.html', error=error, can_reset=bool(config))
     else:
         # Ensures the request is valid
         data = request.form
         if not data.get('username') or not data.get('password') or (not is_login and not data.get('email')):
-            return login_route('Dati mancanti')
+            return signin_route('Dati mancanti')
 
         # Checks for errors
-        if is_login:
-            if (err := User.check(data['username'], data['password'])):
-                return login_route(err)
-        else:
-            if (err := User.create(data['username'], data['email'], data['password'])):
-                return login_route(err)
-
-            # Sends the welcome mail
-            WelcomeEmail(data['username'], '').send(data['email'])
+        if (err := User.check(data['username'], data['password'])):
+            return signin_route(err)
 
         # Saves the session, then returns to the homepage
         session['username'] = data['username']
         return redirect('/')
 
-@app.route('/reset_password', methods=['GET', 'POST'])
+@app.route('/account/registrazione', methods=['GET', 'POST'])
+def signup_route(error=''):
+    if request.method == 'GET' or error:
+        # Returns the registration page if it is a GET request (or a response to a POST)
+        return render_template('registrazione.html', error=error)
+    else:
+        # Ensures the request is valid
+        data = request.form
+        if not data.get('username') or not data.get('password') or (not is_login and not data.get('email')):
+            return signup_route('Dati mancanti')
+
+        # Checks for errors
+        if (err := User.create(data['username'], data['email'], data['password'])):
+            return signup_route(err)
+
+        # Sends the welcome mail
+        WelcomeEmail(data['username'], '').send(data['email'])
+
+        # Saves the session, then returns to the homepage
+        session['username'] = data['username']
+        return redirect('/')
+
+@app.route('/account/logout/')
+@login_required
+def logout_route(user, error=''):
+    session.pop('username', None)
+    return redirect('/account/login')
+
+@app.route('/account/reset_password', methods=['GET', 'POST'])
 def reset_password_route(error=''):
     if request.method == 'GET' or error:
         # Returns the page if it is a GET request
@@ -63,18 +81,12 @@ def reset_password_route(error=''):
 
         return reset_password_route('Email inviata. Controlla la casella di posta.')
 
-@app.route('/logout/')
-@login_required
-def logout_route(user, error=''):
-    session.pop('username', None)
-    return redirect('/login')
-
-@app.route('/impostazioni/')
+@app.route('/account/')
 @login_required
 def settings_route(user):
     return render_template('settings.html')
 
-@app.route('/impostazioni/elimina_account/', methods=['POST'])
+@app.route('/account/elimina/', methods=['POST'])
 @login_required
 def delete_account_route(user):
     user.delete()

@@ -10,8 +10,6 @@ Una piattaforma web (multiutente) creata per gestire:
 
 Una versione di CucinAssistant è disponibile online su [ca.gianlucaparri.me](https://ca.gianlucaparri.me).
 
-![Screenshot](application/static/screenshot_wide.jpg)
-
 ## Installazione
 
 Se si vuole hostare la propria istanza, CucinAssistant può essere installato in due modi:

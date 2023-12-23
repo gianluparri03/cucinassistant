@@ -8,7 +8,7 @@
     <script>
         function delete_account() {
             if (prompt("Sei davvero sicuro di voler eliminare l'account? Scrivi 'Si sono sicuro' per confermare.") == "Si sono sicuro") {
-                document.forms[0].action += 'elimina_account/';
+                document.forms[0].action = '/account/elimina/';
                 document.forms[0].submit();
             }
         }
@@ -19,8 +19,8 @@
     <form method="POST" hidden></form>
 
     <menu>
-        <button onclick="location.href='/logout/'">Logout</button> <br>
+        <button onclick="location.href='/account/logout/'">Logout</button> <br>
         <button onclick="location.href='mailto:gianlucaparri03@gmail.com?subject=[CucinAssistant] Cambio Password';">Cambio password</button> <br>
-        <button onclick="delete_account()">Eliminazione account</button>
+        <button onclick="delete_account()">Elimina account</button>
     </menu>
 {% endblock %}

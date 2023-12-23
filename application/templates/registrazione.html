@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% set title = 'Login' %}
+{% set title = 'Registrazione' %}
 
 {% block imports %} <style> #home, #settings { opacity: 0; } </style> {% endblock %}
 
@@ -9,17 +9,16 @@
         <label for="username">Nome utente</label>
         <input type="text" name="username" required> <br>
 
+        <label for="email">Email</label>
+        <input type="email" name="email" required> <br>
+
         <label for="password">Password</label>
         <input type="password" name="password" required> <br>
 
-        <input type="submit" value="Login">
-
-        {% if can_reset %} 
-            <div><a href="/account/reset_password">Password dimenticata?</a></div>
-        {% endif %}
+        <input type="submit" value="Registrati">
     </form>
 
     <hr>
 
-    <div>Non sei registrato ma vuoi un account? <a href="/account/registrazione">Registrati</a></span>
+    <div>Hai gi&agrave; un account? <a href="/account/login">Login</a></span>
 {% endblock %}
