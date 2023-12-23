@@ -19,8 +19,8 @@
 
         <input type="submit" value="{{ 'Login' if login else 'Registrati' }}">
 
-        {% if login %} 
-            <div><a href="mailto:gianlucaparri03@gmail.com?subject=[CucinAssistant] Reset Password">Password dimenticata?</a></div>
+        {% if login and can_reset %} 
+            <div><a href="/reset_password">Password dimenticata?</a></div>
         {% endif %}
     </form>
 

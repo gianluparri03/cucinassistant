@@ -1,3 +1,4 @@
+from uuid import uuid4
 from hashlib import sha256
 from json import load, dump
 from os import remove as os_remove
@@ -37,6 +38,8 @@ class User:
         # Returns an error if not valid
         if username in users:
             return 'Nome utente non disponibile'
+        elif email in [u[0] for u in users.values()]:
+            return 'Email non disponibile'
         elif not username.isalnum() or not password.isalnum():
             return 'Nome utente e password devono essere alfanumerici'
 
@@ -53,6 +56,28 @@ class User:
         data = read_file(USERS_FILE).get(username)
         if not data or User.hash_password(password) != data[1]:
             return 'Credenziali non valide'
+
+    @staticmethod # Returns the username and the new password, or None
+    def reset_password(email):
+        users = read_file(USERS_FILE)
+        username = ''
+
+        # Looks for the username
+        for u in users:
+            if users[u][0] == email:
+                username = u
+        if not username: return
+
+        # Saves the new password
+        password = str(uuid4()).split('-')[0]
+        users[username][1] = User.hash_password(password)
+        write_file(USERS_FILE, users)
+
+        return username, password
+
+    @staticmethod
+    def get_number():
+        return len(read_file(USERS_FILE))
 
     def delete(self):
         # Deletes the user
@@ -71,6 +96,3 @@ class User:
         # Updates the user's data
         data = self.read_data() | {part_name: part_data}
         write_file(self.username, data)
-
-def get_users_number():
-    return len(read_file(USERS_FILE))

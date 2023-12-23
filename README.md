@@ -8,10 +8,9 @@ Una piattaforma web (multiutente) creata per gestire:
 - Quantità
 - Scadenze
 
-## Utilizzo
-
 Una versione di CucinAssistant è disponibile online su [ca.gianlucaparri.me](https://ca.gianlucaparri.me).
-È disponibile anche un tutorial a [questo link](https://docs.google.com/document/d/1wdu6EWt6kdYuRwVaS9MB8RHxPKAgI4LEX194pqmAUQ4/edit?usp=sharing).
+
+![Screenshot](application/static/screenshot_wide.jpg)
 
 ## Installazione
 
@@ -42,7 +41,7 @@ essere effettuato da un amministratore che ha accesso al server (le password rim
 
 Questo sito web utilizza [sakura](https://github.com/oxalorg/sakura) come framework css e [Inclusive Sans](https://fonts.google.com/specimen/Inclusive+Sans?query=inclusive+sans)
 e [Satisfy](https://fonts.google.com/specimen/Satisfy?query=satisfy) come fonts.
-Sono utilizzate anche due icone di [FontAwesome](https://fontawesome.com/v5/).
+Sono utilizzate anche due icone di [FontAwesome](https://fontawesome.com/).
 
 ## Altro
 

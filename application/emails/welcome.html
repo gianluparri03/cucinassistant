@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Benvenuto su CucinAssistant, {{ username }}!</h2>
+
+    Speriamo che l'applicazione sia di tuo gradimento! <br>
+    Per ogni feedback, problema o domanda, contattaci! <br>
+
+    <i>
+        Se non sei stato tu a registrarti, puoi cancellare
+        l'account <a href="{{ delete_url }}">cliccando qui</a>.
+    </i>
+{% endblock %}
