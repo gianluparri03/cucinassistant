@@ -21,16 +21,15 @@ def write_file(filename, content):
     with open(get_filename(filename), 'w') as f:
         dump(content, f)
 
+def hash_password(password):
+    h = sha256(password.encode('utf-8'))
+    return h.hexdigest()
+
+def get_users_number():
+    return len(read_file(USERS_FILE))
+
 
 class User:
-    def __init__(self, username):
-        self.username = username
-
-    @staticmethod
-    def hash_password(password):
-        h = sha256(password.encode('utf-8'))
-        return h.hexdigest()
-
     @staticmethod # Returns an error
     def create(username, email, password):
         users = read_file(USERS_FILE)
@@ -44,7 +43,7 @@ class User:
             return 'Nome utente e password devono essere alfanumerici'
 
         # Creates the user
-        users[username] = [email, User.hash_password(password)]
+        users[username] = [email, hash_password(password)]
 
         # Creates the files
         write_file(USERS_FILE, users)
@@ -54,7 +53,7 @@ class User:
     def check(username, password):
         # Checks if the credentials are valid
         data = read_file(USERS_FILE).get(username)
-        if not data or User.hash_password(password) != data[1]:
+        if not data or hash_password(password) != data[1]:
             return 'Credenziali non valide'
 
     @staticmethod # Returns the username and the new password, or None
@@ -70,14 +69,22 @@ class User:
 
         # Saves the new password
         password = str(uuid4()).split('-')[0]
-        users[username][1] = User.hash_password(password)
+        users[username][1] = hash_password(password)
         write_file(USERS_FILE, users)
 
         return username, password
 
-    @staticmethod
-    def get_number():
-        return len(read_file(USERS_FILE))
+
+    def __init__(self, username):
+        self.username = username
+
+    def change_password(self, old, new): # Returns the error
+        if (err := User.check(self.username, old)):
+            return 'Password attuale non valida'
+
+        users = read_file(USERS_FILE)
+        users[self.username][1] = hash_password(new)
+        write_file(USERS_FILE, users)
 
     def delete(self):
         # Deletes the user
@@ -86,6 +93,12 @@ class User:
             os_remove(get_filename(self.username))
         except OSError:
             pass
+
+    def get_email(self):
+        return read_file(USERS_FILE)[self.username][0]
+
+    def get_token(self):
+        return read_file(USERS_FILE)[self.username][1]
 
     def read_data(self, part=""):
         # Reads the user's data

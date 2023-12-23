@@ -41,11 +41,12 @@ class Email:
 
 
 class WelcomeEmail(Email):
-    def __init__(self, username, delete_path):
+    def __init__(self, username, token):
         super().__init__()
 
         self.msg['Subject'] = 'Registrazione effettuata'
-        self.parse_template('welcome.html', username=username, delete_url=config['Webserver']+delete_path)
+        delete_url = config['Webserver'] + '/account/elimina/?token=' + token
+        self.parse_template('welcome.html', username=username, delete_url=delete_url)
 
 class ResetPasswordEmail(Email):
     def __init__(self, username, password):
@@ -55,11 +56,12 @@ class ResetPasswordEmail(Email):
         self.parse_template('reset_password.html', username=username, password=password)
 
 class ConfirmDeletionEmail(Email):
-    def __init__(self, username, delete_path):
+    def __init__(self, username, token):
         super().__init__()
 
         self.msg['Subject'] = 'Eliminazione account'
-        self.parse_template('confirm_deletion.html', username=username, delete_url=config['Webserver']+delete_path)
+        delete_url = config['Webserver'] + '/account/elimina/?token=' + token
+        self.parse_template('confirm_deletion.html', username=username, delete_url=delete_url)
 
 class NewVersionEmail(Email):
     def __init__(self, news):

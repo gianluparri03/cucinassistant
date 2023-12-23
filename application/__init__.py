@@ -11,5 +11,5 @@ def make_session_permanent():
     session.permanent = True
 
 from .mail import *
-from .auth import *
+from .account import *
 from .sections import *

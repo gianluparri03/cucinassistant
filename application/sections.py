@@ -1,5 +1,6 @@
 from . import app
-from .auth import login_required
+from .data import get_users_number
+from .account import login_required
 
 from json import load, dump
 from datetime import datetime
@@ -107,3 +108,7 @@ def menu_route(user, error=''):
         else:
             user.update_data('menu', [data[f'e{i}'] for i in range(14)])
             return redirect('.')
+
+@app.route('/statistiche')
+def stats_route():
+    return render_template('stats.html', n_users=get_users_number())

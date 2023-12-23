@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% set title = 'Eliminazione account' %}
+
+{% block content %}
+    <form method="POST">
+        <span>
+            {% if pre %}
+                Sei davvero sicuro di voler eliminare l'account? <br>
+            {% else %}
+                Sei <b>SICURISSIMO</b> di voler eliminare l'account? <br>
+                Tutti i tuoi dati saranno persi per sempre. <br>
+            {% endif %}
+        </span> <br>
+
+        <input type="submit" value="Conferma">
+    </form>
+{% endblock %}

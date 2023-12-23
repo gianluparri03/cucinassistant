@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% set title = 'Registrazione' %}
+
+{% block imports %}
+    <script>
+        function comparePasswords() {
+            if ($("#password1").val() != $("#password2").val()) {
+                alert("Le due password non corrispondono");
+                return false;
+            } else {
+                return true;
+            }
+        }
+    </script>
+
+    <style> #home, #settings { opacity: 0; } </style>
+{% endblock %}
+
+{% block content %}
+    <form method="POST" onsubmit="return comparePasswords();">
+        <label for="username">Nome utente</label>
+        <input type="text" name="username" required> <br>
+
+        <label for="email">Email</label>
+        <input type="email" name="email" required> <br>
+
+        <label for="password1">Password</label>
+        <input type="password" name="password" id="password1" required> <br>
+
+        <label for="password2">Ripeti password</label>
+        <input type="password" name="password" id="password2" required> <br>
+
+        <input type="submit" value="Registrati">
+    </form>
+
+    <hr>
+
+    <div>Hai gi&agrave; un account? <a href="/account/login">Login</a></span>
+{% endblock %}
