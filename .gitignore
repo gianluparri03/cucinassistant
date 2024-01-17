@@ -1,5 +1,4 @@
 env
-.envrc
 .direnv
 
 *__pycache__
@@ -7,5 +6,6 @@ env
 
 data/*
 !data/.keep
+cucinassistant.db
 
 email.cfg

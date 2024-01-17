@@ -21,54 +21,11 @@
     "background_color": "#f9f9f9",
     "theme_color": "#d50000",
 
-    "shortcuts": [
-        {
-            "name": "Menù",
-            "url": "/menu",
-            "description": "Menù della settimana"
-        },
-        {
-            "name": "Spesa",
-            "url": "/spesa",
-            "description": "Lista della spesa"
-        },
-        {
-            "name": "Idee",
-            "url": "/idee",
-            "description": "Lista delle idee"
-        },
-        {
-            "name": "Scadenze",
-            "url": "/scadenze",
-            "description": "Lista delle scadenze"
-        },
-        {
-            "name": "Quantità",
-            "url": "/quantita",
-            "description": "Quantità"
-        }
-    ],
-
     "icons": [
         {
             "src": "/static/logo.png",
             "type": "image/png",
             "sizes": "512x512"
-        }
-    ],
-
-    "screenshots": [
-        {
-            "src": "/static/screenshot_wide.jpg",
-            "type": "image/jpeg",
-            "sizes": "1366x683",
-            "form_factor": "wide"
-        },
-        {
-            "src": "/static/screenshot_narrow.jpg",
-            "type": "image/jpeg",
-            "sizes": "591x1280",
-            "form_factor": "narrow"
         }
     ]
 }

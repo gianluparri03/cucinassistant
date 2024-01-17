@@ -9,9 +9,10 @@ from smtplib import SMTP
 parser = ConfigParser()
 parser.read('email.cfg')
 config = parser['Email'] if 'Email' in parser else {}
+mail_enabled = bool(config)
 
 # If it is, logs in
-if config:
+if mail_enabled:
     mail = SMTP(config['Server'], config['Port'])
     mail.ehlo()
     mail.starttls()
@@ -28,13 +29,13 @@ class Email:
         self.msg['From'] = config['Address']
 
     def parse_template(self, filename, **data):
-        if config:
+        if mail_enabled:
             template = templates.get_template(filename)
             text = template.render(banner=config['Webserver'] + '/static/banner.png', **data)
             self.msg.attach(MIMEText(text, 'html'))
 
     def send(self, *recipients):
-        if config:
+        if mail_enabled:
             for recipient in recipients:
                 self.msg['To'] = recipient
                 mail.sendmail(config['Address'], recipient, self.msg.as_string())

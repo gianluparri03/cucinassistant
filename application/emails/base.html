@@ -1,13 +1,15 @@
 <html>
     <body>
-        <img src="{{ banner }}">
-        <br>
+        <td style="font-size: 1.2em">
+            <img src="{{ banner }}" width="700">
+            <br>
 
-        <main>
-            {% block content %} {% endblock %}
-        </main>
+            <main>
+                {% block content %} {% endblock %}
+            </main>
 
-        <br> <hr>
-        <small>Email generata automaticamente, si prega di non rispondere.</small>
+            <hr width="700">
+            <small>Email generata automaticamente, si prega di non rispondere.</small>
+        </td>
     </body>
 </html>
