@@ -1,15 +1,23 @@
-from . import db
+from . import CAError
 
 from hashlib import sha256
 from functools import wraps
 from secrets import token_hex
-from sqlite3 import IntegrityError
+from sqlite3 import connect, IntegrityError
 
-
-class CAError(Exception): pass
 
 def hash_password(password):
     return sha256(password.encode('utf-8')).hexdigest()
+
+def init_db():
+    global db
+    db = connect('cucinassistant.db', check_same_thread=False, isolation_level=None)
+    db.execute('''CREATE TABLE IF NOT EXISTS users (
+                  username TEXT NOT NULL PRIMARY KEY,
+                  password TEXT NOT NULL,
+                  email TEXT NOT NULL UNIQUE,
+                  token TEXT,
+                  newsletter BOOLEAN DEFAULT TRUE);''')
 
 def use_db(func):
     @wraps(func)

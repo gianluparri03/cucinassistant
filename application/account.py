@@ -1,10 +1,15 @@
-from . import app
-from .mail import *
+from . import app, CAError
 from .database import *
+from .util import *
+from .mail import *
 
 from functools import wraps
-from flask import render_template, request, redirect, session
+from flask import request, redirect, session
 
+
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
 
 def login_required(func):
     @wraps(func)
@@ -18,75 +23,64 @@ def login_required(func):
 
 
 @app.route('/account/')
+@smart_route('account.html')
 @login_required
 def account_route(user):
-    return render_template('account.html')
+    return ''
 
 
-@app.route('/account/login', methods=['GET', 'POST'])
-def signin_route(error=''):
-    if request.method == 'GET' or error:
-        # Returns the login page if it is a GET request (or a response to a POST)
-        return render_template('signin.html', error=error)
-    else:
+@app.route('/account/accedi', methods=['GET', 'POST'])
+@smart_route('signin.html')
+def signin_route():
+    if request.method == 'POST':
         # Ensures the request is valid
         data = request.form
         if not data.get('username') or not data.get('password'):
-            return signin_route('Dati mancanti')
+            raise CAError('Dati mancanti')
 
-        try:
-            # Signs in the user
-            login_user(data['username'], data['password'])
+        # Signs in the user
+        login_user(data['username'], data['password'])
 
-            # Saves the session, then returns to the homepage
-            session['username'] = data['username']
-            return redirect('/')
-
-        # Displays the error if it occurs
-        except CAError as e:
-            return signin_route(e)
+        # Saves the session, then returns to the homepage
+        session['username'] = data['username']
+        return redirect('/')
 
 @app.route('/account/registrazione', methods=['GET', 'POST'])
-def signup_route(error=''):
-    if request.method == 'GET' or error:
-        # Returns the registration page if it is a GET request (or a response to a POST)
-        return render_template('signup.html', error=error)
-    else:
+@smart_route('signup.html')
+def signup_route():
+    if request.method == 'POST':
         # Ensures the request is valid
         data = request.form
         if not data.get('username') or not data.get('password') or not data.get('email'):
-            return signup_route('Dati mancanti')
+            raise CAError('Dati mancanti')
 
-        try:
-            # Signs up the user
-            token = create_user(data['username'], data['email'], data['password'])
+        # Signs up the user
+        token = create_user(data['username'], data['email'], data['password'])
 
-            # Sends the welcome mail
-            WelcomeEmail(data['username'], token).send(data['email'])
+        # Sends the welcome mail
+        WelcomeEmail(data['username'], token).send(data['email'])
 
-            # Saves the session, then returns to the homepage
-            session['username'] = data['username']
-            return redirect('/')
-
-        # Displays the error if it occurs
-        except CAError as e:
-            return signup_route(e)
+        # Saves the session, then returns to the homepage
+        session['username'] = data['username']
+        return redirect('/')
 
 @app.route('/account/logout/')
 @login_required
-def logout_route(username, error=''):
+def logout_route(username):
     session.pop('username', None)
-    return redirect('/account/login')
+    return redirect('/account/accedi')
 
 
 @app.route('/account/elimina/', methods=['GET', 'POST'])
+@smart_route('delete_account.html')
 @login_required
-def delete_account_route(username, error=''):
+def delete_account_route(username):
     token = request.args.get('token')
 
-    if request.method == 'GET' or error:
+    if request.method == 'GET':
         # Renders the page
-        return render_template('delete_account.html', warning=not token, error=error)
+        return {'token': not token}
+
     else:
         if not token:
             # If it's the first confirm button, generates the token, then
@@ -94,48 +88,38 @@ def delete_account_route(username, error=''):
             email = get_user_email(username)
             token = generate_user_token(username)
             ConfirmDeletionEmail(username, token).send(email)
-            return delete_account_route('Ti abbiamo inviato un email. Controlla la casella di posta.')
+            return 'Ti abbiamo inviato un email. Controlla la casella di posta.'
         else:
             # Otherwise deletes the account
-            try:
-                delete_user(username, token)
-                return logout_route()
-            except CAError as err:
-                return delete_account_route(str(err))
+            delete_user(username, token)
+            return logout_route()
 
 
 @app.route('/account/cambio_password/', methods=['GET', 'POST'])
+@smart_route('password_change.html')
 @login_required
-def change_password_route(username, error=''):
-    if request.method == 'GET' or error:
-        # Returns the page if it is a GET request
-        return render_template('password_change.html', error=error)
-    else:
+def change_password_route(username):
+    if request.method == 'POST':
         # Ensures the request is valid
         data = request.form
         if not data.get('old') or not data.get('new'):
-            return reset_password_route('Dati mancanti')
+            raise CAError('Dati mancanti')
         
         # Tries to change the password
-        try:
-            change_user_password(username, data['old'], data['new'])
-            return change_password_route('Password cambiata con successo.')
-        except CAError as err:
-            return change_password_route(str(err))
+        change_user_password(username, data['old'], data['new'])
+        return 'Password cambiata con successo.'
 
 @app.route('/account/reset_password', methods=['GET', 'POST'])
-def reset_password_route(error=''):
-    if request.method == 'GET' or error:
-        # Returns the page if it is a GET request
-        return render_template('password_reset.html', error=error)
-    else:
+@smart_route('password_change.html')
+def reset_password_route():
+    if request.method == 'POST':
         # Ensures the request is valid
         data = request.form
         if not data.get('email'):
-            return reset_password_route('Dati mancanti')
+            raise CAError('Dati mancanti')
         
         # Resets the password, then sends it to the user
         if (cred := reset_user_password(data['email'])):
             ResetPasswordEmail(cred[0], cred[1]).send(data['email'])
 
-        return reset_password_route('Ti abbiamo inviato un email. Controlla la casella di posta.')
+        return 'Ti abbiamo inviato un email. Controlla la casella di posta.'

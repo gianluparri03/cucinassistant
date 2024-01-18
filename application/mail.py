@@ -1,22 +1,17 @@
-from jinja2 import Environment, FileSystemLoader
-from email.mime.multipart import MIMEMultipart
-from configparser import ConfigParser
-from email.mime.text import MIMEText
+from . import config
+
 from smtplib import SMTP
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from jinja2 import Environment, FileSystemLoader
 
 
-# Checks whether the mail is enabled
-parser = ConfigParser()
-parser.read('email.cfg')
-config = parser['Email'] if 'Email' in parser else {}
-mail_enabled = bool(config)
-
-# If it is, logs in
-if mail_enabled:
-    mail = SMTP(config['Server'], config['Port'])
+# If it is enabled, logs in
+if config['Email']['Enabled']:
+    mail = SMTP(config['Email']['Server'], config['Email']['Port'])
     mail.ehlo()
     mail.starttls()
-    mail.login(config['Login'], config['Password'])
+    mail.login(config['Email']['Login'], config['Email']['Password'])
 
 
 # Initializes the template loader
@@ -26,19 +21,19 @@ templates = Environment(loader=FileSystemLoader("application/emails/"))
 class Email:
     def __init__(self):
         self.msg = MIMEMultipart('alternative')
-        self.msg['From'] = config['Address']
+        self.msg['From'] = config['Email']['Address']
 
     def parse_template(self, filename, **data):
-        if mail_enabled:
+        if config['Email']['Enabled']:
             template = templates.get_template(filename)
-            text = template.render(banner=config['Webserver'] + '/static/banner.png', **data)
+            text = template.render(banner=config['Environment']['Webserver'] + '/static/banner.png', **data)
             self.msg.attach(MIMEText(text, 'html'))
 
     def send(self, *recipients):
-        if mail_enabled:
+        if config['Email']['Enabled']:
             for recipient in recipients:
                 self.msg['To'] = recipient
-                mail.sendmail(config['Address'], recipient, self.msg.as_string())
+                mail.sendmail(config['Email']['Address'], recipient, self.msg.as_string())
 
 
 class WelcomeEmail(Email):
@@ -46,7 +41,7 @@ class WelcomeEmail(Email):
         super().__init__()
 
         self.msg['Subject'] = 'Registrazione effettuata'
-        delete_url = config['Webserver'] + '/account/elimina/?token=' + token
+        delete_url = config['Environment']['Webserver'] + '/account/elimina/?token=' + token
         self.parse_template('welcome.html', username=username, delete_url=delete_url)
 
 class ResetPasswordEmail(Email):
@@ -61,7 +56,7 @@ class ConfirmDeletionEmail(Email):
         super().__init__()
 
         self.msg['Subject'] = 'Eliminazione account'
-        delete_url = config['Webserver'] + '/account/elimina/?token=' + token
+        delete_url = config['Environment']['Webserver'] + '/account/elimina/?token=' + token
         self.parse_template('confirm_deletion.html', username=username, delete_url=delete_url)
 
 class NewVersionEmail(Email):

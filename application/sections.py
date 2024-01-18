@@ -1,4 +1,4 @@
-from . import app
+from . import app, config
 from .account import login_required
 
 from json import load, dump
@@ -9,7 +9,7 @@ from flask import render_template, request, redirect
 @app.route('/')
 @login_required
 def home_route(user):
-    return render_template('home.html')
+    return render_template('home.html', config=config)
 
 # @app.route('/spesa/', methods=['GET', 'POST'])
 # @app.route('/idee/', methods=['GET', 'POST'])

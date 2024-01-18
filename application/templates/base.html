@@ -18,7 +18,7 @@
                 "@type" : "WebSite",
                 "name" : "CucinAssistant",
                 "alternateName" : "cucinassistant",
-                "url" : "https://ca.gianlucaparri.me/"
+                "url" : "{{ config['Environment']['Address'] }}"
             }
         </script>
 
@@ -48,7 +48,7 @@
         </script>
         {% block imports %} {% endblock %}
 
-        {% if error %} <script> alert('{{ error }}'); </script> {% endif %}
+        {% if show %} <script> alert('{{ show }}'); </script> {% endif %}
     </head>
 
     <body>
@@ -69,7 +69,7 @@
             <div id="timestamp"></div>
 
             <div id="links">
-                <a href="mailto:cucinassistant@gmail.com">Contatti</a>
+                <a href="mailto:{{ config['Email']['Address'] }}">Contatti</a>
                 <a href="https://git.gianlucaparri.me/gianluparri03/cucinassistant">Sorgente</a>
                 <a href="/statistiche">Statistiche</a>
             </div>

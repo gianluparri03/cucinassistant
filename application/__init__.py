@@ -1,34 +1,28 @@
-from os import environ
-from uuid import uuid4
-from sqlite3 import connect
+from configparser import ConfigParser
 from datetime import timedelta
-from flask import Flask, session
+from flask import Flask
 
+
+class CAError(Exception): pass
+
+
+# Reads the config file
+config = ConfigParser()
+config.read('config.cfg')
+if not 'Environment' in config:
+    raise exit('Config file not found')
 
 # Creates the application
 app = Flask(__name__)
-app.secret_key = 'cucinassistant' if not environ.get('PRODUCTION') else environ['SECRET']
+app.config['SECRET_KEY'] = config['Environment']['Secret']
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=90)
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['SESSION_COOKIE_SECURE'] = True
 
-# Connects to the database
-db = connect('cucinassistant.db', check_same_thread=False, isolation_level=None)
+# Initializes the db
+from .database import init_db
+init_db()
 
-@app.before_request
-def make_session_permanent():
-    session.permanent = True
-
-    # Creates the users table
-    cursor = db.cursor()
-    cursor.execute('''CREATE TABLE IF NOT EXISTS users (
-                    username TEXT NOT NULL PRIMARY KEY,
-                    password TEXT NOT NULL,
-                    email TEXT NOT NULL UNIQUE,
-                    token TEXT,
-                    newsletter BOOLEAN DEFAULT TRUE);''')
-
-
-from .mail import *
+# Registers the routes
 from .account import *
 from .sections import *

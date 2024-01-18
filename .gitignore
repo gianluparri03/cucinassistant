@@ -1,11 +1,8 @@
+config.cfg
+
 env
 .direnv
 
-*__pycache__
-*.swp
-
-data/*
-!data/.keep
 cucinassistant.db
 
-email.cfg
+*__pycache__
