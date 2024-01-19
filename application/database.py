@@ -108,3 +108,10 @@ def reset_user_password(cursor, email):
     cursor.execute('UPDATE users SET password=? WHERE username=?;', (hashed, data[0]))
 
     return data[0], unhashed
+
+
+@use_db
+def get_users_number(cursor):
+    # Counts the users
+    cursor.execute('SELECT COUNT(*) FROM users;')
+    return cursor.fetchone()[0]

@@ -1,15 +1,21 @@
-from . import app, config
+from . import app
+from .database import *
+from .util import smart_route
 from .account import login_required
 
-from json import load, dump
-from datetime import datetime
-from flask import render_template, request, redirect
+# from . import app, config
+# from .account import login_required
+
+# from json import load, dump
+# from datetime import datetime
+# from flask import render_template, request, redirect
 
 
 @app.route('/')
+@smart_route('home.html')
 @login_required
 def home_route(user):
-    return render_template('home.html', config=config)
+    pass
 
 # @app.route('/spesa/', methods=['GET', 'POST'])
 # @app.route('/idee/', methods=['GET', 'POST'])
@@ -108,6 +114,7 @@ def home_route(user):
 #             user.update_data('menu', [data[f'e{i}'] for i in range(14)])
 #             return redirect('.')
 
-# @app.route('/statistiche')
-# def stats_route():
-#     return render_template('stats.html', n_users=get_users_number())
+@app.route('/info')
+@smart_route('info.html')
+def info_route():
+    return {'users': get_users_number()}

@@ -30,22 +30,7 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='sakura.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-        <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"></script>
-        <script>
-            function download() {
-                let now = new Date();
-                let pad = (num) => ((num < 10) ? '0' : '') + num;
-                let timestamp = pad(now.getDate()) + '/' + pad(now.getMonth()+1) + '/' + now.getFullYear();
-                timestamp += ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
-                $('#timestamp').text(timestamp);
-
-                window.print();
-            }
-
-            if (typeof navigator.serviceWorker !== 'undefined') {
-                navigator.serviceWorker.register("{{ url_for('static', filename='sw.js') }}");
-            }
-        </script>
+        <script src="{{ url_for('static', filename='cookie_banner.js') }}"></script>
         {% block imports %} {% endblock %}
 
         {% if show %} <script> alert('{{ show }}'); </script> {% endif %}
@@ -64,15 +49,20 @@
             {% block content %} {% endblock %}
         </main>
 
+        <div id="obfuscator">
+            <div id="cookie-banner">
+                <span>
+                    Questo sito utilizza i cookies per funzionare. Proseguendo con
+                    la navigazione, si presta il consenso all'utilizzo.
+                </span>
+
+                <button onclick="toggleCookieBanner();">Continua</button>
+            </div>
+        </div>
+
         <footer>
             <div>CucinAssistant &copy; 2023, Gianluca Parri</div>
-            <div id="timestamp"></div>
-
-            <div id="links">
-                <a href="mailto:{{ config['Email']['Address'] }}">Contatti</a>
-                <a href="https://git.gianlucaparri.me/gianluparri03/cucinassistant">Sorgente</a>
-                <a href="/statistiche">Statistiche</a>
-            </div>
+            <div><a href="/info">Ulteriori Informazioni</a></div>
         </footer>
     </body>
 </html>

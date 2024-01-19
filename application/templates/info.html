@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% set title = 'Informazioni' %}
+
+{% block content %}
+    <p>
+        <b>CucinAssistant</b> pu&ograve; essere installato su dispositivi Android dal <a href="#" target="_blank">Play Store</a>,
+        oppure su altri dispositivi seguendo <a href="https://www.cdc.gov/niosh/mining/content/hearingloss/installPWA.html" target="_blank">questa guida</a>.
+        <br> <br>
+
+        Il progetto &egrave; stato sviluppato da <a href="https://gianlucaparri.me" target="_blank">Gianluca Parri</a>;
+        il codice sorgente &egrave; disponibile <a href="https://git.gianlucaparri.me/gianluparri03/cucinassistant" target="_blank">qui</a>.
+        Vengono utilizzati <a href="https://github.com/oxalorg/sakura" target="_blank">sakura</a> come framework css,
+        <a href="https://fonts.google.com/specimen/Inclusive+Sans" target="_blank">Inclusive Sans</a> e
+        <a href="https://fonts.google.com/specimen/Satisfy" target="_blank">Satisfy</a> come font e due icone prese da
+        <a href="https://fontawesome.com/" target="_blank">FontAwesome</a>.
+        <br> <br>
+
+        Per ulteriori informazioni, potete scrivere una mail a
+        <a href="mailto:{{ config['Email']['Address'] }}" target="_blank">{{ config['Email']['Address'] }}</a>.
+        <br> <br>
+
+        Attualmente, <b>CucinAssistant</b> ha {{ users }} utenti attivi.
+    </p>
+{% endblock %}

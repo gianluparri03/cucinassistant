@@ -137,27 +137,32 @@ input[type=number] {
 }
 
 
-/* --- PRINT ------------------------- */
-@media print {
-    @page {
-        margin: 0;
-    }
+/* --- COOKIE BANNER ----------------- */
+#obfuscator {
+    width: 100%;
+    height: 100%;
 
-    * {
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
+    display: none;
 
-    footer {
-        position: sticky;
-        width: 100%;
-    }
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
 
-    .button-line, footer #links {
-        display: none;
-    }
+    background-color: rgba(0, 0, 0, .6);
+    overflow: hidden;
+}
 
-    footer #timestamp {
-        display: block;
-    }
+#cookie-banner {
+    width: 80%;
+
+    position: absolute;
+    top: 10%;
+    left: 10%;
+
+    background-color: var(--orange);
+    border-radius: 30px;
+
+    padding: 50px 30px;
+    box-sizing: border-box;
 }

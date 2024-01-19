@@ -1,6 +1,6 @@
 from . import app, CAError
+from .util import smart_route
 from .database import *
-from .util import *
 from .mail import *
 
 from functools import wraps
@@ -26,7 +26,7 @@ def login_required(func):
 @smart_route('account.html')
 @login_required
 def account_route(user):
-    return ''
+    pass
 
 
 @app.route('/account/accedi', methods=['GET', 'POST'])
