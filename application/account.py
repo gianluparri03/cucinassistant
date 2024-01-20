@@ -14,10 +14,10 @@ def make_session_permanent():
 def login_required(func):
     @wraps(func)
     def inner(*args, **kwargs):
-        if (username := session.get('username')):
-            return func(username, *args, **kwargs)
+        if (uid := session.get('user')):
+            return func(uid, *args, **kwargs)
         else:
-            return redirect('/account/login')
+            return redirect('/account/accedi')
     
     return inner
 
@@ -25,7 +25,7 @@ def login_required(func):
 @app.route('/account/')
 @smart_route('account.html')
 @login_required
-def account_route(user):
+def account_route(uid):
     pass
 
 
@@ -39,10 +39,10 @@ def signin_route():
             raise CAError('Dati mancanti')
 
         # Signs in the user
-        login_user(data['username'], data['password'])
+        uid = login_user(data['username'], data['password'])
 
         # Saves the session, then returns to the homepage
-        session['username'] = data['username']
+        session['user'] = uid
         return redirect('/')
 
 @app.route('/account/registrazione', methods=['GET', 'POST'])
@@ -55,26 +55,26 @@ def signup_route():
             raise CAError('Dati mancanti')
 
         # Signs up the user
-        token = create_user(data['username'], data['email'], data['password'])
+        uid = create_user(data['username'], data['email'], data['password'])
 
         # Sends the welcome mail
-        WelcomeEmail(data['username'], token).send(data['email'])
+        WelcomeEmail(data['username']).send(data['email'])
 
         # Saves the session, then returns to the homepage
-        session['username'] = data['username']
+        session['user'] = uid
         return redirect('/')
 
 @app.route('/account/logout/')
 @login_required
-def logout_route(username):
-    session.pop('username', None)
+def logout_route(uid):
+    session.pop('user', None)
     return redirect('/account/accedi')
 
 
 @app.route('/account/elimina/', methods=['GET', 'POST'])
 @smart_route('delete_account.html')
 @login_required
-def delete_account_route(username):
+def delete_account_route(uid):
     token = request.args.get('token')
 
     if request.method == 'GET':
@@ -85,20 +85,21 @@ def delete_account_route(username):
         if not token:
             # If it's the first confirm button, generates the token, then
             # sends the email
-            email = get_user_email(username)
-            token = generate_user_token(username)
+            email = get_user_email(uid)
+            username = get_user_username(uid)
+            token = generate_user_token(uid)
             ConfirmDeletionEmail(username, token).send(email)
             return 'Ti abbiamo inviato un email. Controlla la casella di posta.'
         else:
             # Otherwise deletes the account
-            delete_user(username, token)
+            delete_user(uid, token)
             return logout_route()
 
 
 @app.route('/account/cambio_password/', methods=['GET', 'POST'])
 @smart_route('password_change.html')
 @login_required
-def change_password_route(username):
+def change_password_route(uid):
     if request.method == 'POST':
         # Ensures the request is valid
         data = request.form
@@ -106,7 +107,7 @@ def change_password_route(username):
             raise CAError('Dati mancanti')
         
         # Tries to change the password
-        change_user_password(username, data['old'], data['new'])
+        change_user_password(uid, data['old'], data['new'])
         return 'Password cambiata con successo.'
 
 @app.route('/account/reset_password', methods=['GET', 'POST'])

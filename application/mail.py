@@ -26,7 +26,7 @@ class Email:
     def parse_template(self, filename, **data):
         if config['Email']['Enabled']:
             template = templates.get_template(filename)
-            text = template.render(banner=config['Environment']['Webserver'] + '/static/banner.png', **data)
+            text = template.render(banner=config['Environment']['Address'] + '/static/banner.png', **data)
             self.msg.attach(MIMEText(text, 'html'))
 
     def send(self, *recipients):
@@ -37,12 +37,11 @@ class Email:
 
 
 class WelcomeEmail(Email):
-    def __init__(self, username, token):
+    def __init__(self, username):
         super().__init__()
 
         self.msg['Subject'] = 'Registrazione effettuata'
-        delete_url = config['Environment']['Webserver'] + '/account/elimina/?token=' + token
-        self.parse_template('welcome.html', username=username, delete_url=delete_url)
+        self.parse_template('welcome.html', username=username)
 
 class ResetPasswordEmail(Email):
     def __init__(self, username, password):
@@ -56,7 +55,7 @@ class ConfirmDeletionEmail(Email):
         super().__init__()
 
         self.msg['Subject'] = 'Eliminazione account'
-        delete_url = config['Environment']['Webserver'] + '/account/elimina/?token=' + token
+        delete_url = config['Environment']['Address'] + '/account/elimina/?token=' + token
         self.parse_template('confirm_deletion.html', username=username, delete_url=delete_url)
 
 class NewVersionEmail(Email):

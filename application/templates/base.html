@@ -30,10 +30,29 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='sakura.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-        <script src="{{ url_for('static', filename='cookie_banner.js') }}"></script>
+        <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"></script>
         {% block imports %} {% endblock %}
 
-        {% if show %} <script> alert('{{ show }}'); </script> {% endif %}
+        <script>
+            $(window).on('load', function () {
+                if (!localStorage.getItem('cookies-accepted')) {
+                    $('#obfuscator').css('display', 'block');
+                } else {
+                    $('#obfuscator').remove();
+                }
+            });
+
+            function toggleCookieBanner() {
+                localStorage.setItem('cookies-accepted', true);
+                $('#obfuscator').remove();
+            }
+
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register("{{ url_for('static', filename='serviceworker.js') }}");
+            }
+
+            {% if show %} alert(' {{ show }}'); {% endif %}
+        </script>
     </head>
 
     <body>

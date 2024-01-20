@@ -4,5 +4,7 @@ run:
 build:
 	docker build -t cucinassistant .
 
-test-build:
+test:
+	make build
 	docker run --rm -p 8080:80 -v ./config.cfg:/cucinassistant/config.cfg cucinassistant
+	docker rmi cucinassistant
