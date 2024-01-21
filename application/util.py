@@ -10,31 +10,28 @@ from functools import wraps
 # will be sent to the client; if it's a string, that message will be shown;
 # if it's a dict, it will be used in the template, and finally, if it's a
 # NoneType, the template will be rendered on its own.
-def smart_route(template):
+def smart_route(template, **data):
     def inner(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
             try:
-                data = func(*args, **kwargs)
-                match type(data).__name__:
+                res = func(*args, **kwargs)
+                match type(res).__name__:
                     case 'Response':
-                        return data
+                        return res
 
                     case 'dict':
                         show = ''
+                        data.update(res)
 
                     case 'str':
-                        show = data
-                        data = {}
+                        show = res
 
                     case 'NoneType':
                         show = ''
-                        data = {}
             except CAError as err:
                 show = str(err)
-                data = {}
 
             return render_template(template, **data, show=show, config=config)
-
         return wrapper
     return inner

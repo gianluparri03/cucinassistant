@@ -65,7 +65,8 @@
         <div>
             <button class="non-editing" onclick="edit()" type="button">Modifica</button>
 
-            <button class="editing" onclick="location.reload()" type="button">Annulla</button>
+            <button class="editing" onclick="if (confirm('Sei sicuro di voler annullare le modifiche?')) location.reload();" type="button">Annulla</button>
+            <button class="editing" onclick="if (confirm('Sei sicuro di voler cancellare tutto?')) $('textarea').val('');" type="button">Svuota tutto</button>
             <button class="editing">Salva</button>
         </div>
     </form>

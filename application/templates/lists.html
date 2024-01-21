@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block imports %}
+    <script>
+        let i = 0;
+
+        function start_adding() {
+            $('.non-editing, .editing-e').remove();
+            $('.editing, .editing-a').css('display', 'inline-block');
+            add_element();
+        }
+
+        function add_element() {
+            let div = `<div class="new-element">` +
+                          `<input type="text" required>` +
+                      `</div>`;
+            $('#new-elements').append(div);
+            i++;
+        }
+
+        function remove_element() {
+            if (i > 1) {
+                $('#new-elements').find('div:last').remove();
+                i--;
+            }
+        }
+
+        function start_editing() {
+            $('.non-editing, .editing-a').remove();
+            $('.editing, .editing-e').css('display', 'inline-block');
+            $('input[type=checkbox]').attr('disabled', false);
+        }
+
+        function submit() {
+            let text = '';
+
+            if ($('.editing-a')[0]) {
+                for (div of $('.new-element')) text += '\n' + div.children[0].value;
+            } else {
+                for (input of $('input')) if (input.checked) text += '\n' + input.id;
+            }
+            $('textarea').text(text);
+
+            $('input').remove();
+            return true;
+        }
+
+        window.onload = function() { document.forms[0].onsubmit = submit; }
+    </script>
+{% endblock %}
+
+{% block content %}
+    <form method="POST">
+        <div class="editing-e">
+            <textarea name="remove" hidden></textarea>
+
+            {% if list %}
+                {% for id, name in list.items() %}
+                    <div>
+                        <input type="checkbox" id="{{ id }}" autocomplete="off" disabled>
+                        <label for="{{ id }}"><span>{{ name }}</span></label>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <i>La lista &egrave; vuota.</i>
+            {% endif %}
+        </div>
+
+        <div id="new-elements" class="editing editing-a">
+            <textarea name="add" hidden></textarea>
+        </div>
+
+        <div>
+            <button class="non-editing" onclick="start_adding()" type="button">Aggiungi</button>
+            {% if list %}
+                <button class="non-editing" onclick="start_editing()" type="button">Rimuovi</button>
+            {% endif %}
+
+            <button class="editing">Salva</button>
+            <button class="editing" onclick="if (confirm('Sei sicuro di voler annullare le modifiche?')) location.reload();" type="button">Annulla</button>
+        </div>
+
+        <div>
+            <button class="editing editing-a" onclick="add_element()" type="button">Aggiungi elemento</button>
+            <button class="editing editing-a" onclick="remove_element()" type="button">Rimuovi elemento</button>
+        </div>
+    </form>
+{% endblock %}
