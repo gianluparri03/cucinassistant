@@ -1,4 +1,4 @@
-from . import app
+from . import app, Version
 from .database import *
 from .util import smart_route
 from .account import login_required
@@ -56,4 +56,4 @@ def ideas_route(uid):
 @app.route('/info')
 @smart_route('info.html')
 def info_route():
-    return {'users': get_users_number()}
+    return {'users': get_users_number(), 'version': Version}

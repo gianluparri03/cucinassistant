@@ -9,7 +9,13 @@
             </main>
 
             <hr width="700">
-            <small>Email generata automaticamente, si prega di non rispondere.</small>
+            <small>
+                Email generata automaticamente, si prega di non rispondere.
+
+                {% if unsubscribe_url %}
+                    Per cancellarsi dalla newsletter, <a href="{{ unsubscribe_url }}">clicca qui</a>
+                {% endif%}
+            </small>
         </td>
     </body>
 </html>

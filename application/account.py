@@ -124,3 +124,19 @@ def reset_password_route():
             ResetPasswordEmail(cred[0], cred[1]).send(data['email'])
 
         return 'Ti abbiamo inviato un email. Controlla la casella di posta.'
+
+
+@app.route('/account/disabilita_newsletter')
+@app.route('/account/riabilita_newsletter')
+@smart_route('home.html')
+@login_required
+def toggle_newsletter_route(uid):
+    # Toggles the user's newsletter
+    if 'disabilita' in request.base_url:
+        disable_newsletter(uid)
+    elif 'riabilita' in request.base_url:
+        enable_newsletter(uid)
+    else:
+        return 'Richiesta sconosciuta'
+
+    return 'Fatto'

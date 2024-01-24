@@ -1,4 +1,5 @@
 from . import config
+from .database import get_newsletter_emails
 
 from smtplib import SMTP
 from email.mime.text import MIMEText
@@ -58,9 +59,15 @@ class ConfirmDeletionEmail(Email):
         delete_url = config['Environment']['Address'] + '/account/elimina/?token=' + token
         self.parse_template('confirm_deletion.html', username=username, delete_url=delete_url)
 
-class NewVersionEmail(Email):
-    def __init__(self, news):
+class BroadcastEmail(Email):
+    def __init__(self, subject, content):
         super().__init__()
 
-        self.msg['Subject'] = 'Novit&agrave; della nuova versione'
-        self.parse_template('new_version.html', news=news)
+        self.msg['Subject'] = subject
+        unsubscribe_url = config['Environment']['Address'] + '/account/disabilita_newsletter'
+        self.parse_template('base.html', content=content, unsubscribe_url=unsubscribe_url)
+
+    def send_all(self):
+        addresses = get_newsletter_emails()
+        self.send(*addresses)
+        return len(addresses)

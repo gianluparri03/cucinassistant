@@ -185,3 +185,19 @@ def get_users_number(cursor):
     # Counts the users
     cursor.execute('SELECT COUNT(*) FROM users;')
     return cursor.fetchone()[0]
+
+@use_db
+def get_newsletter_emails(cursor):
+    # Returns the emails of the users that receives the newsletter
+    cursor.execute('SELECT email FROM users WHERE newsletter;')
+    return [c[0] for c in cursor.fetchall() if c]
+
+@use_db
+def disable_newsletter(cursor, uid):
+    # Disables the user's newsletter
+    cursor.execute('UPDATE users SET newsletter=0 WHERE uid=?;', [uid])
+
+@use_db
+def enable_newsletter(cursor, uid):
+    # Enables the user's newsletter
+    cursor.execute('UPDATE users SET newsletter=1 WHERE uid=?;', [uid])
