@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% set title = 'Dispensa' %}
+
+{% block imports %}
+    <script>
+        function search() {
+            let query = prompt('Parola chiave');
+            if (query) {
+                window.find(query, 0, 0, 0, 0, 1);
+            }
+        }
+
+
+        {% if add %}
+            let i = 0;
+
+            function add_element() {
+                let div = `<div class="new-element">` +
+                            `<input type="text" placeholder="Nome" required>` +
+                            `<input type="number" placeholder="Quantit&agrave;">` +
+                            `<input type="date" placeholder="Scadenza">` +
+                        `</div>`;
+
+                $('#new-elements').append(div);
+                i++;
+            }
+
+            function remove_element() {
+                if (i > 1) {
+                    $('#new-elements').find('div:last').remove();
+                    i--;
+                }
+            }
+
+            window.onload = function() {
+                add_element();
+
+                document.forms[0].onsubmit = function() {
+                    let text = '';
+                    for (div of $('.new-element')) {
+                        if (text) text += '\n';
+                        text += div.children[0].value + ';';
+                        if (div.children[1].value) text += div.children[1].value;
+                        text += ';';
+                        if (div.children[2].value) text += div.children[2].value;
+                    }
+
+                    $('textarea').text(text);
+                    $('input').remove();
+                    return true;
+                };
+            };
+        {% elif edit %}
+            function editItem(item, sign) {
+                let delta = prompt('Inserisci la quantita da ' + ((sign == '+') ? 'aggiungere' : 'sottrarre'));
+                if (delta) {
+                    $('textarea').text(item + ';' + sign + delta);
+                    document.forms[0].submit();
+                }
+            }
+        {% elif del %}
+            window.onload = function() {
+                document.forms[0].onsubmit = function() {
+                    let text = '';
+                    for (input of $('input')) if (input.checked) text += '\n' + input.id;
+                    $('textarea').text(text);
+                    $('input').remove();
+                    return true;
+                };
+            };
+        {% endif %}
+    </script>
+{% endblock %}
+
+{% block content %}
+    {% set storage = get_storage() %}
+
+    <form method="POST">
+        {% if not add %}
+            <div>
+                {% if storage %}
+                    <div>
+                        <button id="search-button" onclick="search()" type="button">Cerca</button>
+                    </div>
+                {% else %}
+                    <i>La lista &egrave; vuota.</i>
+                {% endif %}
+
+                {% for item in storage %}
+                    <div>
+                        <input type="checkbox" id="{{ item[0] }}" autocomplete="off" {{ 'disabled' if not del }}>
+
+                        <label for="item-{{ item[0] }}">
+                            <span>{{ item[1] }}</span>
+                            <input type="number" value="{{ item[2] }}" {{ 'disabled' if not edit }}>
+                            {% if edit %}
+                                <button onclick="editItem({{ item[0] }}, '-');" type="button">-</button>
+                                <button onclick="editItem({{ item[0] }}, '+');" type="button">+</button>
+                            {% endif %}
+                            <input type="date" value="{{ item[3] }}" disabled>
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if add %}
+            <div id="new-elements">
+                <textarea name="add" hidden></textarea>
+            </div>
+        {% elif edit %}
+            <textarea name="edit" hidden></textarea>
+        {% elif del %}
+            <textarea name="remove" hidden></textarea>
+        {% endif %}
+
+        <div>
+            {% if add %}
+                <button>Conferma</button>
+                <button onclick="add_element()" type="button">+</button>
+                <button onclick="remove_element()" type="button">-</button>
+                <button onclick="if (confirm('Sei sicuro di voler annullare le modifiche?')) location.href = '.';" type="button">Annulla</button>
+            {% elif edit %}
+                <button onclick="location.href = '.';" type="button">Fine</button>
+            {% elif del %}
+                <button>Conferma</button>
+                <button onclick="if (confirm('Sei sicuro di voler annullare le modifiche?')) location.href = '.';" type="button">Annulla</button>
+            {% else %}
+                <button onclick="location.href='?aggiungi';" type="button">Aggiungi articoli</button>
+                {% if storage %}
+                    <button onclick="location.href='?modifica';" type="button">Modifica quantit&agrave;</button>
+                    <button onclick="location.href='?rimuovi';" type="button">Rimuovi articoli</button>
+                {% endif %}
+            {% endif %}
+        </div>
+    </form>
+{% endblock %}

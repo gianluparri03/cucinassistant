@@ -3,57 +3,80 @@ from .database import *
 from .util import smart_route
 from .account import login_required
 
-from flask import request
+from flask import request, redirect
 
 
 @app.route('/')
 @smart_route('home.html')
 @login_required
-def home_route(user):
+def home_route(uid):
     pass
 
 
 @app.route('/menu/', methods=['GET', 'POST'])
-@smart_route('menu.html')
+@smart_route('menu.html', get_menu=login_required(get_user_menu))
 @login_required
 def menu_route(uid):
-    # Saves the updated menu
     if request.method == 'POST':
         update_user_menu(uid, list(request.form.values()))
+        return redirect('.')
 
-    # Displays the menu
-    return {'menu': get_user_menu(uid)}
+    return {'edit': 'modifica' in request.args}
+
+@app.route('/dispensa/', methods=['GET', 'POST'])
+@smart_route('storage.html', get_storage=login_required(get_user_storage))
+@login_required
+def storage_route(uid):
+    if request.method == 'POST':
+        if 'add' in request.form:
+            add_user_storage(uid, map(lambda s: s.split(';') + ['', ''], request.form['add'].split('\r\n')))
+        elif 'edit' in request.form:
+            data = request.form['edit'].split(';') + ['+0']
+            edit_user_storage(uid, data[0], data[1])
+            return redirect('?modifica')
+        elif 'remove' in request.form:
+            remove_user_storage(uid, request.form['remove'].split('\r\n'))
+        elif request.form:
+            raise CAError('Richiesta sconosciuta')
+
+        return redirect('.')
+
+    return {'add': 'aggiungi' in request.args, 'edit': 'modifica' in request.args, 'del': 'rimuovi' in request.args}
 
 @app.route('/spesa/', methods=['GET', 'POST'])
-@smart_route('lists.html', title='Lista della spesa')
+@smart_route('lists.html', title='Lista della spesa', get_list=lambda: login_required(get_user_lists)('shopping'))
 @login_required
 def shopping_route(uid):
     if request.method == 'POST':
         if 'add' in request.form:
-            add_user_lists('shopping', uid, request.form['add'].split('\r\n'))
+            add_user_lists(uid, 'shopping', request.form['add'].split('\r\n'))
         elif 'remove' in request.form:
-            remove_user_lists('shopping', uid, request.form['remove'].split('\r\n'))
-        else:
+            remove_user_lists(uid, 'shopping', request.form['remove'].split('\r\n'))
+        elif request.form:
             raise CAError('Richiesta sconosciuta')
 
-    return {'list': get_user_lists('shopping', uid)}
+        return redirect('.')
+
+    return {'add': 'aggiungi' in request.args, 'del': 'rimuovi' in request.args}
 
 @app.route('/idee/', methods=['GET', 'POST'])
-@smart_route('lists.html', title='Lista delle idee')
+@smart_route('lists.html', title='Lista delle idee', get_list=lambda: login_required(get_user_lists)('ideas'))
 @login_required
 def ideas_route(uid):
     if request.method == 'POST':
         if 'add' in request.form:
-            add_user_lists('ideas', uid, request.form['add'].split('\r\n'))
+            add_user_lists(uid, 'ideas', request.form['add'].split('\r\n'))
         elif 'remove' in request.form:
-            remove_user_lists('ideas', uid, request.form['remove'].split('\r\n'))
-        else:
+            remove_user_lists(uid, 'ideas', request.form['remove'].split('\r\n'))
+        elif request.form:
             raise CAError('Richiesta sconosciuta')
 
-    return {'list': get_user_lists('ideas', uid)}
+        return redirect('.')
+
+    return {'add': 'aggiungi' in request.args, 'del': 'rimuovi' in request.args}
 
 
 @app.route('/info')
-@smart_route('info.html')
+@smart_route('info.html', get_users_no=get_users_number, version=Version)
 def info_route():
-    return {'users': get_users_number(), 'version': Version}
+    pass

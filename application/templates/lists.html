@@ -2,87 +2,82 @@
 
 {% block imports %}
     <script>
-        let i = 0;
+        {% if add %}
+            let i = 0;
 
-        function start_adding() {
-            $('.non-editing, .editing-e').remove();
-            $('.editing, .editing-a').css('display', 'inline-block');
-            add_element();
-        }
+            function add_element() {
+                let div = `<div class="new-element"><input type="text" placeholder="Nome" required></div>`;
+                $('#new-elements').append(div);
+                i++;
+            }
 
-        function add_element() {
-            let div = `<div class="new-element">` +
-                          `<input type="text" required>` +
-                      `</div>`;
-            $('#new-elements').append(div);
-            i++;
-        }
+            function remove_element() {
+                if (i > 1) {
+                    $('#new-elements').find('div:last').remove();
+                    i--;
+                }
+            }
+        {% endif %}
 
-        function remove_element() {
-            if (i > 1) {
-                $('#new-elements').find('div:last').remove();
-                i--;
+
+        window.onload = function() {
+            {% if add %} add_element(); {% endif %}
+
+            document.forms[0].onsubmit = function() {
+                let text = '';
+
+                {% if add %}
+                    for (div of $('.new-element')) text += '\n' + div.children[0].value;
+                {% elif del %}
+                    for (input of $('input')) if (input.checked) text += '\n' + input.id;
+                {% endif %}
+
+                $('textarea').text(text);
+                $('input').remove();
+                return true;
             }
         }
-
-        function start_editing() {
-            $('.non-editing, .editing-a').remove();
-            $('.editing, .editing-e').css('display', 'inline-block');
-            $('input[type=checkbox]').attr('disabled', false);
-        }
-
-        function submit() {
-            let text = '';
-
-            if ($('.editing-a')[0]) {
-                for (div of $('.new-element')) text += '\n' + div.children[0].value;
-            } else {
-                for (input of $('input')) if (input.checked) text += '\n' + input.id;
-            }
-            $('textarea').text(text);
-
-            $('input').remove();
-            return true;
-        }
-
-        window.onload = function() { document.forms[0].onsubmit = submit; }
     </script>
 {% endblock %}
 
 {% block content %}
     <form method="POST">
-        <div class="editing-e">
-            <textarea name="remove" hidden></textarea>
+        {% if add %}
+            <div id="new-elements">
+                <textarea name="add" hidden></textarea>
+            </div>
+        {% else %}
+            {% set list = get_list() %}
 
-            {% if list %}
-                {% for id, name in list.items() %}
-                    <div>
-                        <input type="checkbox" id="{{ id }}" autocomplete="off" disabled>
-                        <label for="{{ id }}"><span>{{ name }}</span></label>
-                    </div>
-                {% endfor %}
+            <div>
+                <textarea name="remove" hidden></textarea>
+
+                {% if list %}
+                    {% for id, name in list.items() %}
+                        <div>
+                            <input type="checkbox" id="{{ id }}" autocomplete="off" {{ 'disabled' if not del }}>
+                            <label for="{{ id }}"><span>{{ name }}</span></label>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <i>La lista &egrave; vuota.</i>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <div>
+            {% if add %}
+                <button>Conferma</button>
+                <button onclick="add_element()" type="button">+</button>
+                <button onclick="remove_element()" type="button">-</button>
+                <button onclick="if (confirm('Sei sicuro di voler annullare le modifiche?')) location.href = '.';" type="button">Annulla</button>
+            {% elif del %}
+                <button>Conferma</button>
+                <button onclick="if (confirm('Sei sicuro di voler annullare le modifiche?')) location.href = '.';" type="button">Annulla</button>
             {% else %}
-                <i>La lista &egrave; vuota.</i>
+                <button onclick="location.href='?aggiungi';" type="button">Aggiungi articoli</button>
+                {% if list %} <button onclick="location.href='?rimuovi';" type="button">Rimuovi articoli</button> {% endif %}
             {% endif %}
-        </div>
-
-        <div id="new-elements" class="editing editing-a">
-            <textarea name="add" hidden></textarea>
-        </div>
-
-        <div>
-            <button class="non-editing" onclick="start_adding()" type="button">Aggiungi</button>
-            {% if list %}
-                <button class="non-editing" onclick="start_editing()" type="button">Rimuovi</button>
-            {% endif %}
-
-            <button class="editing">Salva</button>
-            <button class="editing" onclick="if (confirm('Sei sicuro di voler annullare le modifiche?')) location.reload();" type="button">Annulla</button>
-        </div>
-
-        <div>
-            <button class="editing editing-a" onclick="add_element()" type="button">Aggiungi elemento</button>
-            <button class="editing editing-a" onclick="remove_element()" type="button">Rimuovi elemento</button>
         </div>
     </form>
 {% endblock %}

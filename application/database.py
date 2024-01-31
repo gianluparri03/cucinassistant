@@ -25,6 +25,14 @@ def init_db():
                   user INTEGER PRIMARY KEY REFERENCES users (uid),
                   menu TEXT);''')
 
+    db.execute('''CREATE TABLE IF NOT EXISTS storage (
+                  user INTEGER REFERENCES users (uid),
+                  id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  name TEXT NOT NULL,
+                  quantity INT,
+                  expiration DATE,
+                  UNIQUE (user, name, expiration));''')
+
     db.execute('''CREATE TABLE IF NOT EXISTS shopping (
                   user INTEGER REFERENCES users (uid),
                   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -152,11 +160,51 @@ def update_user_menu(cursor, uid, items):
     # Saves the new menu
     if len(items) != 14:
         raise CAError('Menu non valido')
-    cursor.execute('INSERT OR REPLACE INTO menus (user, menu) VALUES (?, ?);', [uid, ';'.join(items)])
+    cursor.execute('REPLACE INTO menus (user, menu) VALUES (?, ?);', [uid, ';'.join(items)])
 
 
 @use_db
-def get_user_lists(cursor, section, uid):
+def get_user_storage(cursor, uid):
+    # Returns the storage
+    cursor.execute('SELECT id, name, quantity, expiration FROM storage WHERE user=? ORDER BY expiration;', [uid])
+    return cursor.fetchall()
+
+@use_db
+def add_user_storage(cursor, uid, items):
+    # Adds the items, or updates them
+    for item in items:
+        try:
+            cursor.execute('INSERT INTO storage (user, name, quantity, expiration) VALUES (?, ?, ?, ?);', [uid, item[0], item[1], item[2]])
+        except IntegrityError:
+            cursor.execute('UPDATE storage SET quantity=quantity+? WHERE user=? AND name=? AND expiration=?;', [item[1], uid, item[0], item[2]])
+
+@use_db
+def edit_user_storage(cursor, uid, item, delta):
+    if not delta[1:].isnumeric() or (delta[0] != '-' and delta[0] != '+'):
+        raise CAError('Valore non valido')
+
+    # Fetches the old quantity
+    cursor.execute('SELECT 1, quantity FROM storage WHERE user=? AND id=?;', [uid, item])
+    data = cursor.fetchone()
+    if not data:
+        raise CAError('Elemento non in lista')
+
+    # Save the changes
+    new = max(eval(str(data[1] or '0') + delta), 0)
+    if new > 0:
+        cursor.execute('UPDATE storage SET quantity=? WHERE id=?;', [new, item])
+    else:
+        cursor.execute('DELETE FROM storage WHERE id=?;', [item])
+
+@use_db
+def remove_user_storage(cursor, uid, items):
+    # Remove some items from the storage
+    data = [[uid, item] for item in items if item]
+    cursor.executemany('DELETE FROM storage WHERE user=? AND id=?;', data)
+
+
+@use_db
+def get_user_lists(cursor, uid, section):
     if section not in ('shopping', 'ideas'): raise CAError('Sezione sconosciuta')
 
     # Returns the list
@@ -164,7 +212,7 @@ def get_user_lists(cursor, section, uid):
     return {l[0]: l[1] for l in cursor.fetchall()}
 
 @use_db
-def add_user_lists(cursor, section, uid, items):
+def add_user_lists(cursor, uid, section, items):
     if section not in ('shopping', 'ideas'): raise CAError('Sezione sconosciuta')
 
     # Adds some items to the list
@@ -172,7 +220,7 @@ def add_user_lists(cursor, section, uid, items):
     cursor.executemany(f'INSERT OR IGNORE INTO {section} (user, name) VALUES (?, ?);', data)
 
 @use_db
-def remove_user_lists(cursor, section, uid, items):
+def remove_user_lists(cursor, uid, section, items):
     if section not in ('shopping', 'ideas'): raise CAError('Sezione sconosciuta')
 
     # Remove some items from the list

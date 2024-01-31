@@ -20,6 +20,6 @@
         <a href="mailto:{{ config['Email']['Address'] }}" target="_blank">{{ config['Email']['Address'] }}</a>.
         <br> <br>
 
-        Attualmente, <b>CucinAssistant</b> ha {{ users }} utenti attivi.
+        Attualmente, <b>CucinAssistant</b> ha {{ get_users_no() }} utenti attivi.
     </p>
 {% endblock %}
