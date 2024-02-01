@@ -33,8 +33,10 @@ class Email:
     def send(self, *recipients):
         if config['Email']['Enabled']:
             for recipient in recipients:
+                del self.msg['To']
                 self.msg['To'] = recipient
                 mail.sendmail(config['Email']['Address'], recipient, self.msg.as_string())
+
 
 
 class WelcomeEmail(Email):
