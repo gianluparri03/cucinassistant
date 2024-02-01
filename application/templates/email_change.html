@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% set title = 'Cambio email' %}
+
+{% block content %}
+    <form method="POST">
+        <label for="new">Nuova email</label> <br>
+        <input type="email" name="new" required> <br>
+
+        <button>Cambia</button>
+    </form>
+{% endblock %}

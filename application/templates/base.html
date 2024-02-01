@@ -47,7 +47,7 @@
                 $('#obfuscator').remove();
             }
 
-            if ('serviceWorker' in navigator) {
+            if (typeof navigator.serviceWorker !== 'undefined') {
                 navigator.serviceWorker.register("{{ url_for('static', filename='serviceworker.js') }}");
             }
 

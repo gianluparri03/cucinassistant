@@ -3,7 +3,12 @@ from .database import *
 from .util import smart_route
 from .account import login_required
 
-from flask import request, redirect
+from flask import request, redirect, send_from_directory
+
+
+@app.route('/.well-known/assetlinks.json')
+def assets_route():
+    return send_from_directory('static', 'assets.json')
 
 
 @app.route('/')

@@ -96,6 +96,20 @@ def delete_account_route(uid):
             return logout_route()
 
 
+@app.route('/account/cambio_email/', methods=['GET', 'POST'])
+@smart_route('email_change.html')
+@login_required
+def change_email_route(uid):
+    if request.method == 'POST':
+        # Ensures the request is valid
+        data = request.form
+        if not data.get('new'):
+            raise CAError('Dati mancanti')
+        
+        # Tries to change the email
+        change_user_email(uid, data['new'])
+        return 'Email cambiata con successo.'
+
 @app.route('/account/cambio_password/', methods=['GET', 'POST'])
 @smart_route('password_change.html')
 @login_required

@@ -11,7 +11,6 @@
             }
         }
 
-
         {% if add %}
             let i = 0;
 
@@ -32,8 +31,18 @@
                     i--;
                 }
             }
+        {% elif edit %}
+            function editItem(item, sign) {
+                let delta = prompt('Inserisci la quantita da ' + ((sign == '+') ? 'aggiungere' : 'sottrarre'));
+                if (delta) {
+                    $('textarea').text(item + ';' + sign + delta);
+                    document.forms[0].submit();
+                }
+            }
+        {% endif %}
 
-            window.onload = function() {
+        window.onload = function() {
+            {% if add %}
                 add_element();
 
                 document.forms[0].onsubmit = function() {
@@ -50,26 +59,20 @@
                     $('input').remove();
                     return true;
                 };
-            };
-        {% elif edit %}
-            function editItem(item, sign) {
-                let delta = prompt('Inserisci la quantita da ' + ((sign == '+') ? 'aggiungere' : 'sottrarre'));
-                if (delta) {
-                    $('textarea').text(item + ';' + sign + delta);
-                    document.forms[0].submit();
-                }
-            }
-        {% elif del %}
-            window.onload = function() {
-                document.forms[0].onsubmit = function() {
-                    let text = '';
-                    for (input of $('input')) if (input.checked) text += '\n' + input.id;
-                    $('textarea').text(text);
-                    $('input').remove();
-                    return true;
+            {% elif del %}
+                window.onload = function() {
+                    document.forms[0].onsubmit = function() {
+                        let text = '';
+                        for (input of $('input')) if (input.checked) text += '\n' + input.id;
+                        $('textarea').text(text);
+                        $('input').remove();
+                        return true;
+                    };
                 };
-            };
-        {% endif %}
+            {% endif %}
+
+            $('.buttons').clone().appendTo('form');
+        };
     </script>
 {% endblock %}
 
@@ -77,22 +80,39 @@
     {% set storage = get_storage() %}
 
     <form method="POST">
+        <div class="buttons">
+            {% if add %}
+                <button>Conferma</button>
+                <button onclick="add_element()" type="button">+</button>
+                <button onclick="remove_element()" type="button">-</button>
+                <button onclick="if (confirm('Sei sicuro di voler annullare le modifiche?')) location.href = '.';" type="button">Annulla</button>
+            {% else %}
+                <button id="search-button" onclick="search()" type="button">Cerca</button>
+
+                {% if edit %}
+                    <button onclick="location.href = '.';" type="button">Fine</button>
+                {% elif del %}
+                    <button>Conferma</button>
+                    <button onclick="if (confirm('Sei sicuro di voler annullare le modifiche?')) location.href = '.';" type="button">Annulla</button>
+                {% else %}
+                    <button onclick="location.href='?aggiungi';" type="button">Aggiungi articoli</button>
+
+                    {% if storage %}
+                        <button onclick="location.href='?modifica';" type="button">Modifica quantit&agrave;</button>
+                        <button onclick="location.href='?rimuovi';" type="button">Rimuovi articoli</button>
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+        </div>
+
         {% if not add %}
             <div>
-                {% if storage %}
-                    <div>
-                        <button id="search-button" onclick="search()" type="button">Cerca</button>
-                    </div>
-                {% else %}
-                    <i>La lista &egrave; vuota.</i>
-                {% endif %}
-
                 {% for item in storage %}
                     <div>
-                        <input type="checkbox" id="{{ item[0] }}" autocomplete="off" {{ 'disabled' if not del }}>
+                        <input type="checkbox" id="{{ item[0] }}" autocomplete="off" {{ 'hidden' if not del }}>
 
                         <label for="item-{{ item[0] }}">
-                            <span>{{ item[1] }}</span>
+                            <input value="{{ item[1] }}" disabled>
                             <input type="number" value="{{ item[2] }}" {{ 'disabled' if not edit }}>
                             {% if edit %}
                                 <button onclick="editItem({{ item[0] }}, '-');" type="button">-</button>
@@ -101,6 +121,8 @@
                             <input type="date" value="{{ item[3] }}" disabled>
                         </label>
                     </div>
+                {% else %}
+                    <i>La lista &egrave; vuota.</i>
                 {% endfor %}
             </div>
         {% endif %}
@@ -114,25 +136,5 @@
         {% elif del %}
             <textarea name="remove" hidden></textarea>
         {% endif %}
-
-        <div>
-            {% if add %}
-                <button>Conferma</button>
-                <button onclick="add_element()" type="button">+</button>
-                <button onclick="remove_element()" type="button">-</button>
-                <button onclick="if (confirm('Sei sicuro di voler annullare le modifiche?')) location.href = '.';" type="button">Annulla</button>
-            {% elif edit %}
-                <button onclick="location.href = '.';" type="button">Fine</button>
-            {% elif del %}
-                <button>Conferma</button>
-                <button onclick="if (confirm('Sei sicuro di voler annullare le modifiche?')) location.href = '.';" type="button">Annulla</button>
-            {% else %}
-                <button onclick="location.href='?aggiungi';" type="button">Aggiungi articoli</button>
-                {% if storage %}
-                    <button onclick="location.href='?modifica';" type="button">Modifica quantit&agrave;</button>
-                    <button onclick="location.href='?rimuovi';" type="button">Rimuovi articoli</button>
-                {% endif %}
-            {% endif %}
-        </div>
     </form>
 {% endblock %}
