@@ -19,7 +19,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = config['Environment']['Secret']
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=90)
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-# app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_SECURE'] = True
 
 # Initializes the db
 from .database import init_db
