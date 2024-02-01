@@ -120,7 +120,10 @@ def delete_user(cursor, uid, token):
 @use_db
 def change_user_email(cursor, uid, new):
     # Saves the new one
-    cursor.execute('UPDATE users SET email=? WHERE uid=?;', [new, uid])
+    try:
+        cursor.execute('UPDATE users SET email=? WHERE uid=?;', [new, uid])
+    except IntegrityError:
+        raise CAError('Email non disponibile')
 
 @use_db
 def change_user_password(cursor, uid, old, new):

@@ -2,7 +2,7 @@
 
 {% set title = 'Informazioni' %}
 
-{% if uid %} {% block imports %} <style> #settings { opacity: 0; } </style> {% endblock %} {% endif %}
+{% if not uid %} {% block imports %} <style> #settings { opacity: 0; } </style> {% endblock %} {% endif %}
 
 {% block content %}
     <p>

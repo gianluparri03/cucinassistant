@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% set title = 'Privacy' %}
+
+{% if not uid %} {% block imports %} <style> #settings { opacity: 0; } </style> {% endblock %} {% endif %}
+
+{% block content %}
+    <p>
+        I dati inviati a <b>CucinAssistant</b>, tramite app o browser, vengono criptati dal protocollo HTTPS, in modo
+        che siano comprensibili solo all'utente e al server. I dati non vengono condivisi con terzi e sono salvati in
+        chiaro, ad eccezione delle password, che vengono cifrate. Per ulteriori informazioni, potete contattarmi su
+        <a href="mailto:{{ config['Email']['Address'] }}" target="_blank">{{ config['Email']['Address'] }}</a>.
+    </p>
+{% endblock %}

@@ -85,3 +85,8 @@ def ideas_route(uid):
 @smart_route('info.html', get_users_no=get_users_number, version=Version)
 def info_route():
     pass
+
+@app.route('/privacy')
+@smart_route('privacy.html')
+def privacy_route():
+    pass
