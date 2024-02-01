@@ -187,7 +187,7 @@ def edit_user_storage(cursor, uid, item, delta):
     cursor.execute('SELECT 1, quantity FROM storage WHERE user=? AND id=?;', [uid, item])
     data = cursor.fetchone()
     if not data:
-        raise CAError('Elemento non in lista')
+        raise CAError('Articolo non in lista')
 
     # Save the changes
     new = max(eval(str(data[1] or '0') + delta), 0)

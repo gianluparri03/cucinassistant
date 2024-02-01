@@ -64,7 +64,7 @@ def signup_route():
         session['user'] = uid
         return redirect('/')
 
-@app.route('/account/logout/')
+@app.route('/account/esci/')
 @login_required
 def logout_route(uid):
     session.pop('user', None)
@@ -111,7 +111,7 @@ def change_password_route(uid):
         return 'Password cambiata con successo.'
 
 @app.route('/account/reset_password', methods=['GET', 'POST'])
-@smart_route('password_change.html')
+@smart_route('password_reset.html')
 def reset_password_route():
     if request.method == 'POST':
         # Ensures the request is valid
