@@ -7,14 +7,6 @@ from email.mime.multipart import MIMEMultipart
 from jinja2 import Environment, FileSystemLoader
 
 
-# If it is enabled, logs in
-if config['Email']['Enabled']:
-    mail = SMTP(config['Email']['Server'], config['Email']['Port'])
-    mail.ehlo()
-    mail.starttls()
-    mail.login(config['Email']['Login'], config['Email']['Password'])
-
-
 # Initializes the template loader
 templates = Environment(loader=FileSystemLoader("application/emails/"))
 
@@ -32,10 +24,17 @@ class Email:
 
     def send(self, *recipients):
         if config['Email']['Enabled']:
+            conn = SMTP(config['Email']['Server'], config['Email']['Port'])
+            conn.ehlo()
+            conn.starttls()
+            conn.login(config['Email']['Login'], config['Email']['Password'])
+
             for recipient in recipients:
                 del self.msg['To']
                 self.msg['To'] = recipient
-                mail.sendmail(config['Email']['Address'], recipient, self.msg.as_string())
+                conn.sendmail(config['Email']['Address'], recipient, self.msg.as_string())
+
+            conn.close()
 
 
 

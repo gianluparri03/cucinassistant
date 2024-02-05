@@ -111,12 +111,13 @@
 
                         <label for="item-{{ item[0] }}">
                             <input value="{{ item[1] }}" disabled>
-                            <input type="number" value="{{ item[2] }}" {{ 'disabled' if not edit }}>
+                            <input type="number" value="{{ item[2] }}" disabled>
+                            <input type="date" value="{{ item[3] }}" disabled>
+
                             {% if edit %}
                                 <button onclick="editItem({{ item[0] }}, '-');" type="button">-</button>
                                 <button onclick="editItem({{ item[0] }}, '+');" type="button">+</button>
                             {% endif %}
-                            <input type="date" value="{{ item[3] }}" disabled>
                         </label>
                     </div>
                 {% else %}
