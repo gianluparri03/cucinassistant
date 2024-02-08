@@ -1,157 +1,175 @@
-from . import CAError
+from . import config, CAError
 
-from hashlib import sha256
+import string
+from datetime import date
 from functools import wraps
 from secrets import token_hex
-from sqlite3 import connect, IntegrityError
+from argon2 import PasswordHasher
+from mariadb import connect, Error as DBError
+from argon2.exceptions import VerificationError
 
-
-def hash_password(password):
-    return sha256(password.encode('utf-8')).hexdigest()
 
 def init_db():
-    global db
-    db = connect('cucinassistant.db', check_same_thread=False, isolation_level=None)
+    global db, ph
+    db = connect(host=config['Database']['Hostname'], database=config['Database']['Database'], \
+                 user=config['Database']['Username'], password=config['Database']['Password'])
+    db.autocommit = True
 
-    db.execute('''CREATE TABLE IF NOT EXISTS users (
-                  uid INTEGER PRIMARY KEY AUTOINCREMENT,
-                  username TEXT NOT NULL UNIQUE,
-                  password TEXT NOT NULL,
-                  email TEXT NOT NULL UNIQUE,
-                  token TEXT,
-                  newsletter BOOLEAN DEFAULT TRUE);''')
+    with db.cursor() as cursor:
+        with open('application/schema.sql') as f:
+            for command in f.read().split(';')[:-1]:
+                cursor.execute(command)
 
-    db.execute('''CREATE TABLE IF NOT EXISTS menus (
-                  user INTEGER PRIMARY KEY REFERENCES users (uid),
-                  menu TEXT);''')
-
-    db.execute('''CREATE TABLE IF NOT EXISTS storage (
-                  user INTEGER REFERENCES users (uid),
-                  id INTEGER PRIMARY KEY AUTOINCREMENT,
-                  name TEXT NOT NULL,
-                  quantity INT,
-                  expiration DATE,
-                  UNIQUE (user, name, expiration));''')
-
-    db.execute('''CREATE TABLE IF NOT EXISTS shopping (
-                  user INTEGER REFERENCES users (uid),
-                  id INTEGER PRIMARY KEY AUTOINCREMENT,
-                  name TEXT NOT NULL,
-                  UNIQUE (user, name));''')
-
-    db.execute('''CREATE TABLE IF NOT EXISTS ideas (
-                  user INTEGER REFERENCES users (uid),
-                  id INTEGER PRIMARY KEY AUTOINCREMENT,
-                  name TEXT NOT NULL,
-                  UNIQUE (user, name));''')
+    ph = PasswordHasher()
 
 def use_db(func):
     @wraps(func)
     def inner(*args, **kwargs):
-        cur = db.cursor()
-        ris = func(cur, *args, **kwargs)
-        cur.close()
-        return ris
+        with db.cursor() as cur:
+            return func(cur, *args, **kwargs)
 
     return inner
 
 
 @use_db
+def get_users_number(cursor):
+    # Counts the users
+    cursor.execute('SELECT COUNT(*) FROM users;')
+    return cursor.fetchone()[0]
+
+@use_db
+def get_users_emails(cursor):
+    # Counts the users
+    cursor.execute('SELECT email FROM users;')
+    return list(map(lambda r: r[0], cursor.fetchall()))
+
+@use_db
 def create_user(cursor, username, email, password):
+    # Makes some checks
+    if len(username) < 3:
+        raise CAError('Nome utente non valido (lunghezza minima 3 caratteri)')
+    elif set(username) - set(string.ascii_letters + string.digits + '_'):
+        raise CAError('Nome utente non valido (solo lettere, numeri e "_" consentiti)')
+    elif len(password) < 5:
+        raise CAError('Password non valida (lunghezza minima 5 caratteri)')
+
     try:
         # Tries to create a new user
-        password = hash_password(password)
+        password = ph.hash(password)
         cursor.execute('INSERT INTO users (username, email, password) VALUES (?, ?, ?);', [username, email, password])
         return cursor.lastrowid
 
     # Rewrites the error
-    except IntegrityError as e:
-        match str(e):
-            case 'UNIQUE constraint failed: users.email':
-                raise CAError("Email non disponibile")
-            case 'UNIQUE constraint failed: users.username':
-                raise CAError("Username non disponibile")
-            case _:
-                raise CAError("Errore sconosciuto")
+    except DBError as e:
+        if str(e).endswith("for key 'email'"):
+            raise CAError("Email non disponibile")
+        elif str(e).endswith("for key 'username'"):
+            raise CAError("Nome utente non disponibile")
+        else:
+            raise CAError("Errore sconosciuto")
 
 @use_db
 def login_user(cursor, username, password):
     # Checks if the credentials are valid
-    password = hash_password(password)
-    cursor.execute('SELECT uid FROM users WHERE username=? AND password=?;', [username, password])
-    if not (uid := cursor.fetchone()):
+    cursor.execute('SELECT uid, password FROM users WHERE username=?;', [username])
+    try:
+        if (data := cursor.fetchone()):
+            ph.verify(data[1], password)
+            return data[0]
+        else:
+            raise
+    except VerificationError:
         raise CAError('Credenziali non valide')
+
+@use_db
+def get_user_data(cursor, uid, email=''):
+    # Returns the user's data
+    if email:
+        cursor.execute('SELECT uid, username, email, password, token FROM users WHERE email=?;', [email])
     else:
-        return uid[0]
+        cursor.execute('SELECT uid, username, email, password, token FROM users WHERE uid=?;', [uid])
 
-
-@use_db
-def get_user_username(cursor, uid):
-    # Returns the user's username
-    cursor.execute('SELECT username FROM users WHERE uid=?;', [uid])
-    if (username := cursor.fetchone()):
-        return username[0]
-
-@use_db
-def get_user_email(cursor, uid):
-    # Returns the user's email
-    cursor.execute('SELECT email FROM users WHERE uid=?;', [uid])
-    if (email := cursor.fetchone()):
-        return email[0]
-
+    if (data := cursor.fetchone()):
+        return dict(zip(('uid', 'username', 'email', 'password', 'token'), data))
+    else:
+        raise CAError('Utente sconosciuto')
 
 @use_db
 def generate_user_token(cursor, uid):
     # Generates a new deletion token for the user
     token = token_hex(18)
-    cursor.execute('UPDATE users SET token=? WHERE uid=?;', [token, uid])
-    return token
+    cursor.execute('UPDATE users SET token=? WHERE uid=?;', [ph.hash(token), uid])
+    if cursor.rowcount == 1:
+        return token
+    else:
+        raise CAError('Utente sconosciuto')
 
 @use_db
 def delete_user(cursor, uid, token):
     # Checks if the token is valid
-    cursor.execute('SELECT 1 FROM users WHERE uid=? AND token=?;', [uid, token])
-    if not cursor.fetchone():
-        raise CAError('Errore durante la cancellazione, riprova.')
+    cursor.execute('SELECT token FROM users WHERE uid=?;', [uid])
+    try:
+        if (data := cursor.fetchone()):
+            ph.verify(data[0], token)
+            cursor.execute('DELETE FROM users WHERE uid=?;', [uid])
+        else:
+            raise
+    except:
+        raise CAError('Errore durante la cancellazione, riprova')
 
-    cursor.execute('DELETE FROM users WHERE uid=?;', [uid])
+@use_db
+def change_user_username(cursor, uid, new):
+    # Saves the new one
+    try:
+        if not (data := get_user_data(uid)):
+            raise CAError('Utente sconosciuto')
+        elif data.get('username') == new:
+            return
 
+        cursor.execute('UPDATE users SET username=? WHERE uid=?;', [new, uid])
+    except DBError:
+        raise CAError('Nome utente non disponibile')
 
 @use_db
 def change_user_email(cursor, uid, new):
     # Saves the new one
     try:
+        if not (data := get_user_data(uid)):
+            raise CAError('Utente sconosciuto')
+        elif data.get('email') == new:
+            return
+
         cursor.execute('UPDATE users SET email=? WHERE uid=?;', [new, uid])
-    except IntegrityError:
+    except DBError:
         raise CAError('Email non disponibile')
 
 @use_db
 def change_user_password(cursor, uid, old, new):
-    old = hash_password(old)
-    new = hash_password(new)
+    # Ensures that the user exists
+    if not get_user_data(uid):
+        raise CAError('Utente sconosciuto')
 
-    # Checks if the old are valid
-    cursor.execute('SELECT 1 FROM users WHERE uid=? AND password=?;', [uid, old])
-    if not cursor.fetchone():
-        raise CAError('Password attuale non valida')
-
-    # Saves the new ones
-    cursor.execute('UPDATE users SET password=? WHERE uid=?;', [new, uid])
+    cursor.execute('SELECT password FROM users WHERE uid=?;', [uid])
+    try:
+        # Check if the user is athorized, then updates it
+        ph.verify(cursor.fetchone()[0], old)
+        cursor.execute('UPDATE users SET password=? WHERE uid=?;', [ph.hash(new), uid])
+    except VerificationError:
+        raise CAError('Credenziali non valide')
 
 @use_db
-def reset_user_password(cursor, email):
-    # Selects the uid
-    cursor.execute('SELECT username FROM users WHERE email=?;', [email])
-    username = cursor.fetchone()
-    if not username:
-        return
+def reset_user_password(cursor, email, token, new):
+    # Ensures that the user exists
+    data = get_user_data('', email=email)
+    if not data:
+        raise CAError('Utente sconosciuto')
 
-    # Generates a new password and saves it 
-    unhashed = token_hex(4)
-    hashed = hash_password(unhashed)
-    cursor.execute('UPDATE users SET password=? WHERE username=?;', [hashed, username[0]])
-
-    return username[0], unhashed
+    try:
+        # Check if the user is athorized, then updates it
+        ph.verify(data['token'], token)
+        cursor.execute('UPDATE users SET password=? WHERE uid=?;', [ph.hash(new), data['uid']])
+    except VerificiationError:
+        raise CAError('Errore durante la reimpostazione della password')
 
 
 @use_db
@@ -161,30 +179,67 @@ def get_user_menu(cursor, uid):
     if (menu := cursor.fetchone()):
         return menu[0].split(';')
     else:
-        return [] * 14
+        # Ensures that the user exists
+        cursor.execute('SELECT 1 FROM users WHERE uid=?;', [uid])
+        if (data := cursor.fetchone()):
+            return [] * 14
+        else:
+            raise CAError('Utente sconosciuto')
 
 @use_db
 def update_user_menu(cursor, uid, items):
-    # Saves the new menu
+    # Checks the menu syntax
     if len(items) != 14:
         raise CAError('Menu non valido')
-    cursor.execute('REPLACE INTO menus (user, menu) VALUES (?, ?);', [uid, ';'.join(items)])
+
+    # Saves the new menu
+    try:
+        cursor.execute('REPLACE INTO menus (user, menu) VALUES (?, ?);', [uid, ';'.join(items)])
+    except DBError:
+        raise CAError('Utente sconosciuto')
 
 
 @use_db
 def get_user_storage(cursor, uid):
     # Returns the storage
     cursor.execute('SELECT id, name, quantity, expiration FROM storage WHERE user=? ORDER BY expiration;', [uid])
-    return cursor.fetchall()
+    if (data := cursor.fetchall()):
+        return [[i[0], i[1], i[2] if i[2] != 0 else '', i[3] if not i[3].isoformat().startswith('2004-02-05') else ''] for i in data]
+    else:
+        # Ensures that the user exists
+        cursor.execute('SELECT 1 FROM users WHERE uid=?;', [uid])
+        if (data := cursor.fetchone()):
+            return []
+        else:
+            raise CAError('Utente sconosciuto')
+
 
 @use_db
 def add_user_storage(cursor, uid, items):
-    # Adds the items, or updates them
+    # Makes sure the items syntax is correct
     for item in items:
-        try:
-            cursor.execute('INSERT INTO storage (user, name, quantity, expiration) VALUES (?, ?, ?, ?);', [uid, item[0], item[1], item[2]])
-        except IntegrityError:
-            cursor.execute('UPDATE storage SET quantity=quantity+? WHERE user=? AND name=? AND expiration=?;', [item[1], uid, item[0], item[2]])
+        if len(item) != 3:
+            raise CAError('Formato non valido')
+        if not item[0]:
+            raise CAError('Nome non valido')
+        if not item[1]:
+            item[1] = 0
+        elif not item[1].isnumeric():
+            raise CAError('Quantità non valida')
+        if not item[2]:
+            item[2] = '2004-02-05'
+        else:
+            try:
+                date.fromisoformat(item[2])
+            except ValueError:
+                raise CAError('Data di scandenza non valida')
+
+    # Adds the items, or updates them
+    try:
+        cursor.executemany('INSERT INTO storage (user, name, quantity, expiration) VALUES (?, ?, ?, ?)' + \
+            'ON DUPLICATE KEY UPDATE quantity=quantity+?;', [[uid, i[0], i[1], i[2], i[1]] for i in items])
+    except DBError:
+        raise CAError('Utente sconosciuto')
 
 @use_db
 def edit_user_storage(cursor, uid, item, delta):
@@ -198,11 +253,8 @@ def edit_user_storage(cursor, uid, item, delta):
         raise CAError('Articolo non in lista')
 
     # Save the changes
-    new = max(eval(str(data[1] or '0') + delta), 0)
-    if new > 0:
-        cursor.execute('UPDATE storage SET quantity=? WHERE id=?;', [new, item])
-    else:
-        cursor.execute('DELETE FROM storage WHERE id=?;', [item])
+    new = max(eval(str(data[1]) + delta), 0)
+    cursor.execute('UPDATE storage SET quantity=? WHERE id=?;', [new, item])
 
 @use_db
 def remove_user_storage(cursor, uid, items):
@@ -217,15 +269,26 @@ def get_user_lists(cursor, uid, section):
 
     # Returns the list
     cursor.execute(f'SELECT id, name FROM {section} WHERE user=?;', [uid])
-    return {l[0]: l[1] for l in cursor.fetchall()}
+    if (data := cursor.fetchall()):
+        return {i[0]: i[1] for i in data}
+    else:
+        # Ensures that the user exists
+        cursor.execute('SELECT 1 FROM users WHERE uid=?;', [uid])
+        if (data := cursor.fetchone()):
+            return {}
+        else:
+            raise CAError('Utente sconosciuto')
 
 @use_db
 def add_user_lists(cursor, uid, section, items):
     if section not in ('shopping', 'ideas'): raise CAError('Sezione sconosciuta')
 
     # Adds some items to the list
-    data = [[uid, item] for item in items if item]
-    cursor.executemany(f'INSERT OR IGNORE INTO {section} (user, name) VALUES (?, ?);', data)
+    try:
+        data = [[uid, item] for item in items if item]
+        cursor.executemany(f'INSERT IGNORE INTO {section} (user, name) VALUES (?, ?);', data)
+    except DBError:
+        raise CAError('Utente sconosciuto')
 
 @use_db
 def remove_user_lists(cursor, uid, section, items):
@@ -234,26 +297,3 @@ def remove_user_lists(cursor, uid, section, items):
     # Remove some items from the list
     data = [[uid, item] for item in items if item]
     cursor.executemany(f'DELETE FROM {section} WHERE user=? AND id=?;', data)
-
-
-@use_db
-def get_users_number(cursor):
-    # Counts the users
-    cursor.execute('SELECT COUNT(*) FROM users;')
-    return cursor.fetchone()[0]
-
-@use_db
-def get_newsletter_emails(cursor):
-    # Returns the emails of the users that receives the newsletter
-    cursor.execute('SELECT email FROM users WHERE newsletter;')
-    return [c[0] for c in cursor.fetchall() if c]
-
-@use_db
-def disable_newsletter(cursor, uid):
-    # Disables the user's newsletter
-    cursor.execute('UPDATE users SET newsletter=0 WHERE uid=?;', [uid])
-
-@use_db
-def enable_newsletter(cursor, uid):
-    # Enables the user's newsletter
-    cursor.execute('UPDATE users SET newsletter=1 WHERE uid=?;', [uid])

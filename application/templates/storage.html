@@ -16,9 +16,9 @@
 
             function add_element() {
                 let div = `<div class="new-element">` +
-                            `<input type="text" placeholder="Nome" required>` +
-                            `<input type="number" placeholder="Quantit&agrave;">` +
-                            `<input type="date" placeholder="Scadenza">` +
+                            `<input class="name" type="text" placeholder="Nome" required>` +
+                            `<input class="quantity" type="number" placeholder="Quantit&agrave;">` +
+                            `<input class="expiration" type="date" placeholder="Scadenza">` +
                         `</div>`;
 
                 $('#new-elements').append(div);
@@ -108,17 +108,14 @@
                 {% for item in storage %}
                     <div>
                         <input type="checkbox" id="{{ item[0] }}" autocomplete="off" {{ 'hidden' if not del }}>
+                        <input class="name" value="{{ item[1] }}" disabled>
+                        <input class="quantity" {% if item[2] %} type="number" {% endif %} value="{{ item[2] }}" disabled>
+                        <input class="expiration" {% if item[3] %} type="date" {% endif %} value="{{ item[3] }}" disabled>
 
-                        <label for="item-{{ item[0] }}">
-                            <input value="{{ item[1] }}" disabled>
-                            <input type="number" value="{{ item[2] }}" disabled>
-                            <input type="date" value="{{ item[3] }}" disabled>
-
-                            {% if edit %}
-                                <button onclick="editItem({{ item[0] }}, '-');" type="button">-</button>
-                                <button onclick="editItem({{ item[0] }}, '+');" type="button">+</button>
-                            {% endif %}
-                        </label>
+                        {% if edit %}
+                            <button onclick="editItem({{ item[0] }}, '-');" type="button">-</button>
+                            <button onclick="editItem({{ item[0] }}, '+');" type="button">+</button>
+                        {% endif %}
                     </div>
                 {% else %}
                     <i>La lista &egrave; vuota.</i>

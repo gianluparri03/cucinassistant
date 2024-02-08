@@ -3,7 +3,7 @@ from datetime import timedelta
 from flask import Flask
 
 
-Version = '1.2'
+Version = '1.3'
 
 class CAError(Exception): pass
 

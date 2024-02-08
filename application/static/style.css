@@ -121,25 +121,29 @@ footer a:hover {
 
 /* --- FORM -------------------------- */
 label {
-    display: inline-block;
+    display: inline;
 }
 
-input[type=text] {
+input {
+    margin-top: 5px;
     margin-right: 5px;
 }
 
-input[type=number] {
+input.name {
+    width: 35%;
+}
+
+input.quantity {
     width: 25%;
 }
 
-input[type=date] {
-    width: max(20%, 150px);
+input.expiration {
+    width: max(25%, 150px);
 }
 
 #search-button {
     margin-bottom: 20px;
 }
-
 
 /* --- COOKIE BANNER ----------------- */
 #obfuscator {

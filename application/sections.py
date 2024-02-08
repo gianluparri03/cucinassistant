@@ -34,7 +34,7 @@ def menu_route(uid):
 def storage_route(uid):
     if request.method == 'POST':
         if 'add' in request.form:
-            add_user_storage(uid, map(lambda s: s.split(';') + ['', ''], request.form['add'].split('\r\n')))
+            add_user_storage(uid, [s.split(';') for s in request.form['add'].split('\r\n')])
         elif 'edit' in request.form:
             data = request.form['edit'].split(';') + ['+0']
             edit_user_storage(uid, data[0], data[1])

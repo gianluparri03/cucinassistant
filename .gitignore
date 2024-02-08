@@ -3,6 +3,4 @@ config.cfg
 env
 .direnv
 
-cucinassistant.db
-
 *__pycache__

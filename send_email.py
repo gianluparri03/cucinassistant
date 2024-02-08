@@ -1,4 +1,4 @@
-from application.mail import BroadcastEmail
+from application.mail import Email
 
 
 print('[CucinAssistant] Invio email')
@@ -19,5 +19,5 @@ while not okay:
 
 print(title, content)
 print('\nInvio della mail...', end=' ')
-n = BroadcastEmail(title, content).send_all()
+n = Email(title, 'base', content=content).broadcast()
 print(f'Fatto! {n} email inviate.')

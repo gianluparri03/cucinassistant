@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% set title = 'Cambio ' + field %}
+
+{% block content %}
+    <form method="POST">
+        <label for="new">Nuov{{ 'o' if field == 'username' else 'a' }} {{ field }}</label> <br>
+        <input type="{{ field_type }}" name="new" required> <br>
+
+        <button>Conferma</button>
+    </form>
+{% endblock %}

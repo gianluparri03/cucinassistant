@@ -1,5 +1,5 @@
 from . import config
-from .database import get_newsletter_emails
+from .database import get_users_emails
 
 from smtplib import SMTP
 from email.mime.text import MIMEText
@@ -12,23 +12,27 @@ templates = Environment(loader=FileSystemLoader("application/emails/"))
 
 
 class Email:
-    def __init__(self):
-        self.msg = MIMEMultipart('alternative')
-        self.msg['From'] = config['Email']['Address']
-
-    def parse_template(self, filename, **data):
+    def __init__(self, subject, template_name, **data):
         if config['Email']['Enabled']:
-            template = templates.get_template(filename)
+            # Initializes the email
+            self.msg = MIMEMultipart('alternative')
+            self.msg['From'] = config['Email']['Address']
+            self.msg['Subject'] = subject
+
+            # Parses the template
+            template = templates.get_template(template_name + '.html')
             text = template.render(banner=config['Environment']['Address'] + '/static/banner.png', **data)
             self.msg.attach(MIMEText(text, 'html'))
 
     def send(self, *recipients):
         if config['Email']['Enabled']:
+            # Connects to the server
             conn = SMTP(config['Email']['Server'], config['Email']['Port'])
             conn.ehlo()
             conn.starttls()
             conn.login(config['Email']['Login'], config['Email']['Password'])
 
+            # Sends the email to everyone
             for recipient in recipients:
                 del self.msg['To']
                 self.msg['To'] = recipient
@@ -36,39 +40,8 @@ class Email:
 
             conn.close()
 
-
-
-class WelcomeEmail(Email):
-    def __init__(self, username):
-        super().__init__()
-
-        self.msg['Subject'] = 'Registrazione effettuata'
-        self.parse_template('welcome.html', username=username)
-
-class ResetPasswordEmail(Email):
-    def __init__(self, username, password):
-        super().__init__()
-
-        self.msg['Subject'] = 'Reset Password'
-        self.parse_template('reset_password.html', username=username, password=password)
-
-class ConfirmDeletionEmail(Email):
-    def __init__(self, username, token):
-        super().__init__()
-
-        self.msg['Subject'] = 'Eliminazione account'
-        delete_url = config['Environment']['Address'] + '/account/elimina/?token=' + token
-        self.parse_template('confirm_deletion.html', username=username, delete_url=delete_url)
-
-class BroadcastEmail(Email):
-    def __init__(self, subject, content):
-        super().__init__()
-
-        self.msg['Subject'] = subject
-        unsubscribe_url = config['Environment']['Address'] + '/account/disabilita_newsletter'
-        self.parse_template('base.html', content=content, unsubscribe_url=unsubscribe_url)
-
-    def send_all(self):
-        addresses = get_newsletter_emails()
+    def broadcast(self):
+        # Sends the email to every user
+        addresses = get_users_emails()
         self.send(*addresses)
         return len(addresses)
