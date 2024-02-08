@@ -8,15 +8,15 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS menus (
     user INT PRIMARY KEY REFERENCES users (uid) ON DELETE CASCADE,
-    menu VARCHAR(250) NOT NULL
+    menu VARCHAR(3500) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS storage (
     user INT NOT NULL REFERENCES users (uid) ON DELETE CASCADE,
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(250) NOT NULL,
-    quantity INT NOT NULL,
-    expiration DATE NOT NULL,
+    quantity INT NOT NULL DEFAULT 0,
+    expiration DATE NOT NULL DEFAULT '2004-02-05',
 
     UNIQUE (user, name, expiration)
 );
