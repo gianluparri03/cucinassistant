@@ -35,23 +35,21 @@
 
         <script>
             $(window).on('load', function () {
-                if (!localStorage.getItem('cookies-accepted')) {
-                    $('#obfuscator').css('display', 'block');
+                if (localStorage.getItem('cookies-accepted')) {
+                    $('#cookie-notice').remove();
                 } else {
-                    $('#obfuscator').remove();
+                    $('#cookie-notice').css('display', 'block');
                 }
             });
 
-            function toggleCookieBanner() {
+            function toggleCookieNotice() {
                 localStorage.setItem('cookies-accepted', true);
-                $('#obfuscator').remove();
+                $('#cookie-notice').remove();
             }
 
             if (typeof navigator.serviceWorker !== 'undefined') {
                 navigator.serviceWorker.register("{{ url_for('static', filename='serviceworker.js') }}");
             }
-
-            {% if show %} alert(' {{ show }}'); {% endif %}
         </script>
     </head>
 
@@ -68,16 +66,25 @@
             {% block content %} {% endblock %}
         </main>
 
-        <div id="obfuscator">
-            <div id="cookie-banner">
-                <span>
+        <message id="cookie-notice">
+            <content>
+                <div>
                     Questo sito utilizza i cookies per funzionare. Proseguendo con
                     la navigazione, si presta il consenso all'utilizzo.
-                </span>
+                </div>
 
-                <button onclick="toggleCookieBanner();">Continua</button>
-            </div>
-        </div>
+                <button onclick="toggleCookieNotice();">Continua</button>
+            </content>
+        </message>
+
+        {% if show %}
+            <message>
+                <content>
+                    <div>{{ show }}</div>
+                    <button onclick="$(this).parent().parent().remove();">Continua</button>
+                </content>
+            </message>
+        {% endif %}
 
         <footer>
             <div>CucinAssistant &copy; 2023, Gianluca Parri</div>

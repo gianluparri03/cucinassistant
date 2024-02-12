@@ -25,6 +25,7 @@ def init_db():
 def use_db(func):
     @wraps(func)
     def inner(*args, **kwargs):
+        db.reconnect()
         with db.cursor() as cur:
             return func(cur, *args, **kwargs)
 
@@ -77,7 +78,7 @@ def login_user(cursor, username, password):
             ph.verify(data[1], password)
             return data[0]
         else:
-            raise
+            raise VerificationError()
     except VerificationError:
         raise CAError('Credenziali non valide')
 
@@ -113,8 +114,8 @@ def delete_user(cursor, uid, token):
             ph.verify(data[0], token)
             cursor.execute('DELETE FROM users WHERE uid=?;', [uid])
         else:
-            raise
-    except:
+            raise VerificationError()
+    except VerificationError:
         raise CAError('Errore durante la cancellazione, riprova')
 
 @use_db
