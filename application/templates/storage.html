@@ -69,7 +69,9 @@
                 };
             {% endif %}
 
-            $('.buttons').clone().appendTo('form');
+            if ($("body").height() > $(window).height()) {
+                $('.buttons').clone().prependTo('form');
+            }
         };
     </script>
 {% endblock %}
@@ -78,39 +80,14 @@
     {% set storage = get_storage() %}
 
     <form method="POST">
-        <div class="buttons">
-            {% if add %}
-                <button>Conferma</button>
-                <button onclick="add_element()" type="button">+</button>
-                <button onclick="remove_element()" type="button">-</button>
-                <button onclick="if (confirm('Sei sicuro di voler annullare le modifiche?')) location.href = '.';" type="button">Annulla</button>
-            {% else %}
-                <button id="search-button" onclick="search()" type="button">Cerca</button>
-
-                {% if edit %}
-                    <button onclick="location.href = '.';" type="button">Fine</button>
-                {% elif del %}
-                    <button>Conferma</button>
-                    <button onclick="if (confirm('Sei sicuro di voler annullare le modifiche?')) location.href = '.';" type="button">Annulla</button>
-                {% else %}
-                    <button onclick="location.href='?aggiungi';" type="button">Aggiungi articoli</button>
-
-                    {% if storage %}
-                        <button onclick="location.href='?modifica';" type="button">Modifica quantit&agrave;</button>
-                        <button onclick="location.href='?rimuovi';" type="button">Rimuovi articoli</button>
-                    {% endif %}
-                {% endif %}
-            {% endif %}
-        </div>
-
         {% if not add %}
             <div>
                 {% for item in storage %}
-                    <div>
-                        <input type="checkbox" id="{{ item[0] }}" autocomplete="off" {{ 'hidden' if not del }}>
+                    <div class="item">
+                        {% if del %} <input type="checkbox" id="{{ item[0] }}" autocomplete="off"> {% endif %}
                         <input class="name" value="{{ item[1] }}" disabled>
-                        <input class="quantity" {% if item[2] %} type="number" {% endif %} value="{{ item[2] }}" disabled>
-                        <input class="expiration" {% if item[3] %} type="date" {% endif %} value="{{ item[3] }}" disabled>
+                        {% if item[3] %} <input class="expiration" value="{{ item[3] }}" disabled> {% endif %}
+                        {% if item[2] %} <input class="quantity" value="{{ item[2] }}" disabled> {% endif %}
 
                         {% if edit %}
                             <button onclick="editItem({{ item[0] }}, '-');" type="button">-</button>
@@ -132,5 +109,30 @@
         {% elif del %}
             <textarea name="remove" hidden></textarea>
         {% endif %}
+
+        <div class="buttons">
+            {% if add %}
+                <button class="icon" onclick="if (confirm('Sei sicuro di voler annullare le modifiche?')) location.href = '.';" type="button"><i class="fas fa-undo"></i></button>
+                <button class="icon" onclick="remove_element()" type="button"><i class="fas fa-minus"></i></button>
+                <button class="icon" onclick="add_element()" type="button"><i class="fas fa-plus"></i></button>
+                <button class="icon"><i class="fas fa-check"></i></button>
+            {% else %}
+                <button class="icon" id="search-button" onclick="search()" type="button"><i class="fas fa-search"></i></button>
+
+                {% if edit %}
+                    <button class="icon" onclick="location.href = '.';" type="button"><i class="fas fa-check"></i></button>
+                {% elif del %}
+                    <button class="icon" onclick="if (confirm('Sei sicuro di voler annullare le modifiche?')) location.href = '.';" type="button"><i class="fas fa-undo"></i></button>
+                    <button class="icon" onclick="location.href = '.';" type="button"><i class="fas fa-check"></i></button>
+                {% else %}
+                    {% if storage %}
+                        <button class="icon" onclick="location.href='?rimuovi';" type="button"><i class="fas fa-minus"></i></button>
+                        <button class="icon" onclick="location.href='?modifica';" type="button"><i class="fas fa-edit"></i></button>
+                    {% endif %}
+
+                    <button class="icon" onclick="location.href='?aggiungi';" type="button"><i class="fas fa-plus"></i></button>
+                {% endif %}
+            {% endif %}
+        </div>
     </form>
 {% endblock %}

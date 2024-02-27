@@ -13,7 +13,7 @@ CucinAssistant è disponibile su [ca.gianlucaparri.me](https://ca.gianlucaparri.
 
 Questo sito web utilizza [sakura](https://github.com/oxalorg/sakura) come framework css,
 [Inclusive Sans](https://fonts.google.com/specimen/Inclusive+Sans?query=inclusive+sans)
-e [Satisfy](https://fonts.google.com/specimen/Satisfy?query=satisfy) come font, e due
+e [Satisfy](https://fonts.google.com/specimen/Satisfy?query=satisfy) come font, e alcune
 icone prese da [FontAwesome](https://fontawesome.com/).
 
 ## Altro

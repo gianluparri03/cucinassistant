@@ -67,16 +67,16 @@
 
         <div>
             {% if add %}
-                <button>Conferma</button>
-                <button onclick="add_element()" type="button">+</button>
-                <button onclick="remove_element()" type="button">-</button>
-                <button onclick="if (confirm('Sei sicuro di voler annullare le modifiche?')) location.href = '.';" type="button">Annulla</button>
+                <button class="icon" onclick="if (confirm('Sei sicuro di voler annullare le modifiche?')) location.href = '.';" type="button"><i class="fas fa-undo"></i></button>
+                <button class="icon" onclick="remove_element()" type="button"><i class="fas fa-minus"></i></button>
+                <button class="icon" onclick="add_element()" type="button"><i class="fas fa-plus"></i></button>
+                <button class="icon"><i class="fas fa-check"></i></button>
             {% elif del %}
-                <button>Conferma</button>
-                <button onclick="if (confirm('Sei sicuro di voler annullare le modifiche?')) location.href = '.';" type="button">Annulla</button>
+                <button class="icon" onclick="if (confirm('Sei sicuro di voler annullare le modifiche?')) location.href = '.';" type="button"><i class="fas fa-undo"></i></button>
+                <button class="icon"><i class="fas fa-check"></i></button>
             {% else %}
-                <button onclick="location.href='?aggiungi';" type="button">Aggiungi articoli</button>
-                {% if list %} <button onclick="location.href='?rimuovi';" type="button">Rimuovi articoli</button> {% endif %}
+            {% if list %} <button class="icon" onclick="location.href='?rimuovi';" type="button"><i class="fas fa-minus"></i></button> {% endif %}
+                <button class="icon" onclick="location.href='?aggiungi';" type="button"><i class="fas fa-plus"></i></button>
             {% endif %}
         </div>
     </form>

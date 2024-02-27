@@ -30,6 +30,7 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='sakura.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
+        <script src="https://kit.fontawesome.com/ca194095ec.js" crossorigin="anonymous"></script>
         <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"></script>
         {% block imports %} {% endblock %}
 
@@ -55,9 +56,9 @@
 
     <body>
         <nav>
-            <img id="home" onclick="location.href = '/'" src="{{ url_for('static', filename='icon_home.svg') }}">
+            <i id="home" onclick="location.href = '/';" class="fas fa-home"></i>
             <span id="logo">CucinAssistant</span>
-            <img id="settings" onclick="location.href = '/account/'" src="{{ url_for('static', filename='icon_settings.svg') }}">
+            <i id="settings" onclick="location.href = '/account/';" class="fas fa-cog"></i>
         </nav>
 
         <main>

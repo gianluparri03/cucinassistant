@@ -203,9 +203,9 @@ def update_user_menu(cursor, uid, items):
 @use_db
 def get_user_storage(cursor, uid):
     # Returns the storage
-    cursor.execute('SELECT id, name, quantity, expiration FROM storage WHERE user=? ORDER BY expiration;', [uid])
+    cursor.execute("SELECT id, name, quantity, DATE_FORMAT(expiration, '%d\\/%m\\/%Y') FROM storage WHERE user=? ORDER BY expiration;", [uid])
     if (data := cursor.fetchall()):
-        return [[i[0], i[1], i[2] if i[2] != 0 else '', i[3] if not i[3].isoformat().startswith('2004-02-05') else ''] for i in data]
+        return [[i[0], i[1], i[2] if i[2] != 0 else '', i[3] if not i[3] == '05/02/2004' else ''] for i in data]
     else:
         # Ensures that the user exists
         cursor.execute('SELECT 1 FROM users WHERE uid=?;', [uid])

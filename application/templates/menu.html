@@ -60,11 +60,11 @@
 
         <div>
             {% if not edit %}
-                <button onclick="location.href='?modifica';" type="button">Modifica</button>
+                <button class="icon" onclick="location.href='?modifica';" type="button"><i class="fas fa-edit"></i></button>
             {% else %}
-                <button>Salva</button>
-                <button onclick="if (confirm('Sei sicuro di voler cancellare tutto?')) $('textarea').val('');" type="button">Svuota tutto</button>
-                <button onclick="if (confirm('Sei sicuro di voler annullare le modifiche?')) location.href = '.';" type="button">Annulla</button>
+                <button class="icon" onclick="if (confirm('Sei sicuro di voler annullare le modifiche?')) location.href = '.';" type="button"><i class="fas fa-undo"></i></button>
+                <button class="icon" onclick="if (confirm('Sei sicuro di voler cancellare tutto?')) $('textarea').val('');" type="button"><i class="fas fa-trash-alt"></i></button>
+                <button class="icon" onclick="return confirm('Sei sicuro di voler sovrascrivere il menu precedente?');"><i class="fas fa-check"></i></button>
             {% endif %}
         </div>
     </form>

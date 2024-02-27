@@ -56,6 +56,12 @@ menu button {
     text-align: left;
 }
 
+button.icon {
+    width: 50px;
+    height: 50px;
+    color: white;
+}
+
 
 /* --- NAV, MAIN AND FOOTER ---------- */
 nav {
@@ -73,6 +79,17 @@ nav {
 
     text-align: center;
     background-color: var(--red);
+}
+
+#home, #settings {
+    font-size: 30px;
+    color: white;
+    padding: 20px;
+}
+
+#home:hover, #settings:hover {
+    color: var(--orange);
+    cursor: pointer;
 }
 
 #logo {
@@ -125,24 +142,29 @@ label {
 }
 
 input {
-    margin-top: 5px;
-    margin-right: 5px;
+    margin: 5px;
 }
 
-input.name {
-    width: 35%;
+.item {
+    display: flex;
 }
 
-input.quantity {
-    width: 25%;
+@media (orientation: landscape) {
+    input.name { width: 20vw; }
+    input.quantity { width: 8vw; }
+    input.expiration { width: 12vw; }
 }
 
-input.expiration {
-    width: max(25%, 150px);
-}
+@media (orientation: portrait) {
+    .item {
+        flex-direction: column;
+        margin: 10px auto;
+        border-left: 3px solid var(--orange);
+    }
 
-#search-button {
-    margin-bottom: 20px;
+    input.name { width: 80vw; }
+    input.quantity { width: 30vw; }
+    input.expiration { width: 40vw; }
 }
 
 /* --- MESSAGES ----------------- */

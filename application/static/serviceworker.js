@@ -8,7 +8,10 @@ var filesToCache = [
 
     'https://fonts.googleapis.com/css2?family=Inclusive+Sans&family=Satisfy&display=swap',
     'https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.css',
-    'https://code.jquery.com/jquery-3.7.1.slim.min.js'
+    'https://code.jquery.com/jquery-3.7.1.slim.min.js',
+    'https://ka-f.fontawesome.com/releases/v5.15.4/css/free.min.css?token=ca194095ec',
+    'https://ka-f.fontawesome.com/releases/v5.15.4/css/free-v4-shims.min.css?token=ca194095ec',
+    'https://ka-f.fontawesome.com/releases/v5.15.4/css/free-v4-font-face.min.css?token=ca194095ec'
 ];
 
 filesToCache.map(function(u) {
