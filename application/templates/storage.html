@@ -5,9 +5,14 @@
 {% block imports %}
     <script>
         function search() {
-            let query = prompt('Parola chiave');
+            let query = prompt('Parola chiave').toLowerCase();
             if (query) {
-                window.find(query, 0, 0, 0, 0, 1);
+                for (input of $('input.name')) {
+                    if (input.value.toLowerCase().includes(query)) {
+                        $(input).get(0).scrollIntoView();
+                        break;
+                    }
+                }
             }
         }
 
@@ -15,10 +20,10 @@
             let i = 0;
 
             function add_element() {
-                let div = `<div class="new-element">` +
+                let div = `<div class="new-element item">` +
                             `<input class="name" type="text" placeholder="Nome" required>` +
                             `<input class="quantity" type="number" placeholder="Quantit&agrave;">` +
-                            `<input class="expiration" type="date" placeholder="Scadenza">` +
+                            `<input class="expiration" type="text" placeholder="Scadenza">` +
                         `</div>`;
 
                 $('#new-elements').append(div);
@@ -59,6 +64,7 @@
                     $('input').remove();
                     return true;
                 };
+
             {% elif del %}
                 document.forms[0].onsubmit = function() {
                     let text = '';

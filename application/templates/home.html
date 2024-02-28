@@ -5,10 +5,10 @@
 {% block imports %} <style> #home { opacity: 0; } </style> {% endblock %}
 
 {% block content %}
-    <menu>
-        <button onclick="location.href='/menu/'">Menu della settimana</button> <br>
-        <button onclick="location.href='/dispensa/'">Dispensa</button> <br>
-        <button onclick="location.href='/spesa/'">Lista della spesa</button> <br>
-        <button onclick="location.href='/idee/'">Idee</button> <br>
-    </menu>
+    <div class="links">
+        <button onclick="location.href='/menu/';"><i class="fas fa-hamburger"></i> Men&ugrave;</button> <br>
+        <button onclick="location.href='/dispensa/'"><i class="fas fa-box"></i> Dispensa</button> <br>
+        <button onclick="location.href='/spesa/'"><i class="fas fa-shopping-basket"></i> Lista della spesa</button> <br>
+        <button onclick="location.href='/idee/'"><i class="fas fa-lightbulb"></i> Idee</button> <br>
+    </div>
 {% endblock %}

@@ -46,20 +46,18 @@ button:hover {
     border-color: var(--text);
 }
 
-menu {
+.links {
     padding-left: 0;
 }
 
-menu button {
+.links button {
     width: 70%;
     height: 50px;
     text-align: left;
 }
 
-button.icon {
-    width: 50px;
-    height: 50px;
-    color: white;
+.links button i {
+    width: 25px;
 }
 
 
@@ -88,7 +86,6 @@ nav {
 }
 
 #home:hover, #settings:hover {
-    color: var(--orange);
     cursor: pointer;
 }
 
@@ -103,10 +100,6 @@ nav img {
     width: 3rem;
     margin: 0 1.5rem;
     padding: 0;
-}
-
-nav img:hover {
-    cursor: pointer;
 }
 
 main {
@@ -142,7 +135,13 @@ label {
 }
 
 input {
-    margin: 5px;
+    margin: 5px 0;
+}
+
+button.icon {
+    width: 50px;
+    height: 50px;
+    color: white;
 }
 
 .item {
@@ -150,22 +149,27 @@ input {
 }
 
 @media (orientation: landscape) {
-    input.name { width: 20vw; }
-    input.quantity { width: 8vw; }
-    input.expiration { width: 12vw; }
+    input.name { width: 25vw; }
+    input.quantity { width: 10vw; }
+    input.expiration { width: 15vw; }
+
+    input+input { margin-left: 5px; }
 }
 
 @media (orientation: portrait) {
     .item {
         flex-direction: column;
+        align-items: flex-start;
         margin: 10px auto;
         border-left: 3px solid var(--orange);
+        padding-left: 5px;
     }
 
     input.name { width: 80vw; }
-    input.quantity { width: 30vw; }
-    input.expiration { width: 40vw; }
+    input.quantity { width: 40vw; }
+    input.expiration { width: 50vw; }
 }
+
 
 /* --- MESSAGES ----------------- */
 message {
@@ -207,4 +211,12 @@ message button {
 
 #cookie-notice {
     display: none;
+}
+
+
+/* --- PAGE SPECIFIC ------------ */
+.menu-day {
+    border-left: 3px solid var(--orange);
+    padding-left: 10px;
+    margin: 10px auto;
 }

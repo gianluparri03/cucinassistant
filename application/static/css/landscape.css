@@ -1,0 +1,30 @@
+/* Menu */
+.menu-day {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.menu-day b {
+    width: 100%;
+    display: block;
+}
+.menu-day b+textarea {
+    margin-right: 5px;
+}
+
+.menu-day textarea {
+    width: 48%;
+}
+
+.menu-day textarea+textarea {
+    margin-left: 5px;
+}
+
+
+
+input.name { width: 25vw; }
+input.quantity { width: 10vw; }
+input.expiration { width: 15vw; }
+
+input+input { margin-left: 5px; }

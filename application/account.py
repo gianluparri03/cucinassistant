@@ -22,10 +22,10 @@ def login_required(func):
     return inner
 
 
-@app.route('/account/')
-@smart_route('account.html')
+@app.route('/account/impostazioni')
+@smart_route('settings.html')
 @login_required
-def account_route(uid):
+def settings_route(uid):
     pass
 
 

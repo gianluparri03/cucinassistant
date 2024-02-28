@@ -1,10 +1,10 @@
 const cacheName = 'CucinAssistant';
 var filesToCache = [
-    '/static/icon_home.svg',
-    '/static/icon_settings.svg',
-    '/static/logo.png',
-    '/static/sakura.css',
-    '/static/style.css',
+    '/static/img/logo.png',
+    '/static/css/sakura.css',
+    '/static/css/base.css',
+    '/static/css/portrait.css',
+    '/static/css/landscape.css',
 
     'https://fonts.googleapis.com/css2?family=Inclusive+Sans&family=Satisfy&display=swap',
     'https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.css',

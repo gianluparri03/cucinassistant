@@ -1,4 +1,4 @@
-![CucinAssistant](application/static/banner.png)
+![CucinAssistant](application/static/img/banner.png)
 
 Una piattaforma web (aperta a tutti) creata per ricordarsi:
 

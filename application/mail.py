@@ -21,7 +21,7 @@ class Email:
 
             # Parses the template
             template = templates.get_template(template_name + '.html')
-            text = template.render(banner=config['Environment']['Address'] + '/static/banner.png', **data)
+            text = template.render(banner=config['Environment']['Address'] + '/static/img/banner.png', **data)
             self.msg.attach(MIMEText(text, 'html'))
 
     def send(self, *recipients):
