@@ -1,0 +1,2 @@
+class CAError(Exception):
+    pass

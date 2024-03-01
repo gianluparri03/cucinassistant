@@ -1,4 +1,5 @@
-from . import config, CAError
+from cucinassistant.config import config 
+from cucinassistant.exceptions import CAError
 
 from flask import render_template, Response
 from functools import wraps

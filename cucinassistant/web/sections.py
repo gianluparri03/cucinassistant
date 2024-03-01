@@ -11,11 +11,7 @@ def assets_route():
     return send_from_directory('static', 'assets.json')
 
 
-@app.route('/')
-@smart_route('home.html')
-@login_required
-def home_route(uid):
-    pass
+# TODO split into multiple files
 
 
 @app.route('/menu/', methods=['GET', 'POST'])
@@ -79,14 +75,3 @@ def ideas_route(uid):
         return redirect('.')
 
     return {'add': 'aggiungi' in request.args, 'del': 'rimuovi' in request.args}
-
-
-@app.route('/info')
-@smart_route('other/info.html', get_users_no=get_users_number, version=Version, is_logged=is_logged)
-def info_route():
-    pass
-
-@app.route('/privacy')
-@smart_route('other/privacy.html', is_logged=is_logged)
-def privacy_route():
-    pass

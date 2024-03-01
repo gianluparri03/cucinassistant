@@ -5,7 +5,7 @@
 
 
 run:
-	flask -A application:app run -h 0.0.0.0 -p 8080 --debug
+	flask -A cucinassistant:app run -h 0.0.0.0 -p 8080 --debug
 
 build:
 	if [[ -z "$(version)" ]]; then \

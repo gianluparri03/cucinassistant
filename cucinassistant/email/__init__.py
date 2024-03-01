@@ -1,5 +1,5 @@
-from . import config
-from .database import get_users_emails
+from cucinassistant.config import config
+from cucinassistant.database import get_users_emails
 
 from smtplib import SMTP
 from email.mime.text import MIMEText
@@ -7,8 +7,7 @@ from email.mime.multipart import MIMEMultipart
 from jinja2 import Environment, FileSystemLoader
 
 
-# Initializes the template loader
-templates = Environment(loader=FileSystemLoader("application/emails/"))
+templates = Environment(loader=FileSystemLoader('cucinassistant/email/templates'))
 
 
 class Email:

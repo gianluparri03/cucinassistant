@@ -1,6 +1,3 @@
 config.cfg
-
-env
 .direnv
-
 *__pycache__

@@ -1,15 +1,12 @@
-from . import app, CAError
-from .util import smart_route
-from .mail import Email
-from .database import *
+from cucinassistant.exceptions import CAError
+from cucinassistant.email import Email
+import cucinassistant.database as db
+from cucinassistant.web import *
 
 from functools import wraps
 from flask import request, redirect, session
 
 
-@app.before_request
-def make_session_permanent():
-    session.permanent = True
 
 def login_required(func):
     @wraps(func)
@@ -42,7 +39,7 @@ def signin_route():
             raise CAError('Dati mancanti')
 
         # Signs in the user
-        uid = login_user(data['username'], data['password'])
+        uid = db.login_user(data['username'], data['password'])
 
         # Saves the session, then returns to the homepage
         session['user'] = uid
@@ -58,7 +55,7 @@ def signup_route():
             raise CAError('Dati mancanti')
 
         # Signs up the user and sends it the welcome email
-        uid = create_user(data['username'], data['email'], data['password'])
+        uid = db.create_user(data['username'], data['email'], data['password'])
         Email('Registrazione effettuata', 'welcome', username=data['username']).send(data['email'])
 
         # Saves the session, then returns to the homepage
@@ -84,13 +81,13 @@ def delete_account_route(uid):
         if (data := get_user_data(uid)):
             if not token:
                 # If it's the first confirm button, generates the token and sends the email
-                token = generate_user_token(uid)
+                token = db.generate_user_token(uid)
                 delete_url = config['Environment']['Address'] + '/account/elimina/?token=' + token
                 Email('Eliminazione account', 'delete_account', username=data['username'], delete_url=delete_url).send(data['email'])
                 return 'Ti abbiamo inviato un email. Controlla la casella di posta'
             else:
                 # Otherwise deletes the account
-                delete_user(uid, token)
+                db.delete_user(uid, token)
                 Email('Eliminazione account', 'goodbye', username=data['username']).send(data['email'])
                 return logout_route()
         else:
@@ -107,7 +104,7 @@ def change_username_route(uid):
             return 'Dati mancanti'
         
         # Tries to change the email
-        change_user_username(uid, data['new'])
+        db.change_user_username(uid, data['new'])
         return 'Nome utente cambiato con successo'
 
 @app.route('/account/cambia_email/', methods=['GET', 'POST'])
@@ -121,7 +118,7 @@ def change_email_route(uid):
             return 'Dati mancanti'
         
         # Tries to change the email
-        change_user_email(uid, data['new'])
+        db.change_user_email(uid, data['new'])
         return 'Email cambiata con successo'
 
 @app.route('/account/cambia_password/', methods=['GET', 'POST'])
@@ -135,8 +132,8 @@ def change_password_route(uid):
             return 'Dati mancanti'
         
         # Tries to change the password
-        change_user_password(uid, data['old'], data['new'])
-        user = get_user_data(uid)
+        db.change_user_password(uid, data['old'], data['new'])
+        user = db.get_user_data(uid)
         Email('Cambio password', 'change_password', username=user['username']).send(user['email'])
         return 'Password cambiata con successo'
 
@@ -150,8 +147,8 @@ def recover_password_route():
             return 'Dati mancanti'
         
         # Sends the user a token to reset the password
-        if (data := get_user_data('', email=data['email'])):
-            token = generate_user_token(data['uid'])
+        if (data := db.get_user_data('', email=data['email'])):
+            token = db.generate_user_token(data['uid'])
             change_url = config['Environment']['Address'] + '/account/reset_password/?token=' + token
             Email('Recupera password', 'reset_password', username=data['username'], change_url=change_url).send(data['email'])
 
@@ -169,5 +166,5 @@ def reset_password_route():
             return 'Dati mancanti'
         
         # Tries to change the password
-        reset_user_password(data['email'], data['token'], data['new'])
+        db.reset_user_password(data['email'], data['token'], data['new'])
         return 'Password reimpostata con successo'
