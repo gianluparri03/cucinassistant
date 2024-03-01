@@ -1,7 +1,7 @@
 from . import app, Version
 from .database import *
 from .util import smart_route
-from .account import login_required
+from .account import login_required, is_logged
 
 from flask import request, redirect, send_from_directory
 
@@ -82,11 +82,11 @@ def ideas_route(uid):
 
 
 @app.route('/info')
-@smart_route('info.html', get_users_no=get_users_number, version=Version)
+@smart_route('other/info.html', get_users_no=get_users_number, version=Version, is_logged=is_logged)
 def info_route():
     pass
 
 @app.route('/privacy')
-@smart_route('privacy.html')
+@smart_route('other/privacy.html', is_logged=is_logged)
 def privacy_route():
     pass

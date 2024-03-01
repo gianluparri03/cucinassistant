@@ -2,7 +2,7 @@
 
 {% set title = 'Privacy' %}
 
-{% if not uid %} {% block imports %} <style> #settings { opacity: 0; } </style> {% endblock %} {% endif %}
+{% block imports %} {% if not is_logged() %} <style> #settings { z-index: -1; } </style> {% endif %} {% endblock %}
 
 {% block content %}
     <p>

@@ -2,12 +2,12 @@
 
 {% set title = 'Impostazioni' %}
 
-{% block imports %} <style> #settings { opacity: 0; } </style> {% endblock %}
+{% block imports %} <style> #settings { z-index: -1; } </style> {% endblock %}
 
 {% block content %}
     <div class="links">
         <button onclick="location.href='/account/esci/'"><i class="fas fa-sign-out-alt"></i> Esci</button> <br>
-        <button onclick="location.href='/account/cambia_nomeutente/';"><i class="fas fa-user"></i> Cambia nome utente</button> <br>
+        <button onclick="location.href='/account/cambia_nome/';"><i class="fas fa-user"></i> Cambia nome utente</button> <br>
         <button onclick="location.href='/account/cambia_email/';"><i class="fas fa-envelope"></i> Cambia email</button> <br>
         <button onclick="location.href='/account/cambia_password/';"><i class="fas fa-key"></i> Cambia password</button> <br>
         <button onclick="location.href='/account/elimina/';"><i class="fas fa-trash-alt"></i> Elimina account</button>

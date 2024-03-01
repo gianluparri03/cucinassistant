@@ -2,7 +2,7 @@
 
 {% set title = 'Informazioni' %}
 
-{% if not uid %} {% block imports %} <style> #settings { opacity: 0; } </style> {% endblock %} {% endif %}
+{% block imports %} {% if not is_logged() %} <style> #settings { z-index: -1; } </style> {% endif %} {% endblock %}
 
 {% block content %}
     <p>
@@ -12,12 +12,13 @@
 
         Il progetto &egrave; stato sviluppato da <a href="https://gianlucaparri.me" target="_blank">Gianluca Parri</a>;
         il codice sorgente &egrave; disponibile <a href="https://git.gianlucaparri.me/gianluparri03/cucinassistant" target="_blank">qui</a>.
-        Sono stati utilizzati <a href="https://github.com/oxalorg/sakura" target="_blank">sakura</a> come framework css,
+        Vengono utilizzati <a href="https://github.com/oxalorg/sakura" target="_blank">sakura</a> come framework css,
         <a href="https://fonts.google.com/specimen/Inclusive+Sans" target="_blank">Inclusive Sans</a> e
         <a href="https://fonts.google.com/specimen/Satisfy" target="_blank">Satisfy</a> come font e alcune icone di
         <a href="https://fontawesome.com/" target="_blank">FontAwesome</a>.
         <br> <br>
 
+        Per informazioni riguardo alla privacy, potete consultare <a href="/privacy">questa pagina</a>. <br>
         Per ulteriori informazioni, potete scrivere una mail a
         <a href="mailto:{{ config['Email']['Address'] }}" target="_blank">{{ config['Email']['Address'] }}</a>.
         <br> <br>

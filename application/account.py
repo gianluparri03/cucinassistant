@@ -21,16 +21,19 @@ def login_required(func):
     
     return inner
 
+def is_logged():
+    return 'user' in session
+
 
 @app.route('/account/impostazioni')
-@smart_route('settings.html')
+@smart_route('account/settings.html')
 @login_required
 def settings_route(uid):
     pass
 
 
 @app.route('/account/accedi', methods=['GET', 'POST'])
-@smart_route('signin.html')
+@smart_route('account/signin.html')
 def signin_route():
     if request.method == 'POST':
         # Ensures the request is valid
@@ -46,7 +49,7 @@ def signin_route():
         return redirect('/')
 
 @app.route('/account/registrati', methods=['GET', 'POST'])
-@smart_route('signup.html')
+@smart_route('account/signup.html')
 def signup_route():
     if request.method == 'POST':
         # Ensures the request is valid
@@ -69,7 +72,7 @@ def logout_route(uid):
     return redirect('/account/accedi')
 
 @app.route('/account/elimina/', methods=['GET', 'POST'])
-@smart_route('delete_account.html')
+@smart_route('account/delete.html')
 @login_required
 def delete_account_route(uid):
     token = request.args.get('token')
@@ -93,8 +96,8 @@ def delete_account_route(uid):
         else:
             return 'Utente sconosciuto'
 
-@app.route('/account/cambia_nomeutente/', methods=['GET', 'POST'])
-@smart_route('data_change.html', field='nome utente', field_type='text')
+@app.route('/account/cambia_nome/', methods=['GET', 'POST'])
+@smart_route('account/data_change.html', field='nome', field_type='text')
 @login_required
 def change_username_route(uid):
     if request.method == 'POST':
@@ -108,7 +111,7 @@ def change_username_route(uid):
         return 'Nome utente cambiato con successo'
 
 @app.route('/account/cambia_email/', methods=['GET', 'POST'])
-@smart_route('data_change.html', field='email', field_type='email')
+@smart_route('account/data_change.html', field='email', field_type='email')
 @login_required
 def change_email_route(uid):
     if request.method == 'POST':
@@ -122,7 +125,7 @@ def change_email_route(uid):
         return 'Email cambiata con successo'
 
 @app.route('/account/cambia_password/', methods=['GET', 'POST'])
-@smart_route('password_change.html', type='change')
+@smart_route('account/password_change.html', type='change')
 @login_required
 def change_password_route(uid):
     if request.method == 'POST':
@@ -138,7 +141,7 @@ def change_password_route(uid):
         return 'Password cambiata con successo'
 
 @app.route('/account/recupera_password', methods=['GET', 'POST'])
-@smart_route('password_recover.html')
+@smart_route('account/password_recover.html')
 def recover_password_route():
     if request.method == 'POST':
         # Ensures the request is valid
@@ -155,7 +158,7 @@ def recover_password_route():
         return 'Ti abbiamo inviato un email. Controlla la casella di posta'
 
 @app.route('/account/reset_password/', methods=['GET', 'POST'])
-@smart_route('password_change.html', type='reset')
+@smart_route('account/password_change.html', type='reset')
 def reset_password_route():
     if request.method == 'GET':
         return {'token': request.args.get('token')}

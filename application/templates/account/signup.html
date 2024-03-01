@@ -3,6 +3,8 @@
 {% set title = 'Registrazione' %}
 
 {% block imports %}
+    <style> #home, #settings { z-index: -1; } </style>
+
     <script>
         function comparePasswords() {
             if ($("#password1").val() != $("#password2").val()) {
@@ -13,8 +15,6 @@
             }
         }
     </script>
-
-    <style> #home, #settings { opacity: 0; } </style>
 {% endblock %}
 
 {% block content %}

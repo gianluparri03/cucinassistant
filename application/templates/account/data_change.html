@@ -4,9 +4,9 @@
 
 {% block content %}
     <form method="POST">
-        <label for="new">Nuov{{ 'o' if field == 'username' else 'a' }} {{ field }}</label> <br>
+        <label for="new">Nuov{{ 'o' if field == 'nome' else 'a' }} {{ field }}</label> <br>
         <input type="{{ field_type }}" name="new" required> <br>
 
-        <button>Conferma</button>
+        <button>Applica modifiche</button>
     </form>
 {% endblock %}
