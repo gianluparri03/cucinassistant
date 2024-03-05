@@ -8,7 +8,7 @@
     <script>
         function comparePasswords() {
             if ($("#password1").val() != $("#password2").val()) {
-                alert("Le due password non corrispondono");
+                showMessage("Le due password non corrispondono");
                 return false;
             } else {
                 return true;

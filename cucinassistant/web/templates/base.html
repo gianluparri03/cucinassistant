@@ -37,22 +37,31 @@
         {% block imports %} {% endblock %}
 
         <script>
+            function showMessage(content, handler=function() {}) {
+                var text = $('<p>').text(content);
+                var button = $('<button>').text('Conferma').on('click', function() { $(this).parent().parent().remove(); handler(); });
+
+                var content = $('<content>');
+                content.append(text);
+                content.append(button);
+
+                $('body').append($('<message>').append(content));
+                button.focus();
+            }
+
             $(window).on('load', function () {
-                if (localStorage.getItem('cookies-accepted')) {
-                    $('#cookie-notice').remove();
-                } else {
-                    $('#cookie-notice').css('display', 'block');
+                {% if show %}
+                    showMessage("{{ show }}");
+                {% endif %}
+
+                if (!localStorage.getItem('cookies-accepted')) {
+                    showMessage("CucinAssistant utilizza i cookie (non di terze parti) per funzionare. Continuando, si presta il consenso all'utilizzo.", "localStorage.setItem('cookies-accepted', true)");
+                }
+
+                if (typeof navigator.serviceWorker !== 'undefined') {
+                    navigator.serviceWorker.register("{{ url_for('static', filename='js/serviceworker.js') }}");
                 }
             });
-
-            function toggleCookieNotice() {
-                localStorage.setItem('cookies-accepted', true);
-                $('#cookie-notice').remove();
-            }
-
-            if (typeof navigator.serviceWorker !== 'undefined') {
-                navigator.serviceWorker.register("{{ url_for('static', filename='js/serviceworker.js') }}");
-            }
         </script>
     </head>
 
@@ -65,29 +74,8 @@
 
         <main>
             <h1>{{ title }}</h1>
-
             {% block content %} {% endblock %}
         </main>
-
-        <message id="cookie-notice">
-            <content>
-                <div>
-                    Questo sito utilizza i cookies per funzionare. Proseguendo con
-                    la navigazione, si presta il consenso all'utilizzo.
-                </div>
-
-                <button onclick="toggleCookieNotice();">Continua</button>
-            </content>
-        </message>
-
-        {% if show %}
-            <message>
-                <content>
-                    <div>{{ show }}</div>
-                    <button onclick="$(this).parent().parent().remove();">Continua</button>
-                </content>
-            </message>
-        {% endif %}
 
         <footer>
             <div>CucinAssistant &copy; 2023, Gianluca Parri</div>

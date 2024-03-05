@@ -1,23 +1,24 @@
-from application.mail import Email
+from cucinassistant.email import Email
+from cucinassistant.config import config
 
 
-print('[CucinAssistant] Invio email')
+print('[CucinAssistant] Invio email broadcast')
 
-okay = False
-while not okay:
-    print('\nInserisci il titolo della mail: ')
-    title = input('> ')
-    okay = input('Corretto? [y/n] ') == 'y'
+print('\nInserisci il titolo della mail: ')
+title = input('> ')
+print('\nInserisci il corpo della mail: ')
+content = input('> ')
 
-okay = False
-while not okay:
-    print('\nInserisci il contenuto della mail: ')
-    content = input('> ')
+mail = Email(title, 'base', content=content)
 
-    print(f'\n---\n\nContenuto della mail:\n{content}\n')
-    okay = input('Corretto? [y/n] ') == 'y'
+print('\nInvio della mail di prova...', end=' ')
+mail.send(config['Email']['Address'])
+print('fatto.')
 
-print(title, content)
-print('\nInvio della mail...', end=' ')
-n = Email(title, 'base', content=content).broadcast()
-print(f'Fatto! {n} email inviate.')
+print("\nProseguire con l'invio in broadcast? [prosegui]")
+
+if input('> ') == 'prosegui':
+    n = mail.broadcast()
+    print(f'\nFatto! {n} email inviate.')
+else:
+    print('\nInvio cancellato.')

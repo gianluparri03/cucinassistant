@@ -83,12 +83,12 @@ def delete_account_route(uid):
                 # If it's the first confirm button, generates the token and sends the email
                 token = db.generate_user_token(uid)
                 delete_url = config['Environment']['Address'] + '/account/elimina/?token=' + token
-                Email('Eliminazione account', 'delete_account', username=data['username'], delete_url=delete_url).send(data['email'])
+                Email('Eliminazione account', 'delete_account', username=data.username, delete_url=delete_url).send(data.email)
                 return 'Ti abbiamo inviato un email. Controlla la casella di posta'
             else:
                 # Otherwise deletes the account
                 db.delete_user(uid, token)
-                Email('Eliminazione account', 'goodbye', username=data['username']).send(data['email'])
+                Email('Eliminazione account', 'goodbye', username=data.username).send(data.email)
                 return logout_route()
         else:
             return 'Utente sconosciuto'
@@ -134,7 +134,7 @@ def change_password_route(uid):
         # Tries to change the password
         db.change_user_password(uid, data['old'], data['new'])
         user = db.get_user_data(uid)
-        Email('Cambio password', 'change_password', username=user['username']).send(user['email'])
+        Email('Cambio password', 'change_password', username=user.username).send(user.email)
         return 'Password cambiata con successo'
 
 @app.route('/account/recupera_password', methods=['GET', 'POST'])
@@ -150,7 +150,7 @@ def recover_password_route():
         if (data := db.get_user_data('', email=data['email'])):
             token = db.generate_user_token(data['uid'])
             change_url = config['Environment']['Address'] + '/account/reset_password/?token=' + token
-            Email('Recupera password', 'reset_password', username=data['username'], change_url=change_url).send(data['email'])
+            Email('Recupera password', 'reset_password', username=data.username, change_url=change_url).send(data.email)
 
         return 'Ti abbiamo inviato un email. Controlla la casella di posta'
 

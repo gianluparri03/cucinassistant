@@ -6,8 +6,9 @@
 
 {% block content %}
     <p>
-        <b>CucinAssistant</b> pu&ograve; essere installato su dispositivi Android dal <a href="https://play.google.com/store/apps/details?id=me.gianlucaparri.ca.twa" target="_blank">Play Store</a>,
-        oppure su altri dispositivi seguendo <a href="https://www.cdc.gov/niosh/mining/content/hearingloss/installPWA.html" target="_blank">questa guida</a>.
+        <b>CucinAssistant</b> &egrave; disponibile online su <a href="{{ config['Environment']['Address'] }}">{{ config['Environment']['Address'].split('//')[1] }}</a>.
+        Gli utenti Android possono installare l'applicazione dal <a href="{{ config['Various']['Store'] }}" target="_blank">Play Store</a>,
+        mentre per altri dispositivi si pu&ograve; seguire <a href="https://www.cdc.gov/niosh/mining/content/hearingloss/installPWA.html" target="_blank">questa guida</a>.
         <br> <br>
 
         Il progetto &egrave; stato sviluppato da <a href="https://gianlucaparri.me" target="_blank">Gianluca Parri</a>;

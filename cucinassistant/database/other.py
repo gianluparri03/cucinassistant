@@ -11,31 +11,6 @@ from argon2.exceptions import VerificationError
 
 # TODO split into multiple files
 
-@use_db
-def get_user_menu(cursor, uid):
-    # Returns the menu
-    cursor.execute('SELECT menu FROM menus WHERE user=?;', [uid])
-    if (menu := cursor.fetchone()):
-        return menu[0].split(';')
-    else:
-        # Ensures that the user exists
-        cursor.execute('SELECT 1 FROM users WHERE uid=?;', [uid])
-        if (data := cursor.fetchone()):
-            return [] * 14
-        else:
-            raise CAError('Utente sconosciuto')
-
-@use_db
-def update_user_menu(cursor, uid, items):
-    # Checks the menu syntax
-    if len(items) != 14:
-        raise CAError('Menu non valido')
-
-    # Saves the new menu
-    try:
-        cursor.execute('REPLACE INTO menus (user, menu) VALUES (?, ?);', [uid, ';'.join(items)])
-    except MDBError:
-        raise CAError('Utente sconosciuto')
 
 
 @use_db

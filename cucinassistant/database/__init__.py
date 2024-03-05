@@ -5,20 +5,19 @@ from mariadb import connect
 from functools import wraps
 
 
-# Connects to the database
-db = connect(host=config['Database']['Hostname'], database=config['Database']['Database'], \
-             user=config['Database']['Username'], password=config['Database']['Password'])
-db.autocommit = True
+def init_db(testing=False):
+    global db
 
-# Ensures the tables have been created
-with db.cursor() as cursor:
-    with open('cucinassistant/database/schema.sql') as f:
-        for command in f.read().split(';')[:-1]:
-            cursor.execute(command)
+    # Connects to the database
+    c = config['Database'] if not testing else config['DatabaseTest']
+    db = connect(host=c['Host'], port=int(c['Port']), database=c['Database'], user=c['User'], password=c['Password'])
+    db.autocommit = True
 
-# Initialize the hasher
-ph = PasswordHasher()
-
+    # Ensures the tables have been created
+    with db.cursor() as cursor:
+        with open('cucinassistant/database/schema.sql') as f:
+            for command in f.read().split(';')[:-1]:
+                cursor.execute(command)
 
 def use_db(func):
     @wraps(func)
@@ -31,5 +30,12 @@ def use_db(func):
 
     return inner
 
+
+# Initialize the hasher and the database connection
+ph = PasswordHasher()
+init_db()
+
+
 from .users import *
+from .menus import *
 from .other import *

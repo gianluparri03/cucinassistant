@@ -2,10 +2,13 @@ from cucinassistant.exceptions import CAError
 from cucinassistant.database import db, use_db, ph
 
 from secrets import token_hex
+from collections import namedtuple
 from mariadb import Error as MDBError
 from string import ascii_letters, digits
 from argon2.exceptions import VerificationError
 
+
+User = namedtuple('User', ['uid', 'username', 'email', 'password', 'token'])
 
 @use_db
 def get_users_number(cursor):
@@ -17,7 +20,7 @@ def get_users_number(cursor):
 def get_users_emails(cursor):
     # Counts the users
     cursor.execute('SELECT email FROM users;')
-    return list(map(lambda r: r[0], cursor.fetchall()))
+    return tuple(map(lambda r: r[0], cursor.fetchall()))
 
 @use_db
 def create_user(cursor, username, email, password):
@@ -50,7 +53,7 @@ def login_user(cursor, username, password):
     cursor.execute('SELECT uid, password FROM users WHERE username=?;', [username])
     try:
         if (data := cursor.fetchone()):
-            ph.verify(data[1], password)
+            ph.verify(data[1], password or '')
             return data[0]
         else:
             raise VerificationError()
@@ -66,7 +69,7 @@ def get_user_data(cursor, uid, email=''):
         cursor.execute('SELECT uid, username, email, password, token FROM users WHERE uid=?;', [uid])
 
     if (data := cursor.fetchone()):
-        return dict(zip(('uid', 'username', 'email', 'password', 'token'), data))
+        return User(*data)
     else:
         raise CAError('Utente sconosciuto')
 
@@ -86,10 +89,13 @@ def delete_user(cursor, uid, token):
     cursor.execute('SELECT token FROM users WHERE uid=?;', [uid])
     try:
         if (data := cursor.fetchone()):
-            ph.verify(data[0], token)
-            cursor.execute('DELETE FROM users WHERE uid=?;', [uid])
+            if data[0]:
+                ph.verify(data[0], token or '')
+                cursor.execute('DELETE FROM users WHERE uid=?;', [uid])
+            else:
+                raise VerificationError()
         else:
-            raise VerificationError()
+            raise CAError('Utente sconosciuto')
     except VerificationError:
         raise CAError('Errore durante la cancellazione, riprova')
 
@@ -99,7 +105,7 @@ def change_user_username(cursor, uid, new):
     try:
         if not (data := get_user_data(uid)):
             raise CAError('Utente sconosciuto')
-        elif data.get('username') == new:
+        elif data.username == new:
             return
 
         cursor.execute('UPDATE users SET username=? WHERE uid=?;', [new, uid])
@@ -112,7 +118,7 @@ def change_user_email(cursor, uid, new):
     try:
         if not (data := get_user_data(uid)):
             raise CAError('Utente sconosciuto')
-        elif data.get('email') == new:
+        elif data.email == new:
             return
 
         cursor.execute('UPDATE users SET email=? WHERE uid=?;', [new, uid])
@@ -128,7 +134,7 @@ def change_user_password(cursor, uid, old, new):
     cursor.execute('SELECT password FROM users WHERE uid=?;', [uid])
     try:
         # Check if the user is athorized, then updates it
-        ph.verify(cursor.fetchone()[0], old)
+        ph.verify(cursor.fetchone()[0], old or '')
         cursor.execute('UPDATE users SET password=? WHERE uid=?;', [ph.hash(new), uid])
     except VerificationError:
         raise CAError('Credenziali non valide')
@@ -142,7 +148,10 @@ def reset_user_password(cursor, email, token, new):
 
     try:
         # Check if the user is athorized, then updates it
-        ph.verify(data['token'], token)
-        cursor.execute('UPDATE users SET password=? WHERE uid=?;', [ph.hash(new), data['uid']])
-    except VerificiationError:
+        if data.token:
+            ph.verify(data.token, token or '')
+            cursor.execute('UPDATE users SET password=?, token=NULL WHERE uid=?;', [ph.hash(new), data.uid])
+        else:
+            raise VerificationError()
+    except VerificationError:
         raise CAError('Errore durante la reimpostazione della password')
