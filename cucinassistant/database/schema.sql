@@ -8,10 +8,14 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS menus (
     user INT REFERENCES users (uid) ON DELETE CASCADE,
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    menu VARCHAR(4096),
-    prev INT REFERENCES menus (id),
-    next INT REFERENCES menus (id)
+    id INT NOT NULL,
+    menu VARCHAR(4096) NOT NULL,
+    prev INT,
+    next INT,
+
+    PRIMARY KEY (user, id),
+    FOREIGN KEY (user, prev) REFERENCES menus (user, id),
+    FOREIGN KEY (user, next) REFERENCES menus (user, id)
 );
 
 CREATE TABLE IF NOT EXISTS storage (

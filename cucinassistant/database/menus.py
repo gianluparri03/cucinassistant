@@ -1,59 +1,65 @@
 from cucinassistant.exceptions import CAError
-from cucinassistant.database import db, use_db
+from cucinassistant.database import db, use_user
 
 from collections import namedtuple
 from mariadb import connect, Error as MDBError
 
 
-Menu = namedtuple('Menu', ['menu', 'prev', 'next'])
+Menu = namedtuple('Menu', ['mid', 'menu', 'prev', 'next'])
 
-@use_db
-def get_user_menu(cursor, uid, mid=0):
-    # Ensures that the user exists
-    cursor.execute('SELECT 1 FROM users WHERE uid=?;', [uid])
-    if not cursor.fetchone():
-        raise CAError('Utente sconosciuto')
-
-    menu = []
-
-    if not mid:
+@use_user
+def get_menu(cursor, uid, mid=None):
+    if mid == None:
         # Returns the first menu
-        cursor.execute('SELECT menu FROM menus WHERE user=? ORDER BY id LIMIT 1;', [uid])
+        cursor.execute('SELECT id, menu FROM menus WHERE user=? ORDER BY id DESC LIMIT 1;', [uid])
         if (data := cursor.fetchone()):
-            menu += data.split(';')
+            mid = data[0]
+            menu = data[1]
         else:
-            menu += [] * 14
+            mid = 0
+            menu = ()
     else:
         # Returns the selected menu
-        cursor.execute('SELECT user, menu FROM menus WHERE id=?;', [mid])
+        cursor.execute('SELECT menu FROM menus WHERE user=? AND id=?;', [uid, mid])
         if (data := cursor.fetchone()):
-            if data[0] == uid:
-                menu += data[1].split(';')
-            else:
-                raise CAError('Menu non disponibile')
+            menu = data[0]
         else:
             raise CAError('Menu non trovato')
 
     # Fetches the prev's id
-    cursor.execute('SELECT MAX(id) FROM menus WHERE user = ? AND id < ? ORDER BY id LIMIT 1;', [uid, mid])
+    cursor.execute('SELECT MAX(id) FROM menus WHERE user = ? AND id < ?;', [uid, mid])
     prev = cursor.fetchone()[0]
 
     # Fetches the next's id
-    cursor.execute('SELECT MIN(id) FROM menus WHERE user = ? AND id > ? ORDER BY id LIMIT 1;', [uid, mid])
+    cursor.execute('SELECT MIN(id) FROM menus WHERE user = ? AND id > ?;', [uid, mid])
     next = cursor.fetchone()[0]
 
-    return Menu(menu, prev, next)
+    return Menu(mid, menu, prev, next)
 
-# TODO refactor
+@use_user
+def create_menu(cursor, uid):
+    # Creates a new menu
+    prev = get_menu(uid).mid
+    mid = prev + 1
+    cursor.execute('INSERT INTO menus (user, id, menu, prev) VALUES (?, ?, ?, ?);', [uid, mid, ';'*13, prev or None])
 
-@use_db
-def update_user_menu(cursor, uid, items):
-    # Checks the menu syntax
-    if len(items) != 14:
+    # Updates the link
+    if prev > 0:
+        cursor.execute('UPDATE menus SET next=? WHERE user=? AND id=?;', [mid, uid, prev])
+
+    return mid
+
+@use_user
+def update_menu(cursor, uid, mid, menu):
+    # Makes sure the menu exists (for 0 get_menu wouldn't raise anything)
+    if mid == 0:
+        raise CAError('Menu non trovato')
+    else:
+        get_menu(uid, mid)
+
+    # Ensures the menu is valid
+    if menu.count(';') != 13:
         raise CAError('Menu non valido')
 
-    # Saves the new menu
-    try:
-        cursor.execute('REPLACE INTO menus (user, menu) VALUES (?, ?);', [uid, ';'.join(items)])
-    except MDBError:
-        raise CAError('Utente sconosciuto')
+    # Updates the menu
+    cursor.execute('UPDATE menus SET menu=? WHERE user=? AND id=?;', [menu, uid, mid])

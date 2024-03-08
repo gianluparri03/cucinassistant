@@ -39,7 +39,7 @@ def signin_route():
             raise CAError('Dati mancanti')
 
         # Signs in the user
-        uid = db.login_user(data['username'], data['password'])
+        uid = db.login(data['username'], data['password'])
 
         # Saves the session, then returns to the homepage
         session['user'] = uid
@@ -78,10 +78,10 @@ def delete_account_route(uid):
         # Renders the page
         return {'warning': not token}
     else:
-        if (data := get_user_data(uid)):
+        if (data := get_data(uid)):
             if not token:
                 # If it's the first confirm button, generates the token and sends the email
-                token = db.generate_user_token(uid)
+                token = db.generate_token(uid)
                 delete_url = config['Environment']['Address'] + '/account/elimina/?token=' + token
                 Email('Eliminazione account', 'delete_account', username=data.username, delete_url=delete_url).send(data.email)
                 return 'Ti abbiamo inviato un email. Controlla la casella di posta'
@@ -104,7 +104,7 @@ def change_username_route(uid):
             return 'Dati mancanti'
         
         # Tries to change the email
-        db.change_user_username(uid, data['new'])
+        db.change_username(uid, data['new'])
         return 'Nome utente cambiato con successo'
 
 @app.route('/account/cambia_email/', methods=['GET', 'POST'])
@@ -118,7 +118,7 @@ def change_email_route(uid):
             return 'Dati mancanti'
         
         # Tries to change the email
-        db.change_user_email(uid, data['new'])
+        db.change_email(uid, data['new'])
         return 'Email cambiata con successo'
 
 @app.route('/account/cambia_password/', methods=['GET', 'POST'])
@@ -132,8 +132,8 @@ def change_password_route(uid):
             return 'Dati mancanti'
         
         # Tries to change the password
-        db.change_user_password(uid, data['old'], data['new'])
-        user = db.get_user_data(uid)
+        db.change_password(uid, data['old'], data['new'])
+        user = db.get_data(uid)
         Email('Cambio password', 'change_password', username=user.username).send(user.email)
         return 'Password cambiata con successo'
 
@@ -147,8 +147,8 @@ def recover_password_route():
             return 'Dati mancanti'
         
         # Sends the user a token to reset the password
-        if (data := db.get_user_data('', email=data['email'])):
-            token = db.generate_user_token(data['uid'])
+        if (data := db.get_data('', email=data['email'])):
+            token = db.generate_token(data['uid'])
             change_url = config['Environment']['Address'] + '/account/reset_password/?token=' + token
             Email('Recupera password', 'reset_password', username=data.username, change_url=change_url).send(data.email)
 
@@ -166,5 +166,5 @@ def reset_password_route():
             return 'Dati mancanti'
         
         # Tries to change the password
-        db.reset_user_password(data['email'], data['token'], data['new'])
+        db.reset_password(data['email'], data['token'], data['new'])
         return 'Password reimpostata con successo'

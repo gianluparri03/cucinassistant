@@ -24,6 +24,7 @@ def use_db(func):
     def inner(*args, **kwargs):
         global db
 
+        # Lets the function use a db connection
         db.reconnect()
         with db.cursor() as cur:
             return func(cur, *args, **kwargs)

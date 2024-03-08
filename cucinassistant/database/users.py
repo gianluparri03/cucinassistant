@@ -1,6 +1,7 @@
 from cucinassistant.exceptions import CAError
 from cucinassistant.database import db, use_db, ph
 
+from functools import wraps
 from secrets import token_hex
 from collections import namedtuple
 from mariadb import Error as MDBError
@@ -10,17 +11,19 @@ from argon2.exceptions import VerificationError
 
 User = namedtuple('User', ['uid', 'username', 'email', 'password', 'token'])
 
-@use_db
-def get_users_number(cursor):
-    # Counts the users
-    cursor.execute('SELECT COUNT(*) FROM users;')
-    return cursor.fetchone()[0]
+def use_user(func):
+    @wraps(func)
+    @use_db
+    def inner(cursor, uid, *args, **kwargs):
+        # Ensures the user exists
+        cursor.execute('SELECT 1 FROM users WHERE uid=?;', [uid])
+        if not cursor.fetchone():
+            raise CAError('Utente sconosciuto')
 
-@use_db
-def get_users_emails(cursor):
-    # Counts the users
-    cursor.execute('SELECT email FROM users;')
-    return tuple(map(lambda r: r[0], cursor.fetchall()))
+        return func(cursor, uid, *args, **kwargs)
+
+    return inner
+
 
 @use_db
 def create_user(cursor, username, email, password):
@@ -48,7 +51,7 @@ def create_user(cursor, username, email, password):
             raise CAError("Errore sconosciuto")
 
 @use_db
-def login_user(cursor, username, password):
+def login(cursor, username, password):
     # Checks if the credentials are valid
     cursor.execute('SELECT uid, password FROM users WHERE username=?;', [username])
     try:
@@ -61,7 +64,7 @@ def login_user(cursor, username, password):
         raise CAError('Credenziali non valide')
 
 @use_db
-def get_user_data(cursor, uid, email=''):
+def get_data(cursor, uid, email=''):
     # Returns the user's data
     if email:
         cursor.execute('SELECT uid, username, email, password, token FROM users WHERE email=?;', [email])
@@ -73,64 +76,50 @@ def get_user_data(cursor, uid, email=''):
     else:
         raise CAError('Utente sconosciuto')
 
-@use_db
-def generate_user_token(cursor, uid):
+@use_user
+def generate_token(cursor, uid):
     # Generates a new deletion token for the user
     token = token_hex(18)
     cursor.execute('UPDATE users SET token=? WHERE uid=?;', [ph.hash(token), uid])
-    if cursor.rowcount == 1:
-        return token
-    else:
-        raise CAError('Utente sconosciuto')
+    return token
 
-@use_db
+@use_user
 def delete_user(cursor, uid, token):
     # Checks if the token is valid
     cursor.execute('SELECT token FROM users WHERE uid=?;', [uid])
     try:
-        if (data := cursor.fetchone()):
-            if data[0]:
-                ph.verify(data[0], token or '')
-                cursor.execute('DELETE FROM users WHERE uid=?;', [uid])
-            else:
-                raise VerificationError()
+        if (data := cursor.fetchone())[0]:
+            ph.verify(data[0], token or '')
+            cursor.execute('DELETE FROM users WHERE uid=?;', [uid])
         else:
-            raise CAError('Utente sconosciuto')
+            raise VerificationError()
     except VerificationError:
         raise CAError('Errore durante la cancellazione, riprova')
 
-@use_db
-def change_user_username(cursor, uid, new):
+@use_user
+def change_username(cursor, uid, new):
     # Saves the new one
     try:
-        if not (data := get_user_data(uid)):
-            raise CAError('Utente sconosciuto')
-        elif data.username == new:
+        if get_data(uid).username == new:
             return
 
         cursor.execute('UPDATE users SET username=? WHERE uid=?;', [new, uid])
     except MDBError:
         raise CAError('Nome utente non disponibile')
 
-@use_db
-def change_user_email(cursor, uid, new):
+@use_user
+def change_email(cursor, uid, new):
     # Saves the new one
     try:
-        if not (data := get_user_data(uid)):
-            raise CAError('Utente sconosciuto')
-        elif data.email == new:
+        if get_data(uid).email == new:
             return
 
         cursor.execute('UPDATE users SET email=? WHERE uid=?;', [new, uid])
     except MDBError:
         raise CAError('Email non disponibile')
 
-@use_db
-def change_user_password(cursor, uid, old, new):
-    # Ensures that the user exists
-    if not get_user_data(uid):
-        raise CAError('Utente sconosciuto')
-
+@use_user
+def change_password(cursor, uid, old, new):
     cursor.execute('SELECT password FROM users WHERE uid=?;', [uid])
     try:
         # Check if the user is athorized, then updates it
@@ -140,9 +129,9 @@ def change_user_password(cursor, uid, old, new):
         raise CAError('Credenziali non valide')
 
 @use_db
-def reset_user_password(cursor, email, token, new):
+def reset_password(cursor, email, token, new):
     # Ensures that the user exists
-    data = get_user_data('', email=email)
+    data = get_data('', email=email)
     if not data:
         raise CAError('Utente sconosciuto')
 
@@ -155,3 +144,15 @@ def reset_user_password(cursor, email, token, new):
             raise VerificationError()
     except VerificationError:
         raise CAError('Errore durante la reimpostazione della password')
+
+@use_db
+def get_users_number(cursor):
+    # Counts the users
+    cursor.execute('SELECT COUNT(*) FROM users;')
+    return cursor.fetchone()[0]
+
+@use_db
+def get_users_emails(cursor):
+    # Counts the users
+    cursor.execute('SELECT email FROM users;')
+    return tuple(map(lambda r: r[0], cursor.fetchall()))
