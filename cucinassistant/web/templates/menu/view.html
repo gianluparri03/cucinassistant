@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% set title = "Menu" %}
+
+{% block imports %}
+    <script>
+        window.onload = function() {
+            if ($("body").height() > $(window).height()) {
+                $('.buttons-line').clone().appendTo('form');
+            }
+        };
+    </script>
+{% endblock %}
+
+{% block content %}
+    <form method="POST" autocomplete="off">
+        {% if not menu.mid %}
+            <div>Nessun men&ugrave; trovato.</div>
+
+            <div class="buttons-line">
+                <button class="icon" onclick="location.href='/menu/crea';" type="button"><i class="fas fa-plus"></i></button>
+            </div>
+        {% else %}
+            <div class="buttons-line">
+                <button class="icon" type="button" disabled>{{ menu.mid }}</button>
+                {% if menu.prev %} <button class="icon" onclick="location.href='/menu/{{ menu.prev }}';" type="button"><i class="fas fa-step-backward"></i></button> {% endif %}
+                <button class="icon" onclick="location.href='/menu/{{ menu.mid }}/modifica';" type="button"><i class="fas fa-edit"></i></button>
+                <button class="icon" onclick="location.href='/menu/{{ menu.mid }}/clona';" type="button"><i class="fas fa-clone"></i></button>
+                <button class="icon" onclick="location.href='/menu/crea';" type="button"><i class="fas fa-plus"></i></button>
+                {% if menu.next %} <button class="icon" onclick="location.href='/menu/{{ menu.next }}';" type="button"><i class="fas fa-step-forward"></i></button> {% endif %}
+            </div>
+
+            {% set i = namespace(d=0) %}
+            {% set entries = menu.menu.split(';') %}
+            {% for day_name in ["Luned&igrave;", "Marted&igrave;", "Mercoled&igrave;", "Gioved&igrave;", "Venerd&igrave;", "Sabato", "Domenica"] %}
+                <div class="menu-day">
+                    <b>{{ day_name | safe }}</b>
+                    <textarea disabled>{{ entries[i.d] }}</textarea> {% set i.d = i.d + 1 %}
+                    <textarea disabled>{{ entries[i.d] }}</textarea> {% set i.d = i.d + 1 %}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </form>
+{% endblock %}

@@ -34,28 +34,22 @@
 
         <script src="https://kit.fontawesome.com/ca194095ec.js" crossorigin="anonymous"></script>
         <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"></script>
+        <script src="{{ url_for('static', filename='js/messages.js') }}"></script>
+
         {% block imports %} {% endblock %}
 
         <script>
-            function showMessage(content, handler=function() {}) {
-                var text = $('<p>').text(content);
-                var button = $('<button>').text('Conferma').on('click', function() { $(this).parent().parent().remove(); handler(); });
-
-                var content = $('<content>');
-                content.append(text);
-                content.append(button);
-
-                $('body').append($('<message>').append(content));
-                button.focus();
-            }
-
             $(window).on('load', function () {
-                {% if show %}
-                    showMessage("{{ show }}");
-                {% endif %}
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            showMessage(false, "{{ message | safe }}");
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
 
                 if (!localStorage.getItem('cookies-accepted')) {
-                    showMessage("CucinAssistant utilizza i cookie (non di terze parti) per funzionare. Continuando, si presta il consenso all'utilizzo.", "localStorage.setItem('cookies-accepted', true)");
+                    showMessage(false, "CucinAssistant utilizza i cookie (non di terze parti) per funzionare. Continuando, si presta il consenso all'utilizzo.", () => localStorage.setItem('cookies-accepted', true));
                 }
 
                 if (typeof navigator.serviceWorker !== 'undefined') {

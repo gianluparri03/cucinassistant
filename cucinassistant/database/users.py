@@ -1,4 +1,4 @@
-from cucinassistant.exceptions import CAError
+from cucinassistant.exceptions import CAError, CACritical
 from cucinassistant.database import db, use_db, ph
 
 from functools import wraps
@@ -18,7 +18,7 @@ def use_user(func):
         # Ensures the user exists
         cursor.execute('SELECT 1 FROM users WHERE uid=?;', [uid])
         if not cursor.fetchone():
-            raise CAError('Utente sconosciuto')
+            raise CACritical('Utente sconosciuto')
 
         return func(cursor, uid, *args, **kwargs)
 
@@ -74,7 +74,7 @@ def get_data(cursor, uid, email=''):
     if (data := cursor.fetchone()):
         return User(*data)
     else:
-        raise CAError('Utente sconosciuto')
+        raise CACritical('Utente sconosciuto')
 
 @use_user
 def generate_token(cursor, uid):
@@ -133,7 +133,7 @@ def reset_password(cursor, email, token, new):
     # Ensures that the user exists
     data = get_data('', email=email)
     if not data:
-        raise CAError('Utente sconosciuto')
+        raise CACritical('Utente sconosciuto')
 
     try:
         # Check if the user is athorized, then updates it

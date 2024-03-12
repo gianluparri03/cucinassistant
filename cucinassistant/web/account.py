@@ -4,7 +4,7 @@ import cucinassistant.database as db
 from cucinassistant.web import *
 
 from functools import wraps
-from flask import request, redirect, session
+from flask import request, redirect, session, flash
 
 
 
@@ -36,7 +36,8 @@ def signin_route():
         # Ensures the request is valid
         data = request.form
         if not data.get('username') or not data.get('password'):
-            raise CAError('Dati mancanti')
+            flash('Dati mancanti')
+            return
 
         # Signs in the user
         uid = db.login(data['username'], data['password'])
@@ -52,7 +53,8 @@ def signup_route():
         # Ensures the request is valid
         data = request.form
         if not data.get('username') or not data.get('password') or not data.get('email'):
-            raise CAError('Dati mancanti')
+            flash('Dati mancanti')
+            return
 
         # Signs up the user and sends it the welcome email
         uid = db.create_user(data['username'], data['email'], data['password'])
@@ -84,14 +86,14 @@ def delete_account_route(uid):
                 token = db.generate_token(uid)
                 delete_url = config['Environment']['Address'] + '/account/elimina/?token=' + token
                 Email('Eliminazione account', 'delete_account', username=data.username, delete_url=delete_url).send(data.email)
-                return 'Ti abbiamo inviato un email. Controlla la casella di posta'
+                flash('Ti abbiamo inviato un email. Controlla la casella di posta')
             else:
                 # Otherwise deletes the account
                 db.delete_user(uid, token)
                 Email('Eliminazione account', 'goodbye', username=data.username).send(data.email)
                 return logout_route()
         else:
-            return 'Utente sconosciuto'
+            flash('Utente sconosciuto')
 
 @app.route('/account/cambia_nome/', methods=['GET', 'POST'])
 @smart_route('account/data_change.html', field='nome', field_type='text')
@@ -101,11 +103,12 @@ def change_username_route(uid):
         # Ensures the request is valid
         data = request.form
         if not data.get('new'):
-            return 'Dati mancanti'
+            flash('Dati mancanti')
+            return
         
         # Tries to change the email
         db.change_username(uid, data['new'])
-        return 'Nome utente cambiato con successo'
+        flash('Nome utente cambiato con successo')
 
 @app.route('/account/cambia_email/', methods=['GET', 'POST'])
 @smart_route('account/data_change.html', field='email', field_type='email')
@@ -115,11 +118,12 @@ def change_email_route(uid):
         # Ensures the request is valid
         data = request.form
         if not data.get('new'):
-            return 'Dati mancanti'
+            flash('Dati mancanti')
+            return
         
         # Tries to change the email
         db.change_email(uid, data['new'])
-        return 'Email cambiata con successo'
+        flash('Email cambiata con successo')
 
 @app.route('/account/cambia_password/', methods=['GET', 'POST'])
 @smart_route('account/password_change.html', type='change')
@@ -129,13 +133,14 @@ def change_password_route(uid):
         # Ensures the request is valid
         data = request.form
         if not data.get('old') or not data.get('new'):
-            return 'Dati mancanti'
+            flash('Dati mancanti')
+            return
         
         # Tries to change the password
         db.change_password(uid, data['old'], data['new'])
         user = db.get_data(uid)
         Email('Cambio password', 'change_password', username=user.username).send(user.email)
-        return 'Password cambiata con successo'
+        flash('Password cambiata con successo')
 
 @app.route('/account/recupera_password', methods=['GET', 'POST'])
 @smart_route('account/password_recover.html')
@@ -144,7 +149,8 @@ def recover_password_route():
         # Ensures the request is valid
         data = request.form
         if not data.get('email'):
-            return 'Dati mancanti'
+            flash('Dati mancanti')
+            return
         
         # Sends the user a token to reset the password
         if (data := db.get_data('', email=data['email'])):
@@ -152,7 +158,7 @@ def recover_password_route():
             change_url = config['Environment']['Address'] + '/account/reset_password/?token=' + token
             Email('Recupera password', 'reset_password', username=data.username, change_url=change_url).send(data.email)
 
-        return 'Ti abbiamo inviato un email. Controlla la casella di posta'
+        flash('Ti abbiamo inviato un email. Controlla la casella di posta')
 
 @app.route('/account/reset_password/', methods=['GET', 'POST'])
 @smart_route('account/password_change.html', type='reset')
@@ -163,8 +169,9 @@ def reset_password_route():
         # Ensures the request is valid
         data = request.form
         if not data.get('token') or not data.get('email') or not data.get('new'):
-            return 'Dati mancanti'
+            flash('Dati mancanti')
+            return
         
         # Tries to change the password
         db.reset_password(data['email'], data['token'], data['new'])
-        return 'Password reimpostata con successo'
+        flash('Password reimpostata con successo')

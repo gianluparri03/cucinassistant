@@ -24,7 +24,7 @@ def get_menu(cursor, uid, mid=None):
         if (data := cursor.fetchone()):
             menu = data[0]
         else:
-            raise CAError('Menu non trovato')
+            raise CAError('Men&ugrave; non trovato')
 
     # Fetches the prev's id
     cursor.execute('SELECT MAX(id) FROM menus WHERE user = ? AND id < ?;', [uid, mid])
@@ -53,13 +53,39 @@ def create_menu(cursor, uid):
 def update_menu(cursor, uid, mid, menu):
     # Makes sure the menu exists (for 0 get_menu wouldn't raise anything)
     if mid == 0:
-        raise CAError('Menu non trovato')
+        raise CAError('Men&ugrave; non trovato')
     else:
         get_menu(uid, mid)
 
     # Ensures the menu is valid
     if menu.count(';') != 13:
-        raise CAError('Menu non valido')
+        raise CAError('Men&ugrave; non valido')
 
     # Updates the menu
     cursor.execute('UPDATE menus SET menu=? WHERE user=? AND id=?;', [menu, uid, mid])
+
+@use_user
+def delete_menu(cursor, uid, mid):
+    # Makes sure the menu exists (for 0 get_menu wouldn't raise anything)
+    if mid == 0:
+        raise CAError('Men&ugrave; non trovato')
+    else:
+        menu = get_menu(uid, mid)
+
+    # Updates the adjacent, then deletes the menu
+    cursor.execute('UPDATE menus SET next=? WHERE user=? AND id=?;', [menu.next, uid, menu.prev])
+    cursor.execute('UPDATE menus SET prev=? WHERE user=? AND id=?;', [menu.prev, uid, menu.next])
+    cursor.execute('DELETE FROM menus WHERE user=? AND id=?;', [uid, mid])
+
+@use_user
+def duplicate_menu(cursor, uid, mid):
+    # Makes sure the menu exists (for 0 get_menu wouldn't raise anything)
+    if mid == 0:
+        raise CAError('Men&ugrave; non trovato')
+    else:
+        menu = get_menu(uid, mid).menu
+
+    # Duplicates the menu
+    mid2 = create_menu(uid)
+    update_menu(uid, mid2, menu)
+    return mid2

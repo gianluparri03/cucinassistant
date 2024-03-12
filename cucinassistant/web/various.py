@@ -2,6 +2,8 @@ from cucinassistant.web import *
 from cucinassistant import version
 import cucinassistant.database as db
 
+from flask import send_from_directory
+
 
 @app.before_request
 def make_session_permanent():
@@ -22,3 +24,7 @@ def info_route():
 @smart_route('other/privacy.html', is_logged=is_logged)
 def privacy_route():
     pass
+
+@app.route('/.well-known/assetlinks.json')
+def assets_route():
+    return send_from_directory('static', 'assets.json')

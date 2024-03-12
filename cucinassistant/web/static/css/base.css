@@ -46,6 +46,11 @@ button:hover {
     border-color: var(--text);
 }
 
+button[disabled]:hover {
+    background-color: var(--red);
+    cursor: unset;
+}
+
 .links {
     padding-left: 0;
 }
@@ -202,14 +207,18 @@ message > content {
     box-sizing: border-box;
 }
 
-message > content > div {
+message > content > p {
     margin-bottom: 30px;
 }
 
-message button {
+message > content > div {
     position: absolute;
     right: 20px;
     bottom: 20px;
+}
+
+message button + button {
+    margin-left: 5px;
 }
 
 #cookie-notice {

@@ -1,16 +1,16 @@
+from cucinassistant.exceptions import CAError, CACritical
 from cucinassistant.config import config 
-from cucinassistant.exceptions import CAError
 
-from flask import render_template, Response
+from flask import render_template, Response, flash, redirect
 from functools import wraps
 
 
-# Inside a smart route, any CAError is automatically catched and
+# Inside a smart route, any CAError (and CACritical) is automatically catched and
 # rendered inside the specified template. If all goes well, the return
 # value of the function is rendered: if it's a response, that response
-# will be sent to the client; if it's a string, that message will be shown;
-# if it's a dict, it will be used in the template, and finally, if it's a
-# NoneType, the template will be rendered on its own.
+# will be sent to the client; if it's a dict, it will be used in the
+# template, and finally, if it's a NoneType, the template will be rendered
+# on its own.
 def smart_route(template, **data):
     def inner(func):
         @wraps(func)
@@ -22,17 +22,16 @@ def smart_route(template, **data):
                         return res
 
                     case 'dict':
-                        show = ''
                         data.update(res)
 
-                    case 'str':
-                        show = res
+            except CACritical as err:
+                flash(str(err))
+                return redirect('/account/esci')
 
-                    case 'NoneType':
-                        show = ''
             except CAError as err:
-                show = str(err)
+                flash(str(err))
+                return redirect('/')
 
-            return render_template(template, **data, show=show, config=config)
+            return render_template(template, config=config, **data)
         return wrapper
     return inner
