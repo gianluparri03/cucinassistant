@@ -232,3 +232,7 @@ message button + button {
     padding-left: 10px;
     margin: 10px auto;
 }
+
+ul {
+    margin-bottom: 0;
+}

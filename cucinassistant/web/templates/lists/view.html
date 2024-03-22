@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+
+{% block imports %}
+    <script>
+        function getEditId() {
+            showMessage(false, "Clicca sull'articolo da modificare");
+            for (label of $('li')) {
+                var l = $(label);
+                l.html("<a href='modifica/" + l.attr("eid") + "'>" + l.text() + "</a>");
+            }
+
+            $('h1').text('Modifica ' + $('h1').text().toLowerCase());
+            $('.buttons-line').remove();
+        }
+    </script>
+{% endblock %}
+
+{% block content %}
+    <form method="POST" autocomplete="off">
+        <div class="buttons-line">
+            {% if list %}
+                <button class="icon" onclick="location.href='rimuovi';" type="button"><i class="fas fa-minus"></i></button>
+                <button class="icon" onclick="getEditId();" type="button"><i class="fas fa-edit"></i></button>
+            {% endif %}
+
+            <button class="icon" onclick="location.href='aggiungi';" type="button"><i class="fas fa-plus"></i></button>
+        </div>
+
+        <div>
+            {% if not list %}
+                <i>La lista &egrave; vuota.</i>
+            {% else %}
+                <ul>
+                    {% for entry in list %}
+                        <li eid="{{ entry.eid }}">{{ entry.name }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    </form>
+{% endblock %}

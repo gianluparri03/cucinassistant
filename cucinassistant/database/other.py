@@ -75,39 +75,3 @@ def remove_user_storage(cursor, uid, items):
     # Remove some items from the storage
     data = [[uid, item] for item in items if item]
     cursor.executemany('DELETE FROM storage WHERE user=? AND id=?;', data)
-
-
-@use_db
-def get_user_lists(cursor, uid, section):
-    if section not in ('shopping', 'ideas'): raise CAError('Sezione sconosciuta')
-
-    # Returns the list
-    cursor.execute(f'SELECT id, name FROM {section} WHERE user=?;', [uid])
-    if (data := cursor.fetchall()):
-        return {i[0]: i[1] for i in data}
-    else:
-        # Ensures that the user exists
-        cursor.execute('SELECT 1 FROM users WHERE uid=?;', [uid])
-        if (data := cursor.fetchone()):
-            return {}
-        else:
-            raise CAError('Utente sconosciuto')
-
-@use_db
-def add_user_lists(cursor, uid, section, items):
-    if section not in ('shopping', 'ideas'): raise CAError('Sezione sconosciuta')
-
-    # Adds some items to the list
-    try:
-        data = [[uid, item] for item in items if item]
-        cursor.executemany(f'INSERT IGNORE INTO {section} (user, name) VALUES (?, ?);', data)
-    except MDBError:
-        raise CAError('Utente sconosciuto')
-
-@use_db
-def remove_user_lists(cursor, uid, section, items):
-    if section not in ('shopping', 'ideas'): raise CAError('Sezione sconosciuta')
-
-    # Remove some items from the list
-    data = [[uid, item] for item in items if item]
-    cursor.executemany(f'DELETE FROM {section} WHERE user=? AND id=?;', data)

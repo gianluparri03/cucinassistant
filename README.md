@@ -1,4 +1,4 @@
-![CucinAssistant](application/static/img/banner.png)
+![CucinAssistant](/blob/main/cucinassistant/web/static/img/banner.png)
 
 _Un aiutante per la tua cucina_
 

@@ -4,7 +4,7 @@
     <head>
         <meta charset="utf-8">
 
-        <title>CucinAssistant | {{ title }}</title>
+        <title>CucinAssistant | {{ title | safe }}</title>
 
         <meta http-equiv="content-type" content="text/html">
         <meta name="lang" content="it">
@@ -40,6 +40,7 @@
 
         <script>
             $(window).on('load', function () {
+                // Flashed messages
                 {% with messages = get_flashed_messages() %}
                     {% if messages %}
                         {% for message in messages %}
@@ -48,12 +49,19 @@
                     {% endif %}
                 {% endwith %}
 
+                // Cookie banner
                 if (!localStorage.getItem('cookies-accepted')) {
                     showMessage(false, "CucinAssistant utilizza i cookie (non di terze parti) per funzionare. Continuando, si presta il consenso all'utilizzo.", () => localStorage.setItem('cookies-accepted', true));
                 }
 
+                // Service Worker
                 if (typeof navigator.serviceWorker !== 'undefined') {
                     navigator.serviceWorker.register("{{ url_for('static', filename='js/serviceworker.js') }}");
+                }
+
+                // Buttons duplication
+                if ($('form[autocomplete=off]').length && $("body").height() > $(window).height()) {
+                    $('.buttons-line').clone().appendTo('form');
                 }
             });
         </script>
@@ -67,13 +75,16 @@
         </nav>
 
         <main>
-            <h1>{{ title }}</h1>
+            <h1>{{ title | safe }}</h1>
             {% block content %} {% endblock %}
         </main>
 
         <footer>
             <div>CucinAssistant &copy; 2023, Gianluca Parri</div>
-            <div><a href="/info">Ulteriori informazioni</a></div>
+            <div>
+                <a href="/info">Ulteriori informazioni</a> &bullet;
+                <a href="{{ config['Various']['Tutorial'] }}">Guida all'utilizzo</a>
+            </div>
         </footer>
     </body>
 </html>

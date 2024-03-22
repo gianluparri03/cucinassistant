@@ -39,4 +39,5 @@ init_db()
 
 from .users import *
 from .menus import *
+from .lists import *
 from .other import *

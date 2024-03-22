@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% set title = "Menu" %}
+{% set title = "Modifica Men&ugrave;" %}
 
 {% block imports %}
     <script>
@@ -15,12 +15,6 @@
             for (var i = 0; i < 14; i++) data += $('#entry-' + i).val() + ';';
             $('#data').val(data.slice(0, -1));
         }
-
-        window.onload = function() {
-            if ($("body").height() > $(window).height()) {
-                $('.buttons-line').clone().appendTo('form');
-            }
-        };
     </script>
 {% endblock %}
 

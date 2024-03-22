@@ -12,15 +12,18 @@ from flask import request, redirect
 def menu_view_route(uid, mid=None):
     return {'menu': db.get_menu(uid, mid)}
 
-@app.route('/menu/<int:mid>/modifica', methods=['GET', 'POST'])
+@app.route('/menu/<int:mid>/modifica')
 @smart_route('menu/edit.html')
 @login_required
-def menu_edit_route(uid, mid):
-    if request.method == 'POST':
-        db.update_menu(uid, mid, request.form.get('data', ''))
-        return redirect('.')
-    else:
-        return {'menu': db.get_menu(uid, mid)}
+def menu_edit_route_get(uid, mid):
+    return {'menu': db.get_menu(uid, mid)}
+
+@app.route('/menu/<int:mid>/modifica', methods=['POST'])
+@smart_route('menu/edit.html')
+@login_required
+def menu_edit_route_post(uid, mid):
+    db.update_menu(uid, mid, request.form.get('data', ''))
+    return redirect('.')
 
 @app.route('/menu/crea')
 @login_required

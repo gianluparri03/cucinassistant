@@ -24,7 +24,3 @@ def info_route():
 @smart_route('other/privacy.html', is_logged=is_logged)
 def privacy_route():
     pass
-
-@app.route('/.well-known/assetlinks.json')
-def assets_route():
-    return send_from_directory('static', 'assets.json')

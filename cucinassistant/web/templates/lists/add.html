@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block imports %}
+    <script>
+        let i = 0;
+
+        function addInput() {
+            let div = `<div class="new-element"><input class="name" type="text" placeholder="Nome" required></div>`;
+            $('#new-elements').append(div);
+            i++;
+        }
+
+        function removeInput() {
+            if (i > 1) {
+                $('#new-elements').find('div:last').remove();
+                i--;
+            }
+        }
+
+        function saveData() {
+            var data = "";
+            for (input of $('.new-element > input')) data += input.value + ';';
+            $('#data').val(data.slice(0, -1));
+        }
+
+        window.onload = function() { addInput(); }
+    </script>
+{% endblock %}
+
+{% block content %}
+    <form method="POST" autocomplete="off">
+        <div class="buttons-line">
+            <button class="icon" onclick="showMessage(true, 'Sei sicuro di voler annullare le modifiche?', handler=(() => location.href = '.'));" type="button"><i class="fas fa-undo"></i></button>
+            <button class="icon" onclick="removeInput()" type="button"><i class="fas fa-minus"></i></button>
+            <button class="icon" onclick="addInput()" type="button"><i class="fas fa-plus"></i></button>
+            <button class="icon" onclick="saveData()"><i class="fas fa-check"></i></button>
+        </div>
+
+        <div id="new-elements"></div>
+
+        <input id="data" name="data" hidden>
+    </form>
+{% endblock %}
