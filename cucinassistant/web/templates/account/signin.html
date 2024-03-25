@@ -12,12 +12,8 @@
         <label for="password">Password</label> <br>
         <input type="password" name="password" required> <br>
 
-        <button>Accedi</button>
-
-        <div><a href="/account/recupera_password">Password dimenticata?</a></div>
+        <button title="Accedi" class="icon"><i class="fas fa-sign-in-alt"></i></button>
+        <button title="Registrati" class="icon" onclick="location.href='/account/registrati';" type="button"><i class="fas fa-user-plus"></i></button>
+        <button title="Recupera password" class="icon" onclick="location.href='/account/recupera_password';" type="button"><i class="fas fa-key"></i></button>
     </form>
-
-    <hr>
-
-    <div>Non sei registrato ma vuoi un account? <a href="/account/registrati">Registrati</a></div>
 {% endblock %}

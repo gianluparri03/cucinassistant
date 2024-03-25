@@ -74,13 +74,19 @@ def edit_list(cursor, uid, section, eid, name):
         if not cursor.fetchone():
             raise CAError('Elemento non trovato')
 
-    # Ensures the new name doesn't exist
+    # Continue only if the new name is new
+    cursor.execute(f'SELECT name FROM {section} WHERE id=?;', [eid])
+    if cursor.fetchone()[0] == name:
+        return
+
+    # Ensures the new name is valid
     if not name:
         raise CAError('Nuovo nome non valido')
-    else:
-        cursor.execute(f'SELECT 1 FROM {section} WHERE name=? AND user=?;', [name, uid])
-        if cursor.fetchone():
-            raise CAError('Elemento gi&agrave; in lista')
+
+    # Makes sure tha name is unique
+    cursor.execute(f'SELECT 1 FROM {section} WHERE name=? AND user=?;', [name, uid])
+    if cursor.fetchone():
+        raise CAError('Elemento gi&agrave; in lista')
 
     # Saves the change
     cursor.execute(f'UPDATE {section} SET name=? WHERE id=?;', [name, eid])

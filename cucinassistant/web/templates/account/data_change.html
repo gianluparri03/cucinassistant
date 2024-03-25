@@ -7,6 +7,6 @@
         <label for="new">Nuov{{ 'o' if field == 'nome' else 'a' }} {{ field }}</label> <br>
         <input type="{{ field_type }}" name="new" required> <br>
 
-        <button>Applica modifiche</button>
+        <button title="Conferma" class="icon"><i class="fas fa-check"></i></button>
     </form>
 {% endblock %}

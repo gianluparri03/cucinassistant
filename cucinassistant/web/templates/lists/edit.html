@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <form method="POST" autocomplete="off">
-        <div class="buttons-line">
-            <button class="icon" onclick="location.href='..';" type="button"><i class="fas fa-undo"></i></button>
-            <button class="icon"><i class="fas fa-check"></i></button>
-        </div>
-
+    <form method="POST">
         <div>
             <input name="name" value="{{ prev }}" required>
+        </div>
+
+        <div class="buttons-line">
+            <button title="Annulla" class="icon" onclick="location.href='.';" type="button"><i class="fas fa-undo"></i></button>
+            <button title="Conferma" class="icon"><i class="fas fa-check"></i></button>
         </div>
     </form>
 {% endblock %}
