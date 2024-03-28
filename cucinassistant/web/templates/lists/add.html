@@ -2,18 +2,14 @@
 
 {% block imports %}
     <script>
-        let i = 0;
-
         function addInput() {
             let div = `<div class="new-element"><input class="name" type="text" placeholder="Nome" required></div>`;
             $('#new-elements').append(div);
-            i++;
         }
 
         function removeInput() {
-            if (i > 1) {
+            if ($('.new-element').length > 1) {
                 $('#new-elements').find('div:last').remove();
-                i--;
             }
         }
 

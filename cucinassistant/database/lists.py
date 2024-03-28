@@ -34,11 +34,11 @@ def get_list_entry(cursor, uid, section, eid):
         raise CAError('Elemento non valido')
 
     # Gets the entry
-    cursor.execute(f'SELECT name FROM {section} WHERE user=? AND id=?;', [uid, int(eid)])
+    cursor.execute(f'SELECT id, name FROM {section} WHERE user=? AND id=?;', [uid, int(eid)])
     if (n := cursor.fetchone()):
-        return Entry(eid, n[0])
+        return Entry(*n)
     else:
-        raise CAError('Articolo non in lista')
+        raise CAError('Elemento non in lista')
 
 @check_section
 def append_list(cursor, uid, section, names):
@@ -55,7 +55,7 @@ def remove_list(cursor, uid, section, eids):
         if not eid:
             continue
         elif not check_number(eid):
-            raise CAError('Elemento/i non valido/i')
+            raise CAError('Elemento non valido')
         else:
             data.add((uid, eid))
 
@@ -65,7 +65,7 @@ def remove_list(cursor, uid, section, eids):
     # Remove some items from the list
     cursor.executemany(f'DELETE FROM {section} WHERE user=? AND id=?;', list(data))
     if cursor.rowcount != len(data):
-        raise CAError('Elemento/i non trovato/i')
+        raise CAError('Elemento non trovato')
 
 @check_section
 def edit_list(cursor, uid, section, eid, name):
@@ -73,14 +73,13 @@ def edit_list(cursor, uid, section, eid, name):
     if not check_number(eid):
         raise CAError('Elemento non valido')
     else:
-        cursor.execute(f'SELECT 1 FROM {section} WHERE id=? AND user=?;', [eid, uid])
-        if not cursor.fetchone():
+        cursor.execute(f'SELECT name FROM {section} WHERE id=? AND user=?;', [eid, uid])
+        if not (data := cursor.fetchone()):
             raise CAError('Elemento non trovato')
 
-    # Continue only if the new name is new
-    cursor.execute(f'SELECT name FROM {section} WHERE id=?;', [eid])
-    if cursor.fetchone()[0] == name:
-        return
+        # Continue only if the new name is new
+        elif data[0] == name:
+            return
 
     # Ensures the new name is valid
     if not name:

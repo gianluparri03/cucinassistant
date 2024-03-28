@@ -19,14 +19,14 @@
             var timestamp = input.val();
             input.attr('timestamp', timestamp);
             input.attr('type', 'text');
-            input.val(new Date(timestamp).toLocaleDateString());
+            input.val(timestamp ? new Date(timestamp).toLocaleDateString() : '');
         }
 
         function addInput() {
             let div = `<div class="new-element item">` +
                           `<input class="name" type="text" placeholder="Nome" required>` +
-                          `<input class="quantity" type="number" placeholder="Quantit&agrave;">` +
-                          `<input class="expiration" type="text" placeholder="Scadenza" onblur="blurDate(this);" onfocus="focusDate(this);">` +
+                          `<input class="expiration" type="text" placeholder="Scadenza" onblur="blurDate(this);" onfocus="focusDate(this);" timestamp="">` +
+                          `<input class="quantity" type="number" min="0" placeholder="Quantit&agrave;">` +
                       `</div>`;
 
             $('#new-elements').append(div);
@@ -41,6 +41,9 @@
         }
 
         function saveData() {
+            var data = "";
+            for (item of $('.item')) data += item.children[0].value + ';' + $(item.children[1]).attr('timestamp') + ';' + item.children[2].value + '|';
+            $('#data').val(data.slice(0, -1));
         }
 
         window.onload = function() { addInput(); };

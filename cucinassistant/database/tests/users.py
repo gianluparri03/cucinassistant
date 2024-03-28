@@ -83,6 +83,10 @@ class TestUsers:
         self.t.assertRaisesRegex(CAError, 'Errore durante la cancellazione', db.delete_user, self.antonello, 'token')
         self.t.assertRaisesRegex(CAError, 'Errore durante la cancellazione', db.delete_user, self.antonello, self.token)
         self.token = db.generate_token(self.antonello)
+        db.append_storage(self.antonello, [['storage', '', '']])
+        db.append_list(self.antonello, 'shopping', 'lists')
+        db.append_list(self.antonello, 'ideas', 'lists')
+        db.create_menu(self.antonello)
         db.delete_user(self.antonello, self.token)
         self.t.assertRaisesRegex(CAError, 'Credenziali non valide', db.login, 'antonello', 'passwordA')
 

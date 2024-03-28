@@ -20,7 +20,9 @@ class TestLists(SubTest):
             self.t.assertRaisesRegex(CACritical, 'Utente sconosciuto', db.append_list, self.fake_user, sec, [])
             self.t.assertEqual(len(db.get_list(self.giovanna, sec)), 3)
             db.append_list(self.giovanna, sec, ['a', 'b', 'c'])
+            db.append_list(self.francesco, sec, ['a', 'b', 'c'])
             self.t.assertEqual(len(db.get_list(self.giovanna, sec)), 3)
+            self.t.assertEqual(len(db.get_list(self.francesco, sec)), 3)
             db.append_list(self.giovanna, sec, [])
             self.t.assertEqual(len(db.get_list(self.giovanna, sec)), 3)
 
@@ -32,9 +34,9 @@ class TestLists(SubTest):
             self.t.assertEqual(len(db.get_list(self.giovanna, sec)), 3)
             db.remove_list(self.giovanna, sec, [e.eid for e in db.get_list(self.giovanna, sec) if e.eid > 1])
             self.t.assertEqual(len(db.get_list(self.giovanna, sec)), 1)
-            self.t.assertRaisesRegex(CAError, 'Elemento/i non trovato/i', db.remove_list, self.giovanna, sec, [100])
-            self.t.assertRaisesRegex(CAError, 'Elemento/i non trovato/i', db.remove_list, self.francesco, sec, [1])
-            self.t.assertRaisesRegex(CAError, 'Elemento/i non valido/i', db.remove_list, self.giovanna, sec, ['a'])
+            self.t.assertRaisesRegex(CAError, 'Elemento non trovato', db.remove_list, self.giovanna, sec, [100])
+            self.t.assertRaisesRegex(CAError, 'Elemento non trovato', db.remove_list, self.francesco, sec, [1])
+            self.t.assertRaisesRegex(CAError, 'Elemento non valido', db.remove_list, self.giovanna, sec, ['a'])
             db.remove_list(self.giovanna, sec, ['1'])
             self.t.assertEqual(len(db.get_list(self.giovanna, sec)), 0)
 
@@ -59,7 +61,7 @@ class TestLists(SubTest):
         # Tests for get_list_entry
         self.t.assertRaisesRegex(CAError, 'Lista inesistente', db.append_list, self.giovanna, '', [])
         for sec in ('shopping', 'ideas'):
-            self.t.assertEqual(db.get_list_entry(self.giovanna, sec, 6).name, 'after')
-            self.t.assertEqual(db.get_list_entry(self.giovanna, sec, '5').name, 'after2')
-            self.t.assertRaisesRegex(CAError, 'Articolo non in lista', db.get_list_entry, self.francesco, sec, 6)
+            self.t.assertEqual(db.get_list_entry(self.giovanna, sec, 9).name, 'after')
+            self.t.assertEqual(db.get_list_entry(self.giovanna, sec, '8').name, 'after2')
+            self.t.assertRaisesRegex(CAError, 'Elemento non in lista', db.get_list_entry, self.francesco, sec, 9)
             self.t.assertRaisesRegex(CAError, 'Elemento non valido', db.get_list_entry, self.francesco, sec, 'a')

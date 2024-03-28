@@ -4,7 +4,7 @@ import cucinassistant.database as db
 from cucinassistant import version
 from cucinassistant.web import app
 
-from flask import send_from_directory
+from flask import send_from_directory, session
 
 
 @app.before_request

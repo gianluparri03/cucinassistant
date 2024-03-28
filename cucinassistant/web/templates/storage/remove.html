@@ -5,6 +5,8 @@
 
 {% block imports %}
     <script>
+        window.onload = function() { for (input of $('.expiration')) input.value = new Date(input.value).toLocaleDateString(); }
+
         function saveData() {
             var data = "";
             for (c of $('input[type=checkbox]:checked')) data += c.id.slice(4) + ';';

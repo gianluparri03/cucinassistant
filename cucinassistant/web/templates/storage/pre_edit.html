@@ -3,6 +3,12 @@
 
 {% set title = 'Modifica dispensa' %}
 
+{% block imports %}
+    <script>
+        window.onload = function() { for (input of $('.expiration')) input.value = new Date(input.value).toLocaleDateString(); }
+    </script>
+{% endblock%}
+
 {% block content %}
     <form method="POST" autocomplete="off">
         <div class="buttons-line">
