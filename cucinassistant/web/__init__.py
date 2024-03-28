@@ -17,6 +17,6 @@ app.config['SESSION_COOKIE_SECURE'] = True
 from .smart_route import *
 from .account import *
 from .menu import *
+from .storage import *
 from .lists import *
 from .various import *
-# from .sections import *

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+
+{% set title = 'Dispensa' %}
+
+{% block content %}
+    <form method="POST" autocomplete="off">
+        <div class="buttons-line">
+            {% if storage %}
+                <button title="Rimuovi" class="icon" onclick="location.href='rimuovi';" type="button"><i class="fas fa-minus"></i></button>
+                <button title="Modifica" class="icon" onclick="location.href='modifica/';" type="button"><i class="fas fa-edit"></i></button>
+            {% endif %}
+            <button title="Aggiungi" class="icon" onclick="location.href='aggiungi';" type="button"><i class="fas fa-plus"></i></button>
+        </div>
+
+        <div>
+            {% if not storage %}
+                <i>La lista &egrave; vuota.</i>
+            {% else %}
+                {% for item in storage %}
+                    <div class="item">
+                        <input class="name" value="{{ item.name }}" readonly>
+                        {% if item.expiration %} <input class="expiration" value="{{ item.expiration }}" readonly> {% endif %}
+                        {% if item.quantity %} <input class="quantity" value="{{ item.quantity }}" readonly> {% endif %}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </form>
+{% endblock %}

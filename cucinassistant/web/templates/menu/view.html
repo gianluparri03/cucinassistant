@@ -12,7 +12,7 @@
             <div>Nessun men&ugrave; trovato.</div>
         {% else %}
             <div class="buttons-line">
-                <button title="Numero" class="icon" type="button" disabled>{{ menu.mid }}</button>
+                <button title="Numero" class="icon" type="button" readonly>{{ menu.mid }}</button>
                 {% if menu.prev %} <button title="Precedente" class="icon" onclick="location.href='/menu/{{ menu.prev }}';" type="button"><i class="fas fa-step-backward"></i></button> {% endif %}
                 <button title="Modifica" class="icon" onclick="location.href='/menu/{{ menu.mid }}/modifica';" type="button"><i class="fas fa-edit"></i></button>
                 <button title="Clona" class="icon" onclick="location.href='/menu/{{ menu.mid }}/clona';" type="button"><i class="fas fa-clone"></i></button>
@@ -25,8 +25,8 @@
             {% for day_name in ["Luned&igrave;", "Marted&igrave;", "Mercoled&igrave;", "Gioved&igrave;", "Venerd&igrave;", "Sabato", "Domenica"] %}
                 <div class="menu-day">
                     <b>{{ day_name | safe }}</b>
-                    <textarea disabled>{{ entries[i.d] }}</textarea> {% set i.d = i.d + 1 %}
-                    <textarea disabled>{{ entries[i.d] }}</textarea> {% set i.d = i.d + 1 %}
+                    <textarea readonly>{{ entries[i.d] }}</textarea> {% set i.d = i.d + 1 %}
+                    <textarea readonly>{{ entries[i.d] }}</textarea> {% set i.d = i.d + 1 %}
                 </div>
             {% endfor %}
         {% endif %}

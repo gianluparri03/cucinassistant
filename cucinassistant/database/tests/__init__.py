@@ -1,10 +1,21 @@
-from cucinassistant.exceptions import CAError
 from cucinassistant.database import init_db, create_user
-from cucinassistant.database.users_test import TestUsers
-from cucinassistant.database.menus_test import TestMenus
-from cucinassistant.database.lists_test import TestLists
+from cucinassistant.exceptions import CAError
 
 from unittest import TestCase
+
+
+class SubTest:
+    def __init__(self, tester, francesco, giovanna, fake_user):
+        self.t = tester
+        self.francesco = francesco
+        self.giovanna = giovanna
+        self.fake_user = fake_user
+
+        # Executes all the subtests IN ORDER
+        for name in sorted(dir(self)):
+            if name[0] == 'S':
+                with self.t.subTest(name):
+                    getattr(self, name)()
 
 
 class TestDatabase(TestCase):
@@ -25,13 +36,17 @@ class TestDatabase(TestCase):
         self.fake_user = 0
 
     def test_users(self):
-        # See cucinassistant/database/users_test.py
+        from cucinassistant.database.tests.users import TestUsers
         TestUsers(self, self.fake_user)
 
     def test_menus(self):
-        # See cucinassistant/database/menus_test.py
+        from cucinassistant.database.tests.menus import TestMenus
         TestMenus(self, self.francesco, self.giovanna, self.fake_user)
 
     def test_lists(self):
-        # See cucinassistant/database/lists_test.py
+        from cucinassistant.database.tests.lists import TestLists
         TestLists(self, self.francesco, self.giovanna, self.fake_user)
+
+    def test_storage(self):
+        from cucinassistant.database.tests.storage import TestStorage
+        TestStorage(self, self.francesco, self.giovanna, self.fake_user)

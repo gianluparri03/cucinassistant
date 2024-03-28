@@ -1,6 +1,7 @@
-from cucinassistant.exceptions import CAError
+from cucinassistant.web.smart_route import smart_route
+from cucinassistant.web.account import login_required
 import cucinassistant.database as db
-from cucinassistant.web import *
+from cucinassistant.web import app
 
 from flask import request, redirect
 

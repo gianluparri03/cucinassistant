@@ -1,22 +1,9 @@
 from cucinassistant.exceptions import CAError, CACritical
+from cucinassistant.database.tests import SubTest
 import cucinassistant.database as db
 
 
-class TestLists:
-    def __init__(self, tester, francesco, giovanna, fake_user):
-        self.t = tester
-        self.francesco = francesco
-        self.giovanna = giovanna
-        self.fake_user = fake_user
-        self.fake_menu = 0
-
-        # Executes all the subtests IN ORDER
-        for name in sorted(dir(self)):
-            if name[0] == 'S':
-                with self.t.subTest(sec='Lists', sub=int(name[1:3])):
-                    getattr(self, name)()
-
-
+class TestLists(SubTest):
     def S00_get_list(self):
         # Tests for get_list
         self.t.assertRaisesRegex(CAError, 'Lista inesistente', db.get_list, self.giovanna, '')
@@ -57,7 +44,8 @@ class TestLists:
         for sec in ('shopping', 'ideas'):
             self.t.assertRaisesRegex(CACritical, 'Utente sconosciuto', db.edit_list, self.fake_user, sec, 0, '')
             self.t.assertRaisesRegex(CAError, 'Elemento non trovato', db.edit_list, self.giovanna, sec, 0, '')
-            eid = db.append_list(self.giovanna, sec, ['before'])
+            db.append_list(self.giovanna, sec, ['before'])
+            eid = max(e.eid for e in db.get_list(self.giovanna, sec))
             self.t.assertRaisesRegex(CAError, 'Elemento non trovato', db.edit_list, self.francesco, sec, eid, '')
             self.t.assertRaisesRegex(CAError, 'Elemento non valido', db.edit_list, self.giovanna, sec, 'a', '')
             db.append_list(self.giovanna, sec, ['after'])
@@ -65,13 +53,13 @@ class TestLists:
             self.t.assertRaisesRegex(CAError, 'Elemento gi&agrave; in lista', db.edit_list, self.giovanna, sec, eid, 'after')
             self.t.assertRaisesRegex(CAError, 'Nuovo nome non valido', db.edit_list, self.giovanna, sec, eid, '')
             db.edit_list(self.giovanna, sec, str(eid), 'after2')
-            self.t.assertEqual(db.get_list_entry(self.giovanna, sec, eid), 'after2')
+            self.t.assertEqual(db.get_list_entry(self.giovanna, sec, eid).name, 'after2')
 
     def S04_get_list_entry(self):
         # Tests for get_list_entry
         self.t.assertRaisesRegex(CAError, 'Lista inesistente', db.append_list, self.giovanna, '', [])
         for sec in ('shopping', 'ideas'):
-            self.t.assertEqual(db.get_list_entry(self.giovanna, sec, 6), 'after')
-            self.t.assertEqual(db.get_list_entry(self.giovanna, sec, '5'), 'after2')
+            self.t.assertEqual(db.get_list_entry(self.giovanna, sec, 6).name, 'after')
+            self.t.assertEqual(db.get_list_entry(self.giovanna, sec, '5').name, 'after2')
             self.t.assertRaisesRegex(CAError, 'Articolo non in lista', db.get_list_entry, self.francesco, sec, 6)
             self.t.assertRaisesRegex(CAError, 'Elemento non valido', db.get_list_entry, self.francesco, sec, 'a')

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+
+{% set title = 'Modifica dispensa' %}
+
+{% block content %}
+    <form method="POST" autocomplete="off">
+        <div class="buttons-line">
+            <button title="Conferma" class="icon" onclick="location.href='..';" type="button"><i class="fas fa-check"></i></button>
+        </div>
+
+        <div>
+            {% if not storage %}
+                <i>La lista &egrave; vuota.</i>
+            {% else %}
+                {% for item in storage %}
+                    <div class="item">
+                        <input class="name selectable" value="{{ item.name }}" onclick="location.href='./{{ item.aid }}'" readonly>
+                        {% if item.expiration %} <input class="expiration" value="{{ item.expiration }}" readonly> {% endif %}
+                        {% if item.quantity %} <input class="quantity" value="{{ item.quantity }}" readonly> {% endif %}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </form>
+{% endblock %}

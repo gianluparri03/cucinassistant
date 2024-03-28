@@ -29,7 +29,7 @@ test:
 	while [[ 1 ]]; do docker exec cucinassistant-test mariadb -u test -ptest test -e '' 2> /dev/null && break; sleep .5; done
 	echo "- Database ready"
 	
-	python3 -m unittest cucinassistant.database.tests || true
+	python3 -m unittest cucinassistant.database.tests.__init__ || true
 	docker stop cucinassistant-test > /dev/null
 
 push:

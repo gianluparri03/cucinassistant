@@ -1,7 +1,7 @@
-from cucinassistant.exceptions import CAError
+from cucinassistant.web.smart_route import smart_route
 from cucinassistant.email import Email
 import cucinassistant.database as db
-from cucinassistant.web import *
+from cucinassistant.web import app
 
 from functools import wraps
 from flask import request, redirect, session, flash

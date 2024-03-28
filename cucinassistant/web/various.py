@@ -1,6 +1,8 @@
-from cucinassistant.web import *
-from cucinassistant import version
+from cucinassistant.web.account import login_required, is_logged
+from cucinassistant.web.smart_route import smart_route
 import cucinassistant.database as db
+from cucinassistant import version
+from cucinassistant.web import app
 
 from flask import send_from_directory
 
@@ -24,3 +26,7 @@ def info_route():
 @smart_route('other/privacy.html', is_logged=is_logged)
 def privacy_route():
     pass
+
+@app.route('/favicon.ico')
+def favicon_route():
+    return send_from_directory('static', 'img/logo.png')

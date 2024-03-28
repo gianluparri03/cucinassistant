@@ -1,55 +1,60 @@
 from cucinassistant.exceptions import CAError
-from cucinassistant.database import db, use_user
+from cucinassistant.database import db, use_user, check_number
 
 from collections import namedtuple
+from functools import wraps
 
 
 Entry = namedtuple('Entry', ('eid', 'name'))
 
 
-@use_user
-def get_list(cursor, uid, section):
-    if section not in ('shopping', 'ideas'): raise CAError('Lista inesistente')
+def check_section(func):
+    @wraps(func)
+    @use_user
+    def inner(cursor, uid, section, *args, **kwargs):
+        # Ensures the section exists
+        if section not in ('shopping', 'ideas'):
+            raise CAError('Lista inesistente')
 
+        return func(cursor, uid, section, *args, **kwargs)
+
+    return inner
+
+
+@check_section
+def get_list(cursor, uid, section):
     # Gets the list
     cursor.execute(f'SELECT id, name FROM {section} WHERE user=?;', [uid])
     return tuple(Entry(l[0], l[1]) for l in cursor.fetchall())
 
-@use_user
+@check_section
 def get_list_entry(cursor, uid, section, eid):
-    if section not in ('shopping', 'ideas'): raise CAError('Lista inesistente')
-
     # Makes sure the id is valid
-    if not (isinstance(eid, int) or isinstance(eid, str)) or (isinstance(eid, str) and not eid.isnumeric()):
+    if not check_number(eid):
         raise CAError('Elemento non valido')
 
     # Gets the entry
-    cursor.execute(f'SELECT name FROM {section} WHERE user=? AND id=?;', [uid, eid])
+    cursor.execute(f'SELECT name FROM {section} WHERE user=? AND id=?;', [uid, int(eid)])
     if (n := cursor.fetchone()):
-        return n[0]
+        return Entry(eid, n[0])
     else:
         raise CAError('Articolo non in lista')
 
-@use_user
+@check_section
 def append_list(cursor, uid, section, names):
-    if section not in ('shopping', 'ideas'): raise CAError('Lista inesistente')
-
     # Appends the items to the list
     data = [[uid, name] for name in names if name]
     if not data: return
     cursor.executemany(f'INSERT IGNORE INTO {section} (user, name) VALUES (?, ?);', data)
-    return cursor.lastrowid
 
-@use_user
+@check_section
 def remove_list(cursor, uid, section, eids):
-    if section not in ('shopping', 'ideas'): raise CAError('Lista inesistente')
-
     # Cleans the list
     data = set()
     for eid in eids:
         if not eid:
             continue
-        elif not (isinstance(eid, int) or isinstance(eid, str)) or (isinstance(eid, str) and not eid.isnumeric()):
+        elif not check_number(eid):
             raise CAError('Elemento/i non valido/i')
         else:
             data.add((uid, eid))
@@ -62,12 +67,10 @@ def remove_list(cursor, uid, section, eids):
     if cursor.rowcount != len(data):
         raise CAError('Elemento/i non trovato/i')
 
-@use_user
+@check_section
 def edit_list(cursor, uid, section, eid, name):
-    if section not in ('shopping', 'ideas'): raise CAError('Lista inesistente')
-
     # Ensures the items exists
-    if not (isinstance(eid, int) or isinstance(eid, str)) or (isinstance(eid, str) and not eid.isnumeric()):
+    if not check_number(eid):
         raise CAError('Elemento non valido')
     else:
         cursor.execute(f'SELECT 1 FROM {section} WHERE id=? AND user=?;', [eid, uid])

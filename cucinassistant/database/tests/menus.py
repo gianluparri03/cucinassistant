@@ -1,22 +1,9 @@
 from cucinassistant.exceptions import CAError, CACritical
+from cucinassistant.database.tests import SubTest
 import cucinassistant.database as db
 
 
-class TestMenus:
-    def __init__(self, tester, francesco, giovanna, fake_user):
-        self.t = tester
-        self.francesco = francesco
-        self.giovanna = giovanna
-        self.fake_user = fake_user
-        self.fake_menu = 0
-
-        # Executes all the subtests IN ORDER
-        for name in sorted(dir(self)):
-            if name[0] == 'S':
-                with self.t.subTest(cat='Menus', sub=int(name[1:3])):
-                    getattr(self, name)()
-
-
+class TestMenus(SubTest):
     def S00_create_menu(self):
         # Tests for create_menu
         db.create_menu(self.francesco)

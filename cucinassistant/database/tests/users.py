@@ -15,9 +15,9 @@ class TestUsers:
 
     def S00_create_user(self):
         # Tests for create_user
-        self.t.assertRaisesRegex(CAError, 'Nome utente non valido \(lunghezza minima', db.create_user, '', '', '')
-        self.t.assertRaisesRegex(CAError, 'Nome utente non valido \(solo lettere', db.create_user, 'antonio&', '', '')
-        self.t.assertRaisesRegex(CAError, 'Password non valida \(lunghezza minima', db.create_user, 'antonio', '', '')
+        self.t.assertRaisesRegex(CAError, r'Nome utente non valido \(lunghezza minima', db.create_user, '', '', '')
+        self.t.assertRaisesRegex(CAError, r'Nome utente non valido \(solo lettere', db.create_user, 'antonio&', '', '')
+        self.t.assertRaisesRegex(CAError, r'Password non valida \(lunghezza minima', db.create_user, 'antonio', '', '')
         self.antonio = db.create_user('antonio', 'antonio@email.com', 'passwordA')
         self.t.assertRaisesRegex(CAError, 'Email non disponibile', db.create_user, 'antonello', 'antonio@email.com', 'passwordA')
         self.t.assertRaisesRegex(CAError, 'Nome utente non disponibile', db.create_user, 'antonio', 'antonello@email.com', 'passwordA')

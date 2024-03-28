@@ -1,9 +1,10 @@
-from cucinassistant.exceptions import CAError
+from cucinassistant.web.smart_route import smart_route
+from cucinassistant.web.account import login_required
 import cucinassistant.database as db
-from cucinassistant.web import *
+from cucinassistant.web import app
 
 from enum import Enum
-from flask import request, redirect, url_for
+from flask import request, redirect
 from werkzeug.routing import BaseConverter, ValidationError
 
 
@@ -64,7 +65,7 @@ def shopping_pre_edit_route(uid, sec):
 @smart_route('lists/edit.html')
 @login_required
 def lists_edit_route_get(uid, sec, eid):
-    return {'prev': db.get_list_entry(uid, sec.dbname, eid), 'title': 'Modifica ' + sec.value}
+    return {'prev': db.get_list_entry(uid, sec.dbname, eid).name, 'title': 'Modifica ' + sec.value}
 
 @app.route('/<section:sec>/modifica/<int:eid>/', methods=['POST'])
 @smart_route('lists/edit.html')

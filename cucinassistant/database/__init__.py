@@ -36,8 +36,12 @@ def use_db(func):
 ph = PasswordHasher()
 init_db()
 
+# Utility function
+def check_number(n):
+    return isinstance(n, int) or (isinstance(n, str) and n.isnumeric())
+
 
 from .users import *
 from .menus import *
 from .lists import *
-from .other import *
+from .storage import *
