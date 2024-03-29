@@ -1,50 +1,14 @@
 {% extends "base.html" %}
 
-
 {% set title = 'Modifica articolo' %}
 
-{% block imports %}
-    <script>
-        function focusDate(target) {
-            var input = $(target);
-            var timestamp = input.attr('timestamp');
-            input.val(timestamp);
-            input.attr('type', 'date');
-            input.click();
-        }
-
-        function blurDate(target) {
-            var input = $(target);
-            var timestamp = input.val();
-            input.attr('timestamp', timestamp);
-            input.attr('type', 'text');
-            input.val(timestamp ? new Date(timestamp).toLocaleDateString() : '');
-        }
-
-        function saveData(e) {
-            var re = /^\d+([\+\-\*\/]\d+)?$/;
-            if (re.test($('.quantity').replaceAll(' ', ''))) {
-                showMessage(false, "Quantit&agrave; non valida");
-                e.preventDefault();
-                return;
-            }
-
-            $('.quantity').val(Math.floor(Math.abs(eval($('.quantity').val()))));
-            $('.expiration').val($('.expiration').attr('timestamp'));
-        }
-
-        window.onload = function() {
-            var exp = $('.expiration');
-            exp.val(exp.val() ? new Date(exp.val()).toLocaleDateString() : '');
-        };
-    </script>
-{% endblock %}
+{% block imports %} <script src="{{ url_for('static', filename='js/storage.js') }}"></script> {% endblock %}
 
 {% block content %}
     <form method="POST" autocomplete="off">
         <div class="buttons-line">
             <button title="Annulla" class="icon" onclick="location.href='..';" type="button"><i class="fas fa-undo"></i></button>
-            <button title="Conferma" onclick="saveData(event);" class="icon"><i class="fas fa-check"></i></button>
+            <button title="Conferma" onclick="saveEditData(event);" class="icon"><i class="fas fa-check"></i></button>
         </div>
 
         <div class="item">
@@ -52,5 +16,9 @@
             <input class="expiration" name="expiration" {% if prev.expiration %} value="{{ prev.expiration }}" timestamp="{{ prev.expiration }}" {% else %} placeholder="Scadenza" {% endif %} onblur="blurDate(this);" onfocus="focusDate(this);">
             <input class="quantity" name="quantity" {% if prev.quantity %} value="{{ prev.quantity }}" {% else %} placeholder="Quantit&agrave;" {% endif %}>
         </div>
+
+        <br>
+
+        <small>NB. nella quantit&agrave; si possono inserire operazioni artimetiche (=, -, *, /).
     </form>
 {% endblock %}

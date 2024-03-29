@@ -1,10 +1,11 @@
 from cucinassistant.web.account import login_required, is_logged
 from cucinassistant.web.smart_route import smart_route
+from cucinassistant.version import version
+from cucinassistant.config import config
 import cucinassistant.database as db
-from cucinassistant import version
 from cucinassistant.web import app
 
-from flask import send_from_directory, session
+from flask import send_from_directory, session, redirect
 
 
 @app.before_request
@@ -30,3 +31,11 @@ def privacy_route():
 @app.route('/favicon.ico')
 def favicon_route():
     return send_from_directory('static', 'img/logo.png')
+
+@app.route('/guida')
+def tutorial_route():
+    return redirect(config['Various']['Tutorial'])
+
+@app.route('/serviceworker.js')
+def serviceworker_route():
+    return send_from_directory('static', 'js/serviceworker.js', mimetype='text/javascript')

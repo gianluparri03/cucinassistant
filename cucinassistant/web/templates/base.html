@@ -33,37 +33,27 @@
 
         <script src="https://kit.fontawesome.com/ca194095ec.js" crossorigin="anonymous"></script>
         <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"></script>
-        <script src="{{ url_for('static', filename='js/messages.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/base.js') }}"></script>
 
         {% block imports %} {% endblock %}
 
         <script>
-            $(window).on('load', function () {
-                // Flashed messages
-                {% with messages = get_flashed_messages() %}
-                    {% if messages %}
-                        {% for message in messages %}
+            if (typeof navigator.serviceWorker !== 'undefined') {
+                navigator.serviceWorker.register("/serviceworker.js");
+            }
+        </script>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <script>
+                    $(window).on('load', function () {
+                        {% for message in get_flashed_messages() %}
                             showMessage(false, "{{ message | safe }}");
                         {% endfor %}
-                    {% endif %}
-                {% endwith %}
-
-                // Cookie banner
-                if (!localStorage.getItem('cookies-accepted')) {
-                    showMessage(false, "CucinAssistant utilizza i cookie (non di terze parti) per funzionare. Continuando, si presta il consenso all'utilizzo.", () => localStorage.setItem('cookies-accepted', true));
-                }
-
-                // Service Worker
-                if (typeof navigator.serviceWorker !== 'undefined') {
-                    navigator.serviceWorker.register("{{ url_for('static', filename='js/serviceworker.js') }}");
-                }
-
-                // Buttons duplication
-                if ($('form[autocomplete=off]').length && $("body").height() > $(window).height()) {
-                    $('.buttons-line').clone().appendTo('form');
-                }
-            });
-        </script>
+                    });
+                </script>
+            {% endif %}
+        {% endwith %}
     </head>
 
     <body>
@@ -82,7 +72,7 @@
             <div>CucinAssistant &copy; 2023, Gianluca Parri</div>
             <div>
                 <a href="/info">Ulteriori informazioni</a> &bullet;
-                <a href="{{ config['Various']['Tutorial'] }}">Guida all'utilizzo</a>
+                <a href="/guida" target="_blank">Guida all'utilizzo</a>
             </div>
         </footer>
     </body>

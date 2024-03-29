@@ -1,21 +1,12 @@
 {% extends "base.html" %}
 
-
-{% block imports %}
-    <script>
-        function saveData() {
-            var data = "";
-            for (c of $('input[type=checkbox]:checked')) data += c.id.slice(4) + ';';
-            $('#data').val(data.slice(0, -1));
-        }
-    </script>
-{% endblock %}
+{% block imports %} <script src="{{ url_for('static', filename='js/lists.js') }}"></script> {% endblock %}
 
 {% block content %}
     <form method="POST" autocomplete="off">
         <div class="buttons-line">
             <button title="Annulla" class="icon" onclick="location.href='.';" type="button"><i class="fas fa-undo"></i></button>
-            <button title="Conferma" class="icon" onclick="saveData();"><i class="fas fa-check"></i></button>
+            <button title="Conferma" class="icon" onclick="saveRemoveData();"><i class="fas fa-check"></i></button>
         </div>
 
         <div>

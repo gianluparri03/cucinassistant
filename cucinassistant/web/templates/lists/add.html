@@ -1,26 +1,8 @@
 {% extends "base.html" %}
 
 {% block imports %}
-    <script>
-        function addInput() {
-            let div = `<div class="new-element"><input class="name" type="text" placeholder="Nome" required></div>`;
-            $('#new-elements').append(div);
-        }
-
-        function removeInput() {
-            if ($('.new-element').length > 1) {
-                $('#new-elements').find('div:last').remove();
-            }
-        }
-
-        function saveData() {
-            var data = "";
-            for (input of $('.new-element > input')) data += input.value + ';';
-            $('#data').val(data.slice(0, -1));
-        }
-
-        window.onload = function() { addInput(); }
-    </script>
+    <script src="{{ url_for('static', filename='js/lists.js') }}"></script>
+    <script> window.onload = function() { addInput(); } </script>
 {% endblock %}
 
 {% block content %}
@@ -29,7 +11,7 @@
             <button title="Annulla" class="icon" onclick="showMessage(true, 'Sei sicuro di voler annullare le modifiche?', handler=(() => location.href = '.'));" type="button"><i class="fas fa-undo"></i></button>
             <button title="Rimuovi un elemento" class="icon" onclick="removeInput()" type="button"><i class="fas fa-minus"></i></button>
             <button title="Aggiungi un elemento" class="icon" onclick="addInput()" type="button"><i class="fas fa-plus"></i></button>
-            <button title="Conferma" class="icon" onclick="saveData()"><i class="fas fa-check"></i></button>
+            <button title="Conferma" class="icon" onclick="saveAddData()"><i class="fas fa-check"></i></button>
         </div>
 
         <div id="new-elements"></div>

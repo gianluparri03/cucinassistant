@@ -1,13 +1,8 @@
 {% extends "base.html" %}
 
-
 {% set title = 'Modifica dispensa' %}
 
-{% block imports %}
-    <script>
-        window.onload = function() { for (input of $('.expiration')) input.value = new Date(input.value).toLocaleDateString(); }
-    </script>
-{% endblock%}
+{% block imports %} <script src="{{ url_for('static', filename='js/storage.js') }}"></script> {% endblock %}
 
 {% block content %}
     <form method="POST" autocomplete="off">

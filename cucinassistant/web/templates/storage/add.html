@@ -3,51 +3,8 @@
 {% set title = 'Aggiungi articoli' %}
 
 {% block imports %}
-    <script>
-        let i = 0;
-
-        function focusDate(target) {
-            var input = $(target);
-            var timestamp = input.attr('timestamp');
-            input.val(timestamp);
-            input.attr('type', 'date');
-            input.click();
-        }
-
-        function blurDate(target) {
-            var input = $(target);
-            var timestamp = input.val();
-            input.attr('timestamp', timestamp);
-            input.attr('type', 'text');
-            input.val(timestamp ? new Date(timestamp).toLocaleDateString() : '');
-        }
-
-        function addInput() {
-            let div = `<div class="new-element item">` +
-                          `<input class="name" type="text" placeholder="Nome" required>` +
-                          `<input class="expiration" type="text" placeholder="Scadenza" onblur="blurDate(this);" onfocus="focusDate(this);" timestamp="">` +
-                          `<input class="quantity" type="number" min="0" placeholder="Quantit&agrave;">` +
-                      `</div>`;
-
-            $('#new-elements').append(div);
-            i++;
-        }
-
-        function removeInput() {
-            if (i > 1) {
-                $('#new-elements').find('div:last').remove();
-                i--;
-            }
-        }
-
-        function saveData() {
-            var data = "";
-            for (item of $('.item')) data += item.children[0].value + ';' + $(item.children[1]).attr('timestamp') + ';' + item.children[2].value + '|';
-            $('#data').val(data.slice(0, -1));
-        }
-
-        window.onload = function() { addInput(); };
-    </script>
+    <script src="{{ url_for('static', filename='js/storage.js') }}"></script>
+    <script> window.onload = function() { addInput(); } </script>
 {% endblock %}
 
 {% block content %}
@@ -56,7 +13,7 @@
             <button title="Annulla" class="icon" onclick="showMessage(true, 'Sei sicuro di voler annullare le modifiche?', handler=(() => location.href = '.'));" type="button"><i class="fas fa-undo"></i></button>
             <button title="Rimuovi un elemento" class="icon" onclick="removeInput()" type="button"><i class="fas fa-minus"></i></button>
             <button title="Aggiungi un elemento" class="icon" onclick="addInput()" type="button"><i class="fas fa-plus"></i></button>
-            <button title="Conferma" class="icon" onclick="saveData()"><i class="fas fa-check"></i></button>
+            <button title="Conferma" class="icon" onclick="saveAddData()"><i class="fas fa-check"></i></button>
         </div>
 
         <div id="new-elements"></div>

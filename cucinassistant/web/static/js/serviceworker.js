@@ -1,44 +1,52 @@
-const cacheName = 'CucinAssistant';
-var filesToCache = [
-    '/static/img/logo.png',
-    '/static/css/sakura.css',
+const CACHE_NAME = 'cucinassitant-2.0';
+const CACHE_URLS = [
     '/static/css/base.css',
-    '/static/css/portrait.css',
     '/static/css/landscape.css',
+    '/static/css/portrait.css',
+    '/static/css/sakura.css',
 
-    'https://fonts.googleapis.com/css2?family=Inclusive+Sans&family=Satisfy&display=swap',
-    'https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.css',
-    'https://code.jquery.com/jquery-3.7.1.slim.min.js',
-    'https://ka-f.fontawesome.com/releases/v5.15.4/css/free.min.css?token=ca194095ec',
-    'https://ka-f.fontawesome.com/releases/v5.15.4/css/free-v4-shims.min.css?token=ca194095ec',
-    'https://ka-f.fontawesome.com/releases/v5.15.4/css/free-v4-font-face.min.css?token=ca194095ec'
+    '/static/img/logo.png',
+
+    '/static/js/base.js',
+    '/static/js/account.js',
+    '/static/js/lists.js',
+    '/static/js/menu.js',
+    '/static/js/storage.js',
+
+    '/favicon.ico'
 ];
 
-filesToCache.map(function(u) {
-    return new Request(u, {mode: 'no-cors'});
-});
 
-
-self.addEventListener('install', (e) => {
-    e.waitUntil((async () => {
-        const cache = await caches.open(cacheName);
-        await cache.addAll(filesToCache);
-    })());
+self.addEventListener('install', event => {
+    event.waitUntil(
+        caches.open(CACHE_NAME)
+            .then(cache => cache.addAll(CACHE_URLS))
+            .then(self.skipWaiting())
+    );
 });
 
 self.addEventListener('activate', event => {
-    event.waitUntil(self.clients.claim());
+    const currentCaches = [CACHE_NAME];
+
+    event.waitUntil(
+        caches.keys().then(cacheNames => {
+            return cacheNames.filter(cacheName => cacheName != CACHE_NAME);
+        }).then(cachesToDelete => {
+            return Promise.all(cachesToDelete.map(cacheToDelete => {
+                return caches.delete(cacheToDelete);
+            }));
+        }).then(() => self.clients.claim())
+    );
 });
 
 self.addEventListener('fetch', event => {
-    event.respondWith(async () => {
-        const cache = await caches.open(CACHE_NAME);
-        const cachedResponse = await cache.match(event.request);
-
-        if (cachedResponse !== undefined) {
-            return cachedResponse;
-        } else {
-            return fetch(event.request)
-        }
-    });
+    event.respondWith(
+        caches.match(event.request).then(cachedResponse => {
+            if (cachedResponse) {
+                return cachedResponse;
+            } else {
+                return fetch(event.request);
+            }
+        })
+    );
 });
