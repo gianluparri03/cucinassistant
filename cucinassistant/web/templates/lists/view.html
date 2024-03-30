@@ -4,11 +4,11 @@
     <form method="POST" autocomplete="off">
         <div class="buttons-line">
             {% if list %}
-                <button title="Rimuovi" class="icon" onclick="location.href='rimuovi';" type="button"><i class="fas fa-minus"></i></button>
-                <button title="Modifica" class="icon" onclick="location.href='modifica/';" type="button"><i class="fas fa-edit"></i></button>
+            <button title="Rimuovi" class="icon" onclick="location.href='/{{ routename }}/rimuovi';" type="button"><i class="fas fa-minus"></i></button>
+            <button title="Modifica" class="icon" onclick="location.href='/{{ routename }}/modifica/';" type="button"><i class="fas fa-edit"></i></button>
             {% endif %}
 
-            <button title="Aggiungi" class="icon" onclick="location.href='aggiungi';" type="button"><i class="fas fa-plus"></i></button>
+            <button title="Aggiungi" class="icon" onclick="location.href='/{{ routename }}/aggiungi';" type="button"><i class="fas fa-plus"></i></button>
         </div>
 
         <div>

@@ -27,6 +27,7 @@ def menu_edit_route_post(uid, mid):
     return redirect('.')
 
 @app.route('/menu/crea')
+@smart_route('menu/view.html')
 @login_required
 def menu_create_route(uid):
     mid = db.create_menu(uid)
@@ -34,6 +35,7 @@ def menu_create_route(uid):
     return redirect(f'/menu/{mid}')
 
 @app.route('/menu/<int:mid>/elimina', methods=['POST'])
+@smart_route('menu/view.html')
 @login_required
 def menu_delete_route(uid, mid):
     db.delete_menu(uid, mid)
@@ -41,6 +43,7 @@ def menu_delete_route(uid, mid):
     return redirect('/menu')
 
 @app.route('/menu/<int:mid>/clona')
+@smart_route('menu/view.html')
 @login_required
 def menu_clone_route(uid, mid):
     mid = db.duplicate_menu(uid, mid)

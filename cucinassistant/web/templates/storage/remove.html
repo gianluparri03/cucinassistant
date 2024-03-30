@@ -5,9 +5,16 @@
 {% block imports %} <script src="{{ url_for('static', filename='js/storage.js') }}"></script> {% endblock %}
 
 {% block content %}
+    {% if filter %} <span>Ricerca corrente: {{ filter }}</span> {% endif %}
+
     <form method="POST" autocomplete="off">
         <div class="buttons-line">
-            <button title="Annulla" class="icon" onclick="location.href='.';" type="button"><i class="fas fa-undo"></i></button>
+            <button title="Annulla" class="icon" onclick="location.href='/dispensa';" type="button"><i class="fas fa-undo"></i></button>
+            {% if filter %}
+                <button title="Rimuovi filtro" class="icon" onclick="location.href='/dispensa/rimuovi';" type="button"><i class="fas fa-search-minus"></i></button>
+            {% else %}
+                <button title="Cerca" class="icon" onclick="location.href='/dispensa/cerca?pagina=rimuovi';" type="button"><i class="fas fa-search"></i></button>
+            {% endif %}
             <button title="Conferma" class="icon" onclick="saveRemoveData();"><i class="fas fa-check"></i></button>
         </div>
 

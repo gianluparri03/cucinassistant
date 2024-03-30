@@ -3,14 +3,15 @@ from cucinassistant.web.account import login_required
 import cucinassistant.database as db
 from cucinassistant.web import app
 
-from flask import request, redirect
+from flask import request, redirect, url_for
 
 
 @app.route('/dispensa/')
 @smart_route('storage/view.html')
 @login_required
 def storage_view_route(uid):
-    return {'storage': db.get_storage(uid)}
+    name = request.args.get('nome')
+    return {'storage': db.get_storage(uid, name=name), 'filter': name}
 
 @app.route('/dispensa/aggiungi/')
 @smart_route('storage/add.html')
@@ -30,7 +31,8 @@ def storage_add_route_post(uid):
 @smart_route('storage/pre_edit.html')
 @login_required
 def storage_pre_edit_route(uid):
-    return {'storage': db.get_storage(uid)}
+    name = request.args.get('nome')
+    return {'storage': db.get_storage(uid, name=name), 'filter': name}
 
 @app.route('/dispensa/modifica/<int:aid>')
 @smart_route('storage/edit.html')
@@ -48,8 +50,10 @@ def storage_edit_route_post(uid, aid):
 @app.route('/dispensa/rimuovi/')
 @smart_route('storage/remove.html')
 @login_required
-def storage_remove_route(uid):
-    return {'storage': db.get_storage(uid)}
+def storage_remove_route_get(uid):
+    name = request.args.get('nome')
+    return {'storage': db.get_storage(uid, name=name), 'filter': name}
+
 
 @app.route('/dispensa/rimuovi/', methods=['POST'])
 @smart_route('storage/remove.html')
@@ -57,3 +61,17 @@ def storage_remove_route(uid):
 def storage_remove_route_post(uid):
     db.remove_storage(uid, request.form.get('data').split(';'))
     return redirect('.')
+
+@app.route('/dispensa/cerca')
+@smart_route('storage/search.html')
+@login_required
+def storage_search_route_get(uid):
+    return {'page': request.args.get('pagina', '')}
+
+@app.route('/dispensa/cerca', methods=['POST'])
+@smart_route('storage/search.html')
+@login_required
+def storage_search_route_post(uid):
+    pages = {'': 'storage_view_route', 'rimuovi': 'storage_remove_route_get', 'modifica': 'storage_pre_edit_route'}
+    page = pages.get(request.form.get('page'), pages[''])
+    return redirect(url_for(page, nome=request.form.get('name', '')))

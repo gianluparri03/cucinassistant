@@ -11,6 +11,7 @@ class TestStorage(SubTest):
         db.append_storage(self.giovanna, [['one', '2024-03-02', 0], ['two', '2024-03-03', 0], ['three', '2024-03-01', 0]])
         db.append_storage(self.francesco, [['one', '2024-03-02', 0]])
         self.t.assertEqual([a.name for a in db.get_storage(self.giovanna)], ['three', 'one', 'two'])
+        self.t.assertEqual([a.name for a in db.get_storage(self.giovanna, 'n')], ['one'])
 
     def S01_get_storage_article(self):
         # Tests for get_storage_article
@@ -41,7 +42,7 @@ class TestStorage(SubTest):
         self.t.assertRaisesRegex(CAError, 'Articolo non valido', db.remove_storage, self.giovanna, ['a'])
         db.remove_storage(self.giovanna, [5, 6])
         self.t.assertEqual(len(db.get_storage(self.giovanna)), 3)
-        db.remove_storage(self.giovanna, [])
+        db.remove_storage(self.giovanna, [''])
 
     def S04_edit_storage(self):
         # Tests for remove_storage

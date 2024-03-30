@@ -39,13 +39,13 @@ app.url_map.converters.update(section=SectionsConverter)
 @smart_route('lists/view.html')
 @login_required
 def lists_view_route(uid, sec):
-    return {'list': db.get_list(uid, sec.dbname), 'title': sec.title}
+    return {'list': db.get_list(uid, sec.dbname), 'title': sec.title, 'routename': sec.value}
 
 @app.route('/<section:sec>/aggiungi/')
 @smart_route('lists/add.html')
 @login_required
 def lists_add_route_get(uid, sec):
-    return {'title': 'Aggiungi ' + sec.value}
+    return {'title': 'Aggiungi ' + sec.value, 'routename': sec.value}
 
 @app.route('/<section:sec>/aggiungi/', methods=['POST'])
 @smart_route('lists/add.html')
@@ -59,13 +59,13 @@ def lists_add_route_post(uid, sec):
 @smart_route('lists/pre_edit.html')
 @login_required
 def shopping_pre_edit_route(uid, sec):
-    return {'list': db.get_list(uid, sec.dbname), 'title': 'Modifica ' + sec.value}
+    return {'list': db.get_list(uid, sec.dbname), 'title': 'Modifica ' + sec.value, 'routename': sec.value}
 
 @app.route('/<section:sec>/modifica/<int:eid>/')
 @smart_route('lists/edit.html')
 @login_required
 def lists_edit_route_get(uid, sec, eid):
-    return {'prev': db.get_list_entry(uid, sec.dbname, eid).name, 'title': 'Modifica ' + sec.value}
+    return {'prev': db.get_list_entry(uid, sec.dbname, eid).name, 'title': 'Modifica ' + sec.value, 'routename': sec.value}
 
 @app.route('/<section:sec>/modifica/<int:eid>/', methods=['POST'])
 @smart_route('lists/edit.html')
@@ -78,7 +78,7 @@ def lists_edit_route_post(uid, sec, eid):
 @smart_route('lists/remove.html')
 @login_required
 def lists_remove_route_get(uid, sec):
-    return {'list': db.get_list(uid, sec.dbname), 'title': 'Rimuovi ' + sec.value}
+    return {'list': db.get_list(uid, sec.dbname), 'title': 'Rimuovi ' + sec.value, 'routename': sec.value}
 
 @app.route('/<section:sec>/rimuovi/', methods=['POST'])
 @smart_route('lists/remove.html')

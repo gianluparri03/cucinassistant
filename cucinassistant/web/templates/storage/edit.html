@@ -7,7 +7,7 @@
 {% block content %}
     <form method="POST" autocomplete="off">
         <div class="buttons-line">
-            <button title="Annulla" class="icon" onclick="location.href='..';" type="button"><i class="fas fa-undo"></i></button>
+            <button title="Annulla" class="icon" onclick="location.href='/dispensa';" type="button"><i class="fas fa-undo"></i></button>
             <button title="Conferma" onclick="saveEditData(event);" class="icon"><i class="fas fa-check"></i></button>
         </div>
 
@@ -19,6 +19,9 @@
 
         <br>
 
-        <small>NB. nella quantit&agrave; si possono inserire operazioni artimetiche (=, -, *, /).
+        <small>
+            <b>NB.</b> nella quantit&agrave; si possono inserire operazioni artimetiche (=, -, *, /). <br>
+            Il risultato &egrave; arrotondato all'intero positivo pi&ugrave; vicino.
+        </small>
     </form>
 {% endblock %}

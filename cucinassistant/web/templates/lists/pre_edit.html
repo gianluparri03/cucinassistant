@@ -3,7 +3,7 @@
 {% block content %}
     <form method="POST" autocomplete="off">
         <div class="buttons-line">
-            <button title="Conferma" class="icon" onclick="location.href='..';" type="button"><i class="fas fa-check"></i></button>
+            <button title="Conferma" class="icon" onclick="location.href='/{{ routename }}';" type="button"><i class="fas fa-check"></i></button>
         </div>
 
         <div>
@@ -12,7 +12,7 @@
             {% else %}
                 <ul>
                     {% for entry in list %}
-                        <li><a href="./{{ entry.eid }}">{{ entry.name }}</a></li>
+                    <li><a href="/{{ routename }}/modifica/{{ entry.eid }}">{{ entry.name }}</a></li>
                     {% endfor %}
                 </ul>
             {% endif %}

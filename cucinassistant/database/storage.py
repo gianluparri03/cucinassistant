@@ -31,9 +31,9 @@ def verify_article(data):
 
 
 @use_user
-def get_storage(cursor, uid):
+def get_storage(cursor, uid, name=''):
     # Gets the contente
-    cursor.execute('SELECT id, name, expiration, quantity FROM storage WHERE user=? ORDER BY expiration;', [uid])
+    cursor.execute(f'SELECT id, name, expiration, quantity FROM storage WHERE user=? AND name LIKE ? ORDER BY expiration;', [uid, '%' + (name or '') + '%'])
     return tuple(new_article(*a) for a in cursor.fetchall())
 
 @use_user
@@ -68,7 +68,6 @@ def append_storage(cursor, uid, data_raw):
 def remove_storage(cursor, uid, aids):
     # Cleans the list
     data = set()
-    if not aids: return
     for aid in aids:
         if not aid:
             continue
@@ -76,6 +75,7 @@ def remove_storage(cursor, uid, aids):
             raise CAError('Articolo non valido')
         else:
             data.add((uid, aid))
+    if not data: return
 
     # Remove the selected items
     cursor.executemany('DELETE FROM storage WHERE user=? AND id=?;', list(data))
