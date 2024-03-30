@@ -31,7 +31,6 @@ def menu_edit_route_post(uid, mid):
 @login_required
 def menu_create_route(uid):
     mid = db.create_menu(uid)
-    flash('Men&ugrave; creato correttamente.')
     return redirect(f'/menu/{mid}')
 
 @app.route('/menu/<int:mid>/elimina', methods=['POST'])
@@ -39,7 +38,6 @@ def menu_create_route(uid):
 @login_required
 def menu_delete_route(uid, mid):
     db.delete_menu(uid, mid)
-    flash('Men&ugrave; eliminato correttamente.')
     return redirect('/menu')
 
 @app.route('/menu/<int:mid>/clona')
@@ -47,5 +45,4 @@ def menu_delete_route(uid, mid):
 @login_required
 def menu_clone_route(uid, mid):
     mid = db.duplicate_menu(uid, mid)
-    flash('Men&ugrave; clonato correttamente')
     return redirect(f'/menu/{mid}')

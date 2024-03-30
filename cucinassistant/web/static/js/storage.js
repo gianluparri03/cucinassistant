@@ -50,7 +50,7 @@ function saveEditData(e) {
         return;
     }
 
-    $('.quantity').val(Math.floor(Math.max(0, eval($('.quantity').val()))));
+    $('.quantity').val(Math.floor(Math.max(0, eval($('.quantity').val()))) || 0);
     $('.expiration').val($('.expiration').attr('timestamp'));
 }
 
