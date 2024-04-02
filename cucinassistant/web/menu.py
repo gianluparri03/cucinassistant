@@ -24,7 +24,7 @@ def menu_edit_route_get(uid, mid):
 @login_required
 def menu_edit_route_post(uid, mid):
     db.update_menu(uid, mid, request.form.get('data', ''))
-    return redirect('.')
+    return redirect(f'/menu/{mid}')
 
 @app.route('/menu/crea')
 @smart_route('menu/view.html')

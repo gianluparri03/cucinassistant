@@ -53,7 +53,7 @@ def lists_add_route_get(uid, sec):
 def lists_add_route_post(uid, sec):
     data = d.split(';') if (d := request.form.get('data')) else []
     db.append_list(uid, sec.dbname, data)
-    return redirect('.')
+    return redirect(f'/{sec.value}/')
 
 @app.route('/<section:sec>/modifica/')
 @smart_route('lists/pre_edit.html')
@@ -72,7 +72,7 @@ def lists_edit_route_get(uid, sec, eid):
 @login_required
 def lists_edit_route_post(uid, sec, eid):
     db.edit_list(uid, sec.dbname, eid, request.form.get('name'))
-    return redirect('.')
+    return redirect(f'/{sec.value}/modifica/')
 
 @app.route('/<section:sec>/rimuovi/')
 @smart_route('lists/remove.html')
@@ -85,4 +85,4 @@ def lists_remove_route_get(uid, sec):
 @login_required
 def lists_remove_route_post(uid, sec):
     db.remove_list(uid, sec.dbname, request.form.get('data').split(';'))
-    return redirect('.')
+    return redirect(f'/{sec.value}/')

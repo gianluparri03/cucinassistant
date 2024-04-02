@@ -33,5 +33,5 @@ test:
 	docker stop cucinassistant-test > /dev/null
 
 push:
-	make build $(version)
+	make build version=$(version)
 	docker push git.gianlucaparri.me/gianluparri03/cucinassistant:$(version)

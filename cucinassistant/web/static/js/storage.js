@@ -5,6 +5,7 @@ function focusDate(target) {
     input.val(timestamp);
     input.attr('type', 'date');
     input.click();
+    target.showPicker();
 }
 
 // Used by: add.html, edit.html

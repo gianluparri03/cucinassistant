@@ -25,7 +25,7 @@ def storage_add_route_get(uid):
 def storage_add_route_post(uid):
     data = [a.split(';') for a in request.form.get('data', '').split('|')]
     db.append_storage(uid, data)
-    return redirect('.')
+    return redirect('/dispensa/')
 
 @app.route('/dispensa/modifica/')
 @smart_route('storage/pre_edit.html')
@@ -45,7 +45,7 @@ def storage_edit_route(uid, aid):
 @login_required
 def storage_edit_route_post(uid, aid):
     db.edit_storage(uid, aid, [request.form.get('name'), request.form.get('expiration'), request.form.get('quantity')])
-    return redirect('.')
+    return redirect('/dispensa/modifica/')
 
 @app.route('/dispensa/rimuovi/')
 @smart_route('storage/remove.html')
