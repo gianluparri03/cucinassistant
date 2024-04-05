@@ -14,8 +14,8 @@ CREATE TABLE IF NOT EXISTS menus (
     next INT,
 
     PRIMARY KEY (user, id),
-    FOREIGN KEY (user, prev) REFERENCES menus (user, id),
-    FOREIGN KEY (user, next) REFERENCES menus (user, id)
+    FOREIGN KEY (user, prev) REFERENCES menus (user, id) ON DELETE CASCADE,
+    FOREIGN KEY (user, next) REFERENCES menus (user, id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS storage (

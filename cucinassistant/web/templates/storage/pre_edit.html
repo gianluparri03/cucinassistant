@@ -24,8 +24,8 @@
                 {% for item in storage %}
                     <div class="item">
                         <input class="name selectable" value="{{ item.name }}" onclick="location.href='/dispensa/modifica/{{ item.aid }}'" readonly>
-                        {% if item.expiration %} <input class="expiration" value="{{ item.expiration }}" readonly> {% endif %}
-                        {% if item.quantity %} <input class="quantity" value="{{ item.quantity }}" readonly> {% endif %}
+                        {% if item.expiration %} <input class="expiration" value="{{ item.expiration }}" type="date" readonly> {% endif %}
+                        {% if item.quantity %} <input class="quantity" value="{{ item.quantity }}" type="quantity" readonly> {% endif %}
                     </div>
                 {% endfor %}
             {% endif %}

@@ -1,4 +1,5 @@
 from cucinassistant.web.smart_route import smart_route
+from cucinassistant.config import config
 from cucinassistant.email import Email
 import cucinassistant.database as db
 from cucinassistant.web import app
@@ -80,7 +81,7 @@ def delete_account_route(uid):
         # Renders the page
         return {'warning': not token}
     else:
-        if (data := get_data(uid)):
+        if (data := db.get_data(uid)):
             if not token:
                 # If it's the first confirm button, generates the token and sends the email
                 token = db.generate_token(uid)
@@ -91,6 +92,7 @@ def delete_account_route(uid):
                 # Otherwise deletes the account
                 db.delete_user(uid, token)
                 Email('Eliminazione account', 'goodbye', username=data.username).send(data.email)
+                flash('Account eliminato con successo')
                 return logout_route()
         else:
             flash('Utente sconosciuto')
@@ -154,7 +156,7 @@ def recover_password_route():
         
         # Sends the user a token to reset the password
         if (data := db.get_data('', email=data['email'])):
-            token = db.generate_token(data['uid'])
+            token = db.generate_token(data.uid)
             change_url = config['Environment']['Address'] + '/account/reset_password/?token=' + token
             Email('Recupera password', 'reset_password', username=data.username, change_url=change_url).send(data.email)
 

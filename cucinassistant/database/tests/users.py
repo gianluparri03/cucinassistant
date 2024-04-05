@@ -87,6 +87,8 @@ class TestUsers:
         db.append_list(self.antonello, 'shopping', 'lists')
         db.append_list(self.antonello, 'ideas', 'lists')
         db.create_menu(self.antonello)
+        db.duplicate_menu(self.antonello, 1)
+        db.duplicate_menu(self.antonello, 2)
         db.delete_user(self.antonello, self.token)
         self.t.assertRaisesRegex(CAError, 'Credenziali non valide', db.login, 'antonello', 'passwordA')
 

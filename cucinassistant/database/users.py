@@ -16,7 +16,7 @@ def use_user(func):
     @use_db
     def inner(cursor, uid, *args, **kwargs):
         # Ensures the user exists
-        cursor.execute('SELECT 1 FROM users WHERE uid=?;', [uid])
+        cursor.execute('SELECT uid FROM users WHERE uid=?;', [uid])
         if not cursor.fetchone():
             raise CACritical('Utente sconosciuto')
 

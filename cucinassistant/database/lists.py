@@ -86,7 +86,7 @@ def edit_list(cursor, uid, section, eid, name):
         raise CAError('Nuovo nome non valido')
 
     # Makes sure tha name is unique
-    cursor.execute(f'SELECT 1 FROM {section} WHERE name=? AND user=?;', [name, uid])
+    cursor.execute(f'SELECT id FROM {section} WHERE name=? AND user=?;', [name, uid])
     if cursor.fetchone():
         raise CAError('Elemento gi&agrave; in lista')
 

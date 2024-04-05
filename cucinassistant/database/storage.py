@@ -8,11 +8,11 @@ from datetime import date
 
 Article = namedtuple('Article', ('aid', 'name', 'expiration', 'quantity'))
 
-NULL_EXPIRATION = '2002-05-02'
+NULL_EXPIRATION = '2004-02-05'
 NULL_QUANTITY = '0'
 
 def new_article(a, n, e, q):
-    return Article(a, n, e if e.isoformat() != NULL_EXPIRATION else None, q if str(q) != NULL_QUANTITY else None)
+    return Article(a, n, e.isoformat() if e.isoformat() != NULL_EXPIRATION else None, q if str(q) != NULL_QUANTITY else None)
 
 def verify_article(data):
     if len(data) != 3:
@@ -101,7 +101,7 @@ def edit_storage(cursor, uid, aid, data):
             return
 
     # Makes sure tha name is unique
-    cursor.execute('SELECT 1 FROM storage WHERE name=? AND expiration=? AND id != ? AND user=?;', [name, exp, aid, uid])
+    cursor.execute('SELECT id FROM storage WHERE name=? AND expiration=? AND id != ? AND user=?;', [name, exp, aid, uid])
     if cursor.fetchone():
         raise CAError('Articolo gi&agrave; presente')
 

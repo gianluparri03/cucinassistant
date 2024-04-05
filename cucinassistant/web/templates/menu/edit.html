@@ -13,7 +13,7 @@
             <button title="Conferma" class="icon" onclick="saveMenu();"><i class="fas fa-check"></i></button>
         </div>
 
-        <input id="data" name="data" hidden>
+        <textarea id="data" name="data" hidden></textarea>
 
         {% set i = namespace(d=0) %}
         {% set entries = menu.menu.split(';') %}

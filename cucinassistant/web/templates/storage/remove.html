@@ -27,8 +27,8 @@
                         <input type="checkbox" id="aid-{{ item.aid }}">
                         <label for="aid-{{ item.aid }}" class="item">
                             <input class="name" value="{{ item.name }}" readonly>
-                            {% if item.expiration %} <input class="expiration" value="{{ item.expiration }}" readonly> {% endif %}
-                            {% if item.quantity %} <input class="quantity" value="{{ item.quantity }}" readonly> {% endif %}
+                            {% if item.expiration %} <input class="expiration" value="{{ item.expiration }}" type="date" readonly> {% endif %}
+                            {% if item.quantity %} <input class="quantity" value="{{ item.quantity }}" type="quantity" readonly> {% endif %}
                         </label>
                     </div>
                 {% endfor %}

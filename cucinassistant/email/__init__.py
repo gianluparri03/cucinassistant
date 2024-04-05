@@ -44,5 +44,5 @@ class Email:
             with self.connect() as conn:
                 recipients = get_users_emails()
                 self.msg['Bcc'] = ', '.join(recipients)
-                conn.sendmail(config['Email']['Address'], recipients, self.msg.as_string())
+                conn.send_message(self.msg)
                 return len(recipients)

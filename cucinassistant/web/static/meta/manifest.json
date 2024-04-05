@@ -23,7 +23,7 @@
 
     "icons": [
         {
-            "src": "/static/logo.png",
+            "src": "/static/img/logo.png",
             "type": "image/png",
             "sizes": "512x512"
         }

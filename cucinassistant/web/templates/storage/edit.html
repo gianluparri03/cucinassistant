@@ -13,8 +13,8 @@
 
         <div class="item">
             <input class="name" name="name" value="{{ prev.name }}">
-            <input class="expiration" name="expiration" {% if prev.expiration %} value="{{ prev.expiration }}" timestamp="{{ prev.expiration }}" {% else %} placeholder="Scadenza" {% endif %} onblur="blurDate(this);" onfocus="focusDate(this);">
-            <input class="quantity" name="quantity" {% if prev.quantity %} value="{{ prev.quantity }}" {% else %} placeholder="Quantit&agrave;" {% endif %}>
+            <input class="expiration" name="expiration" {% if prev.expiration %} value="{{ prev.expiration }}" {% endif %} type="date">
+            <input class="quantity" name="quantity" {% if prev.quantity %} value="{{ prev.quantity }}" {% endif %} placeholder="Quantit&agrave;" type="number" min="0" step="1">
         </div>
 
         <br>
