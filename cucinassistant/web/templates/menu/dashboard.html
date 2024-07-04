@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block imports %} <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}"> {% endblock %}
+
+{% set title = "Men&ugrave;" %}
+
+{% set back_link = '/' %}
+
+{% block content %}
+    <div class="dashboard">
+        {% for m in menus %}
+            <button onclick="location.href='/menu/{{ m }}';">
+                <i class="fas fa-{{ 'utensils' if m != 1 else 'bookmark' }}"></i>
+                <span>Men&ugrave; {{ m }}</span>
+            </button>
+        {% endfor %}
+
+        <button onclick="location.href='/menu/crea/';" class="transparent">
+            <i class="fas fa-plus"></i>
+            <span>Nuovo men&ugrave;</span>
+        </button>
+    </div>
+{% endblock %}

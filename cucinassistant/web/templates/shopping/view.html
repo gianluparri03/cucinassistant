@@ -2,12 +2,11 @@
 
 {% block imports %}
     <script src="{{ url_for('static', filename='js/shopping.js') }}"></script>
-    <script>
-        window.onload = function() {  $("label").on("click", clickHandler); }
-    </script>
+    <script> window.onload = function() {  $("label").on("click", clickHandler); } </script>
 {% endblock %}
 
 {% set title = "Lista della spesa" %}
+
 {% set back_link = '/' %}
 
 {% block content %}
@@ -23,6 +22,7 @@
             {% endfor %}
         {% endif %}
 
-        <a href="/spesa/aggiungi"><i class="fas fa-plus"></i> Aggiungi articoli</a>
+        <button class="icon-text"><i class="fas fa-plus"></i> Aggiungi articoli</button>
+        <button class="icon-text"><i class="fas fa-trash"></i> Elimina selezionati</button>
     </div>
 {% endblock %}

@@ -8,6 +8,11 @@ from mariadb import connect, Error as MDBError
 Menu = namedtuple('Menu', ['mid', 'menu', 'prev', 'next'])
 
 @use_user
+def get_menus(cursor, uid):
+    cursor.execute('SELECT id FROM menus WHERE user=?', [uid])
+    return [r[0] for r in cursor.fetchall()]
+
+@use_user
 def get_menu(cursor, uid, mid=None):
     if mid == None:
         # Returns the first menu

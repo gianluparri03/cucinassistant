@@ -2,9 +2,7 @@
 
 {% block imports %}
     <script src="{{ url_for('static', filename='js/shopping.js') }}"></script>
-    <script>
-        window.onload = function() { updateInputs(null, true); }
-    </script>
+    <script> window.onload = function() { updateInputs(null, true); } </script>
 {% endblock %}
 
 {% set title = "Aggiungi articoli" %}

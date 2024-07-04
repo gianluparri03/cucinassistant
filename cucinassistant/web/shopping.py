@@ -27,12 +27,6 @@ def shopping_add_route_post(uid):
     db.append_shopping(uid, data)
     return redirect('/spesa/')
 
-@app.route('/spesa/modifica/')
-@smart_route('shopping/pre_edit.html')
-@login_required
-def shopping_pre_edit_route(uid):
-    return {'list': db.get_shopping(uid)}
-
 @app.route('/spesa/modifica/<int:eid>/')
 @smart_route('shopping/edit.html')
 @login_required
@@ -44,7 +38,7 @@ def shopping_edit_route_get(uid, eid):
 @login_required
 def shopping_edit_route_post(uid, eid):
     db.edit_shopping(uid, eid, request.form.get('name'))
-    return redirect(f'/spesa/modifica/')
+    return redirect(f'/spesa/')
 
 @app.route('/spesa/rimuovi/')
 @smart_route('shopping/remove.html')

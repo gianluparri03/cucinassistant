@@ -1,19 +1,21 @@
 {% extends "base.html" %}
 
-{% set title = "Modifica Men&ugrave;" %}
+{% set title = "Modifica men&ugrave;" %}
+
+{% set back_link = '/menu/' + str(menu.mid) %}
 
 {% block imports %} <script src="{{ url_for('static', filename='js/menu.js') }}"></script> {% endblock %}
 
 {% block content %}
     <form method="POST" autocomplete="off">
-        <div class="buttons-line">
-            <button title="Numero" class="icon" type="button" disabled>{{ menu.mid }}</button>
-            <button title="Annulla" class="icon" onclick="showMessage(true, 'Sei sicuro di voler annullare le modifiche?', handler=(() => location.href = '/menu'));" type="button"><i class="fas fa-undo"></i></button>
-            <button title="Elimina" class="icon" onclick="showMessage(true, 'Sei sicuro di voler eliminare questo men&ugrave;?', handler=deleteMenu);" type="button"><i class="fas fa-trash-alt"></i></button>
-            <button title="Conferma" class="icon" onclick="saveMenu();"><i class="fas fa-check"></i></button>
+        <textarea id="data" name="data" hidden></textarea>
+
+        <div class="menu-day">
+            <b>Nome</b> <br>
+            <input type="text" value="{{ menu.mid }}">
         </div>
 
-        <textarea id="data" name="data" hidden></textarea>
+        <br>
 
         {% set i = namespace(d=0) %}
         {% set entries = menu.menu.split(';') %}
@@ -24,5 +26,8 @@
                 <textarea id="entry-{{ i.d }}">{{ entries[i.d] }}</textarea> {% set i.d = i.d + 1 %}
             </div>
         {% endfor %}
+
+        <button title="Elimina" class="icon-text" onclick="showConfirm('Sei sicuro di voler eliminare questo men&ugrave;?', deleteMenu);" type="button"><i class="fas fa-trash-alt"></i> Elimina men&ugrave;</button>
+        <button title="Conferma" class="icon-text" onclick="saveMenu();"><i class="fas fa-check"></i> Salva</button>
     </form>
 {% endblock %}

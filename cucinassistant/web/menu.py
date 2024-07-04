@@ -7,17 +7,22 @@ from flask import request, redirect
 
 
 @app.route('/menu/')
+@smart_route('menu/dashboard.html')
+@login_required
+def menu_dashboard_route(uid):
+    return {'menus': db.get_menus(uid)}
+
 @app.route('/menu/<int:mid>/')
 @smart_route('menu/view.html')
 @login_required
 def menu_view_route(uid, mid=None):
-    return {'menu': db.get_menu(uid, mid)}
+    return {'menu': db.get_menu(uid, mid), 'str':str}
 
 @app.route('/menu/<int:mid>/modifica')
 @smart_route('menu/edit.html')
 @login_required
 def menu_edit_route_get(uid, mid):
-    return {'menu': db.get_menu(uid, mid)}
+    return {'menu': db.get_menu(uid, mid), 'str': str}
 
 @app.route('/menu/<int:mid>/modifica', methods=['POST'])
 @smart_route('menu/edit.html')
@@ -31,7 +36,7 @@ def menu_edit_route_post(uid, mid):
 @login_required
 def menu_create_route(uid):
     mid = db.create_menu(uid)
-    return redirect(f'/menu/{mid}')
+    return redirect(f'/menu/{mid}/modifica')
 
 @app.route('/menu/<int:mid>/elimina', methods=['POST'])
 @smart_route('menu/view.html')
@@ -45,4 +50,4 @@ def menu_delete_route(uid, mid):
 @login_required
 def menu_clone_route(uid, mid):
     mid = db.duplicate_menu(uid, mid)
-    return redirect(f'/menu/{mid}')
+    return redirect(f'/menu/{mid}/modifica')

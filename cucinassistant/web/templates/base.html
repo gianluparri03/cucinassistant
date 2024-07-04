@@ -33,7 +33,7 @@
 
         <script src="https://kit.fontawesome.com/ca194095ec.js" crossorigin="anonymous"></script>
         <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"></script>
-        <script src="{{ url_for('static', filename='js/base.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/messages.js') }}"></script>
 
         {% block imports %} {% endblock %}
 
@@ -48,7 +48,7 @@
                 <script>
                     $(window).on('load', function () {
                         {% for message in get_flashed_messages() %}
-                            showMessage(false, "{{ message | safe }}");
+                            showAlert("{{ message | safe }}");
                         {% endfor %}
                     });
                 </script>

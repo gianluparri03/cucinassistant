@@ -1,3 +1,17 @@
+// Used by: view.html
+function clickHandler(e) {
+    let check = {icon: "fa-check", name: "Spunta", handler: () => alert('unimplemented')};
+    let uncheck = {icon: "fa-undo", name: "Riaggiungi", handler: () => alert('unimplemented')};
+
+    showMessage("Cosa vuoi fare per " + e.target.textContent + "?",
+        [
+            {icon: "fa-times", name: "Annulla", handler: () => {}},
+            Math.floor(Math.random() * 10) % 2 ? check : uncheck,
+            {icon: "fa-edit", name: "Modifica", handler: () => location.href = '/spesa/modifica/' + e.target.htmlFor},
+        ]
+    );
+}
+
 // Used by: add.html
 function updateInputs(e, first=false) {
     if (first || (e.target == $("input[type=text]").get(-1) && e.target.value)) {
@@ -17,22 +31,4 @@ function saveAddData() {
     var data = "";
     for (input of $('.new-element > input')) if (input.value) data += input.value + ';';
     $('#data').val(data.slice(0, -1));
-}
-
-// Used by: view.html
-function clickHandler(e) {
-    var line1 = $('<p>').html("Cosa vuoi fare per " + e.target.textContent + "?");
-    var line2 = $('<div>');
-
-    function makeFunc(h) { return (e) => { $(e.target).parents('message').remove(); h(); }; }
-    var b1 = $('<button class="icon-text">').html('<i class="fas fa-times"></i> Annulla').on('click', makeFunc(() => {}));
-    var b2 = $('<button class="icon-text">').html('<i class="fas fa-check"></i> Spunta').on('click', makeFunc(() => {}));
-    var b3 = $('<button class="icon-text">').html('<i class="fas fa-edit"></i> Modifica').on('click', makeFunc(() => {}));
-
-    line2.append(b1, b2, b3);
-
-    var content = $('<content>');
-    content.append(line1, line2);
-
-    $('body').append($('<message>').append(content));
 }

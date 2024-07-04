@@ -20,13 +20,14 @@ per una versione stabile e funzionante.
   - [X]    └── signup.html
   - [X] ── base.html
   - [X] ── home.html
-  - [ ] ── lists _TODO: creare una factory per i messaggi ed sradicare la sezione idee_. far rifunzionare il tutto       
+  - [X] ── lists
   - [X]    ├── add.html
-  - [ ]    ├── edit.html
+  - [X]    ├── edit.html
   - [X]    └── view.html
-  - [ ] ── menu
-  - [ ]    ├── edit.html
-  - [ ]    └── view.html
+  - [X] ── menu
+  - [X]    ├── dashboard.html
+  - [X]    ├── edit.html
+  - [X]    └── view.html
   - [ ] ── other
   - [ ]    ├── info.html
   - [ ]    └── privacy.html
