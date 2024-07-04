@@ -43,9 +43,9 @@ class TestDatabase(TestCase):
         from cucinassistant.database.tests.menus import TestMenus
         TestMenus(self, self.francesco, self.giovanna, self.fake_user)
 
-    def test_lists(self):
-        from cucinassistant.database.tests.lists import TestLists
-        TestLists(self, self.francesco, self.giovanna, self.fake_user)
+    def test_shopping(self):
+        from cucinassistant.database.tests.shopping import TestShopping
+        TestShopping(self, self.francesco, self.giovanna, self.fake_user)
 
     def test_storage(self):
         from cucinassistant.database.tests.storage import TestStorage

@@ -114,13 +114,9 @@ button.icon {
     color: white;
 }
 
-button.icontext {
+button.icon-text {
     height: 50px;
     color: white;
-}
-
-.item {
-    display: inline-flex;
 }
 
 
@@ -156,12 +152,29 @@ message > content > p {
     margin-bottom: 30px;
 }
 
+message button {
+    margin: 5px;
+}
+
 #cookie-notice {
     display: none;
 }
 
 
 /* --- PAGE SPECIFIC ------------ */
+.shopping-list > * {
+    display: block;
+}
+
+.shopping-list *:not(#empty-label):hover {
+    cursor: pointer;
+}
+
+.shopping-list input[type=checkbox] {
+    width: 20px;
+    height: 20px;
+}
+
 .menu-day {
     border-left: 3px solid var(--orange);
     padding-left: 10px;

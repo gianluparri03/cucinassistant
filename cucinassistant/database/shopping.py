@@ -8,48 +8,35 @@ from functools import wraps
 Entry = namedtuple('Entry', ('eid', 'name'))
 
 
-def check_section(func):
-    @wraps(func)
-    @use_user
-    def inner(cursor, uid, section, *args, **kwargs):
-        # Ensures the section exists
-        if section not in ('shopping', 'ideas'):
-            raise CAError('Lista inesistente')
-
-        return func(cursor, uid, section, *args, **kwargs)
-
-    return inner
-
-
-@check_section
-def get_list(cursor, uid, section):
-    # Gets the list
-    cursor.execute(f'SELECT id, name FROM {section} WHERE user=?;', [uid])
+@use_user
+def get_shopping(cursor, uid):
+    # Gets the shopping
+    cursor.execute('SELECT id, name FROM shopping WHERE user=?;', [uid])
     return tuple(Entry(l[0], l[1]) for l in cursor.fetchall())
 
-@check_section
-def get_list_entry(cursor, uid, section, eid):
+@use_user
+def get_shopping_entry(cursor, uid, eid):
     # Makes sure the id is valid
     if not check_number(eid):
         raise CAError('Elemento non valido')
 
     # Gets the entry
-    cursor.execute(f'SELECT id, name FROM {section} WHERE user=? AND id=?;', [uid, int(eid)])
+    cursor.execute('SELECT id, name FROM shopping WHERE user=? AND id=?;', [uid, int(eid)])
     if (n := cursor.fetchone()):
         return Entry(*n)
     else:
         raise CAError('Elemento non in lista')
 
-@check_section
-def append_list(cursor, uid, section, names):
-    # Appends the items to the list
+@use_user
+def append_shopping(cursor, uid, names):
+    # Appends the items to the shopping
     data = [[uid, name] for name in names if name]
     if not data: return
-    cursor.executemany(f'INSERT IGNORE INTO {section} (user, name) VALUES (?, ?);', data)
+    cursor.executemany(f'INSERT IGNORE INTO shopping (user, name) VALUES (?, ?);', data)
 
-@check_section
-def remove_list(cursor, uid, section, eids):
-    # Cleans the list
+@use_user
+def remove_shopping(cursor, uid, eids):
+    # Cleans the shopping
     data = set()
     for eid in eids:
         if not eid:
@@ -62,18 +49,18 @@ def remove_list(cursor, uid, section, eids):
     if not data:
         return
 
-    # Remove some items from the list
-    cursor.executemany(f'DELETE FROM {section} WHERE user=? AND id=?;', list(data))
+    # Remove some items from the shopping
+    cursor.executemany(f'DELETE FROM shopping WHERE user=? AND id=?;', shopping(data))
     if cursor.rowcount != len(data):
         raise CAError('Elemento non trovato')
 
-@check_section
-def edit_list(cursor, uid, section, eid, name):
+@use_user
+def edit_shopping(cursor, uid, eid, name):
     # Ensures the items exists
     if not check_number(eid):
         raise CAError('Elemento non valido')
     else:
-        cursor.execute(f'SELECT name FROM {section} WHERE id=? AND user=?;', [eid, uid])
+        cursor.execute('SELECT name FROM shopping WHERE id=? AND user=?;', [eid, uid])
         if not (data := cursor.fetchone()):
             raise CAError('Elemento non trovato')
 
@@ -86,9 +73,9 @@ def edit_list(cursor, uid, section, eid, name):
         raise CAError('Nuovo nome non valido')
 
     # Makes sure tha name is unique
-    cursor.execute(f'SELECT id FROM {section} WHERE name=? AND user=?;', [name, uid])
+    cursor.execute('SELECT id FROM shopping WHERE name=? AND user=?;', [name, uid])
     if cursor.fetchone():
         raise CAError('Elemento gi&agrave; in lista')
 
     # Saves the change
-    cursor.execute(f'UPDATE {section} SET name=? WHERE id=?;', [name, eid])
+    cursor.execute('UPDATE shopping SET name=? WHERE id=?;', [name, eid])

@@ -25,9 +25,9 @@ function clickHandler(e) {
     var line2 = $('<div>');
 
     function makeFunc(h) { return (e) => { $(e.target).parents('message').remove(); h(); }; }
-    var b1 = $('<button class="icontext">').html('<i class="fas fa-times"></i> Annulla').on('click', makeFunc(() => {}));
-    var b2 = $('<button class="icontext">').html('<i class="fas fa-check"></i> Spunta').on('click', makeFunc(() => {}));
-    var b3 = $('<button class="icontext">').html('<i class="fas fa-edit"></i> Modifica').on('click', makeFunc(() => {}));
+    var b1 = $('<button class="icon-text">').html('<i class="fas fa-times"></i> Annulla').on('click', makeFunc(() => {}));
+    var b2 = $('<button class="icon-text">').html('<i class="fas fa-check"></i> Spunta').on('click', makeFunc(() => {}));
+    var b3 = $('<button class="icon-text">').html('<i class="fas fa-edit"></i> Modifica').on('click', makeFunc(() => {}));
 
     line2.append(b1, b2, b3);
 

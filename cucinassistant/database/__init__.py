@@ -43,5 +43,5 @@ def check_number(n):
 
 from .users import *
 from .menus import *
-from .lists import *
+from .shopping import *
 from .storage import *

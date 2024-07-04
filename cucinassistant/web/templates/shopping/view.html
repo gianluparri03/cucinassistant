@@ -1,8 +1,7 @@
 {% extends "base.html" %}
 
 {% block imports %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/shopping.css') }}">
-    <script src="{{ url_for('static', filename='js/lists.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/shopping.js') }}"></script>
     <script>
         window.onload = function() {  $("label").on("click", clickHandler); }
     </script>
@@ -12,9 +11,9 @@
 {% set back_link = '/' %}
 
 {% block content %}
-    <div class="list">
+    <div class="shopping-list">
         {% if not list %}
-            <span>La lista &egrave; vuota.</span>
+            <span id="empty-label">La lista &egrave; vuota.</span>
         {% else %}
             {% for entry in list %}
                 <div>

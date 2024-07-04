@@ -35,11 +35,3 @@ CREATE TABLE IF NOT EXISTS shopping (
 
     UNIQUE (user, name)
 );
-
-CREATE TABLE IF NOT EXISTS ideas (
-    user INT NOT NULL REFERENCES users (uid) ON DELETE CASCADE,
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(250) NOT NULL,
-
-    UNIQUE (user, name)
-);

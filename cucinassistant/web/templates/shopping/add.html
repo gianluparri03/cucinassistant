@@ -1,8 +1,7 @@
 {% extends "base.html" %}
 
 {% block imports %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/shopping.css') }}">
-    <script src="{{ url_for('static', filename='js/lists.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/shopping.js') }}"></script>
     <script>
         window.onload = function() { updateInputs(null, true); }
     </script>
@@ -16,6 +15,6 @@
         <input id="data" name="data" hidden>
 
         <div id="new-elements"></div>
-        <button class="icontext" onclick="saveAddData()"><i class="fas fa-check"></i> Conferma</button>
+        <button class="icon-text" onclick="saveAddData()"><i class="fas fa-check"></i> Conferma</button>
     </form>
 {% endblock %}

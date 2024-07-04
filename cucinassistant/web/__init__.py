@@ -18,5 +18,5 @@ from .smart_route import *
 from .account import *
 from .menu import *
 from .storage import *
-from .lists import *
+from .shopping import *
 from .various import *
