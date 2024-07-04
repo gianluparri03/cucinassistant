@@ -13,7 +13,7 @@ def make_session_permanent():
     session.permanent = True
 
 @app.route('/')
-@smart_route('home.html')
+@smart_route('home.html', get_username=lambda: db.get_data(session['user']).username)
 @login_required
 def home_route(uid):
     pass

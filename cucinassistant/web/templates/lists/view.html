@@ -1,26 +1,29 @@
 {% extends "base.html" %}
 
+{% block imports %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shopping.css') }}">
+    <script src="{{ url_for('static', filename='js/lists.js') }}"></script>
+    <script>
+        window.onload = function() {  $("label").on("click", clickHandler); }
+    </script>
+{% endblock %}
+
+{% set title = "Lista della spesa" %}
+{% set back_link = '/' %}
+
 {% block content %}
-    <form method="POST" autocomplete="off">
-        <div class="buttons-line">
-            {% if list %}
-            <button title="Rimuovi" class="icon" onclick="location.href='/{{ routename }}/rimuovi';" type="button"><i class="fas fa-minus"></i></button>
-            <button title="Modifica" class="icon" onclick="location.href='/{{ routename }}/modifica/';" type="button"><i class="fas fa-edit"></i></button>
-            {% endif %}
+    <div class="list">
+        {% if not list %}
+            <span>La lista &egrave; vuota.</span>
+        {% else %}
+            {% for entry in list %}
+                <div>
+                    <input type="checkbox" id="{{ entry.eid }}" disabled autocomplete="off">
+                    <label for="{{ entry.eid }}">{{ entry.name }}</label>
+                </div>
+            {% endfor %}
+        {% endif %}
 
-            <button title="Aggiungi" class="icon" onclick="location.href='/{{ routename }}/aggiungi';" type="button"><i class="fas fa-plus"></i></button>
-        </div>
-
-        <div>
-            {% if not list %}
-                <i>La lista &egrave; vuota.</i>
-            {% else %}
-                <ul>
-                    {% for entry in list %}
-                        <li eid="{{ entry.eid }}">{{ entry.name }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        </div>
-    </form>
+        <a href="/spesa/aggiungi"><i class="fas fa-plus"></i> Aggiungi articoli</a>
+    </div>
 {% endblock %}

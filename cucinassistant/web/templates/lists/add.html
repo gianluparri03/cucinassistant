@@ -1,21 +1,21 @@
 {% extends "base.html" %}
 
 {% block imports %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shopping.css') }}">
     <script src="{{ url_for('static', filename='js/lists.js') }}"></script>
-    <script> window.onload = function() { addInput(); } </script>
+    <script>
+        window.onload = function() { updateInputs(null, true); }
+    </script>
 {% endblock %}
+
+{% set title = "Aggiungi articoli" %}
+{% set back_link = '/spesa/' %}
 
 {% block content %}
     <form method="POST" autocomplete="off">
-        <div class="buttons-line">
-            <button title="Annulla" class="icon" onclick="showMessage(true, 'Sei sicuro di voler annullare le modifiche?', handler=(() => location.href = '/{{ routename }}'));" type="button"><i class="fas fa-undo"></i></button>
-            <button title="Rimuovi un elemento" class="icon" onclick="removeInput()" type="button"><i class="fas fa-minus"></i></button>
-            <button title="Aggiungi un elemento" class="icon" onclick="addInput()" type="button"><i class="fas fa-plus"></i></button>
-            <button title="Conferma" class="icon" onclick="saveAddData()"><i class="fas fa-check"></i></button>
-        </div>
+        <input id="data" name="data" hidden>
 
         <div id="new-elements"></div>
-
-        <input id="data" name="data" hidden>
+        <button class="icontext" onclick="saveAddData()"><i class="fas fa-check"></i> Conferma</button>
     </form>
 {% endblock %}

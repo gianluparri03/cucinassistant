@@ -98,7 +98,7 @@ def delete_account_route(uid):
             flash('Utente sconosciuto')
 
 @app.route('/account/cambia_nome/', methods=['GET', 'POST'])
-@smart_route('account/data_change.html', field='nome', field_type='text')
+@smart_route('account/data_change.html', field='nome utente', field_type='text')
 @login_required
 def change_username_route(uid):
     if request.method == 'POST':
@@ -128,7 +128,7 @@ def change_email_route(uid):
         flash('Email cambiata con successo')
 
 @app.route('/account/cambia_password/', methods=['GET', 'POST'])
-@smart_route('account/password_change.html', type='change')
+@smart_route('account/password_change.html')
 @login_required
 def change_password_route(uid):
     if request.method == 'POST':
@@ -163,7 +163,7 @@ def recover_password_route():
         flash('Ti abbiamo inviato un email. Controlla la casella di posta')
 
 @app.route('/account/reset_password/', methods=['GET', 'POST'])
-@smart_route('account/password_change.html', type='reset')
+@smart_route('account/password_reset.html')
 def reset_password_route():
     if request.method == 'GET':
         return {'token': request.args.get('token')}

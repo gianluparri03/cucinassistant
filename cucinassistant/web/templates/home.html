@@ -1,14 +1,30 @@
 {% extends "base.html" %}
 
-{% set title = 'Home' %}
+{% block imports %} <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}"> {% endblock %}
 
-{% block imports %} <style> #home { z-index: -1; } </style> {% endblock %}
+{% set meta_title = 'CucinAssistant' %}
+{% set title = "Bentornato, " + get_username() + "!" %}
 
 {% block content %}
-    <div class="links">
-        <button onclick="location.href='/menu/';"><i class="fas fa-hamburger"></i> Men&ugrave;</button> <br>
-        <button onclick="location.href='/dispensa/'"><i class="fas fa-box"></i> Dispensa</button> <br>
-        <button onclick="location.href='/spesa/'"><i class="fas fa-shopping-basket"></i> Lista della spesa</button> <br>
-        <button onclick="location.href='/idee/'"><i class="fas fa-lightbulb"></i> Idee</button> <br>
+    <div class="dashboard">
+        <button onclick="location.href='/menu/';">
+            <i class="fas fa-hamburger"></i>
+            <span>Men&ugrave;</span>
+        </button>
+
+        <button onclick="location.href='/dispensa/'">
+            <i class="fas fa-box"></i>
+            <span>Dispensa</span>
+        </button>
+
+        <button onclick="location.href='/spesa/'">
+            <i class="fas fa-shopping-basket"></i>
+            <span>Lista della spesa</span>
+        </button>
+
+        <button onclick="location.href='/account/impostazioni/'" class="transparent">
+            <i class="fas fa-cog"></i>
+            <span>Impostazioni</span>
+        </button>
     </div>
 {% endblock %}

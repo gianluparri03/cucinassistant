@@ -39,7 +39,7 @@ app.url_map.converters.update(section=SectionsConverter)
 @smart_route('lists/view.html')
 @login_required
 def lists_view_route(uid, sec):
-    return {'list': db.get_list(uid, sec.dbname), 'title': sec.title, 'routename': sec.value}
+    return {'list': db.get_list(uid, sec.dbname), 'routename': sec.value}
 
 @app.route('/<section:sec>/aggiungi/')
 @smart_route('lists/add.html')

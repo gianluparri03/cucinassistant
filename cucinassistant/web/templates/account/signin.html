@@ -1,8 +1,6 @@
 {% extends "base.html" %}
 
-{% set title = 'Accesso' %}
-
-{% block imports %} <style> #home, #settings { z-index: -1; } </style> {% endblock %}
+{% set title = 'Accedi' %}
 
 {% block content %}
     <form method="POST">
@@ -12,8 +10,9 @@
         <label for="password">Password</label> <br>
         <input type="password" name="password" required> <br>
 
-        <button title="Accedi" class="icon"><i class="fas fa-sign-in-alt"></i></button>
-        <button title="Registrati" class="icon" onclick="location.href='/account/registrati';" type="button"><i class="fas fa-user-plus"></i></button>
-        <button title="Recupera password" class="icon" onclick="location.href='/account/recupera_password';" type="button"><i class="fas fa-key"></i></button>
+        <button class="icontext"><i class="fas fa-sign-in-alt"></i> Accedi</button> <br>
+
+        <a href="/account/recupera_password">Hai dimenticato la password?</a> <br>
+        Non hai un account? <a href="/account/registrati">Registrati</a>
     </form>
 {% endblock %}

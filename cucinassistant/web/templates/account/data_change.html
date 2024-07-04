@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
 {% set title = 'Cambio ' + field %}
+{% set back_link = '/account/impostazioni' %}
 
 {% block content %}
     <form method="POST">
-        <label for="new">Nuov{{ 'o' if field == 'nome' else 'a' }} {{ field }}</label> <br>
+        Per continuare, inserisci il nuov{{ 'o' if field == 'nome utente' else 'a' }} {{ field }}. <br>
         <input type="{{ field_type }}" name="new" required> <br>
-
-        <button title="Conferma" class="icon"><i class="fas fa-check"></i></button>
+        <button class="icontext"><i class="fas fa-check"></i> Continua</button>
     </form>
 {% endblock %}

@@ -9,6 +9,40 @@ per una versione stabile e funzionante.
 ## Roadmap
 
 - [ ] Modificare/Sistemare lo stile delle pagine già presenti
-- [ ] Rendere tutte le pagine (eccetto accedi/registrati/...) dinamiche lato client, magari con TypeScript
+  - [ ] ├── account
+  - [X]    ├── data_change.html
+  - [X]    ├── delete.html
+  - [X]    ├── password_change.html
+  - [X]    ├── password_recover.html
+  - [X]    ├── password_reset.html
+  - [ ]    ├── settings.html
+  - [X]    ├── signin.html
+  - [X]    └── signup.html
+  - [X] ── base.html
+  - [X] ── home.html
+  - [ ] ── lists _TODO: creare una factory per i messaggi ed sradicare la sezione idee_. far rifunzionare il tutto       
+  - [X]    ├── add.html
+  - [ ]    ├── edit.html
+  - [X]    └── view.html
+  - [ ] ── menu
+  - [ ]    ├── edit.html
+  - [ ]    └── view.html
+  - [ ] ── other
+  - [ ]    ├── info.html
+  - [ ]    └── privacy.html
+  - [ ] ── storage
+  - [ ]    ├── add.html
+  - [ ]    ├── edit.html
+  - [ ]    ├── pre_edit.html
+  - [ ]    ├── remove.html
+  - [ ]    ├── search.html
+  - [ ]    └── view.html
+
+- [ ] Sistemare il JavaScript delle pagine, magari passando a TypeScript
+  - [ ] Aggiornare service worker
+
 - [ ] Riscrivere il backend (auth, api e file server), magari in Go
 
+- [ ] Rendere le pagine dinamiche lato client
+
+- [ ] Guida all'utilizzo

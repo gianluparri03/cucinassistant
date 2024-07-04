@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% set title = 'Registrazione' %}
+{% set title = 'Registrati' %}
 
 {% block imports %}
     <style> #home, #settings { z-index: -1; } </style>
@@ -20,7 +20,8 @@
         <label for="password2">Ripeti password</label> <br>
         <input type="password" name="password" id="password2" required> <br>
 
-        <button title="Registrati" class="icon"><i class="fas fa-user-plus"></i></button>
-        <button title="Accedi" class="icon" onclick="location.href='/account/accedi';" type="button"><i class="fas fa-sign-in-alt"></i></button>
+        <button class="icontext"><i class="fas fa-user-plus"></i> Regstrati</button> <br>
+
+        Hai gi&agrave; un account? <a href="/account/accedi">Accedi</a>
     </form>
 {% endblock %}
