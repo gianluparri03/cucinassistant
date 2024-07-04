@@ -1,14 +1,14 @@
-![CucinAssistant](cucinassistant/web/static/img/banner.png)
+# CucinAssistant (rewrite)
 
 _Un aiutante per la tua cucina_
 
-Con CucinAssistant puoi gestire menù settimanali, alimenti in dispensa (quantità e scadenze), la lista della spesa e una lista di idee.
-Per ulteriori informazioni potete consultare [la pagina apposita](https://ca.gianlucaparri.me/info).  
+In questo branch, CucinAssistant verrà riscritto completamente.
+Per semplicità e organizzazione del lavoro, in questo branch saranno presenti dei mock: riferirsi al branch [main](https://github.com/gianluparri03/cucinassistant/tree/main)
+per una versione stabile e funzionante.
 
-Il progetto è rilasciato con la **[licenza MIT](/blob/main/LICENSE).  **
+## Roadmap
 
-CucinAssistant utilizza:
-- [sakura](https://github.com/oxalorg/sakura)
-- [Inclusive Sans](https://fonts.google.com/specimen/Inclusive+Sans?query=inclusive+sans)
-- [Satisfy](https://fonts.google.com/specimen/Satisfy?query=satisfy)
-- [FontAwesome](https://fontawesome.com/)
+- [ ] Modificare/Sistemare lo stile delle pagine già presenti
+- [ ] Rendere tutte le pagine (eccetto accedi/registrati/...) dinamiche lato client, magari con TypeScript
+- [ ] Riscrivere il backend (auth, api e file server), magari in Go
+
