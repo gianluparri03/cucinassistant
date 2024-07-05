@@ -1,8 +1,8 @@
-{% extends "base.html" %}
+{% extends "templates/base.html" %}
 
 {% block imports %}
     <script src="{{ url_for('static', filename='js/shopping.js') }}"></script>
-    <script> window.onload = function() {  $("label").on("click", clickHandler); } </script>
+    <script> window.onload = function() {  $(".shopping-item *").on("click", clickHandler); } </script>
 {% endblock %}
 
 {% set title = "Lista della spesa" %}
@@ -15,9 +15,9 @@
             <span id="empty-label">La lista &egrave; vuota.</span>
         {% else %}
             {% for entry in list %}
-                <div>
-                    <input type="checkbox" id="{{ entry.eid }}" disabled autocomplete="off">
-                    <label for="{{ entry.eid }}">{{ entry.name }}</label>
+                <div class="shopping-item">
+                    <input type="checkbox" id="entry-{{ entry.eid }}" readonly>
+                    <label for="entry-{{ entry.eid }}">{{ entry.name }}</label>
                 </div>
             {% endfor %}
         {% endif %}

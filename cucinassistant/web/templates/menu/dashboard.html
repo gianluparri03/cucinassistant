@@ -1,23 +1,22 @@
-{% extends "base.html" %}
+{% extends "templates/dashboard.html" %}
 
-{% block imports %} <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}"> {% endblock %}
-
-{% set title = "Men&ugrave;" %}
+{% set title = "Menù" %}
 
 {% set back_link = '/' %}
 
-{% block content %}
-    <div class="dashboard">
-        {% for m in menus %}
-            <button onclick="location.href='/menu/{{ m }}';">
-                <i class="fas fa-{{ 'utensils' if m != 1 else 'bookmark' }}"></i>
-                <span>Men&ugrave; {{ m }}</span>
-            </button>
-        {% endfor %}
+{% set ns = namespace(items = []) %}
+{% for m in menus %}
+    {% set ns.items = ns.items + [{
+        'link': '/menu/' + str(m),
+        'icon': 'fa-utensils' if m != 1 else 'fa-bookmark',
+        'name': 'Menù ' + str(m)
+    }] %}
+{% endfor %}
 
-        <button onclick="location.href='/menu/crea/';" class="transparent">
-            <i class="fas fa-plus"></i>
-            <span>Nuovo men&ugrave;</span>
-        </button>
-    </div>
-{% endblock %}
+{% set items = ns.items %}
+
+{% set transparent = {
+    'link': '/menu/crea/',
+    'icon': 'fa-plus',
+    'name': 'Nuovo menù'
+} %}

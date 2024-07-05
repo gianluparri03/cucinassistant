@@ -1,6 +1,6 @@
-{% extends "base.html" %}
+{% extends "templates/base.html" %}
 
-{% set title = "Modifica men&ugrave;" %}
+{% set title = "Modifica menù" %}
 
 {% set back_link = '/menu/' + str(menu.mid) %}
 
@@ -21,13 +21,13 @@
         {% set entries = menu.menu.split(';') %}
         {% for day_name in ["Luned&igrave;", "Marted&igrave;", "Mercoled&igrave;", "Gioved&igrave;", "Venerd&igrave;", "Sabato", "Domenica"] %}
             <div class="menu-day">
-                <b>{{ day_name | safe }}</b>
+                <b>{{ day_name }}</b>
                 <textarea id="entry-{{ i.d }}">{{ entries[i.d] }}</textarea> {% set i.d = i.d + 1 %}
                 <textarea id="entry-{{ i.d }}">{{ entries[i.d] }}</textarea> {% set i.d = i.d + 1 %}
             </div>
         {% endfor %}
 
-        <button title="Elimina" class="icon-text" onclick="showConfirm('Sei sicuro di voler eliminare questo men&ugrave;?', deleteMenu);" type="button"><i class="fas fa-trash-alt"></i> Elimina men&ugrave;</button>
+        <button title="Elimina" class="icon-text" onclick="showConfirm('Sei sicuro di voler eliminare questo menù?', deleteMenu);" type="button"><i class="fas fa-trash-alt"></i> Elimina menù</button>
         <button title="Conferma" class="icon-text" onclick="saveMenu();"><i class="fas fa-check"></i> Salva</button>
     </form>
 {% endblock %}

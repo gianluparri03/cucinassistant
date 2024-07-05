@@ -1,0 +1,28 @@
+{% extends "templates/dashboard.html" %}
+
+{% set meta_title = 'CucinAssistant' %}
+{% set title = "Bentornato, " + get_username() + "!" %}
+
+{% set items = [
+    {
+        'link': '/menu/',
+        'icon': 'fa-utensils',
+        'name': 'Menù'
+    },
+    {
+        'link': '/dispensa/',
+        'icon': 'fa-box',
+        'name': 'Dispensa'
+    },
+    {
+        'link': '/spesa/',
+        'icon': 'fa-shopping-cart',
+        'name': 'Lista della spesa'
+    }
+] %}
+
+{% set transparent = {
+    'link': '/account/impostazioni',
+    'icon': 'fa-cog',
+    'name': 'Impostazioni'
+} %}

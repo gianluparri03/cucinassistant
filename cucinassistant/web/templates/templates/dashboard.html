@@ -1,0 +1,22 @@
+{% extends "templates/base.html" %}
+
+{% block imports %} <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}"> {% endblock %}
+
+{% block content %}
+    <div class="dashboard">
+        {% for item in items %}
+            <button onclick="location.href='{{ item.link }}';">
+                <i class="fas {{ item.icon }}"></i>
+                <span>{{ item.name }}</span>
+            </button>
+        {% endfor %}
+
+
+        {% if transparent %}
+        <button onclick="location.href='{{ transparent.link }}';" class="transparent">
+            <i class="fas {{ transparent.icon }}"></i>
+            <span>{{ transparent.name }}</span>
+            </button>
+        {% endif %}
+    </div>
+{% endblock %}

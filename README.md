@@ -39,11 +39,9 @@ per una versione stabile e funzionante.
   - [ ]    ├── search.html
   - [ ]    └── view.html
 
-- [ ] Sistemare il JavaScript delle pagine, magari passando a TypeScript
-  - [ ] Aggiornare service worker
-
 - [ ] Riscrivere il backend (auth, api e file server), magari in Go
 
-- [ ] Rendere le pagine dinamiche lato client
+- [ ] Rendere le pagine dinamiche lato client, magari passando a TypeScript
+  - [ ] Aggiornare service worker
 
 - [ ] Guida all'utilizzo

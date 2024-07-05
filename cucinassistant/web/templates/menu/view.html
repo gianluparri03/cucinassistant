@@ -1,15 +1,15 @@
-{% extends "base.html" %}
+{% extends "templates/base.html" %}
 
-{% set title = "Men&ugrave; " + str(menu.mid) %}
+{% set title = "Menù " + str(menu.mid) %}
 
 {% set back_link = '/menu/' %}
 
 {% block content %}
     {% set i = namespace(d=0) %}
     {% set entries = menu.menu.split(';') %}
-    {% for day_name in ["Luned&igrave;", "Marted&igrave;", "Mercoled&igrave;", "Gioved&igrave;", "Venerd&igrave;", "Sabato", "Domenica"] %}
+    {% for day_name in ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"] %}
         <div class="menu-day">
-            <b>{{ day_name | safe }}</b>
+            <b>{{ day_name }}</b>
             <textarea readonly>{{ entries[i.d] }}</textarea> {% set i.d = i.d + 1 %}
             <textarea readonly>{{ entries[i.d] }}</textarea> {% set i.d = i.d + 1 %}
         </div>

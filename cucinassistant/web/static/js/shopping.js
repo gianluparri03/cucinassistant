@@ -1,13 +1,19 @@
 // Used by: view.html
 function clickHandler(e) {
+    e.preventDefault();
+
+    let label = $(e.target).parent().find('label');
+    let id = label.attr('for');
+    let name = label.text();
+
     let check = {icon: "fa-check", name: "Spunta", handler: () => alert('unimplemented')};
     let uncheck = {icon: "fa-undo", name: "Riaggiungi", handler: () => alert('unimplemented')};
 
-    showMessage("Cosa vuoi fare per " + e.target.textContent + "?",
+    showMessage(`Cosa vuoi fare per ${name}?`,
         [
             {icon: "fa-times", name: "Annulla", handler: () => {}},
             Math.floor(Math.random() * 10) % 2 ? check : uncheck,
-            {icon: "fa-edit", name: "Modifica", handler: () => location.href = '/spesa/modifica/' + e.target.htmlFor},
+            {icon: "fa-edit", name: "Modifica", handler: () => location.href = '/spesa/modifica/' + eid},
         ]
     );
 }

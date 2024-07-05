@@ -29,7 +29,7 @@ def get_menu(cursor, uid, mid=None):
         if (data := cursor.fetchone()):
             menu = data[0]
         else:
-            raise CAError('Men&ugrave; non trovato')
+            raise CAError('Menù non trovato')
 
     # Fetches the prev's id
     cursor.execute('SELECT MAX(id) FROM menus WHERE user = ? AND id < ?;', [uid, mid])
@@ -58,13 +58,13 @@ def create_menu(cursor, uid):
 def update_menu(cursor, uid, mid, menu):
     # Makes sure the menu exists (for 0 get_menu wouldn't raise anything)
     if mid == 0:
-        raise CAError('Men&ugrave; non trovato')
+        raise CAError('Menù non trovato')
     else:
         get_menu(uid, mid)
 
     # Ensures the menu is valid
     if menu.count(';') != 13:
-        raise CAError('Men&ugrave; non valido')
+        raise CAError('Menù non valido')
 
     # Updates the menu
     cursor.execute('UPDATE menus SET menu=? WHERE user=? AND id=?;', [menu, uid, mid])
@@ -73,7 +73,7 @@ def update_menu(cursor, uid, mid, menu):
 def delete_menu(cursor, uid, mid):
     # Makes sure the menu exists (for 0 get_menu wouldn't raise anything)
     if mid == 0:
-        raise CAError('Men&ugrave; non trovato')
+        raise CAError('Menù non trovato')
     else:
         menu = get_menu(uid, mid)
 
@@ -86,7 +86,7 @@ def delete_menu(cursor, uid, mid):
 def duplicate_menu(cursor, uid, mid):
     # Makes sure the menu exists (for 0 get_menu wouldn't raise anything)
     if mid == 0:
-        raise CAError('Men&ugrave; non trovato')
+        raise CAError('Menù non trovato')
     else:
         menu = get_menu(uid, mid).menu
 

@@ -10,7 +10,7 @@ from flask import request, redirect
 @smart_route('menu/dashboard.html')
 @login_required
 def menu_dashboard_route(uid):
-    return {'menus': db.get_menus(uid)}
+    return {'menus': db.get_menus(uid), 'str': str}
 
 @app.route('/menu/<int:mid>/')
 @smart_route('menu/view.html')
