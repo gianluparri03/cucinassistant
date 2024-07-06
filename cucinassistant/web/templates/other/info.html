@@ -2,25 +2,26 @@
 
 {% set title = 'Informazioni' %}
 
-{% block imports %} {% if not is_logged() %} <style> #settings { z-index: -1; } </style> {% endif %} {% endblock %}
+{% set back_link = '/' %}
 
 {% block content %}
     <p>
-        Attualmente, <b>CucinAssistant</b> ha {{ get_users_no() }} utenti attivi.
-        La versione corrente &egrave; la <b>{{ version }}</b>.
-        <br>
+        <b>CucinAssistant</b> è un progetto sviluppato interamente da
+        <a href="https://gianlucaparri.me" target="_blank">Gianluca Parri</a>, ideato nel 2023
+        in seguito alla sua nuova vita da fuorisede universitario. Da quel momento
+        è in continua evoluzione, anche se lentamente. <br> <br>
 
-        <b>CucinAssistant</b> &egrave; disponibile online su <a href="{{ config['Environment']['Address'] }}">{{ config['Environment']['Address'].split('//')[1] }}</a>
-        e come applicazione per Android sul <a href="{{ config['Various']['Store'] }}" target="_blank">Play Store</a>,
-        <br>
+        Al momento è disponibile sia <a href="{{ config['Environment']['Address'] }}" target="_blank">
+        come sito web</a> sia come applicazione Android, disponibile sul
+        <a href="{{ config['Various']['Store'] }}" target="_blank">Play Store</a>; per gli utenti iOS non
+        è disponibile un'app sullo store, ma si può installare dal browser. <br> <br>
 
-        Il codice sorgente &egrave; disponibile <a href="https://github.com/gianluparri03/cucinassistant" target="_blank">qui</a>.
-        <br>
-
-        Per informazioni riguardo alla privacy, potete consultare <a href="/privacy">questa pagina</a>.
-        <br>
+        <b>CucinAssistant</b> è completamente open source; il codice sorgente è disponibile su
+        <a href="https://github.com/gianluparri03/cucinassistant/" target="_blank">GitHub</a>. <br> <br>
 
         Per ulteriori informazioni, potete scrivere una mail a
-        <a href="mailto:{{ config['Email']['Address'] }}" target="_blank">{{ config['Email']['Address'] }}</a>.
+        <a href="mailto:{{ config['Email']['Address'] }}" target="_blank">{{ config['Email']['Address'] }}</a>. <br> <br>
+
+        La versione corrente è la {{ version }}. Attualmente, ci sono {{ get_users_no() }} utenti attivi.
     </p>
 {% endblock %}

@@ -1,8 +1,28 @@
 {% extends "templates/base.html" %}
 
 {% block imports %}
-    <script src="{{ url_for('static', filename='js/shopping.js') }}"></script>
-    <script> window.onload = function() {  $(".shopping-item *").on("click", clickHandler); } </script>
+    <script>
+        window.onload = function() {
+            $(".shopping-item *").on("click", function (e) {
+                e.preventDefault();
+
+                let label = $(e.target).parent().find('label');
+                let id = label.attr('for');
+                let name = label.text();
+
+                let check = {icon: "fa-check", name: "Spunta", handler: () => alert('unimplemented')};
+                let uncheck = {icon: "fa-undo", name: "Riaggiungi", handler: () => alert('unimplemented')};
+
+                showMessage(`Cosa vuoi fare per ${name}?`,
+                    [
+                        {icon: "fa-times", name: "Annulla", handler: () => {}},
+                        Math.floor(Math.random() * 10) % 2 ? check : uncheck,
+                        {icon: "fa-edit", name: "Modifica", handler: () => location.href = '/spesa/modifica/' + eid},
+                    ]
+                );
+            });
+        }
+    </script>
 {% endblock %}
 
 {% set title = "Lista della spesa" %}
@@ -22,7 +42,7 @@
             {% endfor %}
         {% endif %}
 
-        <button class="icon-text"><i class="fas fa-plus"></i> Aggiungi articoli</button>
-        <button class="icon-text"><i class="fas fa-trash"></i> Elimina selezionati</button>
+        <button class="icon-text" onclick="location.href = '/spesa/aggiungi/';"><i class="fas fa-plus"></i> Aggiungi articoli</button>
+        <button class="icon-text" onclick="javascript:alert('unimplemented');"><i class="fas fa-trash"></i> Elimina spuntati</button>
     </div>
 {% endblock %}

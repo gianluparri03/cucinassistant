@@ -3,7 +3,16 @@
 {% set title = 'Registrati' %}
 
 {% block imports %}
-    <style> #home, #settings { z-index: -1; } </style>
+    <script>
+        function comparePasswords() {
+            if ($("#password1").val() != $("#password2").val()) {
+                showAlert("Le due password non corrispondono", () => {});
+                return false;
+            } else {
+                return true;
+            }
+        }
+    </script>
 {% endblock %}
 
 {% block content %}

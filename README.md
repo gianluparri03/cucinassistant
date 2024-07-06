@@ -18,26 +18,29 @@ per una versione stabile e funzionante.
   - [ ]    ├── settings.html
   - [X]    ├── signin.html
   - [X]    └── signup.html
-  - [X] ── base.html
-  - [X] ── home.html
-  - [X] ── lists
-  - [X]    ├── add.html
-  - [X]    ├── edit.html
-  - [X]    └── view.html
   - [X] ── menu
   - [X]    ├── dashboard.html
   - [X]    ├── edit.html
   - [X]    └── view.html
-  - [ ] ── other
-  - [ ]    ├── info.html
-  - [ ]    └── privacy.html
+  - [X] ── other
+  - [X]    ├── home.html
+  - [X]    └── info.html
+  - [X] ── shopping
+  - [X]    ├── add.html
+  - [X]    ├── edit.html
+  - [X]    └── view.html
   - [ ] ── storage
   - [ ]    ├── add.html
+  - [X]    ├── dashboard.html
   - [ ]    ├── edit.html
+  - [X]    ├── new.html
   - [ ]    ├── pre_edit.html
   - [ ]    ├── remove.html
   - [ ]    ├── search.html
   - [ ]    └── view.html
+  - [X] ── templates
+  - [X]    ├── base.html
+  - [X]    └── dashboard.html
 
 - [ ] Riscrivere il backend (auth, api e file server), magari in Go
 

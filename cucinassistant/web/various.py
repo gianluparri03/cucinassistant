@@ -23,14 +23,9 @@ def home_route(uid):
 def info_route():
     pass
 
-@app.route('/privacy')
-@smart_route('other/privacy.html', is_logged=is_logged)
-def privacy_route():
-    pass
-
 @app.route('/favicon.ico')
 def favicon_route():
-    return send_from_directory('static', 'img/logo.png')
+    return send_from_directory('static', 'img/logo_round.png')
 
 @app.route('/guida')
 def tutorial_route():

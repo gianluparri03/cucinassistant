@@ -1,8 +1,10 @@
 {% extends "templates/base.html" %}
 
-{% set title = 'Dispensa' %}
-
 {% block imports %} <script src="{{ url_for('static', filename='js/storage.js') }}"></script> {% endblock %}
+
+{% set title = name %}
+
+{% set back_link = '/dispensa/' %}
 
 {% block content %}
     {% if filter %} <span>Ricerca corrente: {{ filter }}</span> {% endif %}

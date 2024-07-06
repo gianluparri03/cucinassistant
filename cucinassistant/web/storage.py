@@ -7,11 +7,28 @@ from flask import request, redirect, url_for
 
 
 @app.route('/dispensa/')
+@smart_route('storage/dashboard.html')
+@login_required
+def storage_dashboard_route(uid):
+    return {'storages': [{'id': 1, 'name': 'Frigo'}], 'str': str}
+
+@app.route('/dispensa/crea/')
+@smart_route('storage/new.html')
+@login_required
+def storage_new_route_get(uid):
+    pass
+
+@app.route('/dispensa/crea/', methods=["POST"])
+@login_required
+def storage_new_route_post(uid):
+    return redirect('/dispensa/')
+
+@app.route('/dispensa/<int:sid>/')
 @smart_route('storage/view.html')
 @login_required
-def storage_view_route(uid):
+def storage_view_route(uid, sid):
     name = request.args.get('nome')
-    return {'storage': db.get_storage(uid, name=name), 'filter': name}
+    return {'storage': db.get_storage(uid, name=name), 'filter': name, 'name': 'Frigo'}
 
 @app.route('/dispensa/aggiungi/')
 @smart_route('storage/add.html')

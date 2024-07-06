@@ -13,6 +13,7 @@
 }
 
 
+
 /* --- GENERAL ELEMENTS -------------- */
 * {
     font-family: var(--sansserif);
@@ -42,6 +43,11 @@ button[disabled]:hover {
     background-color: var(--red);
     cursor: unset;
 }
+
+p {
+    text-align: justify;
+}
+
 
 
 /* --- NAV, MAIN AND FOOTER ---------- */
@@ -99,6 +105,7 @@ footer a:hover {
 }
 
 
+
 /* --- FORM -------------------------- */
 label {
     display: inline;
@@ -118,6 +125,7 @@ button.icon-text {
     height: 50px;
     color: white;
 }
+
 
 
 /* --- MESSAGES ----------------- */
@@ -161,7 +169,51 @@ message button {
 }
 
 
-/* --- PAGE SPECIFIC ------------ */
+
+/* --- DASHBOARD ---------------- */
+.dashboard {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.dashboard button {
+    background-color: var(--orange);
+    height: min(17vmax, 170px);
+    width: min(17vmax, 170px);
+    margin-right: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.dashboard button:hover {
+    cursor: pointer;
+    background-color: var(--red);
+}
+
+.dashboard button.transparent {
+    background-color: transparent;
+    border-style: dashed;
+    color: var(--text);
+}
+
+.dashboard button.transparent:hover {
+    background-color: rgba(0, 0, 0, .2);
+}
+
+.dashboard button i {
+    display: block;
+    font-size: 1.8em;
+    margin-bottom: .3em;
+}
+
+.dashboard button span {
+    display: block;
+    white-space: collapse;
+    overflow-wrap: anywhere;
+}
+
+
+
+/* --- PAGE SPECIFIC: Shopping -- */
 .shopping-list > * {
     display: block;
 }
@@ -175,10 +227,88 @@ message button {
     height: 20px;
 }
 
+
+
+/* --- PAGE SPECIFIC: Menu ------ */
 .menu-day {
     border-left: 3px solid var(--orange);
     padding-left: 10px;
     margin: 10px auto;
+}
+
+textarea {
+    resize: none;
+}
+
+@media(orientation: landscape) {
+    .menu-day {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .menu-day b {
+        width: 100%;
+        display: block;
+    }
+
+    .menu-day b+textarea {
+        margin-right: 5px;
+    }
+
+    .menu-day textarea {
+        width: 48%;
+    }
+
+    .menu-day textarea+textarea {
+        margin-left: 5px;
+    }
+}
+
+
+
+/* --- PAGE SPECIFIC: Storage --- */
+.storage-item {
+    margin: 10px auto;
+    border-left: 3px solid var(--orange);
+    padding-left: 5px;
+}
+
+@media (orientation: portrait) {
+    .storage-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .storage-item input.name {
+        width: 80vw;
+    }
+
+    .storage-item input.quantity {
+        width: 40vw;
+    }
+
+    .storage-item input.expiration {
+        width: 50vw;
+    }
+}
+
+@media (orientation: landscape) {
+    .storage-item input.name {
+        width: 25vw;
+    }
+
+    .storage-item input.quantity {
+        width: 10vw;
+    }
+
+    .storage-item input.expiration {
+        width: 15vw;
+    }
+
+    .storage-item input+input {
+        margin-left: 5px;
+    }
 }
 
 .selectable {
@@ -188,8 +318,4 @@ message button {
 
 .selectable:hover {
     cursor: pointer;
-}
-
-textarea {
-    resize: none;
 }

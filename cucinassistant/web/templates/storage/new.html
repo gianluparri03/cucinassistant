@@ -1,0 +1,12 @@
+{% extends "templates/base.html" %}
+
+{% set title = 'Nuova sezione' %}
+{% set back_link = '/dispensa/' %}
+
+{% block content %}
+    <form method="POST">
+        Nome della nuova sezione <br>
+        <input name="name" required> <br>
+        <button class="icon-text"><i class="fas fa-check"></i> Continua</button>
+    </form>
+{% endblock %}
