@@ -63,10 +63,22 @@ nav {
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
 
     text-align: center;
     background-color: var(--red);
+}
+
+#home, #back {
+    font-size: 30px;
+    width: 50px;
+    color: white;
+    padding: 20px;
+    position: relative;
+}
+
+#home:hover, #back:hover {
+    cursor: pointer;
 }
 
 #logo {
@@ -274,6 +286,10 @@ textarea {
     padding-left: 5px;
 }
 
+.storage-item, .storage-item *:hover {
+    cursor: pointer;
+}
+
 @media (orientation: portrait) {
     .storage-item {
         flex-direction: column;
@@ -309,13 +325,4 @@ textarea {
     .storage-item input+input {
         margin-left: 5px;
     }
-}
-
-.selectable {
-    color: var(--orange);
-    text-decoration: underline;
-}
-
-.selectable:hover {
-    cursor: pointer;
 }

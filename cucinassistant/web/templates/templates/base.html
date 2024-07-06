@@ -56,11 +56,22 @@
 
     <body>
         <nav>
+            <span id="back">
+                {% if back_link %}
+                    <i class="fas fa-arrow-circle-left" onclick="location.href='{{ back_link }}';"></i>
+                {% endif %}
+            </span>
+
             <span id="logo">CucinAssistant</span>
+
+            <span id="home">
+                {% if back_link %}
+                    <i class="fas fa-home" onclick="location.href='/';"></i>
+                {% endif %}
+            </span>
         </nav>
 
         <main>
-            {% if back_link %} <a href="{{ back_link }}">Indietro</a> {% endif %}
 
             <h1>{{ title }}</h1>
 

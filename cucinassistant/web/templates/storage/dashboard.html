@@ -7,7 +7,7 @@
 {% set ns = namespace(items = []) %}
 {% for s in storages %}
     {% set ns.items = ns.items + [{
-        'link': '/dispensa/' + str(s.id),
+        'link': '/dispensa/' + str(s.id) + '/',
         'icon': 'fa-box',
         'name': s.name
     }] %}

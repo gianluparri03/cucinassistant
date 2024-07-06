@@ -10,7 +10,7 @@ from flask import request, redirect, url_for
 @smart_route('storage/dashboard.html')
 @login_required
 def storage_dashboard_route(uid):
-    return {'storages': [{'id': 1, 'name': 'Frigo'}], 'str': str}
+    return {'storages': [{'id': 1, 'name': 'Frigo'}, {'id': 2, 'name': 'Pasta'}], 'str': str}
 
 @app.route('/dispensa/crea/')
 @smart_route('storage/new.html')
@@ -27,68 +27,69 @@ def storage_new_route_post(uid):
 @smart_route('storage/view.html')
 @login_required
 def storage_view_route(uid, sid):
-    name = request.args.get('nome')
-    return {'storage': db.get_storage(uid, name=name), 'filter': name, 'name': 'Frigo'}
+    if sid == 1:
+        name = request.args.get('nome')
+        return {'storage': db.get_storage(uid, name=name), 'filter': name, 'name': 'Frigo'}
+    else:
+        return {'storage': [], 'name': 'Pasta'}
 
-@app.route('/dispensa/aggiungi/')
+@app.route('/dispensa/<int:sid>/aggiungi/')
 @smart_route('storage/add.html')
 @login_required
-def storage_add_route_get(uid):
+def storage_add_route_get(uid, sid):
     pass
 
-@app.route('/dispensa/aggiungi/', methods=['POST'])
+@app.route('/dispensa/<int:sid>/aggiungi/', methods=['POST'])
 @smart_route('storage/add.html')
 @login_required
-def storage_add_route_post(uid):
+def storage_add_route_post(uid, sid):
     data = [a.split(';') for a in request.form.get('data', '').split('|')]
     db.append_storage(uid, data)
     return redirect('/dispensa/')
 
-@app.route('/dispensa/modifica/')
+@app.route('/dispensa/<int:sid>/modifica/')
 @smart_route('storage/pre_edit.html')
 @login_required
-def storage_pre_edit_route(uid):
+def storage_pre_edit_route(uid, sid):
     name = request.args.get('nome')
     return {'storage': db.get_storage(uid, name=name), 'filter': name}
 
-@app.route('/dispensa/modifica/<int:aid>')
+@app.route('/dispensa/<int:sid>/modifica/<int:aid>')
 @smart_route('storage/edit.html')
 @login_required
-def storage_edit_route(uid, aid):
+def storage_edit_route(uid, sid, aid):
     return {'prev': db.get_storage_article(uid, aid)}
 
-@app.route('/dispensa/modifica/<int:aid>', methods=['POST'])
+@app.route('/dispensa/<int:sid>/modifica/<int:aid>', methods=['POST'])
 @smart_route('storage/edit.html')
 @login_required
-def storage_edit_route_post(uid, aid):
+def storage_edit_route_post(uid, sid, aid):
     db.edit_storage(uid, aid, [request.form.get('name'), request.form.get('expiration'), request.form.get('quantity')])
-    return redirect('/dispensa/modifica/')
+    return redirect(f'/dispensa/{sid}/')
 
-@app.route('/dispensa/rimuovi/')
+@app.route('/dispensa/<int:sid>/rimuovi/')
 @smart_route('storage/remove.html')
 @login_required
-def storage_remove_route_get(uid):
+def storage_remove_route_get(uid, sid):
     name = request.args.get('nome')
     return {'storage': db.get_storage(uid, name=name), 'filter': name}
 
 
-@app.route('/dispensa/rimuovi/', methods=['POST'])
+@app.route('/dispensa/<int:sid>/rimuovi/<int:aid>', methods=['POST'])
 @smart_route('storage/remove.html')
 @login_required
-def storage_remove_route_post(uid):
-    db.remove_storage(uid, request.form.get('data').split(';'))
-    return redirect('.')
+def storage_remove_route_post(uid, sid, aid):
+    db.remove_storage(uid, [aid])
+    return redirect(f'/dispensa/{sid}/')
 
-@app.route('/dispensa/cerca')
+@app.route('/dispensa/<int:sid>/cerca')
 @smart_route('storage/search.html')
 @login_required
-def storage_search_route_get(uid):
-    return {'page': request.args.get('pagina', '')}
+def storage_search_route_get(uid, sid):
+    pass
 
-@app.route('/dispensa/cerca', methods=['POST'])
+@app.route('/dispensa/<int:sid>/cerca', methods=['POST'])
 @smart_route('storage/search.html')
 @login_required
-def storage_search_route_post(uid):
-    pages = {'': 'storage_view_route', 'rimuovi': 'storage_remove_route_get', 'modifica': 'storage_pre_edit_route'}
-    page = pages.get(request.form.get('page'), pages[''])
-    return redirect(url_for(page, nome=request.form.get('name', '')))
+def storage_search_route_post(uid, sid):
+    return redirect(f'/dispensa/{sid}/?nome={request.form.get("name")}')

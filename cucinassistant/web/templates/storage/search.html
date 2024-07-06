@@ -1,18 +1,12 @@
 {% extends "templates/base.html" %}
 
-{% set title = 'Cerca articoli' %}
-
-{% block imports %} <script src="{{ url_for('static', filename='js/storage.js') }}"></script> {% endblock %}
+{% set title = 'Ricerca articoli' %}
+{% set back_link = '../' %}
 
 {% block content %}
     <form method="POST">
-        <input name="page" value="{{ page }}" hidden>
-
-        <div class="buttons-line">
-            <button title="Annulla" class="icon" onclick="location.href='/dispensa/{{ page }}';" type="button"><i class="fas fa-undo"></i></button>
-            <button title="Cerca" class="icon"><i class="fas fa-search"></i></button>
-        </div>
-
-        <input name="name" placeholder="Nome">
+        Nome dell'articolo <br>
+        <input name="name" required> <br>
+        <button class="icon-text"><i class="fas fa-search"></i> Ricerca</button>
     </form>
 {% endblock %}

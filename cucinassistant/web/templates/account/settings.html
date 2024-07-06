@@ -1,15 +1,31 @@
-{% extends "templates/base.html" %}
+{% extends "templates/dashboard.html" %}
 
-{% set title = 'Impostazioni' %}
+{% set title = "Impostazioni" %}
 
-{% block imports %} <style> #settings { z-index: -1; } </style> {% endblock %}
-
-{% block content %}
-    <div class="links">
-        <button onclick="location.href='/account/esci/'"><i class="fas fa-sign-out-alt"></i> Esci</button> <br>
-        <button onclick="location.href='/account/cambia_nome/';"><i class="fas fa-user"></i> Cambia nome utente</button> <br>
-        <button onclick="location.href='/account/cambia_email/';"><i class="fas fa-envelope"></i> Cambia email</button> <br>
-        <button onclick="location.href='/account/cambia_password/';"><i class="fas fa-key"></i> Cambia password</button> <br>
-        <button onclick="location.href='/account/elimina/';"><i class="fas fa-trash-alt"></i> Elimina account</button>
-    </div>
-{% endblock %}
+{% set items = [
+    {
+        'link': '/account/esci/',
+        'icon': 'fa-sign-out-alt',
+        'name': 'Esci'
+    },
+    {
+        'link': '/account/cambia_nome/',
+        'icon': 'fa-user',
+        'name': 'Cambio nome'
+    },
+    {
+        'link': '/account/cambia_email/',
+        'icon': 'fa-envelope',
+        'name': 'Cambio email'
+    },
+    {
+        'link': '/account/cambia_password/',
+        'icon': 'fa-key',
+        'name': 'Cambio password'
+    },
+    {
+        'link': '/account/elimina/',
+        'icon': 'fa-trash',
+        'name': 'Elimina account'
+    }
+] %}

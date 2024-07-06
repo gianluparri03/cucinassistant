@@ -1,43 +1,29 @@
 {% extends "templates/base.html" %}
 
-{% block imports %} <script src="{{ url_for('static', filename='js/storage.js') }}"></script> {% endblock %}
-
 {% set title = name %}
 
 {% set back_link = '/dispensa/' %}
 
 {% block content %}
-    {% if filter %} <span>Ricerca corrente: {{ filter }}</span> {% endif %}
-
-    <form method="POST" autocomplete="off">
-        <div class="buttons-line">
-            {% if storage %}
-                <button title="Rimuovi" class="icon" onclick="location.href='/dispensa/rimuovi';" type="button"><i class="fas fa-minus"></i></button>
-                <button title="Modifica" class="icon" onclick="location.href='/dispensa/modifica/';" type="button"><i class="fas fa-edit"></i></button>
-                {% if filter %}
-                    <button title="Rimuovi filtro" class="icon" onclick="location.href='/dispensa/';" type="button"><i class="fas fa-search-minus"></i></button>
-                {% else %}
-                    <button title="Cerca" class="icon" onclick="location.href='/dispensa/cerca/';" type="button"><i class="fas fa-search"></i></button>
-                {% endif %}
-            {% elif filter %}
-                <button title="Rimuovi filtro" class="icon" onclick="location.href='/dispensa/';" type="button"><i class="fas fa-search-minus"></i></button>
-            {% endif %}
-
-            <button title="Aggiungi" class="icon" onclick="location.href='/dispensa/aggiungi/';" type="button"><i class="fas fa-plus"></i></button>
-        </div>
-
-        <div>
-            {% if not storage %}
-                <i>La lista &egrave; vuota.</i>
+    <div>
+        {% if not storage %}
+            <i>Nessun articolo in dispensa</i>
+        {% else %}
+            {% if filter %}
+                <span>Ricerca corrente: <i>{{ filter }}</i>; <a href=".?nome=">Annulla</a>.</span>
             {% else %}
-                {% for item in storage %}
-                    <div class="item">
-                        <input class="name" value="{{ item.name }}" readonly>
-                        {% if item.expiration %} <input class="expiration" value="{{ item.expiration }}" type="date" readonly> {% endif %}
-                        {% if item.quantity %} <input class="quantity" value="{{ item.quantity }}" type="quantity" readonly> {% endif %}
-                    </div>
-                {% endfor %}
+                <button class="icon-text" onclick="location.href='cerca/';"><i class="fas fa-search"></i> Cerca</button>
             {% endif %}
-        </div>
-    </form>
+
+            {% for item in storage %}
+                <div class="storage-item" onclick="location.href = 'modifica/{{ item.aid }}/';">
+                    <input class="name" value="{{ item.name }}" readonly>
+                    {% if item.expiration %} <input class="expiration" value="{{ item.expiration }}" type="date" readonly> {% endif %}
+                    {% if item.quantity %} <input class="quantity" value="{{ item.quantity }}" type="quantity" readonly> {% endif %}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <button class="icon-text" onclick="location.href+='aggiungi/';"><i class="fas fa-plus"></i> Aggiungi</button>
 {% endblock %}
