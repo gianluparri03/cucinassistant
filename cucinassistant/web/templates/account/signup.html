@@ -2,21 +2,8 @@
 
 {% set title = 'Registrati' %}
 
-{% block imports %}
-    <script>
-        function comparePasswords() {
-            if ($("#password1").val() != $("#password2").val()) {
-                showAlert("Le due password non corrispondono", () => {});
-                return false;
-            } else {
-                return true;
-            }
-        }
-    </script>
-{% endblock %}
-
 {% block content %}
-    <form method="POST" onsubmit="return comparePasswords();">
+    <form method="POST">
         <label for="username">Nome utente</label> <br>
         <input type="text" name="username" required> <br>
 
@@ -31,6 +18,6 @@
 
         <button class="icon-text"><i class="fas fa-user-plus"></i> Regstrati</button> <br>
 
-        Hai gi&agrave; un account? <a href="/account/accedi">Accedi</a>
+        Hai già un account? <a hx-get="/account/accedi">Accedi</a>
     </form>
 {% endblock %}

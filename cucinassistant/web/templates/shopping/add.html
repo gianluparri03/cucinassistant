@@ -1,38 +1,17 @@
 {% extends "templates/base.html" %}
 
-{% block imports %}
-    <script>
-        function updateInputs(e, first=false) {
-            if (first || (e.target == $("input[type=text]").get(-1) && e.target.value)) {
-                let ne = $(`<div class="new-element">
-                                <input class="name" type="text">
-                            </div>`);
+{% set title = 'Aggiungi articoli' %}
 
-                $('#new-elements').append(ne);
-                ne.on("change", updateInputs);
-            } else if (!e.target.value) {
-                e.target.remove();
-            }
-        }
-
-        function save() {
-            var data = "";
-            for (input of $('.new-element > input')) if (input.value) data += input.value + ';';
-            $('#data').val(data.slice(0, -1));
-        }
-    
-        window.onload = function() { updateInputs(null, true); };
-    </script>
-{% endblock %}
-
-{% set title = "Aggiungi articoli" %}
 {% set back_link = '/spesa/' %}
 
 {% block content %}
     <form method="POST">
-        <input id="data" name="data" hidden>
-
         <div id="new-elements"></div>
-        <button class="icon-text" onclick="save()"><i class="fas fa-check"></i> Conferma</button>
+        <button class="icon-text"><i class="fas fa-check"></i> Conferma</button>
     </form>
+
+    <script>
+        inputNo = 0;
+        updateShoppingInputs(null, true);
+    </script>
 {% endblock %}

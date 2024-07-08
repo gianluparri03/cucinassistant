@@ -25,12 +25,8 @@ def info_route():
 
 @app.route('/favicon.ico')
 def favicon_route():
-    return send_from_directory('static', 'img/logo_round.png')
+    return send_from_directory('static', 'logo_round.png')
 
 @app.route('/guida')
 def tutorial_route():
     return redirect(config['Various']['Tutorial'])
-
-@app.route('/serviceworker.js')
-def serviceworker_route():
-    return send_from_directory('static', 'js/serviceworker.js', mimetype='text/javascript')

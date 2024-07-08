@@ -1,22 +1,22 @@
 {% extends "templates/dashboard.html" %}
 
-{% set title = "Menù" %}
+{% set title = 'Menù' %}
 
 {% set back_link = '/' %}
 
 {% set ns = namespace(items = []) %}
 {% for m in menus %}
     {% set ns.items = ns.items + [{
-        'link': '/menu/' + str(m),
+        'name': 'Menù ' + str(m),
         'icon': 'fa-utensils' if m != 1 else 'fa-bookmark',
-        'name': 'Menù ' + str(m)
+        'target': '/menu/' + str(m) + '/'
     }] %}
 {% endfor %}
 
-{% set items = ns.items %}
-
-{% set transparent = {
-    'link': '/menu/crea/',
+{% set items = ns.items + [{
+    'name': 'Nuovo menù',
     'icon': 'fa-plus',
-    'name': 'Nuovo menù'
-} %}
+    'transparent': true,
+    'target': '/menu/nuovo/',
+    'method': 'post'
+}] %}

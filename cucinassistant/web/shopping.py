@@ -27,13 +27,13 @@ def shopping_add_route_post(uid):
     db.append_shopping(uid, data)
     return redirect('/spesa/')
 
-@app.route('/spesa/modifica/<int:eid>/')
+@app.route('/spesa/<int:eid>/modifica/')
 @smart_route('shopping/edit.html')
 @login_required
 def shopping_edit_route_get(uid, eid):
     return {'prev': db.get_shopping_entry(uid, eid).name}
 
-@app.route('/spesa/modifica/<int:eid>/', methods=['POST'])
+@app.route('/spesa/<int:eid>/modifica/', methods=['POST'])
 @smart_route('shopping/edit.html')
 @login_required
 def shopping_edit_route_post(uid, eid):

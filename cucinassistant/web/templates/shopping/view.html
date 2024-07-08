@@ -1,48 +1,23 @@
 {% extends "templates/base.html" %}
 
-{% block imports %}
-    <script>
-        window.onload = function() {
-            $(".shopping-item *").on("click", function (e) {
-                e.preventDefault();
-
-                let label = $(e.target).parent().find('label');
-                let id = label.attr('for');
-                let name = label.text();
-
-                let check = {icon: "fa-check", name: "Spunta", handler: () => alert('unimplemented')};
-                let uncheck = {icon: "fa-undo", name: "Riaggiungi", handler: () => alert('unimplemented')};
-
-                showMessage(`Cosa vuoi fare per ${name}?`,
-                    [
-                        {icon: "fa-times", name: "Annulla", handler: () => {}},
-                        Math.floor(Math.random() * 10) % 2 ? check : uncheck,
-                        {icon: "fa-edit", name: "Modifica", handler: () => location.href = '/spesa/modifica/' + eid},
-                    ]
-                );
-            });
-        }
-    </script>
-{% endblock %}
-
-{% set title = "Lista della spesa" %}
+{% set title = 'Lista della spesa' %}
 
 {% set back_link = '/' %}
 
 {% block content %}
     <div class="shopping-list">
         {% if not list %}
-            <span id="empty-label">La lista &egrave; vuota.</span>
+            <span id="empty-label">La lista è vuota.</span>
         {% else %}
             {% for entry in list %}
-                <div class="shopping-item">
+                <div class="shopping-item" onclick="clickShoppingItem(event);">
                     <input type="checkbox" id="entry-{{ entry.eid }}" readonly>
                     <label for="entry-{{ entry.eid }}">{{ entry.name }}</label>
                 </div>
             {% endfor %}
         {% endif %}
 
-        <button class="icon-text" onclick="location.href = '/spesa/aggiungi/';"><i class="fas fa-plus"></i> Aggiungi articoli</button>
-        <button class="icon-text" onclick="javascript:alert('unimplemented');"><i class="fas fa-trash"></i> Elimina spuntati</button>
+        <button class="icon-text" hx-get="/spesa/aggiungi/"><i class="fas fa-plus"></i> Aggiungi articoli</button>
+        <button class="icon-text" hx-post="/spesa/svuota/"><i class="fas fa-trash"></i> Elimina spuntati</button>
     </div>
 {% endblock %}

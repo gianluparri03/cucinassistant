@@ -2,19 +2,11 @@
 
 {% block content %}
     <div class="dashboard">
-        {% for item in items %}
-            <button onclick="location.href='{{ item.link }}';">
-                <i class="fas {{ item.icon }}"></i>
-                <span>{{ item.name }}</span>
+        {% for i in items %}
+            <button hx-{{ i.method or 'get' }}="{{ i.target }}" {{ 'class="transparent"' | safe if i.transparent }}>
+                <i class="fas {{ i.icon }}"></i>
+                <span>{{ i.name }}</span>
             </button>
         {% endfor %}
-
-
-        {% if transparent %}
-        <button onclick="location.href='{{ transparent.link }}';" class="transparent">
-            <i class="fas {{ transparent.icon }}"></i>
-            <span>{{ transparent.name }}</span>
-            </button>
-        {% endif %}
     </div>
 {% endblock %}

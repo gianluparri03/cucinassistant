@@ -1,22 +1,23 @@
 {% extends "templates/dashboard.html" %}
 
-{% set title = "Dispensa" %}
+{% set title = 'Dispensa' %}
 
 {% set back_link = '/' %}
 
 {% set ns = namespace(items = []) %}
 {% for s in storages %}
     {% set ns.items = ns.items + [{
-        'link': '/dispensa/' + str(s.id) + '/',
+        'name': s.name,
         'icon': 'fa-box',
-        'name': s.name
+        'target': '/dispensa/' + str(s.id) + '/'
     }] %}
 {% endfor %}
 
 {% set items = ns.items %}
 
-{% set transparent = {
-    'link': '/dispensa/crea/',
+{% set items = ns.items + [{
+    'name': 'Nuova sezione',
     'icon': 'fa-plus',
-    'name': 'Nuova sezione'
-} %}
+    'transparent': true,
+    'target': '/dispensa/nuova/',
+}] %}

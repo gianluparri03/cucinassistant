@@ -1,7 +1,8 @@
 {% extends "templates/base.html" %}
 
 {% set title = 'Ricerca articoli' %}
-{% set back_link = '../' %}
+
+{% set back_link = '/dispensa/' + str(sid) + '/' %}
 
 {% block content %}
     <form method="POST">

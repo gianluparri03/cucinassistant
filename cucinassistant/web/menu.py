@@ -28,10 +28,11 @@ def menu_edit_route_get(uid, mid):
 @smart_route('menu/edit.html')
 @login_required
 def menu_edit_route_post(uid, mid):
-    db.update_menu(uid, mid, request.form.get('data', ''))
+    data = ';'.join(request.form.get(f'entry-{i}', '') for i in range(14))
+    db.update_menu(uid, mid, data)
     return redirect(f'/menu/{mid}')
 
-@app.route('/menu/crea')
+@app.route('/menu/nuovo', methods=['POST'])
 @smart_route('menu/view.html')
 @login_required
 def menu_create_route(uid):
@@ -45,7 +46,7 @@ def menu_delete_route(uid, mid):
     db.delete_menu(uid, mid)
     return redirect('/menu')
 
-@app.route('/menu/<int:mid>/clona')
+@app.route('/menu/<int:mid>/clona', methods=['POST'])
 @smart_route('menu/view.html')
 @login_required
 def menu_clone_route(uid, mid):

@@ -2,32 +2,19 @@
 
 {% set title = 'Modifica articolo' %}
 
-{% set back_link = '../../' %}
-
-{% block imports %}
-    <script>
-        function prev() { $('#then').value('prev'); }
-        function next() { $('#then').value('next'); }
-        
-        function remove() {
-            document.forms[0].action = document.forms[0].action.replace('modifica', 'rimuovi');
-        }
-    </script>
-{% endblock %}
+{% set back_link = '/dispensa/' + str(sid) + '/' %}
 
 {% block content %}
     <form method="POST">
-        <input id="then" name="then" hidden>
-
         <div class="storage-item">
             <input class="name" name="name" value="{{ prev.name }}">
             <input class="expiration" name="expiration" {% if prev.expiration %} value="{{ prev.expiration }}" {% endif %} type="date">
             <input class="quantity" name="quantity" {% if prev.quantity %} value="{{ prev.quantity }}" {% endif %} placeholder="Quantit&agrave;" type="number" min="0" step="1">
         </div>
 
-        <button class="icon" onclick="prev();"><i class="fas fa-chevron-left"></i></button>
-        <button class="icon-text" onclick="remove();"><i class="fas fa-trash"></i> Elimina</button>
+        <button class="icon" hx-post="/dispensa/{{ sid }}/{{ aid }}/modifica?poi=precedente"><i class="fas fa-chevron-left"></i></button>
+        <button class="icon-text" hx-post="/dispensa/{{ sid }}/{{ aid }}/rimuovi"><i class="fas fa-trash"></i> Elimina</button>
         <button class="icon-text"><i class="fas fa-check"></i> Conferma</button>
-        <button class="icon" onclick="next();"><i class="fas fa-chevron-right"></i></button>
+        <button class="icon" hx-post="/dispensa/{{ sid }}/{{ aid }}/modifica?poi=successivo"><i class="fas fa-chevron-right"></i></button>
     </form>
 {% endblock %}

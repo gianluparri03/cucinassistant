@@ -10,9 +10,6 @@ per una versione stabile e funzionante.
 
 - [X] Modificare/Sistemare lo stile delle pagine già presenti
 
-- [ ] Riscrivere il backend (auth, api e file server), magari in Go
-
-- [ ] Rendere le pagine dinamiche lato client, magari passando a TypeScript
-  - [ ] Aggiornare service worker
+- [ ] Riscrivere il backend in Go
 
 - [ ] Guida all'utilizzo

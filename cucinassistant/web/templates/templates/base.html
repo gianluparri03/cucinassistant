@@ -1,85 +1,28 @@
-<!DOCTYPE html>
+{% if is_hx() %}
+    <h1>{{ title }}</h1>
+    {% block content %} {% endblock %}
+{% else %}
+    {% extends "templates/structure.html" %}
+{% endif %}
 
-<html>
-    <head>
-        <meta charset="utf-8">
+{% block boot_script %}
+    <script>
+        {% if not is_hx() %} $(window).on('load', function() { {% endif %}
 
-        <title>{{ (meta_title or title) }}</title>
+        document.title = '{{ meta_title or title }}';
 
-        <meta http-equiv="content-type" content="text/html">
-        <meta name="lang" content="it">
-        <meta name="author" content="Parri Gianluca">
-        <meta name="owner" content="Parri Gianluca">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        {% if back_link %}
+            $('#back').attr('hx-get', '{{ back_link }}');
+            htmx.process(document.getElementById('back'));
+            $('nav i').show();
+        {% else %}
+            $('nav i').hide();
+        {% endif %}
 
-        <script type="application/ld+json">
-            {
-                "@context" : "https://schema.org",
-                "@type" : "WebSite",
-                "name" : "CucinAssistant",
-                "alternateName" : "cucinassistant",
-                "url" : "{{ config['Environment']['Address'] }}"
-            }
-        </script>
+        {% for message in get_flashed_messages() %}
+            showAlert("{{ message }}");
+        {% endfor %}
 
-        <link rel="manifest" href="{{ url_for('static', filename='meta/manifest.json') }}">
-
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inclusive+Sans&family=Satisfy&display=swap">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.css">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/sakura.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
-
-        <script src="https://kit.fontawesome.com/ca194095ec.js" crossorigin="anonymous"></script>
-        <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"></script>
-        <script src="{{ url_for('static', filename='js/messages.js') }}"></script>
-
-        {% block imports %} {% endblock %}
-
-        {# <script>
-            if (typeof navigator.serviceWorker !== 'undefined') {
-                navigator.serviceWorker.register("/serviceworker.js");
-            }
-        </script> #}
-
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <script>
-                    $(window).on('load', function () {
-                        {% for message in get_flashed_messages() %}
-                            showAlert("{{ message }}");
-                        {% endfor %}
-                    });
-                </script>
-            {% endif %}
-        {% endwith %}
-    </head>
-
-    <body>
-        <nav>
-            <span id="back">
-                {% if back_link %}
-                    <i class="fas fa-arrow-circle-left" onclick="location.href='{{ back_link }}';"></i>
-                {% endif %}
-            </span>
-
-            <span id="logo">CucinAssistant</span>
-
-            <span id="home">
-                {% if back_link %}
-                    <i class="fas fa-home" onclick="location.href='/';"></i>
-                {% endif %}
-            </span>
-        </nav>
-
-        <main>
-
-            <h1>{{ title }}</h1>
-
-            {% block content %} {% endblock %}
-        </main>
-
-        <footer>
-            CucinAssistant &copy; 2023, Gianluca Parri &bullet; <a href="/info">Ulteriori informazioni</a>
-        </footer>
-    </body>
-</html>
+        {% if not is_hx() %} }); {% endif %}
+    </script>
+{% endblock %}

@@ -1,31 +1,34 @@
 {% extends "templates/dashboard.html" %}
 
-{% set title = "Impostazioni" %}
+{% set title = 'Impostazioni' %}
+
+{% set back_link = '/' %}
 
 {% set items = [
     {
-        'link': '/account/esci/',
+        'name': 'Esci',
         'icon': 'fa-sign-out-alt',
-        'name': 'Esci'
+        'target': '/account/esci/',
+        'method': 'post'
     },
     {
-        'link': '/account/cambia_nome/',
+        'name': 'Cambio nome',
         'icon': 'fa-user',
-        'name': 'Cambio nome'
+        'target': '/account/cambia_nome/'
     },
     {
-        'link': '/account/cambia_email/',
+        'name': 'Cambio email',
         'icon': 'fa-envelope',
-        'name': 'Cambio email'
+        'target': '/account/cambia_email/'
     },
     {
-        'link': '/account/cambia_password/',
+        'name': 'Cambio password',
         'icon': 'fa-key',
-        'name': 'Cambio password'
+        'target': '/account/cambia_password/'
     },
     {
-        'link': '/account/elimina/',
+        'name': 'Elimina account',
         'icon': 'fa-trash',
-        'name': 'Elimina account'
+        'target': '/account/elimina/'
     }
 ] %}

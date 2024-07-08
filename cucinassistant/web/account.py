@@ -65,7 +65,7 @@ def signup_route():
         session['user'] = uid
         return redirect('/')
 
-@app.route('/account/esci/')
+@app.route('/account/esci/', methods=['POST'])
 @login_required
 def logout_route(uid):
     session.pop('user', None)

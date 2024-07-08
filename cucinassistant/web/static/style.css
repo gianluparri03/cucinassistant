@@ -27,6 +27,7 @@ a, a:visited {
 a:hover {
     color: var(--red);
     border-bottom: none;
+    cursor: pointer;
 }
 
 button {
@@ -114,6 +115,7 @@ footer {
 
 footer a:hover {
     color: white;
+    cursor: pointer;
 }
 
 

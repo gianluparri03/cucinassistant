@@ -1,28 +1,29 @@
 {% extends "templates/dashboard.html" %}
 
 {% set meta_title = 'CucinAssistant' %}
-{% set title = "Bentornato, " + get_username() + "!" %}
+
+{% set title = 'Bentornato, ' + get_username() + '!' %}
 
 {% set items = [
     {
-        'link': '/menu/',
+        'name': 'Menù',
         'icon': 'fa-utensils',
-        'name': 'Menù'
+        'target': '/menu/'
     },
     {
-        'link': '/dispensa/',
+        'name': 'Dispensa',
         'icon': 'fa-box',
-        'name': 'Dispensa'
+        'target': '/dispensa/'
     },
     {
-        'link': '/spesa/',
+        'name': 'Lista della spesa',
         'icon': 'fa-shopping-cart',
-        'name': 'Lista della spesa'
+        'target': '/spesa/'
+    },
+    {
+        'name': 'Impostazioni',
+        'icon': 'fa-cog',
+        'transparent': 1,
+        'target': '/account/impostazioni'
     }
 ] %}
-
-{% set transparent = {
-    'link': '/account/impostazioni',
-    'icon': 'fa-cog',
-    'name': 'Impostazioni'
-} %}

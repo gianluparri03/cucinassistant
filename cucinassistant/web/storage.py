@@ -12,13 +12,13 @@ from flask import request, redirect, url_for
 def storage_dashboard_route(uid):
     return {'storages': [{'id': 1, 'name': 'Frigo'}, {'id': 2, 'name': 'Pasta'}], 'str': str}
 
-@app.route('/dispensa/crea/')
+@app.route('/dispensa/nuova/')
 @smart_route('storage/new.html')
 @login_required
 def storage_new_route_get(uid):
     pass
 
-@app.route('/dispensa/crea/', methods=["POST"])
+@app.route('/dispensa/nuova/', methods=["POST"])
 @login_required
 def storage_new_route_post(uid):
     return redirect('/dispensa/')
@@ -29,14 +29,15 @@ def storage_new_route_post(uid):
 def storage_view_route(uid, sid):
     if sid == 1:
         name = request.args.get('nome')
-        return {'storage': db.get_storage(uid, name=name), 'filter': name, 'name': 'Frigo'}
+        return {'storage': db.get_storage(uid, name=name), 'filter': name, 'name': 'Frigo', 'sid': sid, 'str': str}
     else:
-        return {'storage': [], 'name': 'Pasta'}
+        return {'storage': [], 'name': 'Pasta', 'sid': sid, 'str': str}
 
 @app.route('/dispensa/<int:sid>/aggiungi/')
 @smart_route('storage/add.html')
 @login_required
 def storage_add_route_get(uid, sid):
+    return {'sid': sid, 'str': str}
     pass
 
 @app.route('/dispensa/<int:sid>/aggiungi/', methods=['POST'])
@@ -47,35 +48,20 @@ def storage_add_route_post(uid, sid):
     db.append_storage(uid, data)
     return redirect('/dispensa/')
 
-@app.route('/dispensa/<int:sid>/modifica/')
-@smart_route('storage/pre_edit.html')
-@login_required
-def storage_pre_edit_route(uid, sid):
-    name = request.args.get('nome')
-    return {'storage': db.get_storage(uid, name=name), 'filter': name}
-
-@app.route('/dispensa/<int:sid>/modifica/<int:aid>')
+@app.route('/dispensa/<int:sid>/<int:aid>/modifica')
 @smart_route('storage/edit.html')
 @login_required
 def storage_edit_route(uid, sid, aid):
-    return {'prev': db.get_storage_article(uid, aid)}
+    return {'prev': db.get_storage_article(uid, aid), 'str': str, 'aid': aid, 'sid': sid}
 
-@app.route('/dispensa/<int:sid>/modifica/<int:aid>', methods=['POST'])
+@app.route('/dispensa/<int:sid>/<int:aid>/modifica', methods=['POST'])
 @smart_route('storage/edit.html')
 @login_required
 def storage_edit_route_post(uid, sid, aid):
     db.edit_storage(uid, aid, [request.form.get('name'), request.form.get('expiration'), request.form.get('quantity')])
     return redirect(f'/dispensa/{sid}/')
 
-@app.route('/dispensa/<int:sid>/rimuovi/')
-@smart_route('storage/remove.html')
-@login_required
-def storage_remove_route_get(uid, sid):
-    name = request.args.get('nome')
-    return {'storage': db.get_storage(uid, name=name), 'filter': name}
-
-
-@app.route('/dispensa/<int:sid>/rimuovi/<int:aid>', methods=['POST'])
+@app.route('/dispensa/<int:sid>/<int:aid>/rimuovi', methods=['POST'])
 @smart_route('storage/remove.html')
 @login_required
 def storage_remove_route_post(uid, sid, aid):
@@ -86,7 +72,7 @@ def storage_remove_route_post(uid, sid, aid):
 @smart_route('storage/search.html')
 @login_required
 def storage_search_route_get(uid, sid):
-    pass
+    return {'sid': sid, 'str': str}
 
 @app.route('/dispensa/<int:sid>/cerca', methods=['POST'])
 @smart_route('storage/search.html')

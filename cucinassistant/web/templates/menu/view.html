@@ -1,6 +1,6 @@
 {% extends "templates/base.html" %}
 
-{% set title = "Menù " + str(menu.mid) %}
+{% set title = 'Menù ' + str(menu.mid) %}
 
 {% set back_link = '/menu/' %}
 
@@ -15,7 +15,7 @@
         </div>
     {% endfor %}
 
-    <button class="icon-text" type="button"><i class="fas fa-bookmark"></i> Fissa</button>
-    <button class="icon-text" onclick="location.href='/menu/{{ menu.mid }}/modifica';" type="button"><i class="fas fa-edit"></i> Modifica</button>
-    <button class="icon-text" onclick="location.href='/menu/{{ menu.mid }}/clona';" type="button"><i class="fas fa-clone"></i> Clona</button>
+    <button class="icon-text" hx-post="/menu/{{ menu.mid }}/fissa/"><i class="fas fa-bookmark"></i> Fissa</button>
+    <button class="icon-text" hx-get="/menu/{{ menu.mid }}/modifica/"><i class="fas fa-edit"></i> Modifica</button>
+    <button class="icon-text" hx-post="/menu/{{ menu.mid }}/clona/"><i class="fas fa-clone"></i> Clona</button>
 {% endblock %}

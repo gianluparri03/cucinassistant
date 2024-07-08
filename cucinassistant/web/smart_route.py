@@ -1,7 +1,7 @@
 from cucinassistant.exceptions import CAError, CACritical
 from cucinassistant.config import config 
 
-from flask import render_template, Response, flash, redirect
+from flask import render_template, Response, flash, redirect, request
 from functools import wraps
 
 
@@ -32,6 +32,9 @@ def smart_route(template, **data):
                 flash(str(err))
                 return redirect('/')
 
-            return render_template(template, config=config, **data)
+            return render_template(template,
+                                   config=config,
+                                   is_hx=lambda: request.headers.get('HX-Request', False),
+                                   **data)
         return wrapper
     return inner
