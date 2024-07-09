@@ -1,8 +1,6 @@
-{% extends "base.html" %}
-
-{% block content %}
-    <h2>Benvenuto su CucinAssistant, {{ username }}!</h2>
+{{ define "content" }}
+    <h2>Benvenuto su CucinAssistant, {{ .Username }}!</h2>
 
     Speriamo che l'applicazione sia di tuo gradimento! <br>
     Per ogni feedback, problema o domanda, contattaci! <br>
-{% endblock %}
+{{ end }}

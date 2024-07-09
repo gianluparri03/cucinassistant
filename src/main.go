@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"cucinassistant/config"
+	"cucinassistant/database"
 	"cucinassistant/web"
 )
 
@@ -19,8 +20,16 @@ func main() {
 	log.Print("CucinAssistant (v" + config.Version + ")")
 
 	// Parses the config
-	log.Print("Reading configs... ")
+	log.Print("Reading configs...")
 	config.Read(os.Args[1])
+
+	// Connects to the database
+	log.Print("Connecting to the database...")
+	database.Connect()
+
+	// Creates missing tables
+	log.Print("Checking tables...")
+	database.Bootstrap()
 
 	// Adds a listener for shutting down the server if it's on debug mode
 	if config.Runtime.Debug {

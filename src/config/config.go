@@ -7,8 +7,7 @@ type Config struct {
 	ServerAddress string `yaml:"serverAddress"`
 
 	Database struct {
-		Host     string
-		Port     int
+		Address  string
 		Username string
 		Password string
 		Database string
@@ -18,7 +17,7 @@ type Config struct {
 		Enabled  bool
 		Address  string
 		Server   string
-		Port     int
+		Port     string
 		Login    string
 		Password string
 	}

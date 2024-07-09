@@ -4,8 +4,7 @@ baseURL: "http://localhost:8080"
 serverAddress: ":8080"
 
 database:
-  host: "127.0.0.1"
-  port: 3306
+  address: "127.0.0.1:3306"
   username: "cucinassistant"
   password: "cucinassistant"
   database: "cucinassistant"
@@ -14,7 +13,7 @@ email:
   enabled: false
   address: ""
   server: ""
-  port: 0
+  port: ""
   login: ""
   password: ""
 

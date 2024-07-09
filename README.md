@@ -11,6 +11,8 @@ per una versione stabile e funzionante.
 - [X] Modificare/Sistemare lo stile delle pagine già presenti
 
 - [ ] Riscrivere il backend in Go
+    - [ ] Sistemare log
+    - [ ] Assicurarsi che il cookie di sessione sia sicuro
 
 - [ ] Pagine mancanti
     - [ ] 404

@@ -1,34 +1,63 @@
 package web
 
 import (
+	"github.com/gorilla/mux"
+	"github.com/srinathgs/mysqlstore"
 	"html/template"
 	"log"
 	"net/http"
 
 	"cucinassistant/config"
+	"cucinassistant/database"
 )
 
+var store *mysqlstore.MySQLStore
+
 func Start() {
-	registerRoutes()
+	// Creates the router
+	router := createRouter()
+
+	// Prepares the session storage
+	var err error
+	store, err = mysqlstore.NewMySQLStoreFromConnection(
+		database.DB,
+		"sessions",
+		"/",
+		60*60*24*90,
+	)
+	if err != nil {
+		log.Fatal("ERR: " + err.Error())
+	}
 
 	// Starts the server
-	if err := http.ListenAndServe(config.Runtime.ServerAddress, nil); err != nil {
+	if err := http.ListenAndServe(config.Runtime.ServerAddress, router); err != nil {
 		log.Fatal("ERR: " + err.Error())
 	}
 }
 
-func registerRoutes() {
+func createRouter() (router *mux.Router) {
+	router = mux.NewRouter()
+
 	// Static files
 	fs := http.FileServer(http.Dir("web/assets"))
-	http.Handle("/assets/", http.StripPrefix("/assets/", fs))
+	router.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", fs))
 
-	http.HandleFunc("/account/accedi/", func(w http.ResponseWriter, r *http.Request) {
+	// Favicon
+	router.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/assets/logo_round.png", http.StatusMovedPermanently)
+	})
+
+	// TODO move away
+	router.HandleFunc("/account/accedi/", func(w http.ResponseWriter, r *http.Request) {
 		renderPage(w, r, "account/signin", map[string]any{"NavigationDisabled": true})
 	})
 
-	http.HandleFunc("/account/recupera_password/", func(w http.ResponseWriter, r *http.Request) {
+	// TODO move away
+	router.HandleFunc("/account/recupera_password/", func(w http.ResponseWriter, r *http.Request) {
 		renderPage(w, r, "account/password_recover", map[string]any{})
 	})
+
+	return
 }
 
 func renderPage(w http.ResponseWriter, r *http.Request, page string, data map[string]any) {
