@@ -1,8 +1,6 @@
-{% extends "templates/base.html" %}
+{{ define "title" }}Accedi{{ end }}
 
-{% set title = 'Accedi' %}
-
-{% block content %}
+{{ define "content" }}
     <form method="POST">
         <label for="username">Nome utente</label> <br>
         <input type="text" name="username" required> <br>
@@ -15,4 +13,4 @@
         <a hx-get="/account/recupera_password">Hai dimenticato la password?</a> <br>
         Non hai un account? <a hx-get="/account/registrati">Registrati</a>
     </form>
-{% endblock %}
+{{ end }}

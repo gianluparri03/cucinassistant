@@ -1,0 +1,24 @@
+debug: true
+
+baseURL: "http://localhost:8080"
+serverAddress: ":8080"
+
+database:
+  host: "127.0.0.1"
+  port: 3306
+  username: "cucinassistant"
+  password: "cucinassistant"
+  database: "cucinassistant"
+
+email:
+  enabled: false
+  address: ""
+  server: ""
+  port: 0
+  login: ""
+  password: ""
+
+supportEmail: ""
+
+repoLink: "https://github.com/gianluparri03/cucinassistant"
+storeLink: "https://play.google.com/store/apps/details?id=me.gianlucaparri.ca.twa"

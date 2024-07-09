@@ -12,4 +12,10 @@ per una versione stabile e funzionante.
 
 - [ ] Riscrivere il backend in Go
 
+- [ ] Pagine mancanti
+    - [ ] 404
+    - [ ] modifica sezione dispensa
+
 - [ ] Guida all'utilizzo
+
+- [ ] Internalizzazione?

@@ -1,4 +1,5 @@
-config.cfg
+config.yml
+
 .direnv
 *__pycache__
 tags

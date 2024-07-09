@@ -1,4 +1,0 @@
-Flask==2.3.3
-gunicorn==20.1.0
-mariadb==1.1.9
-argon2-cffi==23.1.0

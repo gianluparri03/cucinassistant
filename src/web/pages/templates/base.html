@@ -12,27 +12,17 @@
         <meta name="owner" content="Parri Gianluca">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-        <script type="application/ld+json">
-            {
-                "@context" : "https://schema.org",
-                "@type" : "WebSite",
-                "name" : "CucinAssistant",
-                "alternateName" : "cucinassistant",
-                "url" : "{{ config['Environment']['Address'] }}"
-            }
-        </script>
-
-        <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+        <link rel="manifest" href="/assets/manifest.json">
 
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inclusive+Sans&family=Satisfy&display=swap" crossorigin="anonymous">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.css" crossorigin="anonymous">
-        <link rel="stylesheet" href="{{ url_for('static', filename='sakura.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <link rel="stylesheet" href="/assets/sakura.css">
+        <link rel="stylesheet" href="/assets/style.css">
 
         <script src="https://unpkg.com/htmx.org@2.0.0" crossorigin="anonymous"></script>
         <script src="https://kit.fontawesome.com/ca194095ec.js" crossorigin="anonymous"></script>
         <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" crossorigin="anonymous"></script>
-        <script src="{{ url_for('static', filename='script.js') }}"></script>
+        <script src="/assets/script.js"></script>
 
         <script>
             if (!localStorage.getItem('cookies-accepted')) {
@@ -42,7 +32,11 @@
             }
         </script>
 
-        {% block boot_script %} {% endblock %}
+        <script>
+            $(window).on('load', function() {
+                {{ template "boot_script" . }}
+            });
+        </script>
     </head>
 
     <body hx-target="main" hx-boost="true" hx-push-url="true">
@@ -53,8 +47,8 @@
         </nav>
 
         <main>
-            <h1>{{ title }}</h1>
-            {% block content required %} {% endblock %}
+            <h1>{{ template "title" . }}</h1>
+            {{ template "content" . }}
         </main>
 
         <footer>
@@ -62,3 +56,5 @@
         </footer>
     </body>
 </html>
+
+{{ define "back_link" }}{{ end }}
