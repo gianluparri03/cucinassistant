@@ -3,7 +3,7 @@ package web
 import (
 	"github.com/gorilla/sessions"
 	"html/template"
-	"log"
+	"log/slog"
 	"net/http"
 )
 
@@ -17,11 +17,15 @@ func renderPage(w http.ResponseWriter, r *http.Request, s *sessions.Session, pag
 	}
 
 	// Loads the templates
-	tmpl := template.Must(template.ParseFiles(
+	tmpl, err := template.ParseFiles(
 		"web/pages/templates/"+baseTemplate+".html",
 		"web/pages/templates/boot_script.html",
 		"web/pages/"+page+".html",
-	))
+	)
+
+	if err != nil {
+		slog.Error("while fetching page template:", "err", err, "template", page)
+	}
 
 	// Adds the error (if any)
 	if err, found := s.Values["Error"]; found {
@@ -32,17 +36,17 @@ func renderPage(w http.ResponseWriter, r *http.Request, s *sessions.Session, pag
 		}
 
 		delete(s.Values, "Error")
-		s.Save(r, w)
+		saveSession(w, r, s)
 	}
 
 	// And finally parses them
 	if err := tmpl.Execute(w, data); err != nil {
-		log.Printf("ERR: " + err.Error())
+		slog.Error("while executing page template:", "err", err, "template", page)
 	}
 }
 
 func showError(w http.ResponseWriter, r *http.Request, s *sessions.Session, err error) {
 	s.Values["Error"] = err.Error()
-	s.Save(r, w)
+	saveSession(w, r, s)
 	http.Redirect(w, r, r.URL.String(), 301)
 }

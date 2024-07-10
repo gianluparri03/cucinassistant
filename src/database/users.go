@@ -1,9 +1,9 @@
 package database
 
 import (
-	"fmt"
+	"errors"
 	"github.com/alexedwards/argon2id"
-	"log"
+	"log/slog"
 	"strings"
 )
 
@@ -19,15 +19,16 @@ type User struct {
 func (u *User) SignUp() error {
 	// Ensures the username and the password are big enough
 	if len(u.Username) < 5 {
-		return fmt.Errorf("Nome utente non valido: lunghezza minima 5 caratteri")
+		return errors.New("Nome utente non valido: lunghezza minima 5 caratteri")
 	} else if len(u.Password) < 8 {
-		return fmt.Errorf("Password non valida: lunghezza minima 8 caratteri")
+		return errors.New("Password non valida: lunghezza minima 8 caratteri")
 	}
 
 	// Hashes the password
 	hash, err := argon2id.CreateHash(u.Password, argon2id.DefaultParams)
 	if err != nil {
-		log.Fatal("ERR: " + err.Error())
+		slog.Error("while hashing password:", "err", err)
+		return errors.New("Errore sconosciuto")
 	} else {
 		u.Password = hash
 	}
@@ -44,16 +45,24 @@ func (u *User) SignUp() error {
 	// Handles errors
 	if err != nil {
 		if strings.HasSuffix(err.Error(), "for key 'username'") {
-			return fmt.Errorf("Nome utente non disponibile")
+			return errors.New("Nome utente non disponibile")
 		} else if strings.HasSuffix(err.Error(), "for key 'email'") {
-			return fmt.Errorf("Email non disponibile")
+			return errors.New("Email non disponibile")
 		} else {
-			log.Print("ERR: " + err.Error())
-			return fmt.Errorf("Errore sconosciuto")
+			slog.Warn("while signup:", "err", err)
+			return errors.New("Errore sconosciuto")
 		}
 	}
 
 	// Updates the uid
-	DB.QueryRow(`SELECT uid FROM users WHERE username = ?;`, u.Username).Scan(&u.UID)
+	err = DB.QueryRow(`SELECT uid FROM users WHERE username = ?;`, u.Username).Scan(&u.UID)
+	if err != nil {
+		slog.Error("while retrieving uid on signup:", "err", err)
+		return errors.New("Errore sconosciuto")
+	}
+
+	// Logs
+	slog.Info("User signed up succesfully", "email", u.Email)
+
 	return nil
 }

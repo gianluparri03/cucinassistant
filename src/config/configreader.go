@@ -2,7 +2,7 @@ package config
 
 import (
 	"gopkg.in/yaml.v3"
-	"log"
+	"log/slog"
 	"os"
 )
 
@@ -12,11 +12,18 @@ func Read(path string) {
 
 	// Reads the file
 	if data, err = os.ReadFile(path); err != nil {
-		log.Fatal("ERR: " + err.Error())
+		slog.Error("while opening file:", "err", err)
+		os.Exit(1)
 	}
 
 	// Parses it
 	if err = yaml.Unmarshal(data, &Runtime); err != nil {
-		log.Fatal("ERR: " + err.Error())
+		slog.Error("while unmarshaling:", "err", err)
+		os.Exit(1)
+	}
+
+	// Sets the logger level according to what has been read
+	if Runtime.Debug {
+		slog.SetLogLoggerLevel(slog.LevelDebug)
 	}
 }

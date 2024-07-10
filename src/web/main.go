@@ -2,7 +2,7 @@ package web
 
 import (
 	"github.com/gorilla/mux"
-	"log"
+	"log/slog"
 	"net/http"
 
 	"cucinassistant/config"
@@ -17,7 +17,7 @@ func Start() {
 
 	// Starts the server
 	if err := http.ListenAndServe(config.Runtime.ServerAddress, router); err != nil {
-		log.Fatal("ERR: " + err.Error())
+		slog.Error("while running web server:", "err", err)
 	}
 }
 

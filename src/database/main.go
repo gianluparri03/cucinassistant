@@ -3,7 +3,7 @@ package database
 import (
 	"database/sql"
 	"github.com/go-sql-driver/mysql"
-	"log"
+	"log/slog"
 	"os"
 	"strings"
 
@@ -26,12 +26,14 @@ func Connect() {
 	var err error
 	DB, err = sql.Open("mysql", credentials.FormatDSN())
 	if err != nil {
-		log.Fatal("ERR: " + err.Error())
+		slog.Error("while connecting:", "err", err)
+		os.Exit(1)
 	}
 
 	// Makes sure the connection is valid
 	if err = DB.Ping(); err != nil {
-		log.Fatal("ERR: " + err.Error())
+		slog.Error("while pinging:", "err", err)
+		os.Exit(1)
 	}
 }
 
@@ -39,7 +41,8 @@ func Bootstrap() {
 	// Reads the schema file
 	bytes, err := os.ReadFile("database/schema.sql")
 	if err != nil {
-		log.Fatal("ERR: " + err.Error())
+		slog.Error("while reading schema:", "err", err)
+		os.Exit(1)
 	}
 
 	// Executes all the CREATE TABLEs
@@ -47,7 +50,8 @@ func Bootstrap() {
 	for _, query := range queries {
 		if strings.TrimSpace(query) != "" {
 			if _, err := DB.Exec(query + ";"); err != nil {
-				log.Fatal("ERR: " + err.Error())
+				slog.Error("while creating table:", "err", err)
+				os.Exit(1)
 			}
 		}
 	}

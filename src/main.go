@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 	"os"
 
 	"cucinassistant/config"
@@ -17,30 +17,32 @@ func main() {
 		os.Exit(1)
 	}
 
-	log.Print("CucinAssistant (v" + config.Version + ")")
+	slog.Info("CucinAssistant (v" + config.Version + ")")
+	slog.Info("=======================")
 
 	// Parses the config
-	log.Print("Reading configs...")
+	slog.Info("Reading configs...")
 	config.Read(os.Args[1])
 
 	// Connects to the database
-	log.Print("Connecting to the database...")
+	slog.Info("Connecting to the database...")
 	database.Connect()
 
 	// Creates missing tables
-	log.Print("Checking tables...")
+	slog.Info("Checking tables...")
 	database.Bootstrap()
 
 	// Adds a listener for shutting down the server if it's on debug mode
 	if config.Runtime.Debug {
 		go func() {
 			fmt.Scanln()
-			log.Fatal("ERR: Keyboard interrupt")
+			slog.Error("Keyboard interrupt")
+			os.Exit(0)
 		}()
 
-		log.Print("Starting web server on " + config.Runtime.ServerAddress + " (press ENTER to stop)...")
+		slog.Info("Starting web server on " + config.Runtime.ServerAddress + " (press ENTER to stop)...")
 	} else {
-		log.Print("Starting web server on " + config.Runtime.ServerAddress + "...")
+		slog.Info("Starting web server on " + config.Runtime.ServerAddress + "...")
 	}
 
 	// Starts the server

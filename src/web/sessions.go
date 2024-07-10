@@ -2,7 +2,7 @@ package web
 
 import (
 	"github.com/gorilla/sessions"
-	"log"
+	"log/slog"
 	"net/http"
 	"strings"
 
@@ -13,9 +13,7 @@ type withSession func(w http.ResponseWriter, r *http.Request, s *sessions.Sessio
 
 func (h withSession) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Logs each visit
-	if config.Runtime.Debug {
-		log.Print("[" + r.Method + "] " + r.URL.String())
-	}
+	slog.Debug("[" + r.Method + "] " + r.URL.String())
 
 	// Lets the handlers use the session
 	s, _ := store.Get(r, "session")
@@ -33,5 +31,12 @@ func initStore() {
 		Secure:   strings.HasPrefix(config.Runtime.BaseURL, "https://"),
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
+	}
+}
+
+func saveSession(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
+	// Saves the session
+	if err := s.Save(r, w); err != nil {
+		slog.Warn("during session saving:", "err", err)
 	}
 }

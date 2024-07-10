@@ -1,7 +1,7 @@
 package web
 
 import (
-	"fmt"
+	"errors"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"net/http"
@@ -48,13 +48,13 @@ func signUpUser(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
 	// then tries to sign it up
 	var err error
 	if user.Username == "" {
-		err = fmt.Errorf("Nome utente mancante")
+		err = errors.New("Nome utente mancante")
 	} else if user.Email == "" {
-		err = fmt.Errorf("Email mancante")
+		err = errors.New("Email mancante")
 	} else if user.Password == "" {
-		err = fmt.Errorf("Password mancante")
+		err = errors.New("Password mancante")
 	} else if user.Password != r.FormValue("password2") {
-		err = fmt.Errorf("Le due password non corrispondono")
+		err = errors.New("Le due password non corrispondono")
 	} else {
 		err = user.SignUp()
 	}
@@ -70,6 +70,6 @@ func signUpUser(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
 
 	// Saves the session and then redirects it to the homepage
 	s.Values["UID"] = user.UID
-	s.Save(r, w)
+	saveSession(w, r, s)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
