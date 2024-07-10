@@ -1,4 +1,4 @@
-debug: true
+mode: "debug"
 
 secret: "xxx"
 
@@ -7,19 +7,19 @@ serverAddress: ":8080"
 
 database:
   address: "127.0.0.1:3306"
-  username: "cucinassistant"
-  password: "cucinassistant"
+  username: "ca-user"
+  password: "ca-pass"
   database: "cucinassistant"
 
 email:
-  enabled: false
-  address: ""
-  server: ""
-  port: ""
-  login: ""
-  password: ""
+  enabled: true
+  address: "cucinassistant@gmail.com"
+  server: "<redacted>"
+  port: "<redacted>"
+  login: "<redacted>"
+  password: "<redacted>"
 
-supportEmail: ""
+supportEmail: "cucinassistant@gmail.com"
 
 repoLink: "https://github.com/gianluparri03/cucinassistant"
 storeLink: "https://play.google.com/store/apps/details?id=me.gianlucaparri.ca.twa"

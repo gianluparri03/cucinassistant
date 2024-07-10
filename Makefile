@@ -1,41 +1,24 @@
-run:
-	cd src/ && go run main.go ../config.yml
+start_db:
+	@if [ "$(shell docker ps -a -q -f name='ca-db')" ]; then \
+		if [ ! "$(shell docker ps -aq -f status='running' -f name='ca-db')" ]; then \
+			docker start ca; \
+		fi \
+	else \
+		docker run -d --name ca-db -e MARIADB_USER=ca-user -e MARIADB_PASSWORD=ca-pass -e MARIADB_DATABASE=cucinassistant -e MARIADB_ROOT_PASSWORD=rpass -p 3306:3306 mariadb:10.6; \
+	fi
+
+drop_db:
+	@docker stop ca-db
+	@docker rm ca-db
+
+run: start_db
+	@go run main.go config_debug.yml
 
 fmt:
-	cd src && go fmt ./... && go mod tidy
+	@go fmt ./...
+	@go mod tidy
 
-db:
-	docker exec -it cucinassistant-db mariadb -u cucinassistant -pcucinassistant cucinassistant
-
-clear-db:
-	docker stop cucinassistant-db
-	docker rm cucinassistant-db
-	direnv reload
-
-# build:
-# 	if [[ -z "$(version)" ]]; then \
-# 		echo "You need to specify a version. The correct syntax is 'make build version=...'"; \
-# 		exit 1; \
-# 	fi
-#
-# 	docker build -t git.gianlucaparri.me/gianluparri03/cucinassistant:$(version) .
-#
-# dbsh:
-# 	docker exec -it cucinassistant-db mariadb -u cucinassistant -pcucinassistant cucinassistant
-#
-# test:
-# 	echo "Waiting for the environment to boot..."
-#
-# 	docker stop cucinassistant-test 2> /dev/null || true
-# 	docker run --name cucinassistant-test -d --rm -e MARIADB_USER=test -e MARIADB_PASSWORD=test -e MARIADB_DATABASE=test -e MARIADB_RANDOM_ROOT_PASSWORD=1 -p 3307\:3306 mariadb\:10.6 > /dev/null
-# 	echo "- Database created"
-#
-# 	while [[ 1 ]]; do docker exec cucinassistant-test mariadb -u test -ptest test -e '' 2> /dev/null && break; sleep .5; done
-# 	echo "- Database ready"
-#
-# 	python3 -m unittest cucinassistant.database.tests.__init__ || true
-# 	docker stop cucinassistant-test > /dev/null
-#
-# push:
-# 	make build version=$(version)
-# 	docker push git.gianlucaparri.me/gianluparri03/cucinassistant:$(version)
+test: start_db
+	@docker exec -it ca-db mariadb -u root -prpass -e "DROP DATABASE IF EXISTS test; CREATE DATABASE test; GRANT ALL PRIVILEGES ON test.* TO 'ca-user'@'%';"
+	@go test -v cucinassistant/database -args ../config_test.yml || true
+	@docker exec -it ca-db mariadb -u root -prpass -e "DROP DATABASE test;"

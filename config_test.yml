@@ -1,0 +1,10 @@
+mode: "test"
+
+database:
+  address: "127.0.0.1:3306"
+  username: "ca-user"
+  password: "ca-pass"
+  database: "test"
+
+email:
+  enabled: false

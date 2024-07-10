@@ -33,13 +33,14 @@ func Connect() {
 	// Makes sure the connection is valid
 	if err = DB.Ping(); err != nil {
 		slog.Error("while pinging:", "err", err)
+		err = DB.Ping()
 		os.Exit(1)
 	}
 }
 
-func Bootstrap() {
+func Bootstrap(scriptPath string) {
 	// Reads the schema file
-	bytes, err := os.ReadFile("database/schema.sql")
+	bytes, err := os.ReadFile(scriptPath)
 	if err != nil {
 		slog.Error("while reading schema:", "err", err)
 		os.Exit(1)

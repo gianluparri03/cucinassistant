@@ -23,7 +23,9 @@ func Read(path string) {
 	}
 
 	// Sets the logger level according to what has been read
-	if Runtime.Debug {
+	if Runtime.Mode == "debug" {
 		slog.SetLogLoggerLevel(slog.LevelDebug)
+	} else if Runtime.Mode == "test" {
+		slog.SetLogLoggerLevel(slog.LevelWarn)
 	}
 }

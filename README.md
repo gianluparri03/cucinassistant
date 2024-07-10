@@ -23,3 +23,5 @@ per una versione stabile e funzionante.
 - [ ] Guida all'utilizzo
 
 - [ ] Internalizzazione?
+
+- [ ] History e contributing, docs

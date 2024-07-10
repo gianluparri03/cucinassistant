@@ -30,10 +30,10 @@ func main() {
 
 	// Creates missing tables
 	slog.Info("Checking tables...")
-	database.Bootstrap()
+	database.Bootstrap("database/schema.sql")
 
 	// Adds a listener for shutting down the server if it's on debug mode
-	if config.Runtime.Debug {
+	if config.Runtime.Mode == "debug" {
 		go func() {
 			fmt.Scanln()
 			slog.Error("Keyboard interrupt")

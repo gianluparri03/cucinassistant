@@ -5,6 +5,7 @@ import (
 	"github.com/alexedwards/argon2id"
 	"log/slog"
 	"strings"
+    "net/mail"
 )
 
 type User struct {
@@ -20,7 +21,9 @@ func (u *User) SignUp() error {
 	// Ensures the username and the password are big enough
 	if len(u.Username) < 5 {
 		return errors.New("Nome utente non valido: lunghezza minima 5 caratteri")
-	} else if len(u.Password) < 8 {
+    } else if _, err := mail.ParseAddress(u.Email); err != nil {
+		return errors.New("Email non valida")
+    } else if len(u.Password) < 8 {
 		return errors.New("Password non valida: lunghezza minima 8 caratteri")
 	}
 
@@ -62,7 +65,16 @@ func (u *User) SignUp() error {
 	}
 
 	// Logs
-	slog.Info("User signed up succesfully", "email", u.Email)
+	slog.Info("User signed up succesfully:", "email", u.Email)
 
 	return nil
+}
+
+func GetUsersNumber() (n int) {
+	err := DB.QueryRow(`SELECT COUNT(*) FROM users;`).Scan(&n)
+	if err != nil {
+		slog.Error("while selecting users number:", "err", err)
+	}
+
+	return
 }
