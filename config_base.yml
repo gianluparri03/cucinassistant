@@ -1,5 +1,7 @@
 debug: true
 
+secret: "xxx"
+
 baseURL: "http://localhost:8080"
 serverAddress: ":8080"
 

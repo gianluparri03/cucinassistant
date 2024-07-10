@@ -3,6 +3,8 @@ package config
 type Config struct {
 	Debug bool
 
+	Secret string
+
 	BaseURL       string `yaml:"baseURL"`
 	ServerAddress string `yaml:"serverAddress"`
 

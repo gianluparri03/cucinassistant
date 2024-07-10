@@ -13,6 +13,8 @@ per una versione stabile e funzionante.
 - [ ] Riscrivere il backend in Go
     - [ ] Sistemare log
     - [ ] Assicurarsi che il cookie di sessione sia sicuro
+    - [ ] Test
+    - [ ] dockerfile e compose
 
 - [ ] Pagine mancanti
     - [ ] 404

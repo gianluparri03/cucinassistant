@@ -9,7 +9,5 @@
         $('nav i').show();
     {{ end }}
 
-    {{/* for message in get_flashed_messages() }}
-        showAlert("{{ message }}");
-    {{ endfor */}}
+    {{ if .Error }} showAlert("{{ .Error }}"); {{ end }}
 {{ end }}

@@ -1,8 +1,6 @@
-{% extends "templates/base.html" %}
+{{ define "title" }}Registrati{{ end }}
 
-{% set title = 'Registrati' %}
-
-{% block content %}
+{{ define "content" }}
     <form method="POST">
         <label for="username">Nome utente</label> <br>
         <input type="text" name="username" required> <br>
@@ -14,10 +12,10 @@
         <input type="password" name="password" id="password1" required> <br>
 
         <label for="password2">Ripeti password</label> <br>
-        <input type="password" name="password" id="password2" required> <br>
+        <input type="password" name="password2" id="password2" required> <br>
 
         <button class="icon-text"><i class="fas fa-user-plus"></i> Regstrati</button> <br>
 
         Hai già un account? <a hx-get="/account/accedi">Accedi</a>
     </form>
-{% endblock %}
+{{ end }}

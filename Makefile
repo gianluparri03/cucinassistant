@@ -2,7 +2,15 @@ run:
 	cd src/ && go run main.go ../config.yml
 
 fmt:
-	cd src && go fmt ./...
+	cd src && go fmt ./... && go mod tidy
+
+db:
+	docker exec -it cucinassistant-db mariadb -u cucinassistant -pcucinassistant cucinassistant
+
+clear-db:
+	docker stop cucinassistant-db
+	docker rm cucinassistant-db
+	direnv reload
 
 # build:
 # 	if [[ -z "$(version)" ]]; then \
