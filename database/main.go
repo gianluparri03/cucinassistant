@@ -12,6 +12,8 @@ import (
 
 var DB *sql.DB
 
+// Connect creates a connection to the database.
+// It gets all the needed information from config.Runtime
 func Connect() {
 	// Prepares the configuration
 	credentials := mysql.Config{
@@ -38,6 +40,8 @@ func Connect() {
 	}
 }
 
+// Bootstrap executes the script at the given path in the
+// database. It is used to create missing tables.
 func Bootstrap(scriptPath string) {
 	// Reads the schema file
 	bytes, err := os.ReadFile(scriptPath)

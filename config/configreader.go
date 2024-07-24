@@ -6,6 +6,8 @@ import (
 	"os"
 )
 
+// Read reads the config from the path specified.
+// The result is stored in the Runtime global variable.
 func Read(path string) {
 	var data []byte
 	var err error

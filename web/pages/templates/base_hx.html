@@ -1,9 +1,10 @@
-{{ define "back_link" }}{{ end }}
-
-<h1>{{ template "title" . }}</h1>
-
-{{ template "content" . }}
-
 <script>
-    {{ template "boot_script" . }}
+    {{ define "title" }}CucinAssistant{{ end }}
+    document.title = '{{ template "title" . }}';
 </script>
+
+{{ define "error" }}{{ end }}
+{{ template "error" . }}
+
+{{ define "body" }}{{ end }}
+{{ template "body" . }}

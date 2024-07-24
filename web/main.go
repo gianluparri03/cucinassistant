@@ -6,35 +6,24 @@ import (
 	"net/http"
 
 	"cucinassistant/config"
+	"cucinassistant/web/handlers"
+	"cucinassistant/web/utils"
 )
 
+// Start creates and starts the web server
 func Start() {
 	// Creates the router
-	router := createRouter()
+	router := mux.NewRouter()
+
+	// Registers all the handlers
+	handlers.RegisterAssetsHandlers(router)
+	handlers.RegisterAccountHandlers(router)
 
 	// Prepares the session storage
-	initStore()
+	utils.InitSessionStore()
 
 	// Starts the server
 	if err := http.ListenAndServe(config.Runtime.ServerAddress, router); err != nil {
 		slog.Error("while running web server:", "err", err)
 	}
-}
-
-func createRouter() *mux.Router {
-	router := mux.NewRouter()
-
-	// Static files
-	fs := http.FileServer(http.Dir("web/assets"))
-	router.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", fs))
-
-	// Favicon
-	router.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "/assets/logo_round.png", http.StatusMovedPermanently)
-	})
-
-	// Registers the endpoints
-	registerAccountRoutes(router)
-
-	return router
 }

@@ -1,7 +1,7 @@
 start_db:
 	@if [ "$(shell docker ps -a -q -f name='ca-db')" ]; then \
 		if [ ! "$(shell docker ps -aq -f status='running' -f name='ca-db')" ]; then \
-			docker start ca; \
+			docker start ca-db; \
 		fi \
 	else \
 		docker run -d --name ca-db -e MARIADB_USER=ca-user -e MARIADB_PASSWORD=ca-pass -e MARIADB_DATABASE=cucinassistant -e MARIADB_ROOT_PASSWORD=rpass -p 3306:3306 mariadb:10.6; \

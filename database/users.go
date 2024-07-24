@@ -4,26 +4,34 @@ import (
 	"errors"
 	"github.com/alexedwards/argon2id"
 	"log/slog"
+	"net/mail"
 	"strings"
-    "net/mail"
 )
 
+// User represents a registered User
 type User struct {
+    // UID is the User ID
 	UID int
 
 	Username string
 	Password string
 	Email    string
+
+    // Token is an optional string, that
+    // can be generated to delete an account
+    // or to recover its password
 	Token    string
 }
 
+// SignUp tries to sign up an user. The required fields are Username,
+// Password and Email. If the registration is successfull, the UID will be set.
 func (u *User) SignUp() error {
 	// Ensures the username and the password are big enough
 	if len(u.Username) < 5 {
 		return errors.New("Nome utente non valido: lunghezza minima 5 caratteri")
-    } else if _, err := mail.ParseAddress(u.Email); err != nil {
+	} else if _, err := mail.ParseAddress(u.Email); err != nil {
 		return errors.New("Email non valida")
-    } else if len(u.Password) < 8 {
+	} else if len(u.Password) < 8 {
 		return errors.New("Password non valida: lunghezza minima 8 caratteri")
 	}
 
@@ -70,6 +78,7 @@ func (u *User) SignUp() error {
 	return nil
 }
 
+// GetUsersNumber returns the number of users currently registered
 func GetUsersNumber() (n int) {
 	err := DB.QueryRow(`SELECT COUNT(*) FROM users;`).Scan(&n)
 	if err != nil {

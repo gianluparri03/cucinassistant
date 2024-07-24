@@ -9,6 +9,9 @@ import (
 	"cucinassistant/config"
 )
 
+// SendMail sends an email to a recipient, with a given subject, whose
+// content is generated from a template with some additional data.
+// TemplateName must contains only the basename of the file.
 func SendMail(recipient string, subject string, templateName string, data map[string]any) {
 	// Prepares the headers of the body
 	var body bytes.Buffer
@@ -25,6 +28,8 @@ func SendMail(recipient string, subject string, templateName string, data map[st
 	}
 }
 
+// formatMessage executes the template with the given data, writing all
+// to the buffer
 func formatMessage(w *bytes.Buffer, templateName string, data map[string]any) {
 	// Fetches the templates
 	tmpl, err := template.ParseFiles(
@@ -48,6 +53,7 @@ func formatMessage(w *bytes.Buffer, templateName string, data map[string]any) {
 	}
 }
 
+// sendBody sends the message (a bytes.Buffer) to the recipient
 func sendBody(recipient string, body *bytes.Buffer) {
 	// Prepares the credentials
 	credentials := smtp.PlainAuth(

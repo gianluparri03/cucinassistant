@@ -2,6 +2,8 @@
 
 {{ define "content" }}
     <form method="POST">
+        <input name="action" value="signup" hidden>
+
         <label for="username">Nome utente</label> <br>
         <input type="text" name="username" required> <br>
 
@@ -16,6 +18,6 @@
 
         <button class="icon-text"><i class="fas fa-user-plus"></i> Regstrati</button> <br>
 
-        Hai già un account? <a hx-get="/account/accedi">Accedi</a>
+        Hai già un account? <a hx-get="/account?action=signin">Accedi</a>
     </form>
 {{ end }}

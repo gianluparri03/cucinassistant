@@ -1,4 +1,4 @@
-package web
+package utils
 
 import (
 	"github.com/gorilla/sessions"
@@ -9,20 +9,11 @@ import (
 	"cucinassistant/config"
 )
 
-type withSession func(w http.ResponseWriter, r *http.Request, s *sessions.Session)
-
-func (h withSession) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// Logs each visit
-	slog.Debug("[" + r.Method + "] " + r.URL.String())
-
-	// Lets the handlers use the session
-	s, _ := store.Get(r, "session")
-	h(w, r, s)
-}
-
 var store *sessions.CookieStore
 
-func initStore() {
+// InitSessionStore initializes the cookie session store.
+// It lasts 90 days.
+func InitSessionStore() {
 	// Initializes the session store
 	store = sessions.NewCookieStore([]byte(config.Runtime.Secret))
 	store.Options = &sessions.Options{
@@ -34,9 +25,10 @@ func initStore() {
 	}
 }
 
-func saveSession(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
+// SaveSession saves the session content
+func SaveSession(c Context) {
 	// Saves the session
-	if err := s.Save(r, w); err != nil {
+	if err := c.S.Save(c.R, c.W); err != nil {
 		slog.Warn("during session saving:", "err", err)
 	}
 }

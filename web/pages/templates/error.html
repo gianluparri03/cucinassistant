@@ -1,0 +1,13 @@
+{{ define "error" }}
+    <message>
+        <content>
+            <p>{{ .Message }}</p>
+
+            <div>
+                <button class="icon-text" {{ if .IsHx }} onclick="$(this).parents('message').remove();" {{ else }} hx-get="/" {{ end }}>
+                    <i class="fas fa-check"></i> Ok</i>
+                </button>
+            </div>
+        </content>
+    </message>
+{{ end }}

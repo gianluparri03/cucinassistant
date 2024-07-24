@@ -10,6 +10,7 @@ import (
 	"cucinassistant/web"
 )
 
+// main runs everything
 func main() {
 	// Ensures the config file is given
 	if len(os.Args) < 2 {

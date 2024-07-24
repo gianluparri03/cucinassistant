@@ -1,5 +1,6 @@
 package config
 
+// Config contains all the fields read from a config file
 type Config struct {
 	// Mode is one among "debug", "prod", "test"
 	Mode string
@@ -57,4 +58,5 @@ type Config struct {
 	StoreLink string `yaml:"storeLink"`
 }
 
+// Runtime contains the config read from the file
 var Runtime Config
