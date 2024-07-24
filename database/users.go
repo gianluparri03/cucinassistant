@@ -1,7 +1,6 @@
 package database
 
 import (
-	"errors"
 	"github.com/alexedwards/argon2id"
 	"log/slog"
 	"net/mail"
@@ -10,36 +9,37 @@ import (
 
 // User represents a registered User
 type User struct {
-    // UID is the User ID
+	// UID is the User ID
 	UID int
 
 	Username string
 	Password string
 	Email    string
 
-    // Token is an optional string, that
-    // can be generated to delete an account
-    // or to recover its password
-	Token    string
+	// Token is an optional string, that
+	// can be generated to delete an account
+	// or to recover its password
+	Token string
 }
 
 // SignUp tries to sign up an user. The required fields are Username,
 // Password and Email. If the registration is successfull, the UID will be set.
+// Password will be overwritten with its hash.
 func (u *User) SignUp() error {
 	// Ensures the username and the password are big enough
 	if len(u.Username) < 5 {
-		return errors.New("Nome utente non valido: lunghezza minima 5 caratteri")
+		return ERR_USER_NAME_TOO_SHORT
 	} else if _, err := mail.ParseAddress(u.Email); err != nil {
-		return errors.New("Email non valida")
+		return ERR_USER_MAIL_INVALID
 	} else if len(u.Password) < 8 {
-		return errors.New("Password non valida: lunghezza minima 8 caratteri")
+		return ERR_USER_PASS_TOO_SHORT
 	}
 
 	// Hashes the password
 	hash, err := argon2id.CreateHash(u.Password, argon2id.DefaultParams)
 	if err != nil {
 		slog.Error("while hashing password:", "err", err)
-		return errors.New("Errore sconosciuto")
+		return ERR_UNKNOWN
 	} else {
 		u.Password = hash
 	}
@@ -56,12 +56,12 @@ func (u *User) SignUp() error {
 	// Handles errors
 	if err != nil {
 		if strings.HasSuffix(err.Error(), "for key 'username'") {
-			return errors.New("Nome utente non disponibile")
+			return ERR_USER_NAME_UNAVAIL
 		} else if strings.HasSuffix(err.Error(), "for key 'email'") {
-			return errors.New("Email non disponibile")
+			return ERR_USER_NAME_UNAVAIL
 		} else {
 			slog.Warn("while signup:", "err", err)
-			return errors.New("Errore sconosciuto")
+			return ERR_UNKNOWN
 		}
 	}
 
@@ -69,13 +69,54 @@ func (u *User) SignUp() error {
 	err = DB.QueryRow(`SELECT uid FROM users WHERE username = ?;`, u.Username).Scan(&u.UID)
 	if err != nil {
 		slog.Error("while retrieving uid on signup:", "err", err)
-		return errors.New("Errore sconosciuto")
+		return ERR_UNKNOWN
 	}
 
-	// Logs
-	slog.Info("User signed up succesfully:", "email", u.Email)
-
 	return nil
+}
+
+// SignIn tries to sign in an user. The required fields are Username and
+// Password. If the login is successfull, the UID will be set.
+// Password will be overwritten with an empty string.
+func (u *User) SignIn() error {
+	var uid int
+	var hash string
+
+	// Fetches the hash
+	err := DB.QueryRow(`SELECT uid, password FROM users WHERE username = ?;`, u.Username).Scan(&uid, &hash)
+	if err != nil {
+		if strings.HasSuffix(err.Error(), "no rows in result set") {
+			return ERR_USER_WRONG_CREDENTIALS
+		} else {
+			slog.Error("while retrieving data on signin:", "err", err)
+			return ERR_UNKNOWN
+		}
+	}
+
+	// Ensures the user has been found
+	if uid == 0 {
+		return ERR_USER_WRONG_CREDENTIALS
+	}
+
+	// Compare the passwords
+	match, err := argon2id.ComparePasswordAndHash(u.Password, hash)
+	if err != nil {
+		slog.Error("while comparing hashes on signin:", "err", err)
+		return ERR_UNKNOWN
+	} else if !match {
+		return ERR_USER_WRONG_CREDENTIALS
+	}
+
+	u.UID = uid
+	u.Password = ""
+	return nil
+}
+
+// GetUser returns the user with the given UID. Password
+// and Token fields are not fetched.
+func GetUser(uid int) (u User) {
+	DB.QueryRow(`SELECT username, email FROM users WHERE uid = ?;`, uid).Scan(&u.Username, &u.Email)
+	return
 }
 
 // GetUsersNumber returns the number of users currently registered

@@ -7,7 +7,7 @@ import (
 )
 
 // render executes the given templates witth the given data.
-// It adds the base template in automatic, looking if it's a 
+// It adds the base template in automatic, looking if it's a
 // normal request or a request made by htmx.
 func render(c Context, pages []string, data map[string]any) {
 	// Adds the base template
@@ -19,8 +19,8 @@ func render(c Context, pages []string, data map[string]any) {
 	}
 
 	// Completes the pages names
-	for _, p := range pages {
-		p = "web/pages/" + p + ".html"
+	for i, p := range pages {
+		pages[i] = "web/pages/" + p + ".html"
 	}
 
 	// Loads the templates
@@ -43,7 +43,7 @@ func render(c Context, pages []string, data map[string]any) {
 }
 
 // RenderPage renders a specific page, with some data.
-// PageName must contain the subfolder and the basename, like 
+// PageName must contain the subfolder and the basename, like
 // "account/signup"
 func RenderPage(c Context, pageName string, data map[string]any) {
 	render(c, []string{"templates/body", pageName}, data)

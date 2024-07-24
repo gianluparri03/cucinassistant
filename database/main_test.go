@@ -7,6 +7,7 @@ import (
 	"cucinassistant/config"
 )
 
+// TestMain sets up the testing environment
 func TestMain(m *testing.M) {
 	// Loads the configuration
 	config.Read(os.Args[len(os.Args)-1])

@@ -1,0 +1,28 @@
+{{ define "content" }}
+    <div class="dashboard">
+        <button hx-get="/menu/">
+            <i class="fas fa-utensils"></i>
+            <span>Menù</span>
+        </button>
+
+        <button hx-get="/storage/">
+            <i class="fas fa-box"></i>
+            <span>Dispensa</span>
+        </button>
+
+        <button hx-get="/shopping/">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Lista della spesa</span>
+        </button>
+
+        <button hx-get="/account/settings" class="transparent">
+            <i class="fas fa-cog"></i>
+            <span>Impostazioni</span>
+        </button>
+    </div>
+
+    <script>
+        $('h1').text('Bentornato, {{ .Username }}!');
+        $('nav i').remove();
+    </script>
+{{ end }}
