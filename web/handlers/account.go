@@ -13,6 +13,7 @@ import (
 func RegisterAccountHandlers(router *mux.Router) {
 	router.Handle("/account", utils.Handler(handleGetAccount)).Methods("GET")
 	router.Handle("/account", utils.Handler(handlePostAccount)).Methods("POST")
+	router.Handle("/account/settings", utils.Handler(handleGetAccountSettings)).Methods("GET")
 }
 
 // handleGetAccount is called for GET requests at /account.
@@ -35,6 +36,7 @@ func handleGetAccount(c utils.Context) {
 // handlePostAccount is called for POST requests at /account
 // If the request value for "action" is "signup", it tries to sign up the user.
 // If the request value for "action" is "signin", it tries to sign in the user.
+// If the request value for "action" is "signout", it drops the user's session.
 // In all the other cases, it returns an error.
 func handlePostAccount(c utils.Context) {
 	// Decides which page to render based on the value
@@ -44,6 +46,8 @@ func handlePostAccount(c utils.Context) {
 		signUpUser(c)
 	case "signin":
 		signInUser(c)
+	case "signout":
+		signOutUser(c)
 	default:
 		utils.ShowError(c, "Richiesta sconosciuta")
 	}
@@ -97,4 +101,25 @@ func signInUser(c utils.Context) {
 	c.S.Values["UID"] = user.UID
 	utils.SaveSession(c)
 	utils.Redirect(c, "/")
+}
+
+// signOutUser drops an user's session
+func signOutUser(c utils.Context) {
+	delete(c.S.Values, "UID")
+	utils.SaveSession(c)
+	utils.Redirect(c, "/account?action=signin")
+}
+
+// handleGetAccountSettings is called for GET requests at /account/settings.
+// If there isn't a query string for "action", it renders the settings dashboard.
+// In all the other cases, it renders an error.
+func handleGetAccountSettings(c utils.Context) {
+	// Decides which page to render based on the value
+	// of the action field in the post body
+	switch c.R.URL.Query().Get("action") {
+	case "":
+		utils.RenderPage(c, "account/settings", nil)
+	default:
+		utils.ShowError(c, "Richiesta sconosciuta")
+	}
 }

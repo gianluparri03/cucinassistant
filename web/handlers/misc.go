@@ -12,11 +12,12 @@ import (
 func RegisterMiscHandlers(router *mux.Router) {
 	router.Handle("/", utils.PHandler(handleGetIndex)).Methods("GET")
 	router.Handle("/info", utils.Handler(handleGetInfo)).Methods("GET")
+	router.NotFoundHandler = utils.Handler(handleNotFound)
 }
 
 // handleGetIndex is called for GET* requests at /
 func handleGetIndex(c utils.Context) {
-	data := map[string]any{"Username": database.GetUser(c.UID).Username}
+	data := map[string]any{"Username": database.GetUserData(c.UID).Username}
 	utils.RenderPage(c, "misc/home", data)
 }
 
@@ -29,4 +30,9 @@ func handleGetInfo(c utils.Context) {
 	}
 
 	utils.RenderPage(c, "misc/info", data)
+}
+
+// handleNotFound is used when the page has not been found
+func handleNotFound(c utils.Context) {
+	utils.ShowError(c, "Pagina non trovata")
 }

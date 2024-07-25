@@ -1,34 +1,3 @@
-from cucinassistant.exceptions import CAError, CACritical
-import cucinassistant.database as db
-
-
-class TestUsers:
-    def __init__(self, tester, fake_user):
-        self.t = tester
-        self.fake_user = fake_user
-
-        # Executes all the subtests IN ORDER
-        for name in sorted(dir(self)):
-            if name[0] == 'S':
-                with self.t.subTest(cat='Users', sub=name[:3]):
-                    getattr(self, name)()
-
-    def S00_create_user(self):
-        # Tests for create_user
-        self.t.assertRaisesRegex(CAError, r'Nome utente non valido \(lunghezza minima', db.create_user, '', '', '')
-        self.t.assertRaisesRegex(CAError, r'Nome utente non valido \(solo lettere', db.create_user, 'antonio&', '', '')
-        self.t.assertRaisesRegex(CAError, r'Password non valida \(lunghezza minima', db.create_user, 'antonio', '', '')
-        self.antonio = db.create_user('antonio', 'antonio@email.com', 'passwordA')
-        self.t.assertRaisesRegex(CAError, 'Email non disponibile', db.create_user, 'antonello', 'antonio@email.com', 'passwordA')
-        self.t.assertRaisesRegex(CAError, 'Nome utente non disponibile', db.create_user, 'antonio', 'antonello@email.com', 'passwordA')
-        self.antonello = db.create_user('antonello', 'antonello@email.com', 'passwordA')
-
-    def S01_login(self):
-        # Tests for login
-        self.t.assertEqual(self.antonio, db.login('antonio', 'passwordA'))
-        self.t.assertRaisesRegex(CAError, 'Credenziali non valide', db.login, 'antonio', 'passwordB')
-        self.t.assertRaisesRegex(CAError, 'Credenziali non valide', db.login, 'antonino', 'passwordB')
-
     def S02_get_data(self):
         # Tests for get_data
         antonio_data = db.get_data(self.antonio)

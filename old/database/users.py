@@ -1,81 +1,3 @@
-from cucinassistant.exceptions import CAError, CACritical
-from cucinassistant.database import db, use_db, ph
-
-from functools import wraps
-from secrets import token_hex
-from collections import namedtuple
-from mariadb import Error as MDBError
-from string import ascii_letters, digits
-from argon2.exceptions import VerificationError
-
-
-User = namedtuple('User', ['uid', 'username', 'email', 'password', 'token'])
-
-def use_user(func):
-    @wraps(func)
-    @use_db
-    def inner(cursor, uid, *args, **kwargs):
-        # Ensures the user exists
-        cursor.execute('SELECT uid FROM users WHERE uid=?;', [uid])
-        if not cursor.fetchone():
-            raise CACritical('Utente sconosciuto')
-
-        return func(cursor, uid, *args, **kwargs)
-
-    return inner
-
-
-@use_db
-def create_user(cursor, username, email, password):
-    # Makes some checks
-    if len(username) < 3:
-        raise CAError('Nome utente non valido (lunghezza minima 3 caratteri)')
-    elif set(username) - set(ascii_letters + digits + '_'):
-        raise CAError('Nome utente non valido (solo lettere, numeri e "_" consentiti)')
-    elif len(password) < 5:
-        raise CAError('Password non valida (lunghezza minima 5 caratteri)')
-
-    try:
-        # Tries to create a new user
-        password = ph.hash(password)
-        cursor.execute('INSERT INTO users (username, email, password) VALUES (?, ?, ?);', [username, email, password])
-        return cursor.lastrowid
-
-    # Rewrites the error
-    except MDBError as e:
-        if str(e).endswith("for key 'email'"):
-            raise CAError("Email non disponibile")
-        elif str(e).endswith("for key 'username'"):
-            raise CAError("Nome utente non disponibile")
-        else:
-            raise CAError("Errore sconosciuto")
-
-@use_db
-def login(cursor, username, password):
-    # Checks if the credentials are valid
-    cursor.execute('SELECT uid, password FROM users WHERE username=?;', [username])
-    try:
-        if (data := cursor.fetchone()):
-            ph.verify(data[1], password or '')
-            return data[0]
-        else:
-            raise VerificationError()
-    except VerificationError:
-        raise CAError('Credenziali non valide')
-
-@use_db
-def get_data(cursor, uid, email=''):
-    # Returns the user's data
-    if email:
-        cursor.execute('SELECT uid, username, email, password, token FROM users WHERE email=?;', [email])
-    else:
-        cursor.execute('SELECT uid, username, email, password, token FROM users WHERE uid=?;', [uid])
-
-    if (data := cursor.fetchone()):
-        return User(*data)
-    else:
-        raise CACritical('Utente sconosciuto')
-
 @use_user
 def generate_token(cursor, uid):
     # Generates a new deletion token for the user
@@ -144,12 +66,6 @@ def reset_password(cursor, email, token, new):
             raise VerificationError()
     except VerificationError:
         raise CAError('Errore durante la reimpostazione della password')
-
-@use_db
-def get_users_number(cursor):
-    # Counts the users
-    cursor.execute('SELECT COUNT(*) FROM users;')
-    return cursor.fetchone()[0]
 
 @use_db
 def get_users_emails(cursor):

@@ -112,10 +112,16 @@ func (u *User) SignIn() error {
 	return nil
 }
 
-// GetUser returns the user with the given UID. Password
+// GetUserData returns the user with the given UID. Password
 // and Token fields are not fetched.
-func GetUser(uid int) (u User) {
-	DB.QueryRow(`SELECT username, email FROM users WHERE uid = ?;`, uid).Scan(&u.Username, &u.Email)
+// If the input uid is different from the result's uid, the
+// user has not been found.
+func GetUserData(uid int) (u User) {
+	err := DB.QueryRow(`SELECT uid, username, email FROM users WHERE uid = ?;`, uid).Scan(&u.UID, &u.Username, &u.Email)
+	if err != nil && !strings.HasSuffix(err.Error(), "no rows in result set") {
+		slog.Error("while retrieving data:", "err", err)
+	}
+
 	return
 }
 

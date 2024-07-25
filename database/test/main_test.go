@@ -1,10 +1,11 @@
-package database
+package test
 
 import (
 	"os"
 	"testing"
 
 	"cucinassistant/config"
+	"cucinassistant/database"
 )
 
 // TestMain sets up the testing environment
@@ -14,8 +15,8 @@ func TestMain(m *testing.M) {
 
 	// Connects to the database
 	// and creates the missing tables
-	Connect()
-	Bootstrap("schema.sql")
+	database.Connect()
+	database.Bootstrap("../schema.sql")
 
 	// Runs the actual tests
 	m.Run()

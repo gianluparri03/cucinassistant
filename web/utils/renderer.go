@@ -52,5 +52,5 @@ func RenderPage(c Context, pageName string, data map[string]any) {
 // ShowError shows an error to the user
 func ShowError(c Context, msg string) {
 	c.W.WriteHeader(http.StatusBadRequest)
-	render(c, []string{"templates/error"}, nil)
+	render(c, []string{"templates/error"}, map[string]any{"Message": msg})
 }

@@ -4,7 +4,7 @@
             <p>{{ .Message }}</p>
 
             <div>
-                <button class="icon-text" {{ if .IsHx }} onclick="$(this).parents('message').remove();" {{ else }} hx-get="/" {{ end }}>
+                <button class="icon-text" hx-on:click="$(this).parents('message').remove();" {{ if not .IsHx }} hx-get="/" {{ end }} hx-push-url="true">
                     <i class="fas fa-check"></i> Ok</i>
                 </button>
             </div>
