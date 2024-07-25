@@ -1,12 +1,3 @@
-    def S02_get_data(self):
-        # Tests for get_data
-        antonio_data = db.get_data(self.antonio)
-        self.t.assertEqual(antonio_data.uid, self.antonio)
-        self.t.assertEqual(antonio_data.username, 'antonio')
-        self.t.assertEqual(antonio_data.email, 'antonio@email.com')
-        self.t.assertEqual(antonio_data, db.get_data(0, email='antonio@email.com'))
-        self.t.assertRaisesRegex(CACritical, 'Utente sconosciuto', db.get_data, self.fake_user)
-
     def S03_change_username(self):
         # Tests for change_username
         self.t.assertRaisesRegex(CACritical, 'Utente sconosciuto', db.change_username, self.fake_user, 'nuovo_username')
@@ -32,12 +23,6 @@
         db.change_password(self.antonello, 'passwordA', 'passwordB')
         self.t.assertTrue(db.ph.verify(db.get_data(self.antonello).password, 'passwordB'))
 
-    def S06_generate_token(self):
-        # Tests for generate_token
-        self.token = db.generate_token(self.antonello)
-        self.t.assertTrue(db.ph.verify(db.get_data(self.antonello).token, self.token))
-        self.t.assertRaisesRegex(CACritical, 'Utente sconosciuto', db.generate_token, self.fake_user)
-
     def S07_reset_password(self):
         # Test for reset_password
         self.t.assertRaisesRegex(CACritical, 'Utente sconosciuto', db.reset_password, 'fake@email.com', 'fake_token', 'fake_password')
@@ -60,10 +45,6 @@
         db.duplicate_menu(self.antonello, 2)
         db.delete_user(self.antonello, self.token)
         self.t.assertRaisesRegex(CAError, 'Credenziali non valide', db.login, 'antonello', 'passwordA')
-
-    def S09_get_users_number(self):
-        # Tests for get_users_number
-        self.t.assertEqual(db.get_users_number(), 3)
 
     def S10_get_users_email(self):
         # Tests for get_users_email

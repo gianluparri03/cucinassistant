@@ -1,11 +1,4 @@
 @use_user
-def generate_token(cursor, uid):
-    # Generates a new deletion token for the user
-    token = token_hex(18)
-    cursor.execute('UPDATE users SET token=? WHERE uid=?;', [ph.hash(token), uid])
-    return token
-
-@use_user
 def delete_user(cursor, uid, token):
     # Checks if the token is valid
     cursor.execute('SELECT token FROM users WHERE uid=?;', [uid])

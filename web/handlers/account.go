@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"github.com/gorilla/mux"
+	"net/url"
 
+	"cucinassistant/config"
 	"cucinassistant/database"
 	"cucinassistant/email"
 	"cucinassistant/web/utils"
@@ -17,8 +19,9 @@ func RegisterAccountHandlers(router *mux.Router) {
 }
 
 // handleGetAccount is called for GET requests at /account.
-// If the query string for "action" is "signup", it renders the signup form.
-// If the query string for "action" is "signin", it renders the signin form.
+// It looks at the query string for "action" to decide which form to
+// render. The possible values are "signup", "signin", "forgot_password"
+// and "reset_password".
 // In all the other cases, it renders an error.
 func handleGetAccount(c utils.Context) {
 	// Decides which page to render based on the value
@@ -28,15 +31,19 @@ func handleGetAccount(c utils.Context) {
 		utils.RenderPage(c, "account/signup", nil)
 	case "signin":
 		utils.RenderPage(c, "account/signin", nil)
+	case "forgot_password":
+		utils.RenderPage(c, "account/forgot_password", nil)
+	case "reset_password":
+		utils.RenderPage(c, "account/reset_password", map[string]any{"Token": c.R.URL.Query().Get("token")})
 	default:
 		utils.ShowError(c, "Richiesta sconosciuta")
 	}
 }
 
 // handlePostAccount is called for POST requests at /account
-// If the request value for "action" is "signup", it tries to sign up the user.
-// If the request value for "action" is "signin", it tries to sign in the user.
-// If the request value for "action" is "signout", it drops the user's session.
+// It looks at the request value for "action" to decide what to do.
+// The possible values are "signup", "signin", "signout", "forgot_password"
+// and "reset_password".
 // In all the other cases, it returns an error.
 func handlePostAccount(c utils.Context) {
 	// Decides which page to render based on the value
@@ -48,6 +55,10 @@ func handlePostAccount(c utils.Context) {
 		signInUser(c)
 	case "signout":
 		signOutUser(c)
+	case "forgot_password":
+		forgotPassword(c)
+	case "reset_password":
+		resetPassword(c)
 	default:
 		utils.ShowError(c, "Richiesta sconosciuta")
 	}
@@ -108,6 +119,50 @@ func signOutUser(c utils.Context) {
 	delete(c.S.Values, "UID")
 	utils.SaveSession(c)
 	utils.Redirect(c, "/account?action=signin")
+}
+
+// forgotPassword sends an email to the user to recover its password
+func forgotPassword(c utils.Context) {
+	// Tries to get the user's email
+	if user, err := database.GetUserFromEmail(c.R.FormValue("email")); err == nil {
+		// Tries to generate its token
+		if token, err := user.GenerateToken(); err == nil {
+			data := map[string]any{
+				"Username":  user.Username,
+				"ResetLink": config.Runtime.BaseURL + "/account?action=reset_password&token=" + url.QueryEscape(token),
+			}
+
+			go email.SendMail(user.Email, "Recupero password", "reset_password", data)
+		}
+	}
+
+	utils.ShowError(c, "Ti abbiamo inviato un email. Controlla la casella di posta")
+}
+
+// resetPassword makes an user resets his password
+func resetPassword(c utils.Context) {
+	// Fetches data
+	password := c.R.FormValue("password")
+	user := &database.User{
+		Email: c.R.FormValue("email"),
+		Token: c.R.FormValue("token"),
+	}
+
+	// Ensures the two passwords are equal
+	if password != c.R.FormValue("password2") {
+		utils.ShowError(c, "Le due password non corrispondono")
+		return
+	}
+
+	// Tries to reset the user's password
+	if err := user.ResetPassword(password); err != nil {
+		utils.ShowError(c, err.Error())
+	} else {
+		// Saves the session and then redirects it to the homepage
+		c.S.Values["UID"] = user.UID
+		utils.SaveSession(c)
+		utils.Redirect(c, "/")
+	}
 }
 
 // handleGetAccountSettings is called for GET requests at /account/settings.

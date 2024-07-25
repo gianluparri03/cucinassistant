@@ -17,7 +17,8 @@ func RegisterMiscHandlers(router *mux.Router) {
 
 // handleGetIndex is called for GET* requests at /
 func handleGetIndex(c utils.Context) {
-	data := map[string]any{"Username": database.GetUserData(c.UID).Username}
+	user, _ := database.GetUser(c.UID)
+	data := map[string]any{"Username": user.Username}
 	utils.RenderPage(c, "misc/home", data)
 }
 

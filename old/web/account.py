@@ -71,24 +71,6 @@ def change_password_route(uid):
         Email('Cambio password', 'change_password', username=user.username).send(user.email)
         flash('Password cambiata con successo')
 
-@app.route('/account/recupera_password', methods=['GET', 'POST'])
-@smart_route('account/password_recover.html')
-def recover_password_route():
-    if request.method == 'POST':
-        # Ensures the request is valid
-        data = request.form
-        if not data.get('email'):
-            flash('Dati mancanti')
-            return
-        
-        # Sends the user a token to reset the password
-        if (data := db.get_data('', email=data['email'])):
-            token = db.generate_token(data.uid)
-            change_url = config['Environment']['Address'] + '/account/reset_password/?token=' + token
-            Email('Recupera password', 'reset_password', username=data.username, change_url=change_url).send(data.email)
-
-        flash('Ti abbiamo inviato un email. Controlla la casella di posta')
-
 @app.route('/account/reset_password/', methods=['GET', 'POST'])
 @smart_route('account/password_reset.html')
 def reset_password_route():
