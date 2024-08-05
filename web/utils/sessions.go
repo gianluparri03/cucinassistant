@@ -29,6 +29,6 @@ func InitSessionStore() {
 func SaveSession(c Context) {
 	// Saves the session
 	if err := c.S.Save(c.R, c.W); err != nil {
-		slog.Warn("during session saving:", "err", err)
+		slog.Error("during session saving:", "err", err)
 	}
 }

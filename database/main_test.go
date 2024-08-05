@@ -1,11 +1,26 @@
-package test
+package database
 
 import (
 	"fmt"
+    "os"
 	"testing"
 
-	"cucinassistant/database"
+    "cucinassistant/config"
 )
+
+// TestMain sets up the testing environment
+func TestMain(m *testing.M) {
+	// Loads the configuration
+	config.Read(os.Args[len(os.Args)-1])
+
+	// Connects to the database
+	// and creates the missing tables
+	Connect()
+	Bootstrap("schema.sql")
+
+	// Runs the actual tests
+	m.Run()
+}
 
 // TestCase represents a single input case for a function
 type TestCase[R comparable] struct {
@@ -13,7 +28,7 @@ type TestCase[R comparable] struct {
 	Description string
 
 	// User is the user who will run the test
-	User *database.User
+	User *User
 
 	// Expected is the expected output of the function
 	Expected R
@@ -49,10 +64,10 @@ func (ts TestSuite[R]) Run(t *testing.T) {
 var userN int = 0
 
 // generateTestingUser returns a testing user which has not been registered yet
-func generateTestingUser() database.User {
+func generateTestingUser() User {
 	userN++
 
-	return database.User{
+	return User{
 		Username: fmt.Sprintf("username%d", userN),
 		Email:    fmt.Sprintf("email%d@email.com", userN),
 		Password: fmt.Sprintf("password%d", userN),
@@ -60,7 +75,7 @@ func generateTestingUser() database.User {
 }
 
 // GetTestingUser returns an user to be used for testing purposes
-func GetTestingUser(t *testing.T) (user database.User) {
+func GetTestingUser(t *testing.T) (user User) {
 	user = generateTestingUser()
 	password := user.Password
 

@@ -17,7 +17,7 @@ func Start() {
 
 	// Registers all the handlers
 	handlers.RegisterAssetsHandlers(router)
-	handlers.RegisterAccountHandlers(router)
+	handlers.RegisterUserHandlers(router)
 	handlers.RegisterMiscHandlers(router)
 
 	// Prepares the session storage

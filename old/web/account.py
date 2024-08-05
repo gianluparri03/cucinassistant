@@ -70,19 +70,3 @@ def change_password_route(uid):
         user = db.get_data(uid)
         Email('Cambio password', 'change_password', username=user.username).send(user.email)
         flash('Password cambiata con successo')
-
-@app.route('/account/reset_password/', methods=['GET', 'POST'])
-@smart_route('account/password_reset.html')
-def reset_password_route():
-    if request.method == 'GET':
-        return {'token': request.args.get('token')}
-    else:
-        # Ensures the request is valid
-        data = request.form
-        if not data.get('token') or not data.get('email') or not data.get('new'):
-            flash('Dati mancanti')
-            return
-        
-        # Tries to change the password
-        db.reset_password(data['email'], data['token'], data['new'])
-        flash('Password reimpostata con successo')

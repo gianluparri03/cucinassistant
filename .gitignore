@@ -1,6 +1,6 @@
 config_debug.yml
 
 .direnv
-*__pycache__
 tags
-port.py
+
+cover.out

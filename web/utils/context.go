@@ -57,13 +57,13 @@ func (ph PHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			// and redirects the user away
 			delete(s.Values, "UID")
 			SaveSession(c)
-			Redirect(c, "/account?action=signin")
+			Redirect(c, "/user?action=signin")
 			return
 		}
 	} else {
 		// If there isn't an UID at all, it
 		// redirects the user away
-		Redirect(c, "/account?action=signin")
+		Redirect(c, "/user?action=signin")
 		return
 	}
 

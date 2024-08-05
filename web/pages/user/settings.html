@@ -1,27 +1,27 @@
 {{ define "content" }}
     <div class="dashboard">
-        <button hx-post="/account" hx-include="this">
+        <button hx-post="/user" hx-include="this">
             <i class="fas fa-sign-out-alt"></i>
             <span>Esci</span>
             <input name="action" value="signout" hidden>
         </button>
 
-        <button hx-get="/account/settings?action=change_name">
+        <button hx-get="/user/settings?action=change_name">
             <i class="fas fa-user"></i>
             <span>Cambia nome</span>
         </button>
 
-        <button hx-get="/account/settings?action=change_email">
+        <button hx-get="/user/settings?action=change_email">
             <i class="fas fa-envelope"></i>
             <span>Cambia email</span>
         </button>
 
-        <button hx-get="/account/settings?action=change_password">
+        <button hx-get="/user/settings?action=change_password">
             <i class="fas fa-key"></i>
             <span>Cambia password</span>
         </button>
 
-        <button hx-get="/account/settings?action=delete">
+        <button hx-get="/user/settings?action=delete">
             <i class="fas fa-trash"></i>
             <span>Elimina account</span>
         </button>

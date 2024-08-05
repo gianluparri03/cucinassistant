@@ -44,7 +44,7 @@ func render(c Context, pages []string, data map[string]any) {
 
 // RenderPage renders a specific page, with some data.
 // PageName must contain the subfolder and the basename, like
-// "account/signup"
+// "user/signup"
 func RenderPage(c Context, pageName string, data map[string]any) {
 	render(c, []string{"templates/body", pageName}, data)
 }
