@@ -27,3 +27,7 @@ cover: start_db
 	@go test -coverprofile=cover.out cucinassistant/database -args ../config_test.yml || true
 	@docker exec -it ca-db mariadb -u root -prpass -e "DROP DATABASE test;"
 	@go tool cover -html=cover.out
+	@rm cover.out
+
+dbsh: start_db
+	@docker exec -it ca-db mariadb -u ca-user -pca-pass cucinassistant

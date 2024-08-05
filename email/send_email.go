@@ -24,7 +24,7 @@ func SendMail(recipient string, subject string, templateName string, data map[st
 	// Sends it to the recipient
 	if config.Runtime.Email.Enabled {
 		sendBody(recipient, &body)
-		slog.Info("Sent email:", "template", templateName, "recipient", recipient)
+		slog.Debug("Sent email:", "template", templateName, "recipient", recipient)
 	}
 }
 

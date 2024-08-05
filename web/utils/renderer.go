@@ -49,8 +49,15 @@ func RenderPage(c Context, pageName string, data map[string]any) {
 	render(c, []string{"templates/body", pageName}, data)
 }
 
-// ShowError shows an error to the user
-func ShowError(c Context, msg string) {
+// ShowError shows an error to the user.
+// If redirect is set to true, it will redirect the user
+// to the home page, too.
+func ShowError(c Context, msg string, redirect bool) {
 	c.W.WriteHeader(http.StatusBadRequest)
-	render(c, []string{"templates/error"}, map[string]any{"Message": msg})
+	render(c, []string{"templates/error"}, map[string]any{"Message": msg, "Redirect": redirect})
+}
+
+// Redirect redirects to a given path
+func Redirect(c Context, path string) {
+	http.Redirect(c.W, c.R, path, http.StatusSeeOther)
 }

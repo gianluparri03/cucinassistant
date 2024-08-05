@@ -43,7 +43,7 @@ type PHandler func(c Context)
 // ServeHTTP is used by net/http to serve an http request
 func (ph PHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Logs each visit
-	slog.Debug("[" + r.Method + "] " + r.URL.String())
+	slog.Debug("[" + r.Method + "*] " + r.URL.String())
 
 	// Lets the handlers use the session
 	s, _ := store.Get(r, "session")
@@ -53,17 +53,17 @@ func (ph PHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if data, found := s.Values["UID"]; found {
 		var okay bool
 		if c.UID, okay = data.(int); !okay {
-			// If the saved is not an UID, it drops it
+			// If the saved is not an int, it drops it
 			// and redirects the user away
 			delete(s.Values, "UID")
 			SaveSession(c)
-			Redirect(c, "/user?action=signin")
+			Redirect(c, "/user/signin")
 			return
 		}
 	} else {
 		// If there isn't an UID at all, it
 		// redirects the user away
-		Redirect(c, "/user?action=signin")
+		Redirect(c, "/user/signin")
 		return
 	}
 

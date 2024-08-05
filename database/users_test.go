@@ -114,6 +114,43 @@ func TestUserSignIn(t *testing.T) {
 	}.Run(t)
 }
 
+func TestUserGenerateToken(t *testing.T) {
+	user := GetTestingUser(t)
+
+	TestSuite[error]{
+		Target: func(tc *TestCase[error]) (got error) {
+			tc.Data["Token"], got = tc.User.GenerateToken()
+			return got
+		},
+
+		PostCheck: func(t *testing.T, tc *TestCase[error]) {
+			// Ensures the returned token matches the saved one
+			if tc.Expected == nil {
+				var hash string
+				DB.QueryRow(`SELECT token FROM users WHERE uid = ?;`, tc.User.UID).Scan(&hash)
+				if match, err := argon2id.ComparePasswordAndHash(tc.Data["Token"].(string), hash); !match {
+					t.Errorf("%s, saved token does not match returned one: error: %v", tc.Description, err)
+				}
+			}
+		},
+
+		Cases: []TestCase[error]{
+			{
+				Description: "generated token for unknown user",
+				User:        &User{UID: -1},
+				Expected:    ERR_USER_UNKNOWN,
+				Data:        make(map[string]any),
+			},
+			{
+				Description: "could not generate token",
+				User:        &User{UID: user.UID},
+				Expected:    nil,
+				Data:        make(map[string]any),
+			},
+		},
+	}.Run(t)
+}
+
 func TestUserResetPassword(t *testing.T) {
 	userWithoutToken := GetTestingUser(t)
 	userWithToken := GetTestingUser(t)
@@ -174,38 +211,53 @@ func TestUserResetPassword(t *testing.T) {
 	}.Run(t)
 }
 
-func TestUserGenerateToken(t *testing.T) {
-	user := GetTestingUser(t)
+func TestUserDelete(t *testing.T) {
+	userWithoutToken := GetTestingUser(t)
+	userWithToken := GetTestingUser(t)
+	token, _ := userWithToken.GenerateToken()
 
 	TestSuite[error]{
-		Target: func(tc *TestCase[error]) (got error) {
-			tc.Data["Token"], got = tc.User.GenerateToken()
-			return got
+		Target: func(tc *TestCase[error]) error {
+			// TODO: create some content, to check the foreign keys cascade
+			return tc.User.Delete()
 		},
 
 		PostCheck: func(t *testing.T, tc *TestCase[error]) {
-			// Ensures the returned token matches the saved one
 			if tc.Expected == nil {
-				var hash string
-				DB.QueryRow(`SELECT token FROM users WHERE uid = ?;`, tc.User.UID).Scan(&hash)
-				if match, err := argon2id.ComparePasswordAndHash(tc.Data["Token"].(string), hash); !match {
-					t.Errorf("%s, saved token does not match returned one: error: %v", tc.Description, err)
+				// Makes sure that the token is dropped, and the new password is saved
+				var found int
+				DB.QueryRow(`SELECT 1 FROM users WHERE uid = ?;`, tc.User.UID).Scan(&found)
+
+				if found > 0 {
+					t.Errorf("%s, user wasn't deleted", tc.Description)
 				}
 			}
 		},
 
 		Cases: []TestCase[error]{
 			{
-				Description: "generated token for unknown user",
-				User:        &User{UID: -1},
+				Description: "deleted unknown user",
+				User:        &User{UID: 0, Token: ""},
 				Expected:    ERR_USER_UNKNOWN,
-				Data:        make(map[string]any),
+				Data:        nil,
 			},
 			{
-				Description: "could not generate token",
-				User:        &User{UID: user.UID},
+				Description: "deleted user without the token",
+				User:        &User{UID: userWithoutToken.UID, Token: ""},
+				Expected:    ERR_USER_WRONG_TOKEN,
+				Data:        nil,
+			},
+			{
+				Description: "deleted user with wrong token",
+				User:        &User{UID: userWithToken.UID, Token: token + "+"},
+				Expected:    ERR_USER_WRONG_TOKEN,
+				Data:        nil,
+			},
+			{
+				Description: "could not delete user",
+				User:        &User{UID: userWithToken.UID, Token: token},
 				Expected:    nil,
-				Data:        make(map[string]any),
+				Data:        nil,
 			},
 		},
 	}.Run(t)

@@ -162,6 +162,41 @@ func (u *User) ResetPassword() (err error) {
 	return nil
 }
 
+// Delete deletes the user and all of its content
+// Used fields: UID, Token
+func (u *User) Delete() (err error) {
+	// Fetches the user
+	var hashedToken *string
+	var found int
+	err = DB.QueryRow(`SELECT 1, token FROM users WHERE uid = ?;`, u.UID).Scan(&found, &hashedToken)
+	if err != nil {
+		if strings.HasSuffix(err.Error(), "no rows in result set") {
+			return ERR_USER_UNKNOWN
+		} else {
+			slog.Error("while retrieving data on reset:", "err", err)
+			return ERR_UNKNOWN
+		}
+	} else if hashedToken == nil {
+		return ERR_USER_WRONG_TOKEN
+	}
+
+	// Compares the tokens
+	if match, err := compareHash(u.Token, *hashedToken); err != nil {
+		return err
+	} else if !match {
+		return ERR_USER_WRONG_TOKEN
+	}
+
+	// Deletes the user
+	_, err = DB.Exec(`DELETE FROM users WHERE uid = ?;`, u.UID)
+	if err != nil {
+		slog.Error("while deleting user:", "err", err)
+		return ERR_UNKNOWN
+	}
+
+	return nil
+}
+
 // GetUser returns the user with the given UID.
 // Fetched fields: UID, Username, Email
 func GetUser(uid int) (u User, err error) {

@@ -1,0 +1,18 @@
+{{ define "title" }}Elimina account{{ end }}
+{{ define "back_link" }}/user/settings{{ end }}
+
+{{ define "content" }}
+    <form method="POST">
+        <span>
+            {{ if .Warning }}
+                Sei davvero sicuro di voler eliminare l'account? <br>
+            {{ else }}
+                Sei <b>SICURISSIMO</b> di voler eliminare l'account? <br>
+                Tutti i tuoi dati saranno persi per sempre. <br>
+            {{ end }}
+        </span> <br>
+
+        <input name="token" value="{{ .Token }}" hidden>
+        <button class="icon-text"><i class="fas fa-check"></i> Sì, sono sicuro</button>
+    </form>
+{{ end }}

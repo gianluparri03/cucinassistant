@@ -2,10 +2,10 @@ package database
 
 import (
 	"fmt"
-    "os"
+	"os"
 	"testing"
 
-    "cucinassistant/config"
+	"cucinassistant/config"
 )
 
 // TestMain sets up the testing environment

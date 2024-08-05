@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"cucinassistant/config"
-	"cucinassistant/web/handlers"
 	"cucinassistant/web/utils"
 )
 
@@ -16,9 +15,7 @@ func Start() {
 	router := mux.NewRouter()
 
 	// Registers all the handlers
-	handlers.RegisterAssetsHandlers(router)
-	handlers.RegisterUserHandlers(router)
-	handlers.RegisterMiscHandlers(router)
+	RegisterAll(router)
 
 	// Prepares the session storage
 	utils.InitSessionStore()
