@@ -34,10 +34,6 @@ func (u *User) SignUp() error {
 		return err
 	}
 
-	// Generates the UID
-	var uid int
-	DB.QueryRow(`SELECT IFNULL(MAX(uid), 0) + 1 FROM users;`).Scan(&uid)
-
 	// Hashes the password
 	hash, err := createHash(u.Password)
 	if err != nil {
@@ -45,12 +41,21 @@ func (u *User) SignUp() error {
 	}
 
 	// Tries to save it in the database
-	if _, err = DB.Exec(`INSERT INTO users (uid, username, email, password) VALUES (?, ?, ?, ?);`, uid, u.Username, u.Email, hash); err != nil {
+	_, err = DB.Exec(`INSERT INTO users (uid, username, email, password)
+					  SELECT IFNULL(MAX(uid), 0) + 1, ?, ?, ? FROM users;`, u.Username, u.Email, hash)
+	if err != nil {
 		slog.Error("while signup:", "err", err)
 		return ERR_UNKNOWN
 	}
 
-	u.UID = uid
+	// Retrieves the UID
+	err = DB.QueryRow(`SELECT uid FROM users WHERE username = ?;`, u.Username).Scan(&u.UID)
+	if err != nil {
+		slog.Error("while retrieving the uid in signup:", "err", err)
+		return ERR_UNKNOWN
+	}
+
+	// Masks the password
 	u.Password = hash
 	return nil
 }
@@ -294,7 +299,7 @@ func GetUser(uid int) (u User, err error) {
 			err = ERR_USER_UNKNOWN
 		}
 	}
-	
+
 	// Dereferences token (can be null)
 	if token == nil {
 		u.Token = ""
@@ -318,7 +323,7 @@ func GetUserFromEmail(email string) (u User, err error) {
 			err = ERR_USER_UNKNOWN
 		}
 	}
-	
+
 	// Dereferences token (can be null)
 	if token == nil {
 		u.Token = ""

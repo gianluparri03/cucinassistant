@@ -157,7 +157,7 @@ func changePassword(c utils.Context) {
 	// Sends the email
 	user, _ = database.GetUser(user.UID)
 	go email.SendMail(user.Email, "Cambio password", "password_change", map[string]any{
-		"Username":   user.Username,
+		"Username": user.Username,
 	})
 
 	utils.ShowError(c, "Password cambiata con successo", true)

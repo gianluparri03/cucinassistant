@@ -15,4 +15,7 @@ var (
 	ERR_USER_PASS_TOO_SHORT    = errors.New("Password non valida: lunghezza minima 8 caratteri")
 	ERR_USER_WRONG_CREDENTIALS = errors.New("Credenziali non valide")
 	ERR_USER_WRONG_TOKEN       = errors.New("Qualcosa è andato storto. Riprova.")
+
+	ERR_ENTRY_NOT_FOUND  = errors.New("Elemento non trovato")
+	ERR_ENTRY_DUPLICATED = errors.New("Elemento già in lista")
 )

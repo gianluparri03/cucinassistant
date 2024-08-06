@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestUserSignup(t *testing.T) {
+func TestSignup(t *testing.T) {
 	user := generateTestingUser()
 
 	TestSuite[error]{
@@ -14,9 +14,14 @@ func TestUserSignup(t *testing.T) {
 		},
 
 		PostCheck: func(t *testing.T, tc *TestCase[error]) {
-			// Ensures the user number is correct
-			if un := GetUsersNumber(); un != tc.Data["UsersNumber"].(int) {
-				t.Errorf("%s, wrong users number: expected %d, got %d", tc.Description, tc.Data["UsersNumber"], un)
+			// Ensures the user has been registered only if there
+			// were no errors
+			var found int
+			DB.QueryRow(`SELECT 1 FROM users WHERE username = ? AND email = ?;`, tc.User.Username, tc.User.Email).Scan(&found)
+			if tc.Expected == nil && found == 0 {
+				t.Errorf("%s, not registered", tc.Description)
+			} else if tc.Expected != nil && found > 0 {
+				t.Errorf("%s, registered anyway", tc.Description)
 			}
 
 			// Ensures the saved password hash is correct
@@ -77,7 +82,7 @@ func TestUserSignup(t *testing.T) {
 	}.Run(t)
 }
 
-func TestUserSignIn(t *testing.T) {
+func TestSignIn(t *testing.T) {
 	user, password := GetTestingUser(t)
 
 	TestSuite[error]{
@@ -100,7 +105,7 @@ func TestUserSignIn(t *testing.T) {
 			},
 			{
 				Description: "signed in with wrong password",
-				User:        &User{Username: user.Username, Password: password+"+"},
+				User:        &User{Username: user.Username, Password: password + "+"},
 				Expected:    ERR_USER_WRONG_CREDENTIALS,
 				Data:        map[string]any{"UID": 0},
 			},
@@ -114,7 +119,7 @@ func TestUserSignIn(t *testing.T) {
 	}.Run(t)
 }
 
-func TestUserChangeUsername(t *testing.T) {
+func TestChangeUsername(t *testing.T) {
 	user, _ := GetTestingUser(t)
 
 	TestSuite[error]{
@@ -162,7 +167,7 @@ func TestUserChangeUsername(t *testing.T) {
 	}.Run(t)
 }
 
-func TestUserChangeEmail(t *testing.T) {
+func TestChangeEmail(t *testing.T) {
 	user, _ := GetTestingUser(t)
 
 	TestSuite[error]{
@@ -210,7 +215,7 @@ func TestUserChangeEmail(t *testing.T) {
 	}.Run(t)
 }
 
-func TestUserChangePassword(t *testing.T) {
+func TestChangePassword(t *testing.T) {
 	user, password := GetTestingUser(t)
 
 	TestSuite[error]{
@@ -258,7 +263,7 @@ func TestUserChangePassword(t *testing.T) {
 	}.Run(t)
 }
 
-func TestUserGenerateToken(t *testing.T) {
+func TestGenerateToken(t *testing.T) {
 	user, _ := GetTestingUser(t)
 
 	TestSuite[error]{
@@ -295,7 +300,7 @@ func TestUserGenerateToken(t *testing.T) {
 	}.Run(t)
 }
 
-func TestUserResetPassword(t *testing.T) {
+func TestResetPassword(t *testing.T) {
 	userWithoutToken, _ := GetTestingUser(t)
 	userWithToken, _ := GetTestingUser(t)
 	token, _ := userWithToken.GenerateToken()
@@ -355,7 +360,7 @@ func TestUserResetPassword(t *testing.T) {
 	}.Run(t)
 }
 
-func TestUserDelete(t *testing.T) {
+func TestDeleteUser(t *testing.T) {
 	userWithoutToken, _ := GetTestingUser(t)
 	userWithToken, _ := GetTestingUser(t)
 	token, _ := userWithToken.GenerateToken()
@@ -363,6 +368,7 @@ func TestUserDelete(t *testing.T) {
 	TestSuite[error]{
 		Target: func(tc *TestCase[error]) error {
 			// TODO: create some content, to check the foreign keys cascade
+			tc.User.AppendEntries("...")
 			return tc.User.Delete()
 		},
 
@@ -410,26 +416,22 @@ func TestUserDelete(t *testing.T) {
 func TestGetUser(t *testing.T) {
 	user, _ := GetTestingUser(t)
 
-	TestSuite[User]{
-		Target: func(tc *TestCase[User]) User {
-			got, _ := GetUser(tc.User.UID)
-			return got
+	TestSuite[Pair[User, error]]{
+		Target: func(tc *TestCase[Pair[User, error]]) Pair[User, error] {
+			u, e := GetUser(tc.User.UID)
+			return Pair[User, error]{u, e}
 		},
 
-		PostCheck: func(t *testing.T, tc *TestCase[User]) {},
-
-		Cases: []TestCase[User]{
+		Cases: []TestCase[Pair[User, error]]{
 			{
 				Description: "got data of inexistent user",
 				User:        &User{UID: 0},
-				Expected:    User{},
-				Data:        nil,
+				Expected:    Pair[User, error]{User{}, ERR_USER_UNKNOWN},
 			},
 			{
-				Description: "could not get user data",
+				Description: "wrong user data",
 				User:        &User{UID: user.UID},
-				Expected:    user,
-				Data:        nil,
+				Expected:    Pair[User, error]{user, nil},
 			},
 		},
 	}.Run(t)
@@ -438,26 +440,37 @@ func TestGetUser(t *testing.T) {
 func TestGetUserFromEmail(t *testing.T) {
 	user, _ := GetTestingUser(t)
 
-	TestSuite[User]{
-		Target: func(tc *TestCase[User]) User {
-			got, _ := GetUserFromEmail(tc.User.Email)
-			return got
+	TestSuite[Pair[User, error]]{
+		Target: func(tc *TestCase[Pair[User, error]]) Pair[User, error] {
+			u, e := GetUserFromEmail(tc.User.Email)
+			return Pair[User, error]{u, e}
 		},
 
-		PostCheck: func(t *testing.T, tc *TestCase[User]) {},
-
-		Cases: []TestCase[User]{
+		Cases: []TestCase[Pair[User, error]]{
 			{
-				Description: "got some random data",
+				Description: "got some random user's data (from email)",
 				User:        &User{Email: "email@email.net"},
-				Expected:    User{},
-				Data:        nil,
+				Expected:    Pair[User, error]{User{}, ERR_USER_UNKNOWN},
 			},
 			{
-				Description: "could not get user data",
+				Description: "wrong user data (from email)",
 				User:        &User{Email: user.Email},
-				Expected:    user,
-				Data:        nil,
+				Expected:    Pair[User, error]{user, nil},
+			},
+		},
+	}.Run(t)
+}
+
+func TestGetUsersNumber(t *testing.T) {
+	TestSuite[int]{
+		Target: func(tc *TestCase[int]) int {
+			return GetUsersNumber()
+		},
+
+		Cases: []TestCase[int]{
+			{
+				Description: "wrong users number",
+				Expected:    userN,
 			},
 		},
 	}.Run(t)

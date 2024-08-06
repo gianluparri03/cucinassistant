@@ -3,10 +3,18 @@ package database
 import (
 	"fmt"
 	"os"
+	"reflect"
 	"testing"
 
 	"cucinassistant/config"
 )
+
+// // Pair is used to pack the results of functions
+// // that returns two values
+type Pair[A any, B any] struct {
+	First  A
+	Second B
+}
 
 // TestMain sets up the testing environment
 func TestMain(m *testing.M) {
@@ -23,7 +31,7 @@ func TestMain(m *testing.M) {
 }
 
 // TestCase represents a single input case for a function
-type TestCase[R comparable] struct {
+type TestCase[R any] struct {
 	// Description will be print if the case fails
 	Description string
 
@@ -38,7 +46,7 @@ type TestCase[R comparable] struct {
 }
 
 // TestSuite groups all the TestCases for a function
-type TestSuite[R comparable] struct {
+type TestSuite[R any] struct {
 	// Target is the function on which the tests are made
 	Target func(tc *TestCase[R]) R
 
@@ -53,9 +61,9 @@ type TestSuite[R comparable] struct {
 // Run executes all the cases
 func (ts TestSuite[R]) Run(t *testing.T) {
 	for _, tc := range ts.Cases {
-		if got := ts.Target(&tc); got != tc.Expected {
+		if got := ts.Target(&tc); !reflect.DeepEqual(got, tc.Expected) {
 			t.Errorf("%s: error: expected <%v>, got <%v>", tc.Description, tc.Expected, got)
-		} else {
+		} else if ts.PostCheck != nil {
 			ts.PostCheck(t, &tc)
 		}
 	}

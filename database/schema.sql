@@ -58,11 +58,12 @@ CREATE TABLE IF NOT EXISTS storage_articles (
     UNIQUE (sid, name, expiration)
 );
 
-CREATE TABLE IF NOT EXISTS shopping_list (
+CREATE TABLE IF NOT EXISTS shopping_entries (
     uid INT NOT NULL,
     eid INT NOT NULL,
 
     name VARCHAR(250) NOT NULL,
+    marked BOOLEAN DEFAULT FALSE,
 
     PRIMARY KEY (uid, eid),
     FOREIGN KEY (uid) REFERENCES users (uid) ON DELETE CASCADE,
