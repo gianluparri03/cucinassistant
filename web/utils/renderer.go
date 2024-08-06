@@ -50,11 +50,11 @@ func RenderPage(c Context, pageName string, data map[string]any) {
 }
 
 // ShowError shows an error to the user.
-// If redirect is set to true, it will redirect the user
-// to the home page, too.
-func ShowError(c Context, msg string, redirect bool) {
+// If path is not empty, it will redirect the user
+// to that path when it clicks the button
+func ShowError(c Context, msg string, path string) {
 	c.W.WriteHeader(http.StatusBadRequest)
-	render(c, []string{"templates/error"}, map[string]any{"Message": msg, "Redirect": redirect})
+	render(c, []string{"templates/error"}, map[string]any{"Message": msg, "Path": path})
 }
 
 // Redirect redirects to a given path

@@ -1,0 +1,25 @@
+{{ define "title" }}Lista della spesa{{ end }}
+{{ define "back_link" }}/{{ end }}
+
+{{ define "content" }}
+    <div class="shopping-list">
+        {{ range .List }}
+            <div class="shopping-item">
+                <input type="checkbox" {{ if .Marked }} checked {{ end }} autocomplete="off" readonly
+                hx-post="/shopping_list/{{ .EID }}/toggle" hx-target="#pass" hx-push-url="false">
+
+                <label hx-get="/shopping_list/{{ .EID }}/edit">{{ .Name }}</label>
+            </div>
+        {{ else }}
+            <span id="empty-label">La lista è vuota.</span>
+        {{ end }}
+
+        <button class="icon-text" hx-get="/shopping_list/append"><i class="fas fa-plus"></i> Aggiungi articoli</button>
+
+        {{ if .List }}
+            <button class="icon-text" hx-post="/shopping_list/clear"><i class="fas fa-trash"></i> Ripulisci lista</button>
+        {{ end }}
+    </div>
+
+    <div id="pass"></div>
+{{ end }}

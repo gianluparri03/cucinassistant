@@ -163,7 +163,7 @@ func TestToggleEntry(t *testing.T) {
 	}.Run(t)
 }
 
-func TestCleanEntries(t *testing.T) {
+func TestClearEntries(t *testing.T) {
 	list := ShoppingList{
 		1: Entry{EID: 1, Name: "Entry1"},
 		2: Entry{EID: 2, Name: "Entry2", Marked: true},
@@ -178,7 +178,7 @@ func TestCleanEntries(t *testing.T) {
 
 	TestSuite[error]{
 		Target: func(tc *TestCase[error]) error {
-			return tc.User.CleanEntries()
+			return tc.User.ClearEntries()
 		},
 
 		PostCheck: func(t *testing.T, tc *TestCase[error]) {
@@ -193,12 +193,12 @@ func TestCleanEntries(t *testing.T) {
 
 		Cases: []TestCase[error]{
 			{
-				Description: "inexistent user cleaned its entries",
+				Description: "inexistent user cleared its entries",
 				User:        &User{UID: 0},
 				Expected:    ERR_USER_UNKNOWN,
 			},
 			{
-				Description: "could not clean entries",
+				Description: "could not clear entries",
 				User:        &user,
 				Expected:    nil,
 				Data:        map[string]any{"List": list},

@@ -103,11 +103,11 @@ func (u *User) ToggleEntry(EID int) (err error) {
 	return
 }
 
-// CleanEntries drops all the marked entries
-func (u *User) CleanEntries() (err error) {
+// ClearEntries drops all the marked entries
+func (u *User) ClearEntries() (err error) {
 	res, err := DB.Exec(`DELETE FROM shopping_entries WHERE uid = ? AND marked;`, u.UID)
 	if err != nil {
-		slog.Error("while cleaning entries:", "err", err)
+		slog.Error("while clearing entries:", "err", err)
 		err = ERR_UNKNOWN
 	} else if ra, _ := res.RowsAffected(); ra < 1 {
 		// Makes sure the user exists

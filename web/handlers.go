@@ -2,6 +2,7 @@ package web
 
 import (
 	"net/http"
+	"strconv"
 
 	"cucinassistant/config"
 	"cucinassistant/database"
@@ -34,6 +35,43 @@ func RegisterAll(router *mux.Router) {
 				}
 			},
 			PostDisabled: true,
+		},
+
+		{
+			Path:    "/shopping_list",
+			GetPage: "shopping_list/view",
+			GetData: func(c utils.Context) map[string]any {
+				user, _ := database.GetUser(c.UID)
+				list, _ := user.GetShoppingList()
+				return map[string]any{"List": list}
+			},
+			PostDisabled: true,
+		},
+		{
+			Path:        "/shopping_list/append",
+			GetPage:     "shopping_list/append",
+			PostHandler: appendEntries,
+		},
+		{
+			Path:        "/shopping_list/{EID}/toggle",
+			GetDisabled: true,
+			PostHandler: toggleEntry,
+		},
+		{
+			Path:    "/shopping_list/{EID}/edit",
+			GetPage: "shopping_list/edit",
+			GetData: func(c utils.Context) map[string]any {
+				EID, _ := strconv.Atoi(mux.Vars(c.R)["EID"])
+				user, _ := database.GetUser(c.UID)
+				entry, _ := user.GetEntry(EID)
+				return map[string]any{"Name": entry.Name}
+			},
+			PostHandler: editEntry,
+		},
+		{
+			Path:        "/shopping_list/clear",
+			GetDisabled: true,
+			PostHandler: clearEntries,
 		},
 
 		{
@@ -128,6 +166,6 @@ func RegisterAll(router *mux.Router) {
 
 	// Registers the 404 handler
 	router.NotFoundHandler = utils.Handler(func(c utils.Context) {
-		utils.ShowError(c, "Pagina non trovata", true)
+		utils.ShowError(c, "Pagina non trovata", "/")
 	})
 }

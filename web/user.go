@@ -26,13 +26,13 @@ func signUp(c utils.Context) {
 	// Fetches data, ensuring the two passwords are equal
 	user := retrieveUser(c)
 	if user.Password != c.R.FormValue("password2") {
-		utils.ShowError(c, "Le due password non corrispondono", false)
+		utils.ShowError(c, "Le due password non corrispondono", "")
 		return
 	}
 
 	// Tries to sign up the user
 	if err := user.SignUp(); err != nil {
-		utils.ShowError(c, err.Error(), false)
+		utils.ShowError(c, err.Error(), "")
 		return
 	}
 
@@ -42,7 +42,7 @@ func signUp(c utils.Context) {
 	// Saves the session and then redirects it to the homepage
 	c.S.Values["UID"] = user.UID
 	utils.SaveSession(c)
-	utils.ShowError(c, "Account creato con successo", true)
+	utils.ShowError(c, "Account creato con successo", "/")
 }
 
 // signIn tries to sign in the user whose data is in the request
@@ -52,7 +52,7 @@ func signIn(c utils.Context) {
 
 	// Tries to sign up the user
 	if err := user.SignIn(); err != nil {
-		utils.ShowError(c, err.Error(), false)
+		utils.ShowError(c, err.Error(), "")
 		return
 	}
 
@@ -83,7 +83,7 @@ func forgotPassword(c utils.Context) {
 		}
 	}
 
-	utils.ShowError(c, "Ti abbiamo inviato un email. Controlla la casella di posta", true)
+	utils.ShowError(c, "Ti abbiamo inviato un email. Controlla la casella di posta", "")
 }
 
 // resetPassword makes an user resets his password
@@ -92,13 +92,13 @@ func resetPassword(c utils.Context) {
 	user := retrieveUser(c)
 	newPassword := c.R.FormValue("password-new1")
 	if newPassword != c.R.FormValue("password-new2") {
-		utils.ShowError(c, "Le due password non corrispondono", false)
+		utils.ShowError(c, "Le due password non corrispondono", "")
 		return
 	}
 
 	// Tries to reset the user's password
 	if err := user.ResetPassword(newPassword); err != nil {
-		utils.ShowError(c, err.Error(), false)
+		utils.ShowError(c, err.Error(), "")
 		return
 	}
 
@@ -116,11 +116,11 @@ func changeUsername(c utils.Context) {
 
 	// Tries to change it
 	if err := user.ChangeUsername(newUsername); err != nil {
-		utils.ShowError(c, err.Error(), false)
+		utils.ShowError(c, err.Error(), "")
 		return
 	}
 
-	utils.ShowError(c, "Nome utente cambiato con successo", true)
+	utils.ShowError(c, "Nome utente cambiato con successo", "/user/settings")
 }
 
 // changeEmail lets an user change its email
@@ -131,11 +131,11 @@ func changeEmail(c utils.Context) {
 
 	// Tries to change it
 	if err := user.ChangeEmail(newEmail); err != nil {
-		utils.ShowError(c, err.Error(), false)
+		utils.ShowError(c, err.Error(), "")
 		return
 	}
 
-	utils.ShowError(c, "Nome utente cambiato con successo", true)
+	utils.ShowError(c, "Email cambiata con successo", "/user/settings")
 }
 
 // changePassword lets an user change its password
@@ -144,13 +144,13 @@ func changePassword(c utils.Context) {
 	user := retrieveUser(c)
 	newPassword := c.R.FormValue("password-new1")
 	if newPassword != c.R.FormValue("password-new2") {
-		utils.ShowError(c, "Le due password non corrispondono", false)
+		utils.ShowError(c, "Le due password non corrispondono", "")
 		return
 	}
 
 	// Tries to change the user's password
 	if err := user.ChangePassword(newPassword); err != nil {
-		utils.ShowError(c, err.Error(), false)
+		utils.ShowError(c, err.Error(), "")
 		return
 	}
 
@@ -160,7 +160,7 @@ func changePassword(c utils.Context) {
 		"Username": user.Username,
 	})
 
-	utils.ShowError(c, "Password cambiata con successo", true)
+	utils.ShowError(c, "Password cambiata con successo", "/user/settings")
 }
 
 // deleteUser1 sends an email to the user to delete it
@@ -177,7 +177,7 @@ func deleteUser1(c utils.Context) {
 		}
 	}
 
-	utils.ShowError(c, "Ti abbiamo inviato un email. Controlla la casella di posta", true)
+	utils.ShowError(c, "Ti abbiamo inviato un email. Controlla la casella di posta", "")
 }
 
 // deleteUser2 deletes the user
@@ -187,7 +187,7 @@ func deleteUser2(c utils.Context) {
 
 	// Fetches the email and the username
 	if user_, err := database.GetUser(c.UID); err != nil {
-		utils.ShowError(c, err.Error(), false)
+		utils.ShowError(c, err.Error(), "")
 		return
 	} else {
 		user.Email = user_.Email
@@ -196,7 +196,7 @@ func deleteUser2(c utils.Context) {
 
 	// Tries to delete the user
 	if err := user.Delete(); err != nil {
-		utils.ShowError(c, err.Error(), false)
+		utils.ShowError(c, err.Error(), "")
 		return
 	}
 
@@ -208,5 +208,5 @@ func deleteUser2(c utils.Context) {
 	// Logs it out, and shows the goodbye message
 	delete(c.S.Values, "UID")
 	utils.SaveSession(c)
-	utils.ShowError(c, "Account eliminato con successo", true)
+	utils.ShowError(c, "Account eliminato con successo", "/user/signin")
 }

@@ -40,7 +40,7 @@ func (e Endpoint) Register(router *mux.Router) {
 	// Prepares the GET handler
 	GetHandler := func(c Context) {
 		if e.GetDisabled {
-			ShowError(c, "Richiesta sconosciuta", true)
+			ShowError(c, "Richiesta sconosciuta", "/")
 		} else {
 			if e.GetData != nil {
 				RenderPage(c, e.GetPage, e.GetData(c))
@@ -53,7 +53,7 @@ func (e Endpoint) Register(router *mux.Router) {
 	// Prepares the POST handler
 	PostHandler := func(c Context) {
 		if e.PostDisabled {
-			ShowError(c, "Richiesta sconosciuta", true)
+			ShowError(c, "Richiesta sconosciuta", "/")
 		} else {
 			e.PostHandler(c)
 		}

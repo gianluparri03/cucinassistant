@@ -1,0 +1,32 @@
+{{ define "title" }}Aggiungi elementi{{ end }}
+{{ define "back_link" }}/shopping_list{{ end }}
+
+{{ define "content" }}
+    <form method="POST">
+        <div id="new-elements"></div>
+        <button class="icon-text"><i class="fas fa-check"></i> Conferma</button>
+    </form>
+
+    <script>
+        // If the last input has been filled, it adds a new one.
+        // If one input is cleared, it will delete it entirely.
+        // It always keep an input visible.
+        function updateEntries(e, first=false) {
+            if (first || (e.target == $("input[type=text]").get(-1) && e.target.value)) {
+                let ne = $(`<div class="new-element">
+                                <input class="name" type="text" name="entry-${inputN}-name">
+                            </div>`);
+
+                $('#new-elements').append(ne);
+                ne.on("change", updateEntries);
+                inputN++;
+            } else if (!e.target.value) {
+                e.target.remove();
+            }
+        }
+
+        // Adds manually the first input
+        inputN = 0;
+        updateEntries(null, true);
+    </script>
+{{ end }}

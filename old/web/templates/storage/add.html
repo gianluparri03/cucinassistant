@@ -11,6 +11,26 @@
     </form>
 
     <script>
+        // If the last input has been filled, it adds a new one.
+        // If one input is cleared, it will delete it entirely.
+        // It always keep an input visible.
+        function updateArticles(e, first=false) {
+            let target = e ? $(e.target).parent() : null;
+
+            if (first || (target.get(0) == $(".storage-item").get(-1) && target.find('input.name').val())) {
+                let ne = $(`<div class="storage-item">
+                                <input class="name" name="name-${inputNo}" type="text" placeholder="Nome">
+                                <input class="expiration" name="expiration-${inputNo} "type="date" placeholder="Scadenza">
+                                <input class="quantity" name="quantity-${inputNo} "type="number" min="0" step="1" placeholder="Quantità">
+                            </div>`);
+
+                $('#new-elements').append(ne);
+                ne.on("change", updateArticles);
+            } else if (!target.find('input.name').val()) {
+                target.remove();
+            }
+        }
+
         inputNo = 0;
         updateStorageInputs(null, true);
     </script>
