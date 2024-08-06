@@ -75,16 +75,13 @@ func generateTestingUser() User {
 }
 
 // GetTestingUser returns an user to be used for testing purposes
-func GetTestingUser(t *testing.T) (user User) {
+func GetTestingUser(t *testing.T) (user User, password string) {
 	user = generateTestingUser()
-	password := user.Password
+	password = user.Password
 
 	// And tries to sign it up
 	if err := user.SignUp(); err != nil {
 		t.Fatalf("Cannot create testing user: %s", err.Error())
-	} else {
-		// Restore the plain text password
-		user.Password = password
 	}
 
 	return

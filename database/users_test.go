@@ -78,7 +78,7 @@ func TestUserSignup(t *testing.T) {
 }
 
 func TestUserSignIn(t *testing.T) {
-	user := GetTestingUser(t)
+	user, password := GetTestingUser(t)
 
 	TestSuite[error]{
 		Target: func(tc *TestCase[error]) error {
@@ -100,13 +100,13 @@ func TestUserSignIn(t *testing.T) {
 			},
 			{
 				Description: "signed in with wrong password",
-				User:        &User{Username: user.Username, Password: "pa$$word"},
+				User:        &User{Username: user.Username, Password: password+"+"},
 				Expected:    ERR_USER_WRONG_CREDENTIALS,
 				Data:        map[string]any{"UID": 0},
 			},
 			{
 				Description: "could not sign in",
-				User:        &User{Username: user.Username, Password: user.Password},
+				User:        &User{Username: user.Username, Password: password},
 				Expected:    nil,
 				Data:        map[string]any{"UID": user.UID},
 			},
@@ -114,8 +114,152 @@ func TestUserSignIn(t *testing.T) {
 	}.Run(t)
 }
 
+func TestUserChangeUsername(t *testing.T) {
+	user, _ := GetTestingUser(t)
+
+	TestSuite[error]{
+		Target: func(tc *TestCase[error]) error {
+			return tc.User.ChangeUsername(tc.Data["NewUsername"].(string))
+		},
+
+		PostCheck: func(t *testing.T, tc *TestCase[error]) {
+			if tc.Expected == nil {
+				// Makes sure the new username is saved
+				var username string
+				DB.QueryRow(`SELECT username FROM users WHERE uid = ?;`, tc.User.UID).Scan(&username)
+				if username != tc.Data["NewUsername"].(string) {
+					t.Errorf("%s, new username isn't saved", tc.Description)
+				}
+			}
+		},
+
+		Cases: []TestCase[error]{
+			{
+				Description: "changed username of unknown user",
+				User:        &User{UID: 0},
+				Expected:    ERR_USER_UNKNOWN,
+				Data:        map[string]any{"NewUsername": "newUsername"},
+			},
+			{
+				Description: "changed username with an invalid one",
+				User:        &User{UID: user.UID},
+				Expected:    ERR_USER_NAME_TOO_SHORT,
+				Data:        map[string]any{"NewUsername": "u"},
+			},
+			{
+				Description: "could not change username",
+				User:        &User{UID: user.UID},
+				Expected:    nil,
+				Data:        map[string]any{"NewUsername": "newUsername"},
+			},
+			{
+				Description: "could not keep username",
+				User:        &User{UID: user.UID},
+				Expected:    nil,
+				Data:        map[string]any{"NewUsername": "newUsername"},
+			},
+		},
+	}.Run(t)
+}
+
+func TestUserChangeEmail(t *testing.T) {
+	user, _ := GetTestingUser(t)
+
+	TestSuite[error]{
+		Target: func(tc *TestCase[error]) error {
+			return tc.User.ChangeEmail(tc.Data["NewEmail"].(string))
+		},
+
+		PostCheck: func(t *testing.T, tc *TestCase[error]) {
+			if tc.Expected == nil {
+				// Makes sure the new email is saved
+				var email string
+				DB.QueryRow(`SELECT email FROM users WHERE uid = ?;`, tc.User.UID).Scan(&email)
+				if email != tc.Data["NewEmail"].(string) {
+					t.Errorf("%s, new email isn't saved", tc.Description)
+				}
+			}
+		},
+
+		Cases: []TestCase[error]{
+			{
+				Description: "changed email of unknown user",
+				User:        &User{UID: 0},
+				Expected:    ERR_USER_UNKNOWN,
+				Data:        map[string]any{"NewEmail": "newemail@email.com"},
+			},
+			{
+				Description: "changed email with an invalid one",
+				User:        &User{UID: user.UID},
+				Expected:    ERR_USER_MAIL_INVALID,
+				Data:        map[string]any{"NewEmail": "e"},
+			},
+			{
+				Description: "could not change email",
+				User:        &User{UID: user.UID},
+				Expected:    nil,
+				Data:        map[string]any{"NewEmail": "newemail@email.com"},
+			},
+			{
+				Description: "could not keep email",
+				User:        &User{UID: user.UID},
+				Expected:    nil,
+				Data:        map[string]any{"NewEmail": "newemail@email.com"},
+			},
+		},
+	}.Run(t)
+}
+
+func TestUserChangePassword(t *testing.T) {
+	user, password := GetTestingUser(t)
+
+	TestSuite[error]{
+		Target: func(tc *TestCase[error]) error {
+			return tc.User.ChangePassword(tc.Data["NewPassword"].(string))
+		},
+
+		PostCheck: func(t *testing.T, tc *TestCase[error]) {
+			if tc.Expected == nil {
+				// Makes sure the new password is saved
+				var pHash string
+				DB.QueryRow(`SELECT password FROM users WHERE uid = ?;`, tc.User.UID).Scan(&pHash)
+				if match, err := argon2id.ComparePasswordAndHash(tc.Data["NewPassword"].(string), pHash); !match {
+					t.Errorf("%s, new password doesn't match (err: %v)", tc.Description, err)
+				}
+			}
+		},
+
+		Cases: []TestCase[error]{
+			{
+				Description: "changed password of unknown user",
+				User:        &User{UID: 0, Password: ""},
+				Expected:    ERR_USER_UNKNOWN,
+				Data:        map[string]any{"NewPassword": "newPassword"},
+			},
+			{
+				Description: "changed password with wrong old one",
+				User:        &User{UID: user.UID, Password: password + "+"},
+				Expected:    ERR_USER_WRONG_CREDENTIALS,
+				Data:        map[string]any{"NewPassword": "newPassword"},
+			},
+			{
+				Description: "changed password with an invalid one",
+				User:        &User{UID: user.UID, Password: password + "+"},
+				Expected:    ERR_USER_PASS_TOO_SHORT,
+				Data:        map[string]any{"NewPassword": "p"},
+			},
+			{
+				Description: "could not change password",
+				User:        &User{UID: user.UID, Password: password},
+				Expected:    nil,
+				Data:        map[string]any{"NewPassword": "newPassword"},
+			},
+		},
+	}.Run(t)
+}
+
 func TestUserGenerateToken(t *testing.T) {
-	user := GetTestingUser(t)
+	user, _ := GetTestingUser(t)
 
 	TestSuite[error]{
 		Target: func(tc *TestCase[error]) (got error) {
@@ -152,13 +296,13 @@ func TestUserGenerateToken(t *testing.T) {
 }
 
 func TestUserResetPassword(t *testing.T) {
-	userWithoutToken := GetTestingUser(t)
-	userWithToken := GetTestingUser(t)
+	userWithoutToken, _ := GetTestingUser(t)
+	userWithToken, _ := GetTestingUser(t)
 	token, _ := userWithToken.GenerateToken()
 
 	TestSuite[error]{
 		Target: func(tc *TestCase[error]) error {
-			return tc.User.ResetPassword()
+			return tc.User.ResetPassword(tc.Data["NewPassword"].(string))
 		},
 
 		PostCheck: func(t *testing.T, tc *TestCase[error]) {
@@ -170,8 +314,8 @@ func TestUserResetPassword(t *testing.T) {
 
 				if tHash != nil {
 					t.Errorf("%s, token wasn't dropped as expected", tc.Description)
-				} else if match, err := argon2id.ComparePasswordAndHash("newPassword", pHash); !match {
-					t.Errorf("%s, new password doesn't match %v %s", tc.Description, err, pHash)
+				} else if match, err := argon2id.ComparePasswordAndHash(tc.Data["NewPassword"].(string), pHash); !match {
+					t.Errorf("%s, new password doesn't match (err: %v)", tc.Description, err)
 				}
 			}
 		},
@@ -179,41 +323,41 @@ func TestUserResetPassword(t *testing.T) {
 		Cases: []TestCase[error]{
 			{
 				Description: "reset password of unknown user",
-				User:        &User{Email: "", Token: "", Password: "newPassword"},
+				User:        &User{Email: "", Token: ""},
 				Expected:    ERR_USER_UNKNOWN,
-				Data:        nil,
+				Data:        map[string]any{"NewPassword": "newPassword"},
 			},
 			{
 				Description: "reset password without the token",
-				User:        &User{Email: userWithoutToken.Email, Token: "", Password: "newPassword"},
+				User:        &User{Email: userWithoutToken.Email, Token: ""},
 				Expected:    ERR_USER_WRONG_TOKEN,
-				Data:        nil,
+				Data:        map[string]any{"NewPassword": "newPassword"},
 			},
 			{
 				Description: "reset password with wrong token",
-				User:        &User{Email: userWithToken.Email, Token: token + "+", Password: "newPassword"},
+				User:        &User{Email: userWithToken.Email, Token: token + "+"},
 				Expected:    ERR_USER_WRONG_TOKEN,
-				Data:        nil,
+				Data:        map[string]any{"NewPassword": "newPassword"},
 			},
 			{
 				Description: "reset password with an invalid one",
-				User:        &User{Email: userWithToken.Email, Token: token, Password: "p"},
+				User:        &User{Email: userWithToken.Email, Token: token},
 				Expected:    ERR_USER_PASS_TOO_SHORT,
-				Data:        nil,
+				Data:        map[string]any{"NewPassword": "p"},
 			},
 			{
 				Description: "could not reset password",
-				User:        &User{Email: userWithToken.Email, Token: token, Password: "newPassword"},
+				User:        &User{Email: userWithToken.Email, Token: token},
 				Expected:    nil,
-				Data:        nil,
+				Data:        map[string]any{"NewPassword": "newPassword"},
 			},
 		},
 	}.Run(t)
 }
 
 func TestUserDelete(t *testing.T) {
-	userWithoutToken := GetTestingUser(t)
-	userWithToken := GetTestingUser(t)
+	userWithoutToken, _ := GetTestingUser(t)
+	userWithToken, _ := GetTestingUser(t)
 	token, _ := userWithToken.GenerateToken()
 
 	TestSuite[error]{
@@ -264,8 +408,7 @@ func TestUserDelete(t *testing.T) {
 }
 
 func TestGetUser(t *testing.T) {
-	user := GetTestingUser(t)
-	user.Password = ""
+	user, _ := GetTestingUser(t)
 
 	TestSuite[User]{
 		Target: func(tc *TestCase[User]) User {
@@ -277,7 +420,7 @@ func TestGetUser(t *testing.T) {
 
 		Cases: []TestCase[User]{
 			{
-				Description: "got some random data",
+				Description: "got data of inexistent user",
 				User:        &User{UID: 0},
 				Expected:    User{},
 				Data:        nil,
@@ -293,8 +436,7 @@ func TestGetUser(t *testing.T) {
 }
 
 func TestGetUserFromEmail(t *testing.T) {
-	user := GetTestingUser(t)
-	user.Password = ""
+	user, _ := GetTestingUser(t)
 
 	TestSuite[User]{
 		Target: func(tc *TestCase[User]) User {

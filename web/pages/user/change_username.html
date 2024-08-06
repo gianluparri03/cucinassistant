@@ -1,0 +1,11 @@
+{{ define "title" }}Cambio nome utente{{ end }}
+{{ define "back_link" }}/user/settings{{ end }}
+
+{{ define "content" }}
+    <form method="POST">
+        Per continuare, inserisci il nuovo nome utente. <br>
+		<input name="username-new" value="{{ .Username }}" required> <br>
+
+        <button class="icon-text"><i class="fas fa-check"></i> Continua</button>
+    </form>
+{{ end }}

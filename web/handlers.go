@@ -72,6 +72,29 @@ func RegisterAll(router *mux.Router) {
 			PostDisabled: true,
 		},
 		{
+			Path:         "/user/change_username",
+			GetPage:      "user/change_username",
+			GetData: func(c utils.Context) map[string]any {
+				user, _ := database.GetUser(c.UID)
+				return map[string]any{"Username": user.Username}
+			},
+			PostHandler: changeUsername,
+		},
+		{
+			Path:         "/user/change_email",
+			GetPage:      "user/change_email",
+			GetData: func(c utils.Context) map[string]any {
+				user, _ := database.GetUser(c.UID)
+				return map[string]any{"Email": user.Email}
+			},
+			PostHandler: changeEmail,
+		},
+		{
+			Path:         "/user/change_password",
+			GetPage:      "user/change_password",
+			PostHandler: changePassword,
+		},
+		{
 			Path:    "/user/delete_1",
 			GetPage: "user/delete",
 			GetData: func(c utils.Context) map[string]any {

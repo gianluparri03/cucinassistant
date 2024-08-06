@@ -86,6 +86,104 @@ func (u *User) SignIn() error {
 	return nil
 }
 
+// ChangeUsername changes the user's username with a new one.
+// Used fields: UID
+// Updated fields: Username
+func (u *User) ChangeUsername(newUsername string) (err error) {
+	// Fetches the user
+	u_, err := GetUser(u.UID)
+	if err != nil {
+		return err
+	}
+
+	// Ensures the username is actually new, and that it's valid
+	if u_.Username == newUsername {
+		return nil
+	} else if err = checkUsername(newUsername); err != nil {
+		return err
+	}
+
+	// Saves the new one
+	_, err = DB.Exec(`UPDATE users SET username = ? WHERE uid = ?;`, newUsername, u.UID)
+	if err != nil {
+		slog.Error("while changing user username:", "err", err)
+		return ERR_UNKNOWN
+	}
+
+	// Updates struct
+	u.Username = newUsername
+	return nil
+}
+
+// ChangeEmail changes the user's email with a new one.
+// Used fields: UID
+// Updated fields: Email
+func (u *User) ChangeEmail(newEmail string) (err error) {
+	// Fetches the user
+	u_, err := GetUser(u.UID)
+	if err != nil {
+		return err
+	}
+
+	// Ensures the email is actually new, and that it's valid
+	if u_.Email == newEmail {
+		return nil
+	} else if err = checkEmail(newEmail); err != nil {
+		return err
+	}
+
+	// Saves the new one
+	_, err = DB.Exec(`UPDATE users SET email = ? WHERE uid = ?;`, newEmail, u.UID)
+	if err != nil {
+		slog.Error("while changing user email:", "err", err)
+		return ERR_UNKNOWN
+	}
+
+	// Updates struct
+	u.Email = newEmail
+	return nil
+}
+
+// ChangePassword changes the user's password with a new one.
+// Used fields: UID, Password
+// Updated fields: Password (with the new hash)
+func (u *User) ChangePassword(newPassword string) (err error) {
+	// Checks if the new one is valid
+	if err = checkPassword(newPassword); err != nil {
+		return err
+	}
+
+	// Fetches the user
+	u_, err := GetUser(u.UID)
+	if err != nil {
+		return err
+	}
+
+	// Compares the old passwords
+	if match, err := compareHash(u.Password, u_.Password); err != nil {
+		return err
+	} else if !match {
+		return ERR_USER_WRONG_CREDENTIALS
+	}
+
+	// Hashes the new one
+	hashedPassword, err := createHash(newPassword)
+	if err != nil {
+		return err
+	}
+
+	// Saves the new one
+	_, err = DB.Exec(`UPDATE users SET password = ? WHERE uid = ?;`, hashedPassword, u.UID)
+	if err != nil {
+		slog.Error("while changing user password:", "err", err)
+		return ERR_UNKNOWN
+	}
+
+	// Updates struct
+	u.Password = hashedPassword
+	return nil
+}
+
 // GenerateToken generates a new token for the user, then returns it.
 // The Token field will be overwritten with its hash. The plain text
 // is returned.
@@ -112,51 +210,44 @@ func (u *User) GenerateToken() (token string, err error) {
 
 // ResetPassword tries to reset the password of the user whose
 // is picked from the struct.
-// Used fields: Email, Token, Password (the new one)
+// Used fields: Email, Token
 // Updated fields: UID, Token (cleared), Password (with the hash)
-func (u *User) ResetPassword() (err error) {
+func (u *User) ResetPassword(newPassword string) (err error) {
 	// Checks if password is valid
-	if err = checkPassword(u.Password); err != nil {
+	if err = checkPassword(newPassword); err != nil {
 		return err
 	}
 
 	// Fetches the user
-	var hashedToken *string
-	var uid int
-	err = DB.QueryRow(`SELECT uid, token FROM users WHERE email = ?;`, u.Email).Scan(&uid, &hashedToken)
+	u_, err := GetUserFromEmail(u.Email)
 	if err != nil {
-		if strings.HasSuffix(err.Error(), "no rows in result set") {
-			return ERR_USER_UNKNOWN
-		} else {
-			slog.Error("while retrieving data on reset:", "err", err)
-			return ERR_UNKNOWN
-		}
-	} else if hashedToken == nil {
+		return err
+	} else if u_.Token == "" {
 		return ERR_USER_WRONG_TOKEN
 	}
 
 	// Compares the tokens
-	if match, err := compareHash(u.Token, *hashedToken); err != nil {
+	if match, err := compareHash(u.Token, u_.Token); err != nil {
 		return err
 	} else if !match {
 		return ERR_USER_WRONG_TOKEN
 	}
 
 	// Hashes the password
-	hashedPassword, err := createHash(u.Password)
+	hashedPassword, err := createHash(newPassword)
 	if err != nil {
 		return err
 	}
 
 	// Saves the new password (and resets the token)
-	_, err = DB.Exec(`UPDATE users SET password=?, token=NULL WHERE uid = ?;`, hashedPassword, uid)
+	_, err = DB.Exec(`UPDATE users SET password=?, token=NULL WHERE uid = ?;`, hashedPassword, u_.UID)
 	if err != nil {
 		slog.Error("while resetting password:", "err", err)
 		return ERR_UNKNOWN
 	}
 
 	// Updates the struct
-	u.UID = uid
+	u.UID = u_.UID
 	u.Token = ""
 	u.Password = hashedPassword
 	return nil
@@ -166,22 +257,15 @@ func (u *User) ResetPassword() (err error) {
 // Used fields: UID, Token
 func (u *User) Delete() (err error) {
 	// Fetches the user
-	var hashedToken *string
-	var found int
-	err = DB.QueryRow(`SELECT 1, token FROM users WHERE uid = ?;`, u.UID).Scan(&found, &hashedToken)
+	u_, err := GetUser(u.UID)
 	if err != nil {
-		if strings.HasSuffix(err.Error(), "no rows in result set") {
-			return ERR_USER_UNKNOWN
-		} else {
-			slog.Error("while retrieving data on reset:", "err", err)
-			return ERR_UNKNOWN
-		}
-	} else if hashedToken == nil {
+		return err
+	} else if u_.Token == "" {
 		return ERR_USER_WRONG_TOKEN
 	}
 
 	// Compares the tokens
-	if match, err := compareHash(u.Token, *hashedToken); err != nil {
+	if match, err := compareHash(u.Token, u_.Token); err != nil {
 		return err
 	} else if !match {
 		return ERR_USER_WRONG_TOKEN
@@ -198,32 +282,48 @@ func (u *User) Delete() (err error) {
 }
 
 // GetUser returns the user with the given UID.
-// Fetched fields: UID, Username, Email
+// Fetched fields: UID, Username, Email, Password (hash), Token (hash)
 func GetUser(uid int) (u User, err error) {
-	err = DB.QueryRow(`SELECT uid, username, email FROM users WHERE uid = ?;`, uid).Scan(&u.UID, &u.Username, &u.Email)
+	var token *string
+	err = DB.QueryRow(`SELECT uid, username, email, password, token FROM users WHERE uid = ?;`, uid).Scan(&u.UID, &u.Username, &u.Email, &u.Password, &token)
 	if err != nil {
 		if !strings.HasSuffix(err.Error(), "no rows in result set") {
 			slog.Error("while retrieving user data (from uid):", "err", err)
-			err = ERR_USER_UNKNOWN
-		} else {
 			err = ERR_UNKNOWN
+		} else {
+			err = ERR_USER_UNKNOWN
 		}
+	}
+	
+	// Dereferences token (can be null)
+	if token == nil {
+		u.Token = ""
+	} else {
+		u.Token = *token
 	}
 
 	return
 }
 
 // GetUserFromEmail returns the user with the given email.
-// Fetched fields: UID, Username, Email
+// Fetched fields: UID, Username, Email, Password (hash), Token (hash)
 func GetUserFromEmail(email string) (u User, err error) {
-	err = DB.QueryRow(`SELECT uid, username, email FROM users WHERE email = ?;`, email).Scan(&u.UID, &u.Username, &u.Email)
+	var token *string
+	err = DB.QueryRow(`SELECT uid, username, email, password, token FROM users WHERE email = ?;`, email).Scan(&u.UID, &u.Username, &u.Email, &u.Password, &token)
 	if err != nil {
 		if !strings.HasSuffix(err.Error(), "no rows in result set") {
 			slog.Error("while retrieving user data (from email):", "err", err)
-			err = ERR_USER_UNKNOWN
-		} else {
 			err = ERR_UNKNOWN
+		} else {
+			err = ERR_USER_UNKNOWN
 		}
+	}
+	
+	// Dereferences token (can be null)
+	if token == nil {
+		u.Token = ""
+	} else {
+		u.Token = *token
 	}
 
 	return

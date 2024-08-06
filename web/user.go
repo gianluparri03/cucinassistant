@@ -90,13 +90,14 @@ func forgotPassword(c utils.Context) {
 func resetPassword(c utils.Context) {
 	// Fetches data, ensuring the two passwords are equal
 	user := retrieveUser(c)
-	if user.Password != c.R.FormValue("password2") {
+	newPassword := c.R.FormValue("password-new1")
+	if newPassword != c.R.FormValue("password-new2") {
 		utils.ShowError(c, "Le due password non corrispondono", false)
 		return
 	}
 
 	// Tries to reset the user's password
-	if err := user.ResetPassword(); err != nil {
+	if err := user.ResetPassword(newPassword); err != nil {
 		utils.ShowError(c, err.Error(), false)
 		return
 	}
@@ -105,6 +106,61 @@ func resetPassword(c utils.Context) {
 	c.S.Values["UID"] = user.UID
 	utils.SaveSession(c)
 	utils.Redirect(c, "/")
+}
+
+// changeUsername lets an user change its username
+func changeUsername(c utils.Context) {
+	// Fetches data
+	user := retrieveUser(c)
+	newUsername := c.R.FormValue("username-new")
+
+	// Tries to change it
+	if err := user.ChangeUsername(newUsername); err != nil {
+		utils.ShowError(c, err.Error(), false)
+		return
+	}
+
+	utils.ShowError(c, "Nome utente cambiato con successo", true)
+}
+
+// changeEmail lets an user change its email
+func changeEmail(c utils.Context) {
+	// Fetches data
+	user := retrieveUser(c)
+	newEmail := c.R.FormValue("email-new")
+
+	// Tries to change it
+	if err := user.ChangeEmail(newEmail); err != nil {
+		utils.ShowError(c, err.Error(), false)
+		return
+	}
+
+	utils.ShowError(c, "Nome utente cambiato con successo", true)
+}
+
+// changePassword lets an user change its password
+func changePassword(c utils.Context) {
+	// Fetches data, ensuring the two passwords are equal
+	user := retrieveUser(c)
+	newPassword := c.R.FormValue("password-new1")
+	if newPassword != c.R.FormValue("password-new2") {
+		utils.ShowError(c, "Le due password non corrispondono", false)
+		return
+	}
+
+	// Tries to change the user's password
+	if err := user.ChangePassword(newPassword); err != nil {
+		utils.ShowError(c, err.Error(), false)
+		return
+	}
+
+	// Sends the email
+	user, _ = database.GetUser(user.UID)
+	go email.SendMail(user.Email, "Cambio password", "password_change", map[string]any{
+		"Username":   user.Username,
+	})
+
+	utils.ShowError(c, "Password cambiata con successo", true)
 }
 
 // deleteUser1 sends an email to the user to delete it

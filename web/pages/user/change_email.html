@@ -1,0 +1,11 @@
+{{ define "title" }}Cambio email{{ end }}
+{{ define "back_link" }}/user/settings{{ end }}
+
+{{ define "content" }}
+    <form method="POST">
+        Per continuare, inserisci la nuova email. <br>
+		<input type="email" name="email-new" value="{{ .Email }}" required> <br>
+
+        <button class="icon-text"><i class="fas fa-check"></i> Continua</button>
+    </form>
+{{ end }}
