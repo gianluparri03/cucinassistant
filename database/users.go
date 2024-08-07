@@ -24,20 +24,20 @@ type User struct {
 // SignUp tries to sign up an user. The required fields are Username,
 // Used fields: Username, Password, Email
 // Updated fields: UID, Password (with the hash)
-func (u *User) SignUp() error {
+func (u *User) SignUp() (err error) {
 	// Checks if data is valid
-	if err := checkUsername(u.Username); err != nil {
-		return err
-	} else if err := checkEmail(u.Email); err != nil {
-		return err
-	} else if err := checkPassword(u.Password); err != nil {
-		return err
+	if err = checkUsername(u.Username); err != nil {
+		return
+	} else if err = checkEmail(u.Email); err != nil {
+		return
+	} else if err = checkPassword(u.Password); err != nil {
+		return
 	}
 
 	// Hashes the password
 	hash, err := createHash(u.Password)
 	if err != nil {
-		return err
+		return
 	}
 
 	// Tries to save it in the database
@@ -45,14 +45,16 @@ func (u *User) SignUp() error {
 					  SELECT IFNULL(MAX(uid), 0) + 1, ?, ?, ? FROM users;`, u.Username, u.Email, hash)
 	if err != nil {
 		slog.Error("while signup:", "err", err)
-		return ERR_UNKNOWN
+		err = ERR_UNKNOWN
+		return
 	}
 
 	// Retrieves the UID
 	err = DB.QueryRow(`SELECT uid FROM users WHERE username = ?;`, u.Username).Scan(&u.UID)
 	if err != nil {
 		slog.Error("while retrieving the uid in signup:", "err", err)
-		return ERR_UNKNOWN
+		err = ERR_UNKNOWN
+		return
 	}
 
 	// Masks the password
@@ -63,26 +65,30 @@ func (u *User) SignUp() error {
 // SignIn tries to sign in an user.
 // Used fields: Username, Password
 // Updated fields: UID, Password (cleared)
-func (u *User) SignIn() error {
+func (u *User) SignIn() (err error) {
 	var uid int
 	var hash string
 
 	// Fetches the hash
-	err := DB.QueryRow(`SELECT uid, password FROM users WHERE username = ?;`, u.Username).Scan(&uid, &hash)
+	err = DB.QueryRow(`SELECT uid, password FROM users WHERE username = ?;`, u.Username).Scan(&uid, &hash)
 	if err != nil {
 		if strings.HasSuffix(err.Error(), "no rows in result set") {
-			return ERR_USER_WRONG_CREDENTIALS
+			err = ERR_USER_WRONG_CREDENTIALS
 		} else {
 			slog.Error("while retrieving data on signin:", "err", err)
-			return ERR_UNKNOWN
+			err = ERR_UNKNOWN
 		}
+
+		return
 	}
 
 	// Compare the passwords
-	if match, err := compareHash(u.Password, hash); err != nil {
-		return err
+	var match bool
+	if match, err = compareHash(u.Password, hash); err != nil {
+		return
 	} else if !match {
-		return ERR_USER_WRONG_CREDENTIALS
+		err = ERR_USER_WRONG_CREDENTIALS
+		return
 	}
 
 	// Updates the struct

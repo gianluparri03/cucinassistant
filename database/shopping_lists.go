@@ -55,7 +55,10 @@ func (u *User) GetEntry(EID int) (e Entry, err error) {
 	err = DB.QueryRow(`SELECT eid, name, marked FROM shopping_entries WHERE uid = ? AND eid = ?;`, u.UID, EID).Scan(&e.EID, &e.Name, &e.Marked)
 	if err != nil {
 		if strings.HasSuffix(err.Error(), "no rows in result set") {
-			err = ERR_ENTRY_NOT_FOUND
+			// Makes sure the user exists
+			if _, err = GetUser(u.UID); err == nil {
+				err = ERR_ENTRY_NOT_FOUND
+			}
 		} else {
 			slog.Error("while retrieving shopping entry:", "err", err)
 			err = ERR_UNKNOWN
@@ -91,13 +94,17 @@ func (u *User) AppendEntries(names ...string) (err error) {
 
 // ToggleEntry toggles an entry's marked field
 func (u *User) ToggleEntry(EID int) (err error) {
+	// Gets the entry (to make sure it exists)
+	if _, err = u.GetEntry(EID); err != nil {
+		return
+	}
+
 	res, err := DB.Exec(`UPDATE shopping_entries SET marked = !marked WHERE uid = ? AND eid = ?;`, u.UID, EID)
 	if err != nil {
 		slog.Error("while toggling shopping entries:", "err", err)
 		err = ERR_UNKNOWN
 	} else if ra, _ := res.RowsAffected(); ra < 1 {
-		// Makes sure the entry has been toggled
-		err = ERR_ENTRY_NOT_FOUND
+		err = ERR_UNKNOWN
 	}
 
 	return
@@ -111,38 +118,42 @@ func (u *User) ClearEntries() (err error) {
 		err = ERR_UNKNOWN
 	} else if ra, _ := res.RowsAffected(); ra < 1 {
 		// Makes sure the user exists
-		_, err = GetUser(u.UID)
+		if _, err = GetUser(u.UID); err == nil {
+			err = ERR_ENTRY_NOT_FOUND
+		}
 	}
 
 	return
 }
 
 // EditEntry changes an entry's name
-func (u *User) EditEntry(EID int, newName string) error {
+func (u *User) EditEntry(EID int, newName string) (err error) {
 	// Gets the entry
 	entry, err := u.GetEntry(EID)
 	if err != nil {
-		return err
+		return
 	}
 
 	// Makes sure the new name is actually new
 	if entry.Name == newName {
-		return nil
+		return
 	}
 
 	// Makes sure the new name is not used
 	var found int
 	DB.QueryRow(`SELECT 1 FROM shopping_entries WHERE uid = ? AND name = ?;`, u.UID, newName).Scan(&found)
 	if found > 0 {
-		return ERR_ENTRY_DUPLICATED
+		err = ERR_ENTRY_DUPLICATED
+		return
 	}
 
 	// Change the name
 	_, err = DB.Exec(`UPDATE shopping_entries SET name = ? WHERE uid = ? AND eid = ?;`, newName, u.UID, EID)
 	if err != nil {
 		slog.Error("while editing entry:", "err", err)
-		return ERR_UNKNOWN
+		err = ERR_UNKNOWN
+		return
 	}
 
-	return nil
+	return
 }

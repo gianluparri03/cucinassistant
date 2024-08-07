@@ -19,23 +19,23 @@ func TestGetShoppingList(t *testing.T) {
 
 	TestSuite[Pair[ShoppingList, error]]{
 		Target: func(tc *TestCase[Pair[ShoppingList, error]]) Pair[ShoppingList, error] {
-			list, e := tc.User.GetShoppingList()
-			return Pair[ShoppingList, error]{list, e}
+			list, err := tc.User.GetShoppingList()
+			return Pair[ShoppingList, error]{list, err}
 		},
 
 		Cases: []TestCase[Pair[ShoppingList, error]]{
 			{
-				Description: "got entries of inexistent user",
+				Description: "got entries of unknown user",
 				User:        &User{UID: 0},
 				Expected:    Pair[ShoppingList, error]{ShoppingList{}, ERR_USER_UNKNOWN},
 			},
 			{
-				Description: "wrong user shopping list (empty)",
+				Description: "wrong shopping list (empty)",
 				User:        &userEmpty,
 				Expected:    Pair[ShoppingList, error]{ShoppingList{}, nil},
 			},
 			{
-				Description: "wrong user shopping list (filled)",
+				Description: "wrong shopping list (filled)",
 				User:        &userFilled,
 				Expected:    Pair[ShoppingList, error]{list, nil},
 			},
@@ -59,7 +59,13 @@ func TestGetEntry(t *testing.T) {
 
 		Cases: []TestCase[Pair[Entry, error]]{
 			{
-				Description: "got data of inexistent entry",
+				Description: "unknown user retrieved entry",
+				User:        &User{},
+				Expected:    Pair[Entry, error]{Entry{}, ERR_USER_UNKNOWN},
+				Data:        map[string]any{"EID": 0},
+			},
+			{
+				Description: "got data of unknown entry",
 				User:        &user,
 				Expected:    Pair[Entry, error]{Entry{}, ERR_ENTRY_NOT_FOUND},
 				Data:        map[string]any{"EID": 0},
@@ -105,7 +111,7 @@ func TestAppendEntries(t *testing.T) {
 
 		Cases: []TestCase[error]{
 			{
-				Description: "inexistent user appended entries",
+				Description: "unknown user appended entries",
 				User:        &User{UID: 0},
 				Expected:    ERR_USER_UNKNOWN,
 				Data:        map[string]any{"Names": names, "List": ShoppingList{}},
@@ -142,7 +148,13 @@ func TestToggleEntry(t *testing.T) {
 
 		Cases: []TestCase[error]{
 			{
-				Description: "toggled inexistent entry",
+				Description: "unknown user toggled entry",
+				User:        &User{},
+				Expected:    ERR_USER_UNKNOWN,
+				Data:        map[string]any{"EID": 0},
+			},
+			{
+				Description: "toggled unknown entry",
 				User:        &user,
 				Expected:    ERR_ENTRY_NOT_FOUND,
 				Data:        map[string]any{"EID": 0},
@@ -193,7 +205,7 @@ func TestClearEntries(t *testing.T) {
 
 		Cases: []TestCase[error]{
 			{
-				Description: "inexistent user cleared its entries",
+				Description: "unknown user cleared its entries",
 				User:        &User{UID: 0},
 				Expected:    ERR_USER_UNKNOWN,
 			},
@@ -229,6 +241,12 @@ func TestEditEntry(t *testing.T) {
 		},
 
 		Cases: []TestCase[error]{
+			{
+				Description: "unknown user edited entry",
+				User:        &User{},
+				Expected:    ERR_USER_UNKNOWN,
+				Data:        map[string]any{"EID": 0, "NewName": ""},
+			},
 			{
 				Description: "edited unknown entry",
 				User:        &user,

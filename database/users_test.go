@@ -369,6 +369,7 @@ func TestDeleteUser(t *testing.T) {
 		Target: func(tc *TestCase[error]) error {
 			// TODO: create some content, to check the foreign keys cascade
 			tc.User.AppendEntries("...")
+			tc.User.NewMenu()
 			return tc.User.Delete()
 		},
 
@@ -424,7 +425,7 @@ func TestGetUser(t *testing.T) {
 
 		Cases: []TestCase[Pair[User, error]]{
 			{
-				Description: "got data of inexistent user",
+				Description: "got data of unknown user",
 				User:        &User{UID: 0},
 				Expected:    Pair[User, error]{User{}, ERR_USER_UNKNOWN},
 			},

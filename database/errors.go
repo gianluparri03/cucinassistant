@@ -18,4 +18,6 @@ var (
 
 	ERR_ENTRY_NOT_FOUND  = errors.New("Elemento non trovato")
 	ERR_ENTRY_DUPLICATED = errors.New("Elemento già in lista")
+
+	ERR_MENU_NOT_FOUND = errors.New("Menù non trovato")
 )

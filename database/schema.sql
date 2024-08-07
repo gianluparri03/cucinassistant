@@ -15,20 +15,8 @@ CREATE TABLE IF NOT EXISTS menus (
     uid INT NOT NULL,
     mid INT NOT NULL,
 
-    meal_1  VARCHAR(256),
-    meal_2  VARCHAR(256),
-    meal_3  VARCHAR(256),
-    meal_4  VARCHAR(256),
-    meal_5  VARCHAR(256),
-    meal_6  VARCHAR(256),
-    meal_7  VARCHAR(256),
-    meal_8  VARCHAR(256),
-    meal_9  VARCHAR(256),
-    meal_10 VARCHAR(256),
-    meal_11 VARCHAR(256),
-    meal_12 VARCHAR(256),
-    meal_13 VARCHAR(256),
-    meal_14 VARCHAR(256),
+    name VARCHAR(64) NOT NULL,
+    meals VARCHAR(4096),
 
     PRIMARY KEY (uid, mid),
     FOREIGN KEY (uid) REFERENCES users (uid) ON DELETE CASCADE
