@@ -49,10 +49,10 @@ func RenderPage(c Context, pageName string, data map[string]any) {
 	render(c, []string{"templates/body", pageName}, data)
 }
 
-// ShowError shows an error to the user.
+// ShowMessage shows an error to the user.
 // If path is not empty, it will redirect the user
 // to that path when it clicks the button
-func ShowError(c Context, msg string, path string) {
+func ShowMessage(c Context, msg string, path string) {
 	c.W.WriteHeader(http.StatusBadRequest)
 	render(c, []string{"templates/error"}, map[string]any{"Message": msg, "Path": path})
 }

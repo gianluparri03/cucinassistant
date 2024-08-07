@@ -14,57 +14,45 @@ type Endpoint struct {
 	// in to use this endpoint (bot for GET and POST requests)
 	Unprotected bool
 
-	// GetDisabled indicates whether to return the page or an error
-	GetDisabled bool
-
-	// GetPage is the page to be rendered for GET requests.
-	// See RenderPage for more info.
-	GetPage string
-
-	// GetData is a function that calculates all the auxiliary data
-	// needed to render the page correctly.
-	// See RenderPage for more info.
-	GetData func(c Context) map[string]any
-
-	// PostDisabled indicates whether to use PostHandler or
-	// show an error on POST requests
-	PostDisabled bool
+	// PostHandler is the function executed on GET requests.
+	// If not set, the endpoint will show an error on GET requests
+	GetHandler func(c Context)
 
 	// PostHandler is the function executed on POST requests
-	// if PostDisabled is set to true
+	// If not set, the endpoint will show an error on POST requests
 	PostHandler func(c Context)
 }
 
 // Register adds the endpoint to the router
 func (e Endpoint) Register(router *mux.Router) {
+	// Returns an error message if the method
+	// is not supported
+	unknownHandler := func(c Context) {
+		ShowMessage(c, "Richiesta sconosciuta", "/")
+	}
+
 	// Prepares the GET handler
-	GetHandler := func(c Context) {
-		if e.GetDisabled {
-			ShowError(c, "Richiesta sconosciuta", "/")
-		} else {
-			if e.GetData != nil {
-				RenderPage(c, e.GetPage, e.GetData(c))
-			} else {
-				RenderPage(c, e.GetPage, nil)
-			}
-		}
+	var get func(c Context)
+	if e.GetHandler != nil {
+		get = e.GetHandler
+	} else {
+		get = unknownHandler
 	}
 
 	// Prepares the POST handler
-	PostHandler := func(c Context) {
-		if e.PostDisabled {
-			ShowError(c, "Richiesta sconosciuta", "/")
-		} else {
-			e.PostHandler(c)
-		}
+	var post func(c Context)
+	if e.PostHandler != nil {
+		post = e.PostHandler
+	} else {
+		post = unknownHandler
 	}
 
 	// Registers them
 	if e.Unprotected {
-		router.Handle(e.Path, Handler(GetHandler)).Methods("GET")
-		router.Handle(e.Path, Handler(PostHandler)).Methods("POST")
+		router.Handle(e.Path, Handler(get)).Methods("GET")
+		router.Handle(e.Path, Handler(post)).Methods("POST")
 	} else {
-		router.Handle(e.Path, PHandler(GetHandler)).Methods("GET")
-		router.Handle(e.Path, PHandler(PostHandler)).Methods("POST")
+		router.Handle(e.Path, PHandler(get)).Methods("GET")
+		router.Handle(e.Path, PHandler(post)).Methods("POST")
 	}
 }

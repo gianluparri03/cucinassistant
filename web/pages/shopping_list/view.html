@@ -6,7 +6,7 @@
         {{ range .List }}
             <div class="shopping-item">
                 <input type="checkbox" {{ if .Marked }} checked {{ end }} autocomplete="off" readonly
-                hx-post="/shopping_list/{{ .EID }}/toggle" hx-target="#pass" hx-push-url="false">
+                hx-post="/shopping_list/{{ .EID }}/toggle" hx-push-url="false">
 
                 <label hx-get="/shopping_list/{{ .EID }}/edit">{{ .Name }}</label>
             </div>
@@ -14,12 +14,14 @@
             <span id="empty-label">La lista è vuota.</span>
         {{ end }}
 
-        <button class="icon-text" hx-get="/shopping_list/append"><i class="fas fa-plus"></i> Aggiungi articoli</button>
+        <button class="icon-text" hx-get="/shopping_list/append">
+            <i class="fas fa-plus"></i> Aggiungi articoli
+        </button>
 
         {{ if .List }}
-            <button class="icon-text" hx-post="/shopping_list/clear"><i class="fas fa-trash"></i> Ripulisci lista</button>
+            <button class="icon-text" hx-post="/shopping_list/clear" hx-push-url="false">
+                <i class="fas fa-trash"></i> Ripulisci lista
+            </button>
         {{ end }}
     </div>
-
-    <div id="pass"></div>
 {{ end }}
