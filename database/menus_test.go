@@ -229,7 +229,7 @@ func TestDuplicateMenu(t *testing.T) {
 			{
 				Description: "could not duplicate menu",
 				User:        &user,
-				Expected:    Pair[Menu, error]{Menu{MID: 2, Name: menu.Name, Meals: menu.Meals}, nil},
+				Expected:    Pair[Menu, error]{Menu{MID: 2, Name: menu.Name + duplicatedMenuSuffix, Meals: menu.Meals}, nil},
 				Data:        map[string]any{"MID": menu.MID, "MenusN": 2},
 			},
 		},

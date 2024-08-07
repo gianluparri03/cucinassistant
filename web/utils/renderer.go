@@ -27,6 +27,7 @@ func render(c Context, pages []string, data map[string]any) {
 	tmpl, err := template.ParseFiles(pages...)
 	if err != nil {
 		slog.Error("while fetching page template:", "err", err, "pages", pages)
+		return
 	}
 
 	// Adds the isHx field to the data

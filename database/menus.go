@@ -151,7 +151,7 @@ func (u *User) DuplicateMenu(MID int) (dstMenu Menu, err error) {
 	}
 
 	// Copies the content
-	dstMenu.Name = srcMenu.Name
+	dstMenu.Name = srcMenu.Name + duplicatedMenuSuffix
 	dstMenu.Meals = srcMenu.Meals
 
 	// Updates it in the database

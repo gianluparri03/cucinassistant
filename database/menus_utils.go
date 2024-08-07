@@ -6,10 +6,14 @@ import (
 
 const (
 	// menuDefaultName is the name given to new menus
-	menuDefaultName = "Nuovo menù"
+	menuDefaultName = "Menù"
 
 	// mealSeparator is used to separate meals when packed
 	mealSeparator = ";"
+
+	// duplicatedMenuSuffix is added at the end of the name when
+	// duplicating a menu
+	duplicatedMenuSuffix = " (copia)"
 )
 
 // packMeals packs the 14 meals in a string

@@ -1,0 +1,49 @@
+{{ define "title" }}{{ .Menu.Name }}{{ end }}
+{{ define "back_link" }}/menus{{ end }}
+
+{{ define "content" }}
+    <div class="menu-day">
+        <b>Lunedì</b>
+        <textarea readonly>{{ index .Menu.Meals 0 }}</textarea>
+        <textarea readonly>{{ index .Menu.Meals 1 }}</textarea>
+    </div>
+
+    <div class="menu-day">
+        <b>Martedì</b>
+        <textarea readonly>{{ index .Menu.Meals 2 }}</textarea>
+        <textarea readonly>{{ index .Menu.Meals 3 }}</textarea>
+    </div>
+
+    <div class="menu-day">
+        <b>Mercoledì</b>
+        <textarea readonly>{{ index .Menu.Meals 4 }}</textarea>
+        <textarea readonly>{{ index .Menu.Meals 5 }}</textarea>
+    </div>
+
+    <div class="menu-day">
+        <b>Giovedì</b>
+        <textarea readonly>{{ index .Menu.Meals 6 }}</textarea>
+        <textarea readonly>{{ index .Menu.Meals 7 }}</textarea>
+    </div>
+
+    <div class="menu-day">
+        <b>Venerdì</b>
+        <textarea readonly>{{ index .Menu.Meals 8 }}</textarea>
+        <textarea readonly>{{ index .Menu.Meals 9 }}</textarea>
+    </div>
+
+    <div class="menu-day">
+        <b>Sabato</b>
+        <textarea readonly>{{ index .Menu.Meals 10 }}</textarea>
+        <textarea readonly>{{ index .Menu.Meals 11 }}</textarea>
+    </div>
+
+    <div class="menu-day">
+        <b>Domenica</b>
+        <textarea readonly>{{ index .Menu.Meals 12 }}</textarea>
+        <textarea readonly>{{ index .Menu.Meals 13 }}</textarea>
+    </div>
+
+    <button class="icon-text" hx-get="/menus/{{ .Menu.MID }}/edit"><i class="fas fa-edit"></i> Modifica</button>
+    <button class="icon-text" hx-post="/menus/{{ .Menu.MID }}/duplicate"><i class="fas fa-clone"></i> Clona</button>
+{{ end }}

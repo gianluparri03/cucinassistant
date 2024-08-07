@@ -1,0 +1,18 @@
+{{ define "title" }}Menù{{ end }}
+{{ define "back_link" }}/{{ end }}
+
+{{ define "content" }}
+    <div class="dashboard">
+        {{ range .Menus }}
+            <button hx-get="/menus/{{ .MID }}">
+                <i class="fas fa-utensils"></i>
+                <span>{{ .Name }}</span>
+            </button>
+        {{ end }}
+
+        <button hx-post="/menus/new" hx-push-url="false" class="transparent">
+            <i class="fas fa-plus"></i>
+            <span>Nuovo menù</span>
+        </button>
+    </div>
+{{ end }}

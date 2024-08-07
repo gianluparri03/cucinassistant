@@ -17,6 +17,32 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 	},
 
 	{
+		Path:       "/menus",
+		GetHandler: handlers.GetMenus,
+	},
+	{
+		Path:        "/menus/new",
+		PostHandler: handlers.PostNewMenu,
+	},
+	{
+		Path:       "/menus/{MID}",
+		GetHandler: handlers.GetMenu,
+	},
+	{
+		Path:        "/menus/{MID}/edit",
+		GetHandler:  handlers.GetEditMenu,
+		PostHandler: handlers.PostEditMenu,
+	},
+	{
+		Path:        "/menus/{MID}/duplicate",
+		PostHandler: handlers.PostDuplicateMenu,
+	},
+	{
+		Path:        "/menus/{MID}/delete",
+		PostHandler: handlers.PostDeleteMenu,
+	},
+
+	{
 		Path:       "/shopping_list",
 		GetHandler: handlers.GetShoppingList,
 	},
