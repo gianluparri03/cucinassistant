@@ -10,7 +10,6 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 		Path:       "/",
 		GetHandler: handlers.GetIndex,
 	},
-
 	{
 		Path:       "/info",
 		GetHandler: handlers.GetInfo,

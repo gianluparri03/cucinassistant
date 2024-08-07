@@ -2,6 +2,7 @@ package utils
 
 import (
 	"github.com/gorilla/mux"
+	"net/http"
 )
 
 // Endpoint contains all the info to register automatically
@@ -16,23 +17,25 @@ type Endpoint struct {
 
 	// PostHandler is the function executed on GET requests.
 	// If not set, the endpoint will show an error on GET requests
-	GetHandler func(c Context)
+	GetHandler func(Context) error
 
 	// PostHandler is the function executed on POST requests
 	// If not set, the endpoint will show an error on POST requests
-	PostHandler func(c Context)
+	PostHandler func(Context) error
 }
 
 // Register adds the endpoint to the router
 func (e Endpoint) Register(router *mux.Router) {
 	// Returns an error message if the method
-	// is not supported
-	unknownHandler := func(c Context) {
-		ShowMessage(c, "Richiesta sconosciuta", "/")
+	// is not allowed
+	unknownHandler := func(c Context) error {
+		c.W.WriteHeader(http.StatusMethodNotAllowed)
+		ShowAndRedirect(c, "Richiesta sconosciuta", "/")
+		return nil
 	}
 
 	// Prepares the GET handler
-	var get func(c Context)
+	var get Handler
 	if e.GetHandler != nil {
 		get = e.GetHandler
 	} else {
@@ -40,7 +43,7 @@ func (e Endpoint) Register(router *mux.Router) {
 	}
 
 	// Prepares the POST handler
-	var post func(c Context)
+	var post Handler
 	if e.PostHandler != nil {
 		post = e.PostHandler
 	} else {

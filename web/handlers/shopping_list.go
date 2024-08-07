@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/gorilla/mux"
 	"strconv"
 	"strings"
@@ -9,32 +10,41 @@ import (
 	"cucinassistant/web/utils"
 )
 
-// GetShoppingList renders /shopping_list
-func GetShoppingList(c utils.Context) {
-	var err error
-
-	if user, err := database.GetUser(c.UID); err == nil {
-		if list, err := user.GetShoppingList(); err == nil {
-			utils.RenderPage(c, "shopping_list/view", map[string]any{"List": list})
-			return
-		}
+// GetEID returns the EID written in the url
+func GetEID(c utils.Context) (EID int, err error) {
+	// Fetches the EID from the url, then converts
+	// it to an int
+	EID, err = strconv.Atoi(mux.Vars(c.R)["EID"])
+	if err != nil {
+		err = database.ERR_ENTRY_NOT_FOUND
 	}
 
-	utils.ShowMessage(c, err.Error(), "")
+	return
+}
+
+// GetShoppingList renders /shopping_list
+func GetShoppingList(c utils.Context) (err error) {
+	var list database.ShoppingList
+	if list, err = c.U.GetShoppingList(); err == nil {
+		utils.RenderPage(c, "shopping_list/view", map[string]any{"List": list})
+	}
+
+	return
 }
 
 // GetAppendEntries renders /shopping_list/append
-func GetAppendEntries(c utils.Context) {
+func GetAppendEntries(c utils.Context) error {
 	utils.RenderPage(c, "shopping_list/append", nil)
+	return nil
 }
 
 // PostAppendEntries tries to append the given entries
 // to the shopping list
-func PostAppendEntries(c utils.Context) {
+func PostAppendEntries(c utils.Context) (err error) {
 	var names []string
+	c.R.ParseForm()
 
 	// Insert all the values whose key is entry-X-name
-	c.R.ParseForm()
 	for key, values := range c.R.PostForm {
 		if strings.HasPrefix(key, "entry-") && strings.HasSuffix(key, "-name") {
 			if len(values) > 0 && values[0] != "" {
@@ -44,98 +54,67 @@ func PostAppendEntries(c utils.Context) {
 	}
 
 	// Tries to append them to the list
-	var err error
-	if user, err := database.GetUser(c.UID); err == nil {
-		if err = user.AppendEntries(names...); err == nil {
-			utils.Redirect(c, "/shopping_list")
-			return
-		}
+	if err = c.U.AppendEntries(names...); err == nil {
+		utils.Redirect(c, "/shopping_list")
 	}
 
-	// Handles errors
-	utils.ShowMessage(c, err.Error(), "")
+	return
 }
 
 // PostToggleEntry tries to toggle an entry in the shopping list
-func PostToggleEntry(c utils.Context) {
+func PostToggleEntry(c utils.Context) (err error) {
 	// Retrieves the EID
-	EID, err := strconv.Atoi(mux.Vars(c.R)["EID"])
-	if err != nil {
-		utils.ShowMessage(c, database.ERR_ENTRY_NOT_FOUND.Error(), "/shopping_list")
-		return
-	}
-
-	// Tries to toggle the entry
-	var user database.User
-	if user, err = database.GetUser(c.UID); err == nil {
-		if err = user.ToggleEntry(EID); err == nil {
+	var EID int
+	if EID, err = GetEID(c); err == nil {
+		// Tries to toggle the entry
+		if err = c.U.ToggleEntry(EID); err == nil {
 			utils.Redirect(c, "/shopping_list")
-			return
 		}
 	}
 
-	// Handles the error
-	utils.ShowMessage(c, err.Error(), "/shopping_list")
+	return
 }
 
 // PostClearEntries tries to deletes all the marked entries
-func PostClearEntries(c utils.Context) {
+func PostClearEntries(c utils.Context) (err error) {
 	// Tries to clear the list
-	var user database.User
-	var err error
-	if user, err = database.GetUser(c.UID); err == nil {
-		if err = user.ClearEntries(); err == nil {
-			utils.ShowMessage(c, "Lista svuotata con successo", "/shopping_list")
-			return
-		}
+	if err = c.U.ClearEntries(); err == nil {
+		utils.ShowAndRedirect(c, "Lista svuotata con successo", "/shopping_list")
 	}
 
-	// Handles the error
-	utils.ShowMessage(c, err.Error(), "/shopping_list")
+	return
 }
 
 // GetEditEntry renders /shopping_list/{EID}/edit
-func GetEditEntry(c utils.Context) {
+func GetEditEntry(c utils.Context) (err error) {
 	// Retrieves the EID
-	EID, err := strconv.Atoi(mux.Vars(c.R)["EID"])
-	if err != nil {
-		utils.ShowMessage(c, database.ERR_ENTRY_NOT_FOUND.Error(), "/shopping_list")
-		return
-	}
-
-	// Retrieves the entry's name and renders the page
-	if user, err := database.GetUser(c.UID); err == nil {
-		if entry, err := user.GetEntry(EID); err == nil {
+	var EID int
+	if EID, err = GetEID(c); err == nil {
+		// Retrieves the entry's name and renders the page
+		var entry database.Entry
+		if entry, err = c.U.GetEntry(EID); err == nil {
 			utils.RenderPage(c, "shopping_list/edit", map[string]any{"Name": entry.Name})
-			return
 		}
 	}
 
-	utils.ShowMessage(c, err.Error(), "")
+	fmt.Println(err)
+
+	return
 }
 
 // PostEditEntry tries to change an entry's name
-func PostEditEntry(c utils.Context) {
-	var err error
-
+func PostEditEntry(c utils.Context) (err error) {
 	// Retrieves the EID
-	EID, err := strconv.Atoi(mux.Vars(c.R)["EID"])
-	if err != nil {
-		utils.ShowMessage(c, database.ERR_ENTRY_NOT_FOUND.Error(), "/shopping_list")
-		return
-	}
+	var EID int
+	if EID, err = GetEID(c); err == nil {
+		// Retrieves the new name
+		newName := c.R.FormValue("name")
 
-	// Retrieves the new name
-	newName := c.R.FormValue("name")
-
-	// Tries to toggle the entry
-	if user, err := database.GetUser(c.UID); err == nil {
-		if err = user.EditEntry(EID, newName); err == nil {
+		// Tries to toggle the entry
+		if err = c.U.EditEntry(EID, newName); err == nil {
 			utils.Redirect(c, "/shopping_list")
-			return
 		}
 	}
 
-	// Handles the error
-	utils.ShowMessage(c, err.Error(), "")
+	return
 }
