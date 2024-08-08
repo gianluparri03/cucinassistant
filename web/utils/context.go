@@ -21,12 +21,13 @@ type Context struct {
 	S *sessions.Session
 
 	// User is the user currently logged in
-	U database.User
+	U *database.User
 }
 
 // Handler is a function that accepts a context and returns an error.
-// It is used to serve http requests
-type Handler func(Context) error
+// It is used to serve http requests. If an error is returned, it will
+// be showed to the user.
+type Handler func(*Context) error
 
 // ServeHTTP is used by net/http to serve an http request
 func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -35,7 +36,7 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// Executes the handler
 	s, _ := store.Get(r, "session")
-	c := Context{W: w, R: r, S: s}
+	c := &Context{W: w, R: r, S: s}
 	err := h(c)
 
 	// Shows the error (if present)
@@ -47,7 +48,7 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // PHandler (ProtectedHandler) is like an Handler,
 // but redirects unregistered users away.
 // It also provides the user in the context.
-type PHandler func(Context) error
+type PHandler func(*Context) error
 
 // ServeHTTP is used by net/http to serve an http request
 func (ph PHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +57,7 @@ func (ph PHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// Lets the handlers use the session
 	s, _ := store.Get(r, "session")
-	c := Context{W: w, R: r, S: s}
+	c := &Context{W: w, R: r, S: s}
 
 	// Gets the UID from the cookies
 	if rawUID, found := s.Values["UID"]; !found {
@@ -65,7 +66,7 @@ func (ph PHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	} else {
 		// Fetches the user from the database
 		var err error
-		if c.U, err = database.GetUser(rawUID.(int)); err == nil {
+		if c.U, err = database.GetUser("UID", rawUID.(int)); err == nil {
 			// If all was okay, executes the handler
 			err = ph(c)
 		}

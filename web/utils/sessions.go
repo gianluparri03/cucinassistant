@@ -26,7 +26,7 @@ func InitSessionStore() {
 
 // SaveUID adds the UID to the session.
 // It also redirects to /, with an optional message
-func SaveUID(c Context, UID int, msg string) {
+func SaveUID(c *Context, UID int, msg string) {
 	c.S.Values["UID"] = UID
 	c.S.Save(c.R, c.W)
 	ShowAndRedirect(c, msg, "/")
@@ -34,7 +34,7 @@ func SaveUID(c Context, UID int, msg string) {
 
 // DropUID drops the UID from the session.
 // It also redirects to /user/signin, with an optional message
-func DropUID(c Context, msg string) {
+func DropUID(c *Context, msg string) {
 	delete(c.S.Values, "UID")
 	c.S.Save(c.R, c.W)
 	ShowAndRedirect(c, msg, "/user/signin")

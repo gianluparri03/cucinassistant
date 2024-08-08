@@ -11,7 +11,7 @@ import (
 )
 
 // GetEID returns the EID written in the url
-func GetEID(c utils.Context) (EID int, err error) {
+func GetEID(c *utils.Context) (EID int, err error) {
 	// Fetches the EID from the url, then converts
 	// it to an int
 	EID, err = strconv.Atoi(mux.Vars(c.R)["EID"])
@@ -23,8 +23,8 @@ func GetEID(c utils.Context) (EID int, err error) {
 }
 
 // GetShoppingList renders /shopping_list
-func GetShoppingList(c utils.Context) (err error) {
-	var list database.ShoppingList
+func GetShoppingList(c *utils.Context) (err error) {
+	var list map[int]*database.Entry
 	if list, err = c.U.GetShoppingList(); err == nil {
 		utils.RenderPage(c, "shopping_list/view", map[string]any{"List": list})
 	}
@@ -33,14 +33,14 @@ func GetShoppingList(c utils.Context) (err error) {
 }
 
 // GetAppendEntries renders /shopping_list/append
-func GetAppendEntries(c utils.Context) error {
+func GetAppendEntries(c *utils.Context) error {
 	utils.RenderPage(c, "shopping_list/append", nil)
 	return nil
 }
 
 // PostAppendEntries tries to append the given entries
 // to the shopping list
-func PostAppendEntries(c utils.Context) (err error) {
+func PostAppendEntries(c *utils.Context) (err error) {
 	var names []string
 	c.R.ParseForm()
 
@@ -62,7 +62,7 @@ func PostAppendEntries(c utils.Context) (err error) {
 }
 
 // PostToggleEntry tries to toggle an entry in the shopping list
-func PostToggleEntry(c utils.Context) (err error) {
+func PostToggleEntry(c *utils.Context) (err error) {
 	// Retrieves the EID
 	var EID int
 	if EID, err = GetEID(c); err == nil {
@@ -76,7 +76,7 @@ func PostToggleEntry(c utils.Context) (err error) {
 }
 
 // PostClearEntries tries to deletes all the marked entries
-func PostClearEntries(c utils.Context) (err error) {
+func PostClearEntries(c *utils.Context) (err error) {
 	// Tries to clear the list
 	if err = c.U.ClearEntries(); err == nil {
 		utils.ShowAndRedirect(c, "Lista svuotata con successo", "/shopping_list")
@@ -86,12 +86,12 @@ func PostClearEntries(c utils.Context) (err error) {
 }
 
 // GetEditEntry renders /shopping_list/{EID}/edit
-func GetEditEntry(c utils.Context) (err error) {
+func GetEditEntry(c *utils.Context) (err error) {
 	// Retrieves the EID
 	var EID int
 	if EID, err = GetEID(c); err == nil {
 		// Retrieves the entry's name and renders the page
-		var entry database.Entry
+		var entry *database.Entry
 		if entry, err = c.U.GetEntry(EID); err == nil {
 			utils.RenderPage(c, "shopping_list/edit", map[string]any{"Name": entry.Name})
 		}
@@ -103,7 +103,7 @@ func GetEditEntry(c utils.Context) (err error) {
 }
 
 // PostEditEntry tries to change an entry's name
-func PostEditEntry(c utils.Context) (err error) {
+func PostEditEntry(c *utils.Context) (err error) {
 	// Retrieves the EID
 	var EID int
 	if EID, err = GetEID(c); err == nil {

@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"github.com/alexedwards/argon2id"
+	"log/slog"
 	"net/mail"
 )
 
@@ -65,6 +66,7 @@ func createHash(plain string) (hash string, err error) {
 func compareHash(plain string, hash string) (match bool, err error) {
 	match, err = argon2id.ComparePasswordAndHash(plain, hash)
 	if err != nil {
+		slog.Error("while hashing string", "err", err)
 		err = ERR_UNKNOWN
 	}
 
@@ -85,4 +87,24 @@ func generateToken() (plain string, hash string, err error) {
 	}
 
 	return
+}
+
+// ensureFetched checks if an user is builded
+// by hand or fetched form the database. In the
+// first case, it replaces it with a fetched one.
+func (u *User) ensureFetched() error {
+	if u == nil {
+		return ERR_USER_UNKNOWN
+	}
+
+	if !u.fetched {
+		if uFetched, err := GetUser("UID", u.UID); err == nil {
+			*u = *uFetched
+			return nil
+		} else {
+			return err
+		}
+	}
+
+	return nil
 }

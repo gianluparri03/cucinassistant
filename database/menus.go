@@ -19,8 +19,8 @@ type Menu struct {
 }
 
 // GetMenus returns a list of menus (meals not included)
-func (u *User) GetMenus() (menus []Menu, err error) {
-	menus = []Menu{}
+func (u *User) GetMenus() (menus []*Menu, err error) {
+	menus = []*Menu{}
 
 	// Queries the entries
 	var rows *sql.Rows
@@ -36,50 +36,57 @@ func (u *User) GetMenus() (menus []Menu, err error) {
 	for rows.Next() {
 		var m Menu
 		rows.Scan(&m.MID, &m.Name)
-		menus = append(menus, m)
+		menus = append(menus, &m)
 	}
 
 	// If no menus have been found, makes sure the user exists
 	if len(menus) == 0 {
-		_, err = GetUser(u.UID)
+		if _, err = GetUser("UID", u.UID); err != nil {
+			menus = nil
+		}
 	}
 
 	return
 }
 
 // GetMenu returns a specific menu, with the meals
-func (u *User) GetMenu(MID int) (menu Menu, err error) {
+func (u *User) GetMenu(MID int) (menu *Menu, err error) {
+	menu = &Menu{}
 	var meals string
 
 	// Scans the menu
 	err = DB.QueryRow(`SELECT mid, name, meals FROM menus WHERE uid=? AND mid=?;`, u.UID, MID).Scan(&menu.MID, &menu.Name, &meals)
 	if err != nil {
+		menu = nil
+
 		if strings.HasSuffix(err.Error(), "no rows in result set") {
 			// Makes sure the user exists if the menu has not been found
-			if _, err = GetUser(u.UID); err == nil {
+			if _, err = GetUser("UID", u.UID); err == nil {
 				err = ERR_MENU_NOT_FOUND
 			}
 		} else {
 			slog.Error("while retrieving menu:", "err", err)
 			err = ERR_UNKNOWN
 		}
+
+		return
 	}
 
 	// Unpacks the meals
 	menu.Meals = unpackMeals(meals)
-
 	return
 }
 
 // NewMenu creates a new menu
-func (u *User) NewMenu() (menu Menu, err error) {
+func (u *User) NewMenu() (menu *Menu, err error) {
 	// Ensures the user exists
-	_, err = GetUser(u.UID)
+	_, err = GetUser("UID", u.UID)
 	if err != nil {
 		return
 	}
 
 	// Uses the default name
+	menu = &Menu{}
 	menu.Name = menuDefaultName
 
 	// Adds the new menu
@@ -97,7 +104,7 @@ func (u *User) NewMenu() (menu Menu, err error) {
 }
 
 // ReplaceMenu replaces the menu's name and all of its meals
-func (u *User) ReplaceMenu(MID int, newData Menu) (err error) {
+func (u *User) ReplaceMenu(MID int, newData *Menu) (err error) {
 	// Ensures the menu (and the user) exist
 	if _, err = u.GetMenu(MID); err != nil {
 		return
@@ -128,7 +135,7 @@ func (u *User) DeleteMenu(MID int) (err error) {
 		err = ERR_UNKNOWN
 	} else if ra, _ := res.RowsAffected(); ra < 1 {
 		// If the query has failed, makes sure that the menu (and the user) exist
-		if _, err = GetUser(u.UID); err == nil {
+		if _, err = GetUser("UID", u.UID); err == nil {
 			err = ERR_MENU_NOT_FOUND
 		}
 	}
@@ -137,8 +144,8 @@ func (u *User) DeleteMenu(MID int) (err error) {
 }
 
 // DuplicateMenu creates a copy of a menu
-func (u *User) DuplicateMenu(MID int) (dstMenu Menu, err error) {
-	var srcMenu Menu
+func (u *User) DuplicateMenu(MID int) (dstMenu *Menu, err error) {
+	var srcMenu *Menu
 
 	// Gets the source menu
 	if srcMenu, err = u.GetMenu(MID); err != nil {

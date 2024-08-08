@@ -7,13 +7,13 @@ import (
 )
 
 // GetIndex renders /
-func GetIndex(c utils.Context) error {
+func GetIndex(c *utils.Context) error {
 	utils.RenderPage(c, "misc/home", map[string]any{"Username": c.U.Username})
 	return nil
 }
 
 // GetInfo renders /info
-func GetInfo(c utils.Context) error {
+func GetInfo(c *utils.Context) error {
 	utils.RenderPage(c, "misc/info", map[string]any{
 		"Config":      config.Runtime,
 		"Version":     config.Version,

@@ -72,10 +72,10 @@ func (ts TestSuite[R]) Run(t *testing.T) {
 var userN int = 0
 
 // generateTestingUser returns a testing user which has not been registered yet
-func generateTestingUser() User {
+func generateTestingUser() *User {
 	userN++
 
-	return User{
+	return &User{
 		Username: fmt.Sprintf("username%d", userN),
 		Email:    fmt.Sprintf("email%d@email.com", userN),
 		Password: fmt.Sprintf("password%d", userN),
@@ -83,12 +83,13 @@ func generateTestingUser() User {
 }
 
 // GetTestingUser returns an user to be used for testing purposes
-func GetTestingUser(t *testing.T) (user User, password string) {
+func GetTestingUser(t *testing.T) (user *User, password string) {
 	user = generateTestingUser()
 	password = user.Password
 
 	// And tries to sign it up
-	if err := user.SignUp(); err != nil {
+	var err error
+	if user, err = SignUp(user.Username, user.Email, user.Password); err != nil {
 		t.Fatalf("Cannot create testing user: %s", err.Error())
 	}
 

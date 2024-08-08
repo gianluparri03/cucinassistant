@@ -9,7 +9,7 @@ import (
 // render executes the given templates witth the given data.
 // It adds the base template in automatic, looking if it's a
 // normal request or a request made by htmx.
-func render(c Context, pages []string, data map[string]any) {
+func render(c *Context, pages []string, data map[string]any) {
 	// Adds the base template
 	isHx := c.R.Header.Get("HX-Request") != ""
 	if !isHx {
@@ -46,24 +46,24 @@ func render(c Context, pages []string, data map[string]any) {
 // RenderPage renders a specific page, with some data.
 // PageName must contain the subfolder and the basename, like
 // "user/signup"
-func RenderPage(c Context, pageName string, data map[string]any) {
+func RenderPage(c *Context, pageName string, data map[string]any) {
 	render(c, []string{"templates/body", pageName}, data)
 }
 
 // Show shows a popup message to the user.
-func Show(c Context, msg string) {
+func Show(c *Context, msg string) {
 	c.W.WriteHeader(http.StatusBadRequest)
 	render(c, []string{"templates/error"}, map[string]any{"Message": msg})
 }
 
 // Redirect redirects to a given path
-func Redirect(c Context, path string) {
+func Redirect(c *Context, path string) {
 	http.Redirect(c.W, c.R, path, http.StatusSeeOther)
 }
 
 // ShowAndRedirect shows a popup to the user, then
 // redirects him away
-func ShowAndRedirect(c Context, msg string, path string) {
+func ShowAndRedirect(c *Context, msg string, path string) {
 	c.W.WriteHeader(http.StatusBadRequest)
 	render(c, []string{"templates/error"}, map[string]any{"Message": msg, "Path": path})
 }

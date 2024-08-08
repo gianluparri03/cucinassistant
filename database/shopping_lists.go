@@ -18,20 +18,16 @@ type Entry struct {
 	Marked bool
 }
 
-// ShoppingList contains the pairs EID: Entry
-type ShoppingList map[int]Entry
-
 // GetShoppingList returns an user's shopping list
-func (u *User) GetShoppingList() (sl ShoppingList, err error) {
-	sl = ShoppingList{}
+func (u *User) GetShoppingList() (sl map[int]*Entry, err error) {
+	sl = map[int]*Entry{}
 
 	// Queries the entries
 	var rows *sql.Rows
 	rows, err = DB.Query(`SELECT eid, name, marked FROM shopping_entries WHERE uid = ?;`, u.UID)
 	if err != nil {
 		slog.Error("while retrieving shopping list:", "err", err)
-		err = ERR_UNKNOWN
-		return
+		return nil, ERR_UNKNOWN
 	}
 
 	// Appends them to the list
@@ -39,24 +35,30 @@ func (u *User) GetShoppingList() (sl ShoppingList, err error) {
 	for rows.Next() {
 		var e Entry
 		rows.Scan(&e.EID, &e.Name, &e.Marked)
-		sl[e.EID] = e
+		sl[e.EID] = &e
 	}
 
 	// If no entries have been found, makes sure the user exists
 	if len(sl) == 0 {
-		_, err = GetUser(u.UID)
+		if _, err = GetUser("UID", u.UID); err != nil {
+			sl = nil
+		}
 	}
 
 	return
 }
 
 // GetEntry returns a single entry of the shopping list
-func (u *User) GetEntry(EID int) (e Entry, err error) {
+func (u *User) GetEntry(EID int) (e *Entry, err error) {
+	e = &Entry{}
+
 	err = DB.QueryRow(`SELECT eid, name, marked FROM shopping_entries WHERE uid = ? AND eid = ?;`, u.UID, EID).Scan(&e.EID, &e.Name, &e.Marked)
 	if err != nil {
+		e = nil
+
 		if strings.HasSuffix(err.Error(), "no rows in result set") {
 			// Makes sure the user exists
-			if _, err = GetUser(u.UID); err == nil {
+			if _, err = GetUser("UID", u.UID); err == nil {
 				err = ERR_ENTRY_NOT_FOUND
 			}
 		} else {
@@ -71,7 +73,7 @@ func (u *User) GetEntry(EID int) (e Entry, err error) {
 // AppendEntries appends some entries to the shopping list
 func (u *User) AppendEntries(names ...string) (err error) {
 	// Ensures the user exists
-	_, err = GetUser(u.UID)
+	_, err = GetUser("UID", u.UID)
 	if err != nil {
 		return
 	}
@@ -118,7 +120,7 @@ func (u *User) ClearEntries() (err error) {
 		err = ERR_UNKNOWN
 	} else if ra, _ := res.RowsAffected(); ra < 1 {
 		// Makes sure the user exists
-		if _, err = GetUser(u.UID); err == nil {
+		if _, err = GetUser("UID", u.UID); err == nil {
 			err = ERR_ENTRY_NOT_FOUND
 		}
 	}

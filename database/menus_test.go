@@ -1,6 +1,7 @@
 package database
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -14,27 +15,27 @@ func TestGetMenus(t *testing.T) {
 	m2.Name = "newName"
 	userFilled.ReplaceMenu(m2.MID, m2)
 
-	TestSuite[Pair[[]Menu, error]]{
-		Target: func(tc *TestCase[Pair[[]Menu, error]]) Pair[[]Menu, error] {
+	TestSuite[Pair[[]*Menu, error]]{
+		Target: func(tc *TestCase[Pair[[]*Menu, error]]) Pair[[]*Menu, error] {
 			menus, err := tc.User.GetMenus()
-			return Pair[[]Menu, error]{menus, err}
+			return Pair[[]*Menu, error]{menus, err}
 		},
 
-		Cases: []TestCase[Pair[[]Menu, error]]{
+		Cases: []TestCase[Pair[[]*Menu, error]]{
 			{
 				Description: "got menus of unknown user",
 				User:        &User{UID: 0},
-				Expected:    Pair[[]Menu, error]{[]Menu{}, ERR_USER_UNKNOWN},
+				Expected:    Pair[[]*Menu, error]{nil, ERR_USER_UNKNOWN},
 			},
 			{
 				Description: "wrong menus (empty)",
-				User:        &userEmpty,
-				Expected:    Pair[[]Menu, error]{[]Menu{}, nil},
+				User:        userEmpty,
+				Expected:    Pair[[]*Menu, error]{[]*Menu{}, nil},
 			},
 			{
 				Description: "wrong menus (filled)",
-				User:        &userFilled,
-				Expected:    Pair[[]Menu, error]{[]Menu{m1, m2}, nil},
+				User:        userFilled,
+				Expected:    Pair[[]*Menu, error]{[]*Menu{m1, m2}, nil},
 			},
 		},
 	}.Run(t)
@@ -47,29 +48,29 @@ func TestGetMenu(t *testing.T) {
 	menu.Meals = [14]string{"a", "b", "c"}
 	user.ReplaceMenu(menu.MID, menu)
 
-	TestSuite[Pair[Menu, error]]{
-		Target: func(tc *TestCase[Pair[Menu, error]]) Pair[Menu, error] {
+	TestSuite[Pair[*Menu, error]]{
+		Target: func(tc *TestCase[Pair[*Menu, error]]) Pair[*Menu, error] {
 			menu, err := tc.User.GetMenu(tc.Data["MID"].(int))
-			return Pair[Menu, error]{menu, err}
+			return Pair[*Menu, error]{menu, err}
 		},
 
-		Cases: []TestCase[Pair[Menu, error]]{
+		Cases: []TestCase[Pair[*Menu, error]]{
 			{
 				Description: "unknown user retrieved menu",
 				User:        &User{UID: 0},
-				Expected:    Pair[Menu, error]{Menu{}, ERR_USER_UNKNOWN},
+				Expected:    Pair[*Menu, error]{nil, ERR_USER_UNKNOWN},
 				Data:        map[string]any{"MID": 0},
 			},
 			{
 				Description: "got data of unknown menu",
-				User:        &user,
-				Expected:    Pair[Menu, error]{Menu{}, ERR_MENU_NOT_FOUND},
+				User:        user,
+				Expected:    Pair[*Menu, error]{nil, ERR_MENU_NOT_FOUND},
 				Data:        map[string]any{"MID": 0},
 			},
 			{
 				Description: "wrong menu data",
-				User:        &user,
-				Expected:    Pair[Menu, error]{menu, nil},
+				User:        user,
+				Expected:    Pair[*Menu, error]{menu, nil},
 				Data:        map[string]any{"MID": menu.MID},
 			},
 		},
@@ -79,13 +80,13 @@ func TestGetMenu(t *testing.T) {
 func TestNewMenu(t *testing.T) {
 	user, _ := GetTestingUser(t)
 
-	TestSuite[Pair[Menu, error]]{
-		Target: func(tc *TestCase[Pair[Menu, error]]) Pair[Menu, error] {
+	TestSuite[Pair[*Menu, error]]{
+		Target: func(tc *TestCase[Pair[*Menu, error]]) Pair[*Menu, error] {
 			menu, err := tc.User.NewMenu()
-			return Pair[Menu, error]{menu, err}
+			return Pair[*Menu, error]{menu, err}
 		},
 
-		PostCheck: func(t *testing.T, tc *TestCase[Pair[Menu, error]]) {
+		PostCheck: func(t *testing.T, tc *TestCase[Pair[*Menu, error]]) {
 			expected := tc.Data["MenusN"].(int)
 			menus, _ := tc.User.GetMenus()
 			if len(menus) != expected {
@@ -93,17 +94,17 @@ func TestNewMenu(t *testing.T) {
 			}
 		},
 
-		Cases: []TestCase[Pair[Menu, error]]{
+		Cases: []TestCase[Pair[*Menu, error]]{
 			{
 				Description: "unknown user created menu",
 				User:        &User{UID: 0},
-				Expected:    Pair[Menu, error]{Menu{}, ERR_USER_UNKNOWN},
+				Expected:    Pair[*Menu, error]{nil, ERR_USER_UNKNOWN},
 				Data:        map[string]any{"MenusN": 0},
 			},
 			{
 				Description: "could not create menu",
-				User:        &user,
-				Expected:    Pair[Menu, error]{Menu{MID: 1, Name: menuDefaultName}, nil},
+				User:        user,
+				Expected:    Pair[*Menu, error]{&Menu{MID: 1, Name: menuDefaultName}, nil},
 				Data:        map[string]any{"MenusN": 1},
 			},
 		},
@@ -116,19 +117,19 @@ func TestReplaceMenu(t *testing.T) {
 
 	newName := "newName"
 	newMeals := [14]string{"a", "b", "c"}
-	expected := Menu{MID: menu.MID, Name: newName, Meals: newMeals}
+	expected := &Menu{MID: menu.MID, Name: newName, Meals: newMeals}
 
 	TestSuite[error]{
 		Target: func(tc *TestCase[error]) error {
-			newData := Menu{Name: tc.Data["NewName"].(string), Meals: tc.Data["NewMeals"].([14]string)}
+			newData := &Menu{Name: tc.Data["NewName"].(string), Meals: tc.Data["NewMeals"].([14]string)}
 			return tc.User.ReplaceMenu(tc.Data["MID"].(int), newData)
 		},
 
 		PostCheck: func(t *testing.T, tc *TestCase[error]) {
 			if tc.Expected == nil {
-				expected := tc.Data["Menu"].(Menu)
+				expected := tc.Data["Menu"].(*Menu)
 				got, _ := tc.User.GetMenu(tc.Data["MID"].(int))
-				if got != expected {
+				if !reflect.DeepEqual(got, expected) {
 					t.Errorf("%v, changes not saved: expected <%v> got <%v>", tc.Description, expected, got)
 				}
 			}
@@ -139,11 +140,11 @@ func TestReplaceMenu(t *testing.T) {
 				Description: "unknown user replaced menu",
 				User:        &User{UID: 0},
 				Expected:    ERR_USER_UNKNOWN,
-				Data:        map[string]any{"MID": 0, "NewName": newName, "NewMeals": newMeals, "Menu": Menu{}},
+				Data:        map[string]any{"MID": 0, "NewName": newName, "NewMeals": newMeals, "Menu": nil},
 			},
 			{
 				Description: "could not replace menu",
-				User:        &user,
+				User:        user,
 				Expected:    nil,
 				Data:        map[string]any{"MID": menu.MID, "NewName": newName, "NewMeals": newMeals, "Menu": expected},
 			},
@@ -178,13 +179,13 @@ func TestDeleteMenu(t *testing.T) {
 			},
 			{
 				Description: "deleted unknown menu",
-				User:        &user,
+				User:        user,
 				Expected:    ERR_MENU_NOT_FOUND,
 				Data:        map[string]any{"MID": 0},
 			},
 			{
 				Description: "could not delete menu",
-				User:        &user,
+				User:        user,
 				Expected:    nil,
 				Data:        map[string]any{"MID": menu.MID},
 			},
@@ -199,13 +200,13 @@ func TestDuplicateMenu(t *testing.T) {
 	menu.Meals = [14]string{"a", "b", "c"}
 	user.ReplaceMenu(menu.MID, menu)
 
-	TestSuite[Pair[Menu, error]]{
-		Target: func(tc *TestCase[Pair[Menu, error]]) Pair[Menu, error] {
+	TestSuite[Pair[*Menu, error]]{
+		Target: func(tc *TestCase[Pair[*Menu, error]]) Pair[*Menu, error] {
 			menu, err := tc.User.DuplicateMenu(tc.Data["MID"].(int))
-			return Pair[Menu, error]{menu, err}
+			return Pair[*Menu, error]{menu, err}
 		},
 
-		PostCheck: func(t *testing.T, tc *TestCase[Pair[Menu, error]]) {
+		PostCheck: func(t *testing.T, tc *TestCase[Pair[*Menu, error]]) {
 			expected := tc.Data["MenusN"].(int)
 			menus, _ := tc.User.GetMenus()
 			if len(menus) != expected {
@@ -213,23 +214,23 @@ func TestDuplicateMenu(t *testing.T) {
 			}
 		},
 
-		Cases: []TestCase[Pair[Menu, error]]{
+		Cases: []TestCase[Pair[*Menu, error]]{
 			{
 				Description: "unknown user duplicated menu",
 				User:        &User{UID: 0},
-				Expected:    Pair[Menu, error]{Menu{}, ERR_USER_UNKNOWN},
+				Expected:    Pair[*Menu, error]{nil, ERR_USER_UNKNOWN},
 				Data:        map[string]any{"MID": 0, "MenusN": 0},
 			},
 			{
 				Description: "duplicated unknown menu",
-				User:        &user,
-				Expected:    Pair[Menu, error]{Menu{}, ERR_MENU_NOT_FOUND},
+				User:        user,
+				Expected:    Pair[*Menu, error]{nil, ERR_MENU_NOT_FOUND},
 				Data:        map[string]any{"MID": 0, "MenusN": 1},
 			},
 			{
 				Description: "could not duplicate menu",
-				User:        &user,
-				Expected:    Pair[Menu, error]{Menu{MID: 2, Name: menu.Name + duplicatedMenuSuffix, Meals: menu.Meals}, nil},
+				User:        user,
+				Expected:    Pair[*Menu, error]{&Menu{MID: 2, Name: menu.Name + duplicatedMenuSuffix, Meals: menu.Meals}, nil},
 				Data:        map[string]any{"MID": menu.MID, "MenusN": 2},
 			},
 		},

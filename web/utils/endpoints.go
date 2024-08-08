@@ -17,18 +17,18 @@ type Endpoint struct {
 
 	// PostHandler is the function executed on GET requests.
 	// If not set, the endpoint will show an error on GET requests
-	GetHandler func(Context) error
+	GetHandler func(*Context) error
 
 	// PostHandler is the function executed on POST requests
 	// If not set, the endpoint will show an error on POST requests
-	PostHandler func(Context) error
+	PostHandler func(*Context) error
 }
 
 // Register adds the endpoint to the router
 func (e Endpoint) Register(router *mux.Router) {
 	// Returns an error message if the method
 	// is not allowed
-	unknownHandler := func(c Context) error {
+	unknownHandler := func(c *Context) error {
 		c.W.WriteHeader(http.StatusMethodNotAllowed)
 		ShowAndRedirect(c, "Richiesta sconosciuta", "/")
 		return nil
