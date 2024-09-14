@@ -19,7 +19,7 @@ fmt:
 
 test: start_db
 	@docker exec -it ca-db mariadb -u root -prpass -e "DROP DATABASE IF EXISTS test; CREATE DATABASE test; GRANT ALL PRIVILEGES ON test.* TO 'ca-user'@'%';"
-	@go test -v cucinassistant/database -args ../config_test.yml || true
+	@go test -v cucinassistant/database/tests -args ../../config_test.yml || true
 	@docker exec -it ca-db mariadb -u root -prpass -e "DROP DATABASE test;"
 
 cover: start_db

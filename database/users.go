@@ -68,7 +68,7 @@ func SignIn(username string, password string) (user *User, err error) {
 
 	// Compare the passwords
 	var match bool
-	if match, err = compareHash(password, user_.Password); err != nil {
+	if match, err = CompareHash(password, user_.Password); err != nil {
 		return
 	} else if !match {
 		err = ERR_USER_WRONG_CREDENTIALS
@@ -145,7 +145,7 @@ func (u *User) ChangePassword(oldPassword string, newPassword string) (err error
 	}
 
 	// Compares the old passwords
-	if match, err := compareHash(oldPassword, u.Password); err != nil {
+	if match, err := CompareHash(oldPassword, u.Password); err != nil {
 		return err
 	} else if !match {
 		return ERR_USER_WRONG_CREDENTIALS
@@ -211,7 +211,7 @@ func (u *User) ResetPassword(token string, newPassword string) (err error) {
 
 	// Compares the tokens
 	var match bool
-	if match, err = compareHash(token, u.Token); err != nil {
+	if match, err = CompareHash(token, u.Token); err != nil {
 		return
 	} else if !match {
 		err = ERR_USER_WRONG_TOKEN
@@ -252,7 +252,7 @@ func (u *User) Delete(token string) (err error) {
 
 	// Compares the tokens
 	var match bool
-	if match, err = compareHash(token, u.Token); err != nil {
+	if match, err = CompareHash(token, u.Token); err != nil {
 		return
 	} else if !match {
 		err = ERR_USER_WRONG_TOKEN

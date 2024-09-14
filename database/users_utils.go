@@ -62,8 +62,8 @@ func createHash(plain string) (hash string, err error) {
 	return
 }
 
-// compareHash compare a plain text with its hash
-func compareHash(plain string, hash string) (match bool, err error) {
+// CompareHash compare a plain text with its hash
+func CompareHash(plain string, hash string) (match bool, err error) {
 	match, err = argon2id.ComparePasswordAndHash(plain, hash)
 	if err != nil {
 		slog.Error("while hashing string", "err", err)

@@ -1,8 +1,10 @@
-package database
+package tests
 
 import (
 	"reflect"
 	"testing"
+
+    "cucinassistant/database"
 )
 
 func TestGetMenus(t *testing.T) {
@@ -17,10 +19,10 @@ func TestGetMenus(t *testing.T) {
 	otherOtherUser.NewMenu()
 
 	type data struct {
-		User *User
+		User *database.User
 
 		ExpectedErr   error
-		ExpectedMenus []*Menu
+		ExpectedMenus []*database.Menu
 	}
 
 	TestSuite[data]{
@@ -36,15 +38,15 @@ func TestGetMenus(t *testing.T) {
 		Cases: []TestCase[data]{
 			{
 				"got menus of unknown user",
-				data{User: &User{}, ExpectedErr: ERR_USER_UNKNOWN},
+				data{User: unknownUser, ExpectedErr: database.ERR_USER_UNKNOWN},
 			},
 			{
 				"(empty)",
-				data{User: otherUser, ExpectedMenus: []*Menu{}},
+				data{User: otherUser, ExpectedMenus: []*database.Menu{}},
 			},
 			{
 				"(filled)",
-				data{User: user, ExpectedMenus: []*Menu{m1, m2}},
+				data{User: user, ExpectedMenus: []*database.Menu{m1, m2}},
 			},
 		},
 	}.Run(t)
@@ -58,11 +60,11 @@ func TestGetMenu(t *testing.T) {
 	otherUser, _ := GetTestingUser(t)
 
 	type data struct {
-		User *User
+		User *database.User
 		MID  int
 
 		ExpectedErr  error
-		ExpectedMenu *Menu
+		ExpectedMenu *database.Menu
 	}
 
 	TestSuite[data]{
@@ -78,11 +80,11 @@ func TestGetMenu(t *testing.T) {
 		Cases: []TestCase[data]{
 			{
 				"got data of unknown menu",
-				data{User: user, ExpectedErr: ERR_MENU_NOT_FOUND},
+				data{User: user, ExpectedErr: database.ERR_MENU_NOT_FOUND},
 			},
 			{
 				"other user retrieved menu",
-				data{User: otherUser, MID: menu.MID, ExpectedErr: ERR_MENU_NOT_FOUND},
+				data{User: otherUser, MID: menu.MID, ExpectedErr: database.ERR_MENU_NOT_FOUND},
 			},
 			{
 				"",
@@ -96,7 +98,7 @@ func TestNewMenu(t *testing.T) {
 	user, _ := GetTestingUser(t)
 
 	type data struct {
-		User *User
+		User *database.User
 
 		ExpectedErr error
 		ExpectedMN  int
@@ -116,7 +118,7 @@ func TestNewMenu(t *testing.T) {
 		Cases: []TestCase[data]{
 			{
 				"unknown user created menu",
-				data{User: &User{}, ExpectedErr: ERR_USER_UNKNOWN},
+				data{User: unknownUser, ExpectedErr: database.ERR_USER_UNKNOWN},
 			},
 			{
 				"",
@@ -139,7 +141,7 @@ func TestReplaceMenu(t *testing.T) {
 	otherUser, _ := GetTestingUser(t)
 
 	type data struct {
-		User     *User
+		User     *database.User
 		MID      int
 		NewName  string
 		NewMeals [14]string
@@ -156,7 +158,7 @@ func TestReplaceMenu(t *testing.T) {
 
 			if d.ExpectedErr == nil {
 				menu, _ := d.User.GetMenu(d.MID)
-				expected := &Menu{MID: d.MID, Name: d.NewName, Meals: d.NewMeals}
+				expected := &database.Menu{MID: d.MID, Name: d.NewName, Meals: d.NewMeals}
 				if !reflect.DeepEqual(menu, expected) {
 					t.Errorf("%v, changes not saved", msg)
 				} else if !reflect.DeepEqual(menu, got) {
@@ -168,7 +170,7 @@ func TestReplaceMenu(t *testing.T) {
 		Cases: []TestCase[data]{
 			{
 				"other user replaced menu",
-				data{User: otherUser, MID: menu.MID, NewName: newName, NewMeals: newMeals, ExpectedErr: ERR_MENU_NOT_FOUND},
+				data{User: otherUser, MID: menu.MID, NewName: newName, NewMeals: newMeals, ExpectedErr: database.ERR_MENU_NOT_FOUND},
 			},
 			{
 				"",
@@ -185,7 +187,7 @@ func TestDeleteMenu(t *testing.T) {
 	otherUser, _ := GetTestingUser(t)
 
 	type data struct {
-		User *User
+		User *database.User
 		MID  int
 
 		ExpectedErr error
@@ -209,11 +211,11 @@ func TestDeleteMenu(t *testing.T) {
 		Cases: []TestCase[data]{
 			{
 				"other user deleted menu",
-				data{User: otherUser, MID: menu.MID, ExpectedErr: ERR_MENU_NOT_FOUND, ShouldExist: true},
+				data{User: otherUser, MID: menu.MID, ExpectedErr: database.ERR_MENU_NOT_FOUND, ShouldExist: true},
 			},
 			{
 				"deleted unknown menu",
-				data{User: user, ExpectedErr: ERR_MENU_NOT_FOUND},
+				data{User: user, ExpectedErr: database.ERR_MENU_NOT_FOUND},
 			},
 			{
 				"",
@@ -231,11 +233,11 @@ func TestDuplicateMenu(t *testing.T) {
 	otherUser, _ := GetTestingUser(t)
 
 	type data struct {
-		User *User
+		User *database.User
 		MID  int
 
 		ExpectedErr   error
-		ExpectedMenus []*Menu
+		ExpectedMenus []*database.Menu
 	}
 
 	TestSuite[data]{
@@ -259,11 +261,11 @@ func TestDuplicateMenu(t *testing.T) {
 		Cases: []TestCase[data]{
 			{
 				"other user duplicated menu",
-				data{User: otherUser, MID: menu.MID, ExpectedErr: ERR_MENU_NOT_FOUND},
+				data{User: otherUser, MID: menu.MID, ExpectedErr: database.ERR_MENU_NOT_FOUND},
 			},
 			{
 				"duplicated unknown menu",
-				data{User: user, ExpectedErr: ERR_MENU_NOT_FOUND},
+				data{User: user, ExpectedErr: database.ERR_MENU_NOT_FOUND},
 			},
 			{
 				"",

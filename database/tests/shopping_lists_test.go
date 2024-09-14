@@ -1,15 +1,17 @@
-package database
+package tests
 
 import (
 	"reflect"
 	"strconv"
 	"testing"
+
+	"cucinassistant/database"
 )
 
 var testingEntriesN int = 0
 
 // denerateEntry adds an entry to an user's shopping list
-func generateEntry(u *User) (entry *Entry) {
+func generateEntry(u *database.User) (entry *database.Entry) {
 	testingEntriesN++
 
 	name := "entry-" + strconv.Itoa(testingEntriesN)
@@ -38,7 +40,7 @@ func TestGetShoppingList(t *testing.T) {
 	entry1 := generateEntry(user)
 	entry2 := generateEntry(user)
 	entry3 := generateEntry(user)
-	list := ShoppingList{entry1.EID: entry1, entry2.EID: entry2, entry3.EID: entry3}
+	list := database.ShoppingList{entry1.EID: entry1, entry2.EID: entry2, entry3.EID: entry3}
 
 	otherUser, _ := GetTestingUser(t)
 
@@ -46,10 +48,10 @@ func TestGetShoppingList(t *testing.T) {
 	generateEntry(otherOtherUser)
 
 	type data struct {
-		User *User
+		User *database.User
 
 		ExpectedErr  error
-		ExpectedList ShoppingList
+		ExpectedList database.ShoppingList
 	}
 
 	TestSuite[data]{
@@ -65,11 +67,11 @@ func TestGetShoppingList(t *testing.T) {
 		Cases: []TestCase[data]{
 			{
 				"got entries of unknown user",
-				data{User: &User{}, ExpectedErr: ERR_USER_UNKNOWN},
+				data{User: unknownUser, ExpectedErr: database.ERR_USER_UNKNOWN},
 			},
 			{
 				"(empty)",
-				data{User: otherUser, ExpectedList: ShoppingList{}},
+                data{User: otherUser, ExpectedList: database.ShoppingList{}},
 			},
 			{
 				"(filled)",
@@ -87,11 +89,11 @@ func TestGetEntry(t *testing.T) {
 	otherUser, _ := GetTestingUser(t)
 
 	type data struct {
-		User *User
+		User *database.User
 		EID  int
 
 		ExpectedErr   error
-		ExpectedEntry *Entry
+		ExpectedEntry *database.Entry
 	}
 
 	TestSuite[data]{
@@ -107,11 +109,11 @@ func TestGetEntry(t *testing.T) {
 		Cases: []TestCase[data]{
 			{
 				"other user retrieved entry",
-				data{User: otherUser, EID: entry1.EID, ExpectedErr: ERR_ENTRY_NOT_FOUND},
+				data{User: otherUser, EID: entry1.EID, ExpectedErr: database.ERR_ENTRY_NOT_FOUND},
 			},
 			{
 				"got data of unknown entry",
-				data{User: user, ExpectedErr: ERR_ENTRY_NOT_FOUND},
+				data{User: user, ExpectedErr: database.ERR_ENTRY_NOT_FOUND},
 			},
 			{
 				"(marked)",
@@ -128,19 +130,19 @@ func TestGetEntry(t *testing.T) {
 func TestAppendEntries(t *testing.T) {
 	user, _ := GetTestingUser(t)
 	entry1 := generateEntry(user)
-	entry2 := &Entry{EID: testingEntriesN + 1, Name: "appended-2"}
-	entry3 := &Entry{EID: testingEntriesN + 2, Name: "appended-3"}
+	entry2 := &database.Entry{EID: testingEntriesN + 1, Name: "appended-2"}
+	entry3 := &database.Entry{EID: testingEntriesN + 2, Name: "appended-3"}
 	testingEntriesN += 2
 
 	names := []string{entry2.Name, entry3.Name, entry1.Name, entry2.Name}
-	list := ShoppingList{entry1.EID: entry1, entry2.EID: entry2, entry3.EID: entry3}
+	list := database.ShoppingList{entry1.EID: entry1, entry2.EID: entry2, entry3.EID: entry3}
 
 	type data struct {
-		User  *User
+		User  *database.User
 		Names []string
 
 		ExpectedErr  error
-		ExpectedList ShoppingList
+		ExpectedList database.ShoppingList
 	}
 
 	TestSuite[data]{
@@ -159,7 +161,7 @@ func TestAppendEntries(t *testing.T) {
 		Cases: []TestCase[data]{
 			{
 				"unknown user appended entries",
-				data{User: &User{}, Names: names, ExpectedErr: ERR_USER_UNKNOWN},
+				data{User: unknownUser, Names: names, ExpectedErr: database.ERR_USER_UNKNOWN},
 			},
 			{
 				"could not append entries",
@@ -176,7 +178,7 @@ func TestToggleEntry(t *testing.T) {
 	otherUser, _ := GetTestingUser(t)
 
 	type data struct {
-		User *User
+		User *database.User
 		EID  int
 
 		ExpectedErr    error
@@ -199,11 +201,11 @@ func TestToggleEntry(t *testing.T) {
 		Cases: []TestCase[data]{
 			{
 				"other user toggled entry",
-				data{User: otherUser, EID: entry.EID, ExpectedErr: ERR_ENTRY_NOT_FOUND},
+				data{User: otherUser, EID: entry.EID, ExpectedErr: database.ERR_ENTRY_NOT_FOUND},
 			},
 			{
 				"toggled unknown entry",
-				data{User: user, ExpectedErr: ERR_ENTRY_NOT_FOUND},
+				data{User: user, ExpectedErr: database.ERR_ENTRY_NOT_FOUND},
 			},
 			{
 				"(marking)",
@@ -227,10 +229,10 @@ func TestClearShoppingList(t *testing.T) {
 	otherEntry := generateEntry(otherUser)
 
 	type data struct {
-		User *User
+		User *database.User
 
 		ExpectedErr  error
-		ExpectedList ShoppingList
+		ExpectedList database.ShoppingList
 	}
 
 	TestSuite[data]{
@@ -248,17 +250,17 @@ func TestClearShoppingList(t *testing.T) {
 		Cases: []TestCase[data]{
 			{
 				"unknown user cleared shopping list",
-				data{User: &User{}, ExpectedErr: ERR_USER_UNKNOWN},
+				data{User: unknownUser, ExpectedErr: database.ERR_USER_UNKNOWN},
 			},
 			{
 				"",
-				data{User: user, ExpectedList: ShoppingList{entry.EID: entry}},
+				data{User: user, ExpectedList: database.ShoppingList{entry.EID: entry}},
 			},
 		},
 	}.Run(t)
 
 	list, _ := otherUser.GetShoppingList()
-	if !reflect.DeepEqual(list, ShoppingList{otherEntry.EID: otherEntry}) {
+	if !reflect.DeepEqual(list, database.ShoppingList{otherEntry.EID: otherEntry}) {
 		t.Errorf("cleared shopping list of everyone")
 	}
 }
@@ -271,7 +273,7 @@ func TestEditEntry(t *testing.T) {
 	otherUser, _ := GetTestingUser(t)
 
 	type data struct {
-		User    *User
+		User    *database.User
 		EID     int
 		NewName string
 
@@ -294,15 +296,15 @@ func TestEditEntry(t *testing.T) {
 		Cases: []TestCase[data]{
 			{
 				"other user edited entry",
-				data{User: otherUser, EID: entry1.EID, NewName: entry1.Name + "+", ExpectedErr: ERR_ENTRY_NOT_FOUND},
+				data{User: otherUser, EID: entry1.EID, NewName: entry1.Name + "+", ExpectedErr: database.ERR_ENTRY_NOT_FOUND},
 			},
 			{
 				"edited unknown entry",
-				data{User: user, NewName: entry1.Name + "+", ExpectedErr: ERR_ENTRY_NOT_FOUND},
+				data{User: user, NewName: entry1.Name + "+", ExpectedErr: database.ERR_ENTRY_NOT_FOUND},
 			},
 			{
 				"duplicated entry",
-				data{User: user, EID: entry1.EID, NewName: entry2.Name, ExpectedErr: ERR_ENTRY_DUPLICATED},
+				data{User: user, EID: entry1.EID, NewName: entry2.Name, ExpectedErr: database.ERR_ENTRY_DUPLICATED},
 			},
 			{
 				"(same)",
