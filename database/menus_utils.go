@@ -6,7 +6,7 @@ import (
 
 const (
 	// menuDefaultName is the name given to new menus
-	menuDefaultName = "Menù"
+	menuDefaultName = "Nuovo Menù"
 
 	// mealSeparator is used to separate meals when packed
 	mealSeparator = ";"

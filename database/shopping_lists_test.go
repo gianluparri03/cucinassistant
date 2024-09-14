@@ -2,42 +2,78 @@ package database
 
 import (
 	"reflect"
+	"strconv"
 	"testing"
 )
 
-func TestGetShoppingList(t *testing.T) {
-	list := map[int]*Entry{
-		1: &Entry{EID: 1, Name: "Entry1"},
-		2: &Entry{EID: 2, Name: "Entry2", Marked: true},
-		3: &Entry{EID: 3, Name: "Entry3"},
+var testingEntriesN int = 0
+
+// denerateEntry adds an entry to an user's shopping list
+func generateEntry(u *User) (entry *Entry) {
+	testingEntriesN++
+
+	name := "entry-" + strconv.Itoa(testingEntriesN)
+	u.AppendEntries(name)
+
+	// Find its id
+	list, _ := u.GetShoppingList()
+	var EID int
+	for EID, entry = range list {
+		if entry.Name == name {
+			break
+		}
 	}
 
-	userEmpty, _ := GetTestingUser(t)
-	userFilled, _ := GetTestingUser(t)
-	userFilled.AppendEntries(list[1].Name, list[2].Name, list[3].Name)
-	userFilled.ToggleEntry(list[2].EID)
+	// Marks only the odd ones
+	if testingEntriesN%2 > 0 {
+		u.ToggleEntry(EID)
+		entry.Marked = true
+	}
 
-	TestSuite[Pair[map[int]*Entry, error]]{
-		Target: func(tc *TestCase[Pair[map[int]*Entry, error]]) Pair[map[int]*Entry, error] {
-			list, err := tc.User.GetShoppingList()
-			return Pair[map[int]*Entry, error]{list, err}
+	return
+}
+
+func TestGetShoppingList(t *testing.T) {
+	user, _ := GetTestingUser(t)
+	entry1 := generateEntry(user)
+	entry2 := generateEntry(user)
+	entry3 := generateEntry(user)
+	list := ShoppingList{entry1.EID: entry1, entry2.EID: entry2, entry3.EID: entry3}
+
+	otherUser, _ := GetTestingUser(t)
+
+	otherOtherUser, _ := GetTestingUser(t)
+	generateEntry(otherOtherUser)
+
+	type data struct {
+		User *User
+
+		ExpectedErr  error
+		ExpectedList ShoppingList
+	}
+
+	TestSuite[data]{
+		Target: func(t *testing.T, msg string, d data) {
+			list, err := d.User.GetShoppingList()
+			if err != d.ExpectedErr {
+				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
+			} else if !reflect.DeepEqual(list, d.ExpectedList) {
+				t.Errorf("%s: expected list <%v>, got <%v>", msg, d.ExpectedList, list)
+			}
 		},
 
-		Cases: []TestCase[Pair[map[int]*Entry, error]]{
+		Cases: []TestCase[data]{
 			{
-				Description: "got entries of unknown user",
-				User:        &User{UID: 0},
-				Expected:    Pair[map[int]*Entry, error]{nil, ERR_USER_UNKNOWN},
+				"got entries of unknown user",
+				data{User: &User{}, ExpectedErr: ERR_USER_UNKNOWN},
 			},
 			{
-				Description: "wrong shopping list (empty)",
-				User:        userEmpty,
-				Expected:    Pair[map[int]*Entry, error]{map[int]*Entry{}, nil},
+				"(empty)",
+				data{User: otherUser, ExpectedList: ShoppingList{}},
 			},
 			{
-				Description: "wrong shopping list (filled)",
-				User:        userFilled,
-				Expected:    Pair[map[int]*Entry, error]{list, nil},
+				"(filled)",
+				data{User: user, ExpectedList: list},
 			},
 		},
 	}.Run(t)
@@ -45,84 +81,89 @@ func TestGetShoppingList(t *testing.T) {
 
 func TestGetEntry(t *testing.T) {
 	user, _ := GetTestingUser(t)
+	entry1 := generateEntry(user)
+	entry2 := generateEntry(user)
 
-	entryUnmarked := &Entry{EID: 1, Name: "unmarked"}
-	entryMarked := &Entry{EID: 2, Name: "marked", Marked: true}
-	user.AppendEntries(entryUnmarked.Name, entryMarked.Name)
-	user.ToggleEntry(entryMarked.EID)
+	otherUser, _ := GetTestingUser(t)
 
-	TestSuite[Pair[*Entry, error]]{
-		Target: func(tc *TestCase[Pair[*Entry, error]]) Pair[*Entry, error] {
-			en, er := tc.User.GetEntry(tc.Data["EID"].(int))
-			return Pair[*Entry, error]{en, er}
+	type data struct {
+		User *User
+		EID  int
+
+		ExpectedErr   error
+		ExpectedEntry *Entry
+	}
+
+	TestSuite[data]{
+		Target: func(t *testing.T, msg string, d data) {
+			entry, err := d.User.GetEntry(d.EID)
+			if err != d.ExpectedErr {
+				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
+			} else if !reflect.DeepEqual(entry, d.ExpectedEntry) {
+				t.Errorf("%s: expected entry <%v>, got <%v>", msg, d.ExpectedEntry, entry)
+			}
 		},
 
-		Cases: []TestCase[Pair[*Entry, error]]{
+		Cases: []TestCase[data]{
 			{
-				Description: "unknown user retrieved entry",
-				User:        &User{},
-				Expected:    Pair[*Entry, error]{nil, ERR_USER_UNKNOWN},
-				Data:        map[string]any{"EID": 0},
+				"other user retrieved entry",
+				data{User: otherUser, EID: entry1.EID, ExpectedErr: ERR_ENTRY_NOT_FOUND},
 			},
 			{
-				Description: "got data of unknown entry",
-				User:        user,
-				Expected:    Pair[*Entry, error]{nil, ERR_ENTRY_NOT_FOUND},
-				Data:        map[string]any{"EID": 0},
+				"got data of unknown entry",
+				data{User: user, ExpectedErr: ERR_ENTRY_NOT_FOUND},
 			},
 			{
-				Description: "wrong entry's data (unmarked)",
-				User:        user,
-				Expected:    Pair[*Entry, error]{entryUnmarked, nil},
-				Data:        map[string]any{"EID": entryUnmarked.EID},
+				"(marked)",
+				data{User: user, EID: entry1.EID, ExpectedEntry: entry1},
 			},
 			{
-				Description: "wrong entry's data (marked)",
-				User:        user,
-				Expected:    Pair[*Entry, error]{entryMarked, nil},
-				Data:        map[string]any{"EID": entryMarked.EID},
+				"(unmarked)",
+				data{User: user, EID: entry2.EID, ExpectedEntry: entry2},
 			},
 		},
 	}.Run(t)
 }
 
 func TestAppendEntries(t *testing.T) {
-	list := map[int]*Entry{
-		1: &Entry{EID: 1, Name: "Entry1"},
-		2: &Entry{EID: 2, Name: "Entry2"},
-		3: &Entry{EID: 3, Name: "Entry3"},
-	}
-	names := []string{list[1].Name, list[2].Name, list[2].Name, list[1].Name, list[3].Name}
-
 	user, _ := GetTestingUser(t)
+	entry1 := generateEntry(user)
+	entry2 := &Entry{EID: testingEntriesN + 1, Name: "appended-2"}
+	entry3 := &Entry{EID: testingEntriesN + 2, Name: "appended-3"}
+	testingEntriesN += 2
 
-	TestSuite[error]{
-		Target: func(tc *TestCase[error]) error {
-			return tc.User.AppendEntries(tc.Data["Names"].([]string)...)
-		},
+	names := []string{entry2.Name, entry3.Name, entry1.Name, entry2.Name}
+	list := ShoppingList{entry1.EID: entry1, entry2.EID: entry2, entry3.EID: entry3}
 
-		PostCheck: func(t *testing.T, tc *TestCase[error]) {
-			if tc.Expected == nil {
-				got, _ := tc.User.GetShoppingList()
-				expected := tc.Data["List"].(map[int]*Entry)
-				if !reflect.DeepEqual(got, expected) {
-					t.Errorf("%s, list does not match: expected <%v> got <%v>", tc.Description, expected, got)
+	type data struct {
+		User  *User
+		Names []string
+
+		ExpectedErr  error
+		ExpectedList ShoppingList
+	}
+
+	TestSuite[data]{
+		Target: func(t *testing.T, msg string, d data) {
+			err := d.User.AppendEntries(d.Names...)
+			if err != d.ExpectedErr {
+				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
+			} else {
+				list, _ := d.User.GetShoppingList()
+				if !reflect.DeepEqual(list, d.ExpectedList) {
+					t.Errorf("%s: expected list <%v>, got <%v>", msg, d.ExpectedList, list)
 				}
 			}
 		},
 
-		Cases: []TestCase[error]{
+		Cases: []TestCase[data]{
 			{
-				Description: "unknown user appended entries",
-				User:        &User{},
-				Expected:    ERR_USER_UNKNOWN,
-				Data:        map[string]any{"Names": names, "List": nil},
+				"unknown user appended entries",
+				data{User: &User{}, Names: names, ExpectedErr: ERR_USER_UNKNOWN},
 			},
 			{
-				Description: "could not append entries",
-				User:        user,
-				Expected:    nil,
-				Data:        map[string]any{"Names": names, "List": list},
+				"could not append entries",
+				data{User: user, Names: names, ExpectedList: list},
 			},
 		},
 	}.Run(t)
@@ -130,148 +171,146 @@ func TestAppendEntries(t *testing.T) {
 
 func TestToggleEntry(t *testing.T) {
 	user, _ := GetTestingUser(t)
-	entry := &Entry{EID: 1, Name: "name"}
-	user.AppendEntries(entry.Name)
+	entry := generateEntry(user)
 
-	TestSuite[error]{
-		Target: func(tc *TestCase[error]) error {
-			return tc.User.ToggleEntry(tc.Data["EID"].(int))
-		},
+	otherUser, _ := GetTestingUser(t)
 
-		PostCheck: func(t *testing.T, tc *TestCase[error]) {
-			if tc.Expected == nil {
-				entry, _ := tc.User.GetEntry(tc.Data["EID"].(int))
-				shouldBe := tc.Data["ShouldBe"].(bool)
-				if entry.Marked != shouldBe {
-					t.Errorf("%s, wrong marked value: expected <%v> got <%v>", tc.Description, shouldBe, entry.Marked)
+	type data struct {
+		User *User
+		EID  int
+
+		ExpectedErr    error
+		ExpectedStatus bool
+	}
+
+	TestSuite[data]{
+		Target: func(t *testing.T, msg string, d data) {
+			err := d.User.ToggleEntry(d.EID)
+			if err != d.ExpectedErr {
+				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
+			} else if err == nil {
+				entry, _ := d.User.GetEntry(d.EID)
+				if entry.Marked != d.ExpectedStatus {
+					t.Errorf("%s: expected status <%v>, got <%v>", msg, d.ExpectedStatus, entry.Marked)
 				}
 			}
 		},
 
-		Cases: []TestCase[error]{
+		Cases: []TestCase[data]{
 			{
-				Description: "unknown user toggled entry",
-				User:        &User{},
-				Expected:    ERR_USER_UNKNOWN,
-				Data:        map[string]any{"EID": 0},
+				"other user toggled entry",
+				data{User: otherUser, EID: entry.EID, ExpectedErr: ERR_ENTRY_NOT_FOUND},
 			},
 			{
-				Description: "toggled unknown entry",
-				User:        user,
-				Expected:    ERR_ENTRY_NOT_FOUND,
-				Data:        map[string]any{"EID": 0},
+				"toggled unknown entry",
+				data{User: user, ExpectedErr: ERR_ENTRY_NOT_FOUND},
 			},
 			{
-				Description: "could not toggle entry (false->true)",
-				User:        user,
-				Expected:    nil,
-				Data:        map[string]any{"EID": entry.EID, "ShouldBe": true},
+				"(marking)",
+				data{User: user, EID: entry.EID, ExpectedStatus: true},
 			},
 			{
-				Description: "could not toggle entry (true->false)",
-				User:        user,
-				Expected:    nil,
-				Data:        map[string]any{"EID": entry.EID, "ShouldBe": false},
+				"(unmarking)",
+				data{User: user, EID: entry.EID, ExpectedStatus: false},
 			},
 		},
 	}.Run(t)
 }
 
-func TestClearEntries(t *testing.T) {
-	list := map[int]*Entry{
-		1: &Entry{EID: 1, Name: "Entry1"},
-		2: &Entry{EID: 2, Name: "Entry2", Marked: true},
-		3: &Entry{EID: 3, Name: "Entry3"},
+func TestClearShoppingList(t *testing.T) {
+	user, _ := GetTestingUser(t)
+	generateEntry(user)
+	entry := generateEntry(user)
+	generateEntry(user)
+
+	otherUser, _ := GetTestingUser(t)
+	otherEntry := generateEntry(otherUser)
+
+	type data struct {
+		User *User
+
+		ExpectedErr  error
+		ExpectedList ShoppingList
 	}
 
-	user, _ := GetTestingUser(t)
-	user.AppendEntries(list[1].Name, list[2].Name, list[3].Name)
-	user.ToggleEntry(list[2].EID)
-
-	delete(list, 2)
-
-	TestSuite[error]{
-		Target: func(tc *TestCase[error]) error {
-			return tc.User.ClearEntries()
-		},
-
-		PostCheck: func(t *testing.T, tc *TestCase[error]) {
-			if tc.Expected == nil {
-				got, _ := tc.User.GetShoppingList()
-				expected := tc.Data["List"].(map[int]*Entry)
-				if !reflect.DeepEqual(got, expected) {
-					t.Errorf("%s, shopping list does not match: expected <%v> got <%v>", tc.Description, expected, got)
+	TestSuite[data]{
+		Target: func(t *testing.T, msg string, d data) {
+			if err := d.User.ClearShoppingList(); err != d.ExpectedErr {
+				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
+			} else if err == nil {
+				list, _ := d.User.GetShoppingList()
+				if !reflect.DeepEqual(list, d.ExpectedList) {
+					t.Errorf("%s: expected list <%v>, got <%v>", msg, d.ExpectedList, list)
 				}
 			}
 		},
 
-		Cases: []TestCase[error]{
+		Cases: []TestCase[data]{
 			{
-				Description: "unknown user cleared its entries",
-				User:        &User{UID: 0},
-				Expected:    ERR_USER_UNKNOWN,
+				"unknown user cleared shopping list",
+				data{User: &User{}, ExpectedErr: ERR_USER_UNKNOWN},
 			},
 			{
-				Description: "could not clear entries",
-				User:        user,
-				Expected:    nil,
-				Data:        map[string]any{"List": list},
+				"",
+				data{User: user, ExpectedList: ShoppingList{entry.EID: entry}},
 			},
 		},
 	}.Run(t)
+
+	list, _ := otherUser.GetShoppingList()
+	if !reflect.DeepEqual(list, ShoppingList{otherEntry.EID: otherEntry}) {
+		t.Errorf("cleared shopping list of everyone")
+	}
 }
 
 func TestEditEntry(t *testing.T) {
 	user, _ := GetTestingUser(t)
-	entry1 := &Entry{EID: 1, Name: "Entry1"}
-	entry2 := &Entry{EID: 2, Name: "Entry2"}
-	user.AppendEntries(entry1.Name, entry2.Name)
+	entry1 := generateEntry(user)
+	entry2 := generateEntry(user)
 
-	TestSuite[error]{
-		Target: func(tc *TestCase[error]) error {
-			return tc.User.EditEntry(tc.Data["EID"].(int), tc.Data["NewName"].(string))
-		},
+	otherUser, _ := GetTestingUser(t)
 
-		PostCheck: func(t *testing.T, tc *TestCase[error]) {
-			if tc.Expected == nil {
-				entry, _ := tc.User.GetEntry(tc.Data["EID"].(int))
-				newName := tc.Data["NewName"].(string)
-				if entry.Name != newName {
-					t.Errorf("%s, new name does not match: expected <%v> got <%v>", tc.Description, newName, entry.Name)
+	type data struct {
+		User    *User
+		EID     int
+		NewName string
+
+		ExpectedErr error
+	}
+
+	TestSuite[data]{
+		Target: func(t *testing.T, msg string, d data) {
+			err := d.User.EditEntry(d.EID, d.NewName)
+			if err != d.ExpectedErr {
+				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
+			} else if err == nil {
+				entry, _ := d.User.GetEntry(d.EID)
+				if entry.Name != d.NewName {
+					t.Errorf("%s: name not changed", msg)
 				}
 			}
 		},
 
-		Cases: []TestCase[error]{
+		Cases: []TestCase[data]{
 			{
-				Description: "unknown user edited entry",
-				User:        &User{},
-				Expected:    ERR_USER_UNKNOWN,
-				Data:        map[string]any{"EID": 0, "NewName": ""},
+				"other user edited entry",
+				data{User: otherUser, EID: entry1.EID, NewName: entry1.Name + "+", ExpectedErr: ERR_ENTRY_NOT_FOUND},
 			},
 			{
-				Description: "edited unknown entry",
-				User:        user,
-				Expected:    ERR_ENTRY_NOT_FOUND,
-				Data:        map[string]any{"EID": 0, "NewName": ""},
+				"edited unknown entry",
+				data{User: user, NewName: entry1.Name + "+", ExpectedErr: ERR_ENTRY_NOT_FOUND},
 			},
 			{
-				Description: "duplicated entry",
-				User:        user,
-				Expected:    ERR_ENTRY_DUPLICATED,
-				Data:        map[string]any{"EID": entry2.EID, "NewName": entry1.Name},
+				"duplicated entry",
+				data{User: user, EID: entry1.EID, NewName: entry2.Name, ExpectedErr: ERR_ENTRY_DUPLICATED},
 			},
 			{
-				Description: "could not keep entry's name",
-				User:        user,
-				Expected:    nil,
-				Data:        map[string]any{"EID": entry2.EID, "NewName": entry2.Name},
+				"(same)",
+				data{User: user, EID: entry1.EID, NewName: entry1.Name},
 			},
 			{
-				Description: "could not edit entry",
-				User:        user,
-				Expected:    nil,
-				Data:        map[string]any{"EID": entry2.EID, "NewName": entry2.Name + "+"},
+				"(different)",
+				data{User: user, EID: entry1.EID, NewName: entry1.Name + "+"},
 			},
 		},
 	}.Run(t)

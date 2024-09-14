@@ -75,10 +75,10 @@ func PostToggleEntry(c *utils.Context) (err error) {
 	return
 }
 
-// PostClearEntries tries to deletes all the marked entries
-func PostClearEntries(c *utils.Context) (err error) {
+// PostClearShoppingList tries to deletes all the marked entries
+func PostClearShoppingList(c *utils.Context) (err error) {
 	// Tries to clear the list
-	if err = c.U.ClearEntries(); err == nil {
+	if err = c.U.ClearShoppingList(); err == nil {
 		utils.ShowAndRedirect(c, "Lista svuotata con successo", "/shopping_list")
 	}
 

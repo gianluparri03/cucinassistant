@@ -18,9 +18,12 @@ type Entry struct {
 	Marked bool
 }
 
+// ShoppingList is an alias for a map of entries
+type ShoppingList map[int]*Entry
+
 // GetShoppingList returns an user's shopping list
-func (u *User) GetShoppingList() (sl map[int]*Entry, err error) {
-	sl = map[int]*Entry{}
+func (u *User) GetShoppingList() (sl ShoppingList, err error) {
+	sl = ShoppingList{}
 
 	// Queries the entries
 	var rows *sql.Rows
@@ -79,12 +82,11 @@ func (u *User) AppendEntries(names ...string) (err error) {
 	}
 
 	// Prepares the statement
-	stmt, _ := DB.Prepare(`INSERT IGNORE INTO shopping_entries (uid, eid, name)
-	                       SELECT ?, IFNULL(MAX(eid), 0) + 1, ? FROM shopping_entries WHERE uid=?;`)
+	stmt, _ := DB.Prepare(`INSERT IGNORE INTO shopping_entries (uid, name) VALUES (?, ?);`)
 
 	// Inserts the entries
 	for _, name := range names {
-		_, err_ := stmt.Exec(u.UID, name, u.UID)
+		_, err_ := stmt.Exec(u.UID, name)
 		if err_ != nil {
 			slog.Error("while appending shopping entries:", "err", err_)
 			err = ERR_UNKNOWN
@@ -113,7 +115,7 @@ func (u *User) ToggleEntry(EID int) (err error) {
 }
 
 // ClearEntries drops all the marked entries
-func (u *User) ClearEntries() (err error) {
+func (u *User) ClearShoppingList() (err error) {
 	res, err := DB.Exec(`DELETE FROM shopping_entries WHERE uid = ? AND marked;`, u.UID)
 	if err != nil {
 		slog.Error("while clearing entries:", "err", err)

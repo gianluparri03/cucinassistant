@@ -34,7 +34,7 @@ func GetMenus(c *utils.Context) (err error) {
 func PostNewMenu(c *utils.Context) (err error) {
 	var menu *database.Menu
 	if menu, err = c.U.NewMenu(); err == nil {
-		utils.Redirect(c, "/menus/"+strconv.Itoa(menu.MID))
+		utils.Redirect(c, "/menus/"+strconv.Itoa(menu.MID)+"/edit")
 	}
 
 	return
@@ -76,15 +76,13 @@ func PostEditMenu(c *utils.Context) (err error) {
 	var MID int
 	if MID, err = getMID(c); err == nil {
 		// Retrieves the new data
-		data := &database.Menu{
-			Name: c.R.FormValue("name"),
-		}
+		var meals [14]string
 		for i := 0; i < 14; i++ {
-			data.Meals[i] = c.R.FormValue("meal-" + strconv.Itoa(i))
+			meals[i] = c.R.FormValue("meal-" + strconv.Itoa(i))
 		}
 
 		// Tries to replace the menu
-		if err = c.U.ReplaceMenu(MID, data); err == nil {
+		if _, err = c.U.ReplaceMenu(MID, c.R.FormValue("name"), meals); err == nil {
 			utils.Redirect(c, "/menus/"+strconv.Itoa(MID))
 		}
 	}

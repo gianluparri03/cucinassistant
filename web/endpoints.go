@@ -61,7 +61,7 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 	},
 	{
 		Path:        "/shopping_list/clear",
-		PostHandler: handlers.PostClearEntries,
+		PostHandler: handlers.PostClearShoppingList,
 	},
 
 	{

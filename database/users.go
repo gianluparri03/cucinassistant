@@ -45,8 +45,7 @@ func SignUp(username string, email string, password string) (user *User, err err
 	}
 
 	// Tries to save it in the database
-	_, err = DB.Exec(`INSERT INTO users (uid, username, email, password)
-					  SELECT IFNULL(MAX(uid), 0) + 1, ?, ?, ? FROM users;`, username, email, hash)
+	_, err = DB.Exec(`INSERT INTO users (username, email, password) VALUES (?, ?, ?);`, username, email, hash)
 	if err != nil {
 		slog.Error("while signup:", "err", err)
 		err = ERR_UNKNOWN
