@@ -119,4 +119,27 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 		GetHandler:  handlers.GetDeleteUser2,
 		PostHandler: handlers.PostDeleteUser2,
 	},
+
+	{
+		Path:       "/storage",
+		GetHandler: handlers.GetSections,
+	},
+	{
+		Path:        "/storage/new",
+		GetHandler:  handlers.GetNewSection,
+		PostHandler: handlers.PostNewSection,
+	},
+	{
+		Path:       "/storage/{SID}",
+		GetHandler: handlers.GetSection,
+	},
+	{
+		Path:        "/storage/{SID}/edit",
+		GetHandler:  handlers.GetEditSection,
+		PostHandler: handlers.PostEditSection,
+	},
+	{
+		Path:        "/storage/{SID}/delete",
+		PostHandler: handlers.PostDeleteSection,
+	},
 }

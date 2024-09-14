@@ -1,0 +1,29 @@
+{{ define "title" }}Modifica sezione{{ end }}
+{{ define "back_link" }}/storage/{{ .Section.SID }}{{ end }}
+
+{{ define "content" }}
+    <b>Nome</b>
+    <form method="POST">
+        Nuovo nome per la sezione<br>
+        <input type="text" name="name" value="{{ .Section.Name }}"required> <br>
+        <button class="icon-text"><i class="fas fa-check"></i> Continua</button>
+    </form>
+
+    <br>
+
+    <b>Altro</b>
+    <div id="pre-delete">
+        <button class="icon-text" onclick="swapButtons();"><i class="fas fa-trash"></i> Elimina sezione</button> <br>
+    </div>
+    <div id="post-delete" hidden>
+        Sei davvero sicuro? Tutti gli articoli in questa sezione verranno eliminati.
+        <button class="icon-text" hx-post="/storage/{{ .Section.SID }}/delete"><i class="fas fa-trash"></i> Sì, sono sicuro</button> <br>
+    </div>
+
+    <script>
+        function swapButtons() {
+            $('#pre-delete').remove();
+            $('#post-delete').show();
+        }
+    </script>
+{{ end }}

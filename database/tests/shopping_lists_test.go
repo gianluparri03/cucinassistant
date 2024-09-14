@@ -71,7 +71,7 @@ func TestGetShoppingList(t *testing.T) {
 			},
 			{
 				"(empty)",
-                data{User: otherUser, ExpectedList: database.ShoppingList{}},
+				data{User: otherUser, ExpectedList: database.ShoppingList{}},
 			},
 			{
 				"(filled)",

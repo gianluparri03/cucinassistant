@@ -31,12 +31,6 @@ def verify_article(data):
 
 
 @use_user
-def get_storage(cursor, uid, name=''):
-    # Gets the contente
-    cursor.execute(f'SELECT id, name, expiration, quantity FROM storage WHERE user=? AND name LIKE ? ORDER BY expiration;', [uid, '%' + (name or '') + '%'])
-    return tuple(new_article(*a) for a in cursor.fetchall())
-
-@use_user
 def get_storage_article(cursor, uid, aid):
     # Makes sure the id is valid
     if not (isinstance(aid, int) or isinstance(aid, str)) or (isinstance(aid, str) and not aid.isnumeric()):

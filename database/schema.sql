@@ -26,17 +26,20 @@ CREATE TABLE IF NOT EXISTS menus (
 CREATE INDEX IF NOT EXISTS user ON menus (uid);
 
 
-CREATE TABLE IF NOT EXISTS storage_sections (
+CREATE TABLE IF NOT EXISTS sections (
     uid INT NOT NULL,
     sid INT NOT NULL AUTO_INCREMENT,
 
     name VARCHAR(128) NOT NULL,
 
     PRIMARY KEY (sid),
-    FOREIGN KEY (uid) REFERENCES users (uid) ON DELETE CASCADE
+    FOREIGN KEY (uid) REFERENCES users (uid) ON DELETE CASCADE,
+    UNIQUE (uid, name)
 );
 
-CREATE TABLE IF NOT EXISTS storage_articles (
+CREATE INDEX IF NOT EXISTS user_name ON sections (uid, name);
+
+CREATE TABLE IF NOT EXISTS articles (
     uid INT NOT NULL,
     sid INT NOT NULL,
     aid INT NOT NULL AUTO_INCREMENT,
@@ -46,12 +49,12 @@ CREATE TABLE IF NOT EXISTS storage_articles (
     expiration DATE NOT NULL DEFAULT '2004-02-05',
 
     PRIMARY KEY (aid),
-    FOREIGN KEY (sid) REFERENCES storage_sections (sid) ON DELETE CASCADE,
+    FOREIGN KEY (sid) REFERENCES sections (sid) ON DELETE CASCADE,
     UNIQUE (sid, name, expiration)
 );
 
 
-CREATE TABLE IF NOT EXISTS shopping_entries (
+CREATE TABLE IF NOT EXISTS entries (
     uid INT NOT NULL,
     eid INT NOT NULL AUTO_INCREMENT,
 
@@ -63,4 +66,4 @@ CREATE TABLE IF NOT EXISTS shopping_entries (
     UNIQUE (uid, name)
 );
 
-CREATE INDEX IF NOT EXISTS user ON shopping_entries (uid);
+CREATE INDEX IF NOT EXISTS user ON entries (uid);

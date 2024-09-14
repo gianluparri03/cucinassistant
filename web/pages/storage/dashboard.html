@@ -1,0 +1,18 @@
+{{ define "title" }}Sezioni{{ end }}
+{{ define "back_link" }}/{{ end }}
+
+{{ define "content" }}
+    <div class="dashboard">
+        {{ range .List }}
+            <button hx-get="/storage/{{ .SID }}">
+                <i class="fas fa-box"></i>
+                <span>{{ .Name }}</span>
+            </button>
+        {{ end }}
+
+        <button hx-get="/storage/new" class="transparent">
+            <i class="fas fa-plus"></i>
+            <span>Nuova sezione</span>
+        </button>
+    </div>
+{{ end }}

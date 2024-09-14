@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-    "cucinassistant/database"
+	"cucinassistant/database"
 )
 
 var testingUsersN int = 0

@@ -6,33 +6,6 @@ from cucinassistant.web import app
 from flask import request, redirect, url_for
 
 
-@app.route('/dispensa/')
-@smart_route('storage/dashboard.html')
-@login_required
-def storage_dashboard_route(uid):
-    return {'storages': [{'id': 1, 'name': 'Frigo'}, {'id': 2, 'name': 'Pasta'}], 'str': str}
-
-@app.route('/dispensa/nuova/')
-@smart_route('storage/new.html')
-@login_required
-def storage_new_route_get(uid):
-    pass
-
-@app.route('/dispensa/nuova/', methods=["POST"])
-@login_required
-def storage_new_route_post(uid):
-    return redirect('/dispensa/')
-
-@app.route('/dispensa/<int:sid>/')
-@smart_route('storage/view.html')
-@login_required
-def storage_view_route(uid, sid):
-    if sid == 1:
-        name = request.args.get('nome')
-        return {'storage': db.get_storage(uid, name=name), 'filter': name, 'name': 'Frigo', 'sid': sid, 'str': str}
-    else:
-        return {'storage': [], 'name': 'Pasta', 'sid': sid, 'str': str}
-
 @app.route('/dispensa/<int:sid>/aggiungi/')
 @smart_route('storage/add.html')
 @login_required

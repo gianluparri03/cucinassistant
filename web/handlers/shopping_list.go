@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"github.com/gorilla/mux"
 	"strconv"
 	"strings"
@@ -24,7 +23,7 @@ func GetEID(c *utils.Context) (EID int, err error) {
 
 // GetShoppingList renders /shopping_list
 func GetShoppingList(c *utils.Context) (err error) {
-	var list map[int]*database.Entry
+	var list database.ShoppingList
 	if list, err = c.U.GetShoppingList(); err == nil {
 		utils.RenderPage(c, "shopping_list/view", map[string]any{"List": list})
 	}
@@ -96,8 +95,6 @@ func GetEditEntry(c *utils.Context) (err error) {
 			utils.RenderPage(c, "shopping_list/edit", map[string]any{"Name": entry.Name})
 		}
 	}
-
-	fmt.Println(err)
 
 	return
 }

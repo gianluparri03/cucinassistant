@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-    "cucinassistant/database"
+	"cucinassistant/database"
 )
 
 func TestGetMenus(t *testing.T) {

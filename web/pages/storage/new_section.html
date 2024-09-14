@@ -1,0 +1,11 @@
+{{ define "title" }}Nuova sezione{{ end }}
+{{ define "back_link" }}/storage{{ end }}
+
+{{ define "content" }}
+    <form method="POST">
+        Inserisci un nome per la nuova sezione <br>
+		<input type="text" name="name" required> <br>
+
+        <button class="icon-text"><i class="fas fa-check"></i> Continua</button>
+    </form>
+{{ end }}

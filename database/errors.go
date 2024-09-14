@@ -20,4 +20,7 @@ var (
 	ERR_ENTRY_DUPLICATED = errors.New("Elemento già in lista")
 
 	ERR_MENU_NOT_FOUND = errors.New("Menù non trovato")
+
+	ERR_SECTION_DUPLICATED = errors.New("Esiste già una sezione con lo stesso nome")
+	ERR_SECTION_NOT_FOUND  = errors.New("Sezione non trovata")
 )
