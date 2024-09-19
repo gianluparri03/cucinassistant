@@ -24,7 +24,7 @@ func (u *User) GetMenus() (menus []*Menu, err error) {
 
 	// Queries the entries
 	var rows *sql.Rows
-	rows, err = DB.Query(`SELECT mid, name FROM menus WHERE uid=$1;`, u.UID)
+	rows, err = db.Query(`SELECT mid, name FROM menus WHERE uid=$1;`, u.UID)
 	if err != nil {
 		slog.Error("while retrieving menus:", "err", err)
 		err = ERR_UNKNOWN
@@ -55,7 +55,7 @@ func (u *User) GetMenu(MID int) (menu *Menu, err error) {
 	var meals string
 
 	// Scans the menu
-	err = DB.QueryRow(`SELECT mid, name, meals FROM menus WHERE uid=$1 AND mid=$2;`, u.UID, MID).Scan(&menu.MID, &menu.Name, &meals)
+	err = db.QueryRow(`SELECT mid, name, meals FROM menus WHERE uid=$1 AND mid=$2;`, u.UID, MID).Scan(&menu.MID, &menu.Name, &meals)
 	if err != nil {
 		menu = nil
 
@@ -90,7 +90,7 @@ func (u *User) NewMenu() (menu *Menu, err error) {
 	menu.Name = menuDefaultName
 
 	// Adds the new menu
-	_, err = DB.Exec(`INSERT INTO menus (uid, name, meals) VALUES ($1, $2, $3);`, u.UID, menu.Name, packMeals(menu.Meals))
+	_, err = db.Exec(`INSERT INTO menus (uid, name, meals) VALUES ($1, $2, $3);`, u.UID, menu.Name, packMeals(menu.Meals))
 	if err != nil {
 		slog.Error("while creating new menu:", "err", err)
 		err = ERR_UNKNOWN
@@ -98,7 +98,7 @@ func (u *User) NewMenu() (menu *Menu, err error) {
 	}
 
 	// Fetches the MID
-	DB.QueryRow(`SELECT MAX(mid) FROM menus WHERE uid=$1;`, u.UID).Scan(&menu.MID)
+	db.QueryRow(`SELECT MAX(mid) FROM menus WHERE uid=$1;`, u.UID).Scan(&menu.MID)
 	return
 }
 
@@ -110,7 +110,7 @@ func (u *User) ReplaceMenu(MID int, newName string, newMeals [14]string) (menu *
 	}
 
 	// Executes the query
-	_, err = DB.Exec(`INSERT INTO menus (uid, mid, name, meals) VALUES ($1, $2, $3, $4)
+	_, err = db.Exec(`INSERT INTO menus (uid, mid, name, meals) VALUES ($1, $2, $3, $4)
                       ON CONFLICT (mid) DO UPDATE
                       SET name=$3, meals=$4;`, u.UID, MID, newName, packMeals(newMeals))
 	if err != nil {
@@ -126,7 +126,7 @@ func (u *User) ReplaceMenu(MID int, newName string, newMeals [14]string) (menu *
 // DeleteMenu deletes a menu
 func (u *User) DeleteMenu(MID int) (err error) {
 	// Executes the query
-	res, err := DB.Exec(`DELETE FROM menus WHERE uid=$1 AND mid=$2;`, u.UID, MID)
+	res, err := db.Exec(`DELETE FROM menus WHERE uid=$1 AND mid=$2;`, u.UID, MID)
 	if err != nil {
 		slog.Error("while deleting menu:", "err", err)
 		err = ERR_UNKNOWN

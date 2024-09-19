@@ -20,7 +20,7 @@ func Start() {
 	}
 
 	// Registers all the assets
-	RegisterAssets(router)
+	registerAssets(router)
 
 	// Prepares the session storage
 	utils.InitSessionStore()
@@ -31,8 +31,8 @@ func Start() {
 	}
 }
 
-// RegisterAssets adds all the assets to the router
-func RegisterAssets(router *mux.Router) {
+// registerAssets adds all the assets to the router
+func registerAssets(router *mux.Router) {
 	// Registers the assets
 	fs := http.FileServer(http.Dir("web/assets"))
 	router.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", fs))

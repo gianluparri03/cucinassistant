@@ -27,7 +27,7 @@ func (u *User) GetShoppingList() (sl ShoppingList, err error) {
 
 	// Queries the entries
 	var rows *sql.Rows
-	rows, err = DB.Query(`SELECT eid, name, marked FROM entries WHERE uid=$1;`, u.UID)
+	rows, err = db.Query(`SELECT eid, name, marked FROM entries WHERE uid=$1;`, u.UID)
 	if err != nil {
 		slog.Error("while retrieving shopping list:", "err", err)
 		return nil, ERR_UNKNOWN
@@ -55,7 +55,7 @@ func (u *User) GetShoppingList() (sl ShoppingList, err error) {
 func (u *User) GetEntry(EID int) (e *Entry, err error) {
 	e = &Entry{}
 
-	err = DB.QueryRow(`SELECT eid, name, marked FROM entries WHERE uid=$1 AND eid=$2;`, u.UID, EID).Scan(&e.EID, &e.Name, &e.Marked)
+	err = db.QueryRow(`SELECT eid, name, marked FROM entries WHERE uid=$1 AND eid=$2;`, u.UID, EID).Scan(&e.EID, &e.Name, &e.Marked)
 	if err != nil {
 		e = nil
 
@@ -82,7 +82,7 @@ func (u *User) AppendEntries(names ...string) (err error) {
 	}
 
 	// Prepares the statement
-	stmt, err := DB.Prepare(`INSERT INTO entries (uid, name) VALUES ($1, $2) ON CONFLICT DO NOTHING;`)
+	stmt, err := db.Prepare(`INSERT INTO entries (uid, name) VALUES ($1, $2) ON CONFLICT DO NOTHING;`)
 
 	// Inserts the entries
 	for _, name := range names {
@@ -103,7 +103,7 @@ func (u *User) ToggleEntry(EID int) (err error) {
 		return
 	}
 
-	res, err := DB.Exec(`UPDATE entries SET marked=(NOT marked) WHERE uid=$1 AND eid=$2;`, u.UID, EID)
+	res, err := db.Exec(`UPDATE entries SET marked=(NOT marked) WHERE uid=$1 AND eid=$2;`, u.UID, EID)
 	if err != nil {
 		slog.Error("while toggling shopping entries:", "err", err)
 		err = ERR_UNKNOWN
@@ -116,7 +116,7 @@ func (u *User) ToggleEntry(EID int) (err error) {
 
 // ClearEntries drops all the marked entries
 func (u *User) ClearShoppingList() (err error) {
-	res, err := DB.Exec(`DELETE FROM entries WHERE uid=$1 AND marked;`, u.UID)
+	res, err := db.Exec(`DELETE FROM entries WHERE uid=$1 AND marked;`, u.UID)
 	if err != nil {
 		slog.Error("while clearing entries:", "err", err)
 		err = ERR_UNKNOWN
@@ -143,14 +143,14 @@ func (u *User) EditEntry(EID int, newName string) (err error) {
 
 	// Makes sure the new name is not used
 	var found int
-	DB.QueryRow(`SELECT 1 FROM entries WHERE uid=$1 AND name=$2;`, u.UID, newName).Scan(&found)
+	db.QueryRow(`SELECT 1 FROM entries WHERE uid=$1 AND name=$2;`, u.UID, newName).Scan(&found)
 	if found > 0 {
 		err = ERR_ENTRY_DUPLICATED
 		return
 	}
 
 	// Change the name
-	_, err = DB.Exec(`UPDATE entries SET name=$3 WHERE uid=$1 AND eid=$2;`, u.UID, EID, newName)
+	_, err = db.Exec(`UPDATE entries SET name=$3 WHERE uid=$1 AND eid=$2;`, u.UID, EID, newName)
 	if err != nil {
 		slog.Error("while editing entry:", "err", err)
 		err = ERR_UNKNOWN

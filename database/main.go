@@ -10,23 +10,23 @@ import (
 	"cucinassistant/config"
 )
 
-var DB *sql.DB
+var db *sql.DB
 
 // Connect creates a connection to the database.
 // It gets all the needed information from config.Runtime
 func Connect() {
 	// Connects to the database
 	var err error
-	DB, err = sql.Open("postgres", config.Runtime.Database)
+	db, err = sql.Open("postgres", config.Runtime.Database)
 	if err != nil {
 		slog.Error("while connecting to the db:", "err", err)
 		os.Exit(1)
 	}
 
 	// Makes sure the connection is valid
-	if err = DB.Ping(); err != nil {
+	if err = db.Ping(); err != nil {
 		slog.Error("while pinging the db:", "err", err)
-		err = DB.Ping()
+		err = db.Ping()
 		os.Exit(1)
 	}
 }
@@ -35,7 +35,7 @@ func Connect() {
 func Bootstrap() {
 	for _, query := range strings.Split(schema, ";") {
 		if strings.TrimSpace(query) != "" {
-			if _, err := DB.Exec(query + ";"); err != nil {
+			if _, err := db.Exec(query + ";"); err != nil {
 				slog.Error("while creating table:", "err", err)
 				os.Exit(1)
 			}

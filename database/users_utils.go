@@ -17,7 +17,7 @@ func checkUsername(username string) error {
 	}
 
 	var found bool
-	DB.QueryRow(`SELECT 1 FROM ca_users WHERE username=$1;`, username).Scan(&found)
+	db.QueryRow(`SELECT 1 FROM ca_users WHERE username=$1;`, username).Scan(&found)
 	if found {
 		return ERR_USER_NAME_UNAVAIL
 	}
@@ -34,7 +34,7 @@ func checkEmail(email string) error {
 	}
 
 	var found int
-	DB.QueryRow(`SELECT 1 FROM ca_users WHERE email=$1;`, email).Scan(&found)
+	db.QueryRow(`SELECT 1 FROM ca_users WHERE email=$1;`, email).Scan(&found)
 	if found > 0 {
 		return ERR_USER_MAIL_UNAVAIL
 	}

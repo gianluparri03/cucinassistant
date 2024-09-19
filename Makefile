@@ -39,17 +39,17 @@ dbsh: start_db
 
 # Runs the webserver
 run: start_db
-	@go run main.go config_debug.yml
+	@go run main.go config/debug.yml
 
 
 # Runs the tests
 test: create_test_db
-	@go test -v cucinassistant/database -args config_test.yml || true
+	@go test -v cucinassistant/database -args config/test.yml || true
 
 
 # Runs the tests and shows a coverage report
 cover: create_test_db
-	@go test -coverprofile=/tmp/cover.out cucinassistant/database -args config_test.yml || true
+	@go test -coverprofile=/tmp/cover.out cucinassistant/database -args config/test.yml || true
 	@go tool cover -html=/tmp/cover.out
 
 

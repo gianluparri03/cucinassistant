@@ -1,5 +1,2 @@
-config_debug.yml
-
+config/debug.yml
 .direnv
-
-cover.out
