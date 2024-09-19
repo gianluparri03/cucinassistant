@@ -1,33 +1,58 @@
+db_container = ca_db
+db_user = cucinassistant
+db_pass = cucinassistant
+db_name = cucinassistant
+db_test = test
+
+
+# Makes sure that the database is running
 start_db:
-	@if [ "$(shell docker ps -a -q -f name='ca-db')" ]; then \
-		if [ ! "$(shell docker ps -aq -f status='running' -f name='ca-db')" ]; then \
-			docker start ca-db; \
+	@if [ "$(shell docker ps -a -q -f name=$(db_container))" ]; then \
+		if [ ! "$(shell docker ps -aq -f status='running' -f name=$(db_container))" ]; then \
+			docker start $(db_container); \
 		fi \
 	else \
-		docker run -d --name ca-db -e MARIADB_USER=ca-user -e MARIADB_PASSWORD=ca-pass -e MARIADB_DATABASE=cucinassistant -e MARIADB_ROOT_PASSWORD=rpass -p 3306:3306 mariadb:10.6; \
+		docker run -d --name $(db_container) \
+		-e POSTGRES_USER=$(db_user) \
+		-e POSTGRES_PASSWORD=$(db_pass) \
+		-e POSTGRES_DATABASE=$(db_name) \
+		-p 5432:5432 postgres; \
 	fi
 
-drop_db:
-	@docker stop ca-db
-	@docker rm ca-db
 
+# Drops the database entirely
+drop_db:
+	@docker stop $(db_container)
+	@docker rm $(db_container)
+
+
+# Creates a test table in the database
+create_test_db: start_db
+	@-docker exec -it $(db_container) dropdb -U $(db_user) "$(db_test)"
+	@docker exec -it $(db_container) createdb -U $(db_user) "$(db_test)"
+
+
+# Opens a shell with the database
+dbsh: start_db
+	@docker exec -it $(db_container) psql -U $(db_user) -d $(db_name)
+
+
+# Runs the webserver
 run: start_db
 	@go run main.go config_debug.yml
 
+
+# Runs the tests
+test: create_test_db
+	@go test -v cucinassistant/database -args config_test.yml || true
+
+
+# Runs the tests and shows a coverage report
+cover: create_test_db
+	@go test -coverprofile=/tmp/cover.out cucinassistant/database -args config_test.yml || true
+	@go tool cover -html=/tmp/cover.out
+
+
+# Runs go fmt
 fmt:
 	@go fmt ./...
-
-test: start_db
-	@docker exec -it ca-db mariadb -u root -prpass -e "DROP DATABASE IF EXISTS test; CREATE DATABASE test; GRANT ALL PRIVILEGES ON test.* TO 'ca-user'@'%';"
-	@go test -v cucinassistant/database/tests -args ../../config_test.yml || true
-	@docker exec -it ca-db mariadb -u root -prpass -e "DROP DATABASE test;"
-
-cover: start_db
-	@docker exec -it ca-db mariadb -u root -prpass -e "DROP DATABASE IF EXISTS test; CREATE DATABASE test; GRANT ALL PRIVILEGES ON test.* TO 'ca-user'@'%';"
-	@go test -coverprofile=cover.out cucinassistant/database{,/tests} -args ../../config_test.yml || true
-	@docker exec -it ca-db mariadb -u root -prpass -e "DROP DATABASE test;"
-	@go tool cover -html=cover.out
-	@rm cover.out
-
-dbsh: start_db
-	@docker exec -it ca-db mariadb -u ca-user -pca-pass cucinassistant

@@ -14,7 +14,7 @@ var store *sessions.CookieStore
 // It lasts 90 days.
 func InitSessionStore() {
 	// Initializes the session store
-	store = sessions.NewCookieStore([]byte(config.Runtime.Secret))
+	store = sessions.NewCookieStore([]byte(config.Runtime.SessionSecret))
 	store.Options = &sessions.Options{
 		Path:     "/",
 		MaxAge:   60 * 60 * 24 * 90,

@@ -4,21 +4,22 @@
 {{ define "content" }}
     <p>
         <b>CucinAssistant</b> è un progetto sviluppato interamente da
-        <a href="https://gianlucaparri.me" target="_blank">Gianluca Parri</a>, ideato nel 2023
+        <a href="https://gianlucaparri.me" target="_blank"><b>Gianluca Parri</b></a>, ideato nel 2023
         in seguito alla sua nuova vita da fuorisede universitario. Da quel momento
-        è in continua evoluzione, anche se lentamente. <br> <br>
+        è in continua evoluzione, anche se lentamente. <br>
+        La versione corrente è la <b>{{ .VersionNumber }}</b> (<b>{{ .VersionCodeName }}</b>). <br> <br>
 
         Al momento è disponibile sia <a href="{{ .Config.BaseURL }}" target="_blank">
-        come sito web</a> sia come applicazione Android, disponibile sul
-        <a href="{{ .Config.StoreLink }}" target="_blank">Play Store</a>; per gli utenti iOS non
+        come <b>sito web</b></a> sia come applicazione Android, disponibile sul
+        <a href="https://play.google.com/store/apps/details?id=me.gianlucaparri.ca.twa" target="_blank"><b>Play Store</b></a>; per gli utenti iOS non
         è disponibile un'app sullo store, ma si può installare dal browser. <br> <br>
 
-        <b>CucinAssistant</b> è completamente open source; il codice sorgente è disponibile su
-        <a href="https://github.com/gianluparri03/cucinassistant/" target="_blank">GitHub</a>. <br> <br>
+        <b>CucinAssistant</b> è completamente <b>open source</b>; il codice sorgente è disponibile su
+        <a href="https://github.com/gianluparri03/cucinassistant/" target="_blank"><b>GitHub</b></a>. <br> <br>
 
-        Per ulteriori informazioni, potete scrivere una mail a
-        <a href="mailto:{{ .Config.SupportEmail }}" target="_blank">{{ .Config.SupportEmail }}</a>. <br> <br>
+        Per ulteriori <b>informazioni</b>, potete scrivere una mail a
+        <a href="mailto:cucinassistant@gmail.com" target="_blank">cucinassistant@gmail.com</a>. <br> <br>
 
-        La versione corrente è la {{ .Version }}. Attualmente, ci sono {{ .UsersNumber }} utenti attivi.
+        Attualmente, ci sono {{ .UsersNumber }} <b>utenti attivi</b>.
     </p>
 {{ end }}

@@ -73,6 +73,10 @@ func (ph PHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		// Shows the error (if present)
 		if err != nil {
+			if err == database.ERR_USER_UNKNOWN {
+				DropUID(c, "")
+			}
+
 			Show(c, err.Error())
 		}
 	}

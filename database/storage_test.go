@@ -1,10 +1,8 @@
-package tests
+package database
 
 import (
 	"reflect"
 	"testing"
-
-	"cucinassistant/database"
 )
 
 func TestGetSections(t *testing.T) {
@@ -19,10 +17,10 @@ func TestGetSections(t *testing.T) {
 	otherOtherUser.NewSection("s")
 
 	type data struct {
-		User *database.User
+		User *User
 
 		ExpectedErr      error
-		ExpectedSections []*database.Section
+		ExpectedSections []*Section
 	}
 
 	TestSuite[data]{
@@ -38,15 +36,15 @@ func TestGetSections(t *testing.T) {
 		Cases: []TestCase[data]{
 			{
 				"got sections of unknown user",
-				data{User: unknownUser, ExpectedErr: database.ERR_USER_UNKNOWN},
+				data{User: unknownUser, ExpectedErr: ERR_USER_UNKNOWN},
 			},
 			{
 				"(empty)",
-				data{User: otherUser, ExpectedSections: []*database.Section{}},
+				data{User: otherUser, ExpectedSections: []*Section{}},
 			},
 			{
 				"(filled)",
-				data{User: user, ExpectedSections: []*database.Section{s1, s2}},
+				data{User: user, ExpectedSections: []*Section{s1, s2}},
 			},
 		},
 	}.Run(t)
@@ -60,21 +58,21 @@ func TestGetSection(t *testing.T) {
 	otherUser, _ := GetTestingUser(t)
 
 	type data struct {
-		User *database.User
+		User *User
 		SID  int
 
 		ExpectedErr     error
-		ExpectedSection *database.Section
+		ExpectedSection *Section
 	}
 
 	TestSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			var expectedSections map[bool]*database.Section
+			var expectedSections map[bool]*Section
 			if withArticles := d.ExpectedSection; withArticles != nil {
-				withoutArticles := &database.Section{SID: withArticles.SID, Name: withArticles.Name}
-				expectedSections = map[bool]*database.Section{true: withArticles, false: withoutArticles}
+				withoutArticles := &Section{SID: withArticles.SID, Name: withArticles.Name}
+				expectedSections = map[bool]*Section{true: withArticles, false: withoutArticles}
 			} else {
-				expectedSections = map[bool]*database.Section{true: nil, false: nil}
+				expectedSections = map[bool]*Section{true: nil, false: nil}
 			}
 
 			for _, withArticles := range []bool{true, false} {
@@ -92,11 +90,11 @@ func TestGetSection(t *testing.T) {
 		Cases: []TestCase[data]{
 			{
 				"got data of unknown section",
-				data{User: user, ExpectedErr: database.ERR_SECTION_NOT_FOUND},
+				data{User: user, ExpectedErr: ERR_SECTION_NOT_FOUND},
 			},
 			{
 				"other user retrieved section",
-				data{User: otherUser, SID: section.SID, ExpectedErr: database.ERR_SECTION_NOT_FOUND},
+				data{User: otherUser, SID: section.SID, ExpectedErr: ERR_SECTION_NOT_FOUND},
 			},
 			{
 				"",
@@ -110,7 +108,7 @@ func TestNewSection(t *testing.T) {
 	user, _ := GetTestingUser(t)
 
 	type data struct {
-		User *database.User
+		User *User
 		Name string
 
 		ExpectedErr error
@@ -134,7 +132,7 @@ func TestNewSection(t *testing.T) {
 		Cases: []TestCase[data]{
 			{
 				"unknown user created section",
-				data{User: unknownUser, Name: "s", ExpectedErr: database.ERR_USER_UNKNOWN},
+				data{User: unknownUser, Name: "s", ExpectedErr: ERR_USER_UNKNOWN},
 			},
 			{
 				"",
@@ -142,7 +140,7 @@ func TestNewSection(t *testing.T) {
 			},
 			{
 				"created duplicated section",
-				data{User: user, Name: "s1", ExpectedErr: database.ERR_SECTION_DUPLICATED},
+				data{User: user, Name: "s1", ExpectedErr: ERR_SECTION_DUPLICATED},
 			},
 			{
 				"",
@@ -161,7 +159,7 @@ func TestEditSection(t *testing.T) {
 	otherUser.NewSection("s3")
 
 	type data struct {
-		User    *database.User
+		User    *User
 		SID     int
 		NewName string
 
@@ -177,7 +175,7 @@ func TestEditSection(t *testing.T) {
 
 			if d.ExpectedErr == nil {
 				section, _ := d.User.GetSection(d.SID, false)
-				expected := &database.Section{SID: d.SID, Name: d.NewName}
+				expected := &Section{SID: d.SID, Name: d.NewName}
 				if !reflect.DeepEqual(section, expected) {
 					t.Errorf("%v, changes not saved", msg)
 				}
@@ -187,15 +185,15 @@ func TestEditSection(t *testing.T) {
 		Cases: []TestCase[data]{
 			{
 				"other user edited section",
-				data{User: otherUser, SID: section.SID, NewName: "s3", ExpectedErr: database.ERR_SECTION_NOT_FOUND},
+				data{User: otherUser, SID: section.SID, NewName: "s3", ExpectedErr: ERR_SECTION_NOT_FOUND},
 			},
 			{
 				"edited unknown section",
-				data{User: user, NewName: "s3", ExpectedErr: database.ERR_SECTION_NOT_FOUND},
+				data{User: user, NewName: "s3", ExpectedErr: ERR_SECTION_NOT_FOUND},
 			},
 			{
 				"duplicated section",
-				data{User: user, SID: section.SID, NewName: "s2", ExpectedErr: database.ERR_SECTION_DUPLICATED},
+				data{User: user, SID: section.SID, NewName: "s2", ExpectedErr: ERR_SECTION_DUPLICATED},
 			},
 			{
 				"(same)",
@@ -217,7 +215,7 @@ func TestDeleteSection(t *testing.T) {
 	otherUser, _ := GetTestingUser(t)
 
 	type data struct {
-		User *database.User
+		User *User
 		SID  int
 
 		ExpectedErr error
@@ -241,11 +239,11 @@ func TestDeleteSection(t *testing.T) {
 		Cases: []TestCase[data]{
 			{
 				"other user deleted section",
-				data{User: otherUser, SID: section.SID, ExpectedErr: database.ERR_SECTION_NOT_FOUND, ShouldExist: true},
+				data{User: otherUser, SID: section.SID, ExpectedErr: ERR_SECTION_NOT_FOUND, ShouldExist: true},
 			},
 			{
 				"deleted unknown section",
-				data{User: user, ExpectedErr: database.ERR_SECTION_NOT_FOUND},
+				data{User: user, ExpectedErr: ERR_SECTION_NOT_FOUND},
 			},
 			{
 				"",

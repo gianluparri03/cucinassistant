@@ -45,7 +45,7 @@ func SignUp(username string, email string, password string) (user *User, err err
 	}
 
 	// Tries to save it in the database
-	_, err = DB.Exec(`INSERT INTO users (username, email, password) VALUES (?, ?, ?);`, username, email, hash)
+	_, err = DB.Exec(`INSERT INTO ca_users (username, email, password) VALUES ($1, $2, $3);`, username, email, hash)
 	if err != nil {
 		slog.Error("while signup:", "err", err)
 		err = ERR_UNKNOWN
@@ -94,7 +94,7 @@ func (u *User) ChangeUsername(newUsername string) (err error) {
 	}
 
 	// Saves the new one
-	_, err = DB.Exec(`UPDATE users SET username = ? WHERE uid = ?;`, newUsername, u.UID)
+	_, err = DB.Exec(`UPDATE ca_users SET username=$2 WHERE uid=$1;`, u.UID, newUsername)
 	if err != nil {
 		slog.Error("while changing user username:", "err", err)
 		err = ERR_UNKNOWN
@@ -121,7 +121,7 @@ func (u *User) ChangeEmail(newEmail string) (err error) {
 	}
 
 	// Saves the new one
-	_, err = DB.Exec(`UPDATE users SET email = ? WHERE uid = ?;`, newEmail, u.UID)
+	_, err = DB.Exec(`UPDATE ca_users SET email=$2 WHERE uid=$1;`, u.UID, newEmail)
 	if err != nil {
 		slog.Error("while changing user email:", "err", err)
 		return ERR_UNKNOWN
@@ -158,7 +158,7 @@ func (u *User) ChangePassword(oldPassword string, newPassword string) (err error
 	}
 
 	// Saves the new one
-	_, err = DB.Exec(`UPDATE users SET password = ? WHERE uid = ?;`, hashedPassword, u.UID)
+	_, err = DB.Exec(`UPDATE ca_users SET password=$2 WHERE uid=$1;`, u.UID, hashedPassword)
 	if err != nil {
 		slog.Error("while changing user password:", "err", err)
 		return ERR_UNKNOWN
@@ -178,7 +178,7 @@ func (u *User) GenerateToken() (token string, err error) {
 
 	// Saves it in the database
 	var res sql.Result
-	res, err = DB.Exec(`UPDATE users SET token = ? WHERE uid = ?;`, hash, u.UID)
+	res, err = DB.Exec(`UPDATE ca_users SET token=$2 WHERE uid=$1;`, u.UID, hash)
 	if err != nil {
 		slog.Error("while saving token:", "err", err)
 		return "", ERR_UNKNOWN
@@ -226,7 +226,7 @@ func (u *User) ResetPassword(token string, newPassword string) (err error) {
 	}
 
 	// Saves the new password (and resets the token)
-	_, err = DB.Exec(`UPDATE users SET password=?, token=NULL WHERE uid=?;`, hashedPassword, u.UID)
+	_, err = DB.Exec(`UPDATE ca_users SET password=$2, token=NULL WHERE uid=$1;`, u.UID, hashedPassword)
 	if err != nil {
 		slog.Error("while resetting password:", "err", err)
 		err = ERR_UNKNOWN
@@ -260,7 +260,7 @@ func (u *User) Delete(token string) (err error) {
 	}
 
 	// Deletes the user
-	_, err = DB.Exec(`DELETE FROM users WHERE uid = ?;`, u.UID)
+	_, err = DB.Exec(`DELETE FROM ca_users WHERE uid=$1;`, u.UID)
 	if err != nil {
 		slog.Error("while deleting user:", "err", err)
 		err = ERR_UNKNOWN
@@ -284,7 +284,7 @@ func GetUser(field string, value any) (user *User, err error) {
 	var token *string
 
 	// Queries the data
-	err = DB.QueryRow(`SELECT uid, username, email, password, token FROM users WHERE `+field+` = ?;`, value).
+	err = DB.QueryRow(`SELECT uid, username, email, password, token FROM ca_users WHERE `+field+`=$1;`, value).
 		Scan(&user.UID, &user.Username, &user.Email, &user.Password, &token)
 	if err != nil {
 		user = nil
@@ -312,7 +312,7 @@ func GetUser(field string, value any) (user *User, err error) {
 
 // GetUsersNumber returns the number of users currently registered
 func GetUsersNumber() (n int) {
-	err := DB.QueryRow(`SELECT COUNT(*) FROM users;`).Scan(&n)
+	err := DB.QueryRow(`SELECT COUNT(*) FROM ca_users;`).Scan(&n)
 	if err != nil {
 		slog.Error("while selecting users number:", "err", err)
 	}

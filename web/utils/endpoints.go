@@ -26,8 +26,7 @@ type Endpoint struct {
 
 // Register adds the endpoint to the router
 func (e Endpoint) Register(router *mux.Router) {
-	// Returns an error message if the method
-	// is not allowed
+	// Returns an error message if the method is not allowed
 	unknownHandler := func(c *Context) error {
 		c.W.WriteHeader(http.StatusMethodNotAllowed)
 		ShowAndRedirect(c, "Richiesta sconosciuta", "/")

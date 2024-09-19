@@ -2,36 +2,26 @@ package config
 
 // Config contains all the fields read from a config file
 type Config struct {
-	// Mode is one among "debug", "prod", "test"
-	Mode string
+	// Debugging, if enabled, will add a shutdown prompt
+	Debugging bool
 
-	// Secret is used to encrypt session cookies
-	Secret string
+	// Testing, if enabled, will disable emails
+	Testing bool
 
-	// BaseURL is used in emails to retrieve assets from the webserver (needs protocol)
+	// SessionSecret is used to encrypt session cookies
+	SessionSecret string
+
+	// BaseURL is an URL from which CucinAssistant will be accessed,
+	// like https://ca.gianlucaparri.me
 	BaseURL string `yaml:"baseURL"`
 
-	// ServerAddress is the address the web server will listen to
-	ServerAddress string `yaml:"serverAddress"`
+	// Port is the port the server will listen to
+	Port string
 
-	Database struct {
-		// Address is the hostname:port of the database
-		Address string
-
-		// Username is the username of the database
-		Username string
-
-		// Password is the password of the database
-		Password string
-
-		// Database is the name of the database
-		Database string
-	}
+	// Database is the postgresql's connection string
+	Database string
 
 	Email struct {
-		// Enabled indicates if the emails will be sent or not (set to false only for testing)
-		Enabled bool
-
 		// Address is the sender address
 		Address string
 
@@ -41,21 +31,9 @@ type Config struct {
 		// Port is the port of the smtp server
 		Port string
 
-		// Login is the login value of the smtp server
-		Login string
-
 		// Password is the password of the smtp server
 		Password string
 	}
-
-	// SupportEmail is the email visible in the info page
-	SupportEmail string `yaml:"supportEmail"`
-
-	// RepoLink is the link to the repository visible in the info page
-	RepoLink string `yaml:"repoLink"`
-
-	// StoreLink is the link to the Play Store visible in the info page
-	StoreLink string `yaml:"storeLink"`
 }
 
 // Runtime contains the config read from the file

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"strings"
 
 	"cucinassistant/config"
 	"cucinassistant/database"
@@ -18,8 +19,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	slog.Info("CucinAssistant (v" + config.Version + ")")
-	slog.Info("=======================")
+	// Prints a welcome text
+	title := fmt.Sprintf("CucinAssistant %d (%s)", config.VersionNumber, config.VersionCodeName)
+	slog.Info(title)
+	slog.Info(strings.Repeat("=", len(title)))
 
 	// Parses the config
 	slog.Info("Reading configs...")
@@ -29,23 +32,22 @@ func main() {
 	slog.Info("Connecting to the database...")
 	database.Connect()
 
-	// Creates missing tables
-	slog.Info("Checking tables...")
-	database.Bootstrap("database/schema.sql")
+	// Checks the schema
+	slog.Info("Checking schema...")
+	database.Bootstrap()
 
 	// Adds a listener for shutting down the server if it's on debug mode
-	if config.Runtime.Mode == "debug" {
+	slog.Info("Starting web server...")
+	if config.Runtime.Debugging {
 		go func() {
 			fmt.Scanln()
-			slog.Error("Keyboard interrupt")
 			os.Exit(0)
 		}()
 
-		slog.Info("Starting web server on " + config.Runtime.ServerAddress + " (press ENTER to stop)...")
-	} else {
-		slog.Info("Starting web server on " + config.Runtime.ServerAddress + "...")
+		slog.Info("[Press ENTER to stop]")
 	}
 
 	// Starts the server
+	slog.Info("Running on http://localhost:" + config.Runtime.Port + "/")
 	web.Start()
 }

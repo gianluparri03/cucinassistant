@@ -25,7 +25,7 @@ func (u *User) GetSections() (sections []*Section, err error) {
 
 	// Queries the sections
 	var rows *sql.Rows
-	rows, err = DB.Query(`SELECT sid, name FROM sections WHERE uid=?;`, u.UID)
+	rows, err = DB.Query(`SELECT sid, name FROM sections WHERE uid=$1;`, u.UID)
 	if err != nil {
 		slog.Error("while retrieving sections:", "err", err)
 		return nil, ERR_UNKNOWN
@@ -59,14 +59,14 @@ func (u *User) NewSection(name string) (section *Section, err error) {
 
 	// Checks if the name is used
 	var found bool
-	DB.QueryRow(`SELECT 1 FROM sections WHERE uid=? AND name=?;`, u.UID, name).Scan(&found)
+	DB.QueryRow(`SELECT 1 FROM sections WHERE uid=$1 AND name=$2;`, u.UID, name).Scan(&found)
 	if found {
 		err = ERR_SECTION_DUPLICATED
 		return
 	}
 
 	// Tries to save it in the database
-	_, err = DB.Exec(`INSERT INTO sections (uid, name) VALUES (?, ?);`, u.UID, name)
+	_, err = DB.Exec(`INSERT INTO sections (uid, name) VALUES ($1, $2);`, u.UID, name)
 	if err != nil {
 		slog.Error("while creating section:", "err", err)
 		err = ERR_UNKNOWN
@@ -75,7 +75,7 @@ func (u *User) NewSection(name string) (section *Section, err error) {
 
 	// Retrieves the SID
 	section = &Section{Name: name}
-	DB.QueryRow(`SELECT sid FROM sections WHERE uid=? AND name=?;`, u.UID, name).Scan(&section.SID)
+	DB.QueryRow(`SELECT sid FROM sections WHERE uid=$1 AND name=$2;`, u.UID, name).Scan(&section.SID)
 	return
 }
 
@@ -85,7 +85,7 @@ func (u *User) GetSection(SID int, fetchArticles bool) (section *Section, err er
 	section = &Section{}
 
 	// Scans the section
-	err = DB.QueryRow(`SELECT sid, name FROM sections WHERE uid=? AND sid=?;`, u.UID, SID).Scan(&section.SID, &section.Name)
+	err = DB.QueryRow(`SELECT sid, name FROM sections WHERE uid=$1 AND sid=$2;`, u.UID, SID).Scan(&section.SID, &section.Name)
 	if err != nil {
 		section = nil
 
@@ -118,14 +118,14 @@ func (u *User) EditSection(SID int, newName string) (err error) {
 
 	// Makes sure the new name is not used
 	var found int
-	DB.QueryRow(`SELECT 1 FROM sections WHERE uid=? AND name=?;`, u.UID, newName).Scan(&found)
+	DB.QueryRow(`SELECT 1 FROM sections WHERE uid=$1 AND name=$2;`, u.UID, newName).Scan(&found)
 	if found > 0 {
 		err = ERR_SECTION_DUPLICATED
 		return
 	}
 
 	// Change the name
-	_, err = DB.Exec(`UPDATE sections SET name=? WHERE uid=? AND sid=?;`, newName, u.UID, SID)
+	_, err = DB.Exec(`UPDATE sections SET name=$3 WHERE uid=$1 AND sid=$2;`, u.UID, SID, newName)
 	if err != nil {
 		slog.Error("while editing section:", "err", err)
 		err = ERR_UNKNOWN
@@ -138,7 +138,7 @@ func (u *User) EditSection(SID int, newName string) (err error) {
 // DeleteSection tries to delete a section, with all the related articles
 func (u *User) DeleteSection(SID int) (err error) {
 	// Executes the query
-	res, err := DB.Exec(`DELETE FROM sections WHERE uid=? AND sid=?;`, u.UID, SID)
+	res, err := DB.Exec(`DELETE FROM sections WHERE uid=$1 AND sid=$2;`, u.UID, SID)
 	if err != nil {
 		slog.Error("while deleting section:", "err", err)
 		err = ERR_UNKNOWN

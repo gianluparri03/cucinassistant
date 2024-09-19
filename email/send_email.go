@@ -22,7 +22,7 @@ func SendMail(recipient string, subject string, templateName string, data map[st
 	formatMessage(&body, templateName, data)
 
 	// Sends it to the recipient
-	if config.Runtime.Email.Enabled {
+	if !config.Runtime.Testing {
 		sendBody(recipient, &body)
 		slog.Debug("Sent email:", "template", templateName, "recipient", recipient)
 	}
@@ -58,7 +58,7 @@ func sendBody(recipient string, body *bytes.Buffer) {
 	// Prepares the credentials
 	credentials := smtp.PlainAuth(
 		"",
-		config.Runtime.Email.Login,
+		config.Runtime.Email.Address,
 		config.Runtime.Email.Password,
 		config.Runtime.Email.Server,
 	)

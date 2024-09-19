@@ -1,25 +1,15 @@
-mode: "debug"
+debugging: true
 
-secret: "xxx"
+sessionSecret: "xxx"
 
 baseURL: "http://localhost:8080"
-serverAddress: ":8080"
+port: "8080"
 
-database:
-  address: "127.0.0.1:3306"
-  username: "ca-user"
-  password: "ca-pass"
-  database: "cucinassistant"
+database: "user=cucinassistant password=cucinassistant dbname=cucinassistant ssl-mode=disable"
 
 email:
-  enabled: true
   address: "cucinassistant@gmail.com"
   server: "<redacted>"
   port: "<redacted>"
   login: "<redacted>"
   password: "<redacted>"
-
-supportEmail: "cucinassistant@gmail.com"
-
-repoLink: "https://github.com/gianluparri03/cucinassistant"
-storeLink: "https://play.google.com/store/apps/details?id=me.gianlucaparri.ca.twa"

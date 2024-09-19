@@ -11,8 +11,9 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 		GetHandler: handlers.GetIndex,
 	},
 	{
-		Path:       "/info",
-		GetHandler: handlers.GetInfo,
+		Path:        "/info",
+		Unprotected: true,
+		GetHandler:  handlers.GetInfo,
 	},
 
 	{
