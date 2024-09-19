@@ -153,7 +153,7 @@ func TestReplaceMenu(t *testing.T) {
 		Target: func(t *testing.T, msg string, d data) {
 			got, err := d.User.ReplaceMenu(d.MID, d.NewName, d.NewMeals)
 			if err != d.ExpectedErr {
-				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
+				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
 			}
 
 			if d.ExpectedErr == nil {
@@ -162,7 +162,7 @@ func TestReplaceMenu(t *testing.T) {
 				if !reflect.DeepEqual(menu, expected) {
 					t.Errorf("%v, changes not saved", msg)
 				} else if !reflect.DeepEqual(menu, got) {
-					t.Errorf("%v, wrong returned values", msg)
+					t.Errorf("%v, new menu badly returned", msg)
 				}
 			}
 		},
@@ -171,6 +171,10 @@ func TestReplaceMenu(t *testing.T) {
 			{
 				"other user replaced menu",
 				data{User: otherUser, MID: menu.MID, NewName: newName, NewMeals: newMeals, ExpectedErr: database.ERR_MENU_NOT_FOUND},
+			},
+			{
+				"replaced unknown menu",
+				data{User: user, NewName: newName, NewMeals: newMeals, ExpectedErr: database.ERR_MENU_NOT_FOUND},
 			},
 			{
 				"",

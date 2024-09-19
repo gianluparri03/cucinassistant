@@ -178,12 +178,12 @@ func TestChangeUsername(t *testing.T) {
 				data{User: user, NewUsername: otherUser.Username, ExpectedErr: database.ERR_USER_NAME_UNAVAIL},
 			},
 			{
-				"",
-				data{User: user, NewUsername: user.Username + "u"},
+				"(same)",
+				data{User: user, NewUsername: user.Username},
 			},
 			{
-				"",
-				data{User: user, NewUsername: user.Username},
+				"(different)",
+				data{User: user, NewUsername: user.Username + "u"},
 			},
 		},
 	}.Run(t)
@@ -229,12 +229,12 @@ func TestChangeEmail(t *testing.T) {
 				data{User: user, NewEmail: otherUser.Email, ExpectedErr: database.ERR_USER_MAIL_UNAVAIL},
 			},
 			{
-				"",
-				data{User: user, NewEmail: user.Email + "e"},
+				"(same)",
+				data{User: user, NewEmail: user.Email},
 			},
 			{
-				"",
-				data{User: user, NewEmail: user.Email},
+				"(different)",
+				data{User: user, NewEmail: user.Email + "e"},
 			},
 		},
 	}.Run(t)
@@ -385,6 +385,11 @@ func TestResetPassword(t *testing.T) {
 func TestDeleteUser(t *testing.T) {
 	user, _ := GetTestingUser(t)
 	token, _ := user.GenerateToken()
+	// TODO: add an article
+	user.AppendEntries("e")
+	user.NewMenu()
+	user.NewSection("s")
+
 	otherUser, _ := GetTestingUser(t)
 
 	type data struct {
@@ -396,9 +401,6 @@ func TestDeleteUser(t *testing.T) {
 
 	TestSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			// TODO: create some content, to check the foreign keys cascade
-			d.User.AppendEntries("...")
-			d.User.NewMenu()
 			err := d.User.Delete(d.Token)
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)

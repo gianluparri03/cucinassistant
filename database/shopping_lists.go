@@ -122,9 +122,7 @@ func (u *User) ClearShoppingList() (err error) {
 		err = ERR_UNKNOWN
 	} else if ra, _ := res.RowsAffected(); ra < 1 {
 		// Makes sure the user exists
-		if _, err = GetUser("UID", u.UID); err == nil {
-			err = ERR_ENTRY_NOT_FOUND
-		}
+		_, err = GetUser("UID", u.UID)
 	}
 
 	return

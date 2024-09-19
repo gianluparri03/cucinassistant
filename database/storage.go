@@ -59,7 +59,7 @@ func (u *User) NewSection(name string) (section *Section, err error) {
 
 	// Checks if the name is used
 	var found bool
-	DB.QueryRow(`SELECT 1 FROM sections WHERE uid=? AND name=?;`, name).Scan(&found)
+	DB.QueryRow(`SELECT 1 FROM sections WHERE uid=? AND name=?;`, u.UID, name).Scan(&found)
 	if found {
 		err = ERR_SECTION_DUPLICATED
 		return

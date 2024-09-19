@@ -24,7 +24,7 @@ test: start_db
 
 cover: start_db
 	@docker exec -it ca-db mariadb -u root -prpass -e "DROP DATABASE IF EXISTS test; CREATE DATABASE test; GRANT ALL PRIVILEGES ON test.* TO 'ca-user'@'%';"
-	@go test -coverprofile=cover.out cucinassistant/database -args ../config_test.yml || true
+	@go test -coverprofile=cover.out cucinassistant/database{,/tests} -args ../../config_test.yml || true
 	@docker exec -it ca-db mariadb -u root -prpass -e "DROP DATABASE test;"
 	@go tool cover -html=cover.out
 	@rm cover.out
