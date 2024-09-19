@@ -21,33 +21,33 @@ func main() {
 
 	// Prints a welcome text
 	title := fmt.Sprintf("CucinAssistant %d (%s)", config.VersionNumber, config.VersionCodeName)
-	slog.Info(title)
-	slog.Info(strings.Repeat("=", len(title)))
+	slog.Warn(title)
+	slog.Warn(strings.Repeat("=", len(title)))
 
 	// Parses the config
-	slog.Info("Reading configs...")
+	slog.Warn("Reading configs...")
 	config.Read(os.Args[1])
 
 	// Connects to the database
-	slog.Info("Connecting to the database...")
+	slog.Warn("Connecting to the database...")
 	database.Connect()
 
 	// Checks the schema
-	slog.Info("Checking schema...")
+	slog.Warn("Checking schema...")
 	database.Bootstrap()
 
 	// Adds a listener for shutting down the server if it's on debug mode
-	slog.Info("Starting web server...")
+	slog.Warn("Starting web server...")
 	if config.Runtime.Debugging {
 		go func() {
 			fmt.Scanln()
 			os.Exit(0)
 		}()
 
-		slog.Info("[Press ENTER to stop]")
+		slog.Warn("[Press ENTER to stop]")
 	}
 
 	// Starts the server
-	slog.Info("Running on http://localhost:" + config.Runtime.Port + "/")
+	slog.Warn("Running on http://localhost:" + config.Runtime.Port + "/")
 	web.Start()
 }

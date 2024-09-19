@@ -1,6 +1,6 @@
 debugging: true
 
-sessionSecret: "xxx"
+sessionSecret: "<...>"
 
 baseURL: "http://localhost:8080"
 port: "8080"
@@ -8,8 +8,8 @@ port: "8080"
 database: "user=cucinassistant password=cucinassistant dbname=cucinassistant ssl-mode=disable"
 
 email:
-  address: "cucinassistant@gmail.com"
-  server: "<redacted>"
-  port: "<redacted>"
-  login: "<redacted>"
-  password: "<redacted>"
+  address: "<...>"
+  server: "<...>"
+  port: "<...>"
+  login: "<...>"
+  password: "<...>"

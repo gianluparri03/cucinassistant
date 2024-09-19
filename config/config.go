@@ -12,7 +12,7 @@ type Config struct {
 	SessionSecret string
 
 	// BaseURL is an URL from which CucinAssistant will be accessed,
-	// like https://ca.gianlucaparri.me
+	// like `https://ca.gianlucaparri.me`
 	BaseURL string `yaml:"baseURL"`
 
 	// Port is the port the server will listen to

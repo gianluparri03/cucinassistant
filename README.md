@@ -4,6 +4,7 @@ Warning: as of today, CucinAssistant's UI is in Italian, while the code (and the
 I plan to add the support for multiple languages in the next updates.
 
 You can look at the [docs file](docs.md) to see how the code is organized.
+Instead, the [running file](running.md) explains how to run CucinAssistant with docker compose.
 
 
 ## What is CucinAssistant
