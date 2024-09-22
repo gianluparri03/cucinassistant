@@ -1,7 +1,14 @@
 # CucinAssistant
 
-Warning: as of today, CucinAssistant's UI is in Italian, while the code (and the docs) are in English.
-I plan to add the support for multiple languages in the next updates.
+![Website](https://img.shields.io/website?url=https%3A%2F%2Fca.gianlucaparri.me)
+![Codacy Grade](https://img.shields.io/codacy/grade/54e56adbe15f43568a1819224319b423)
+![Codacy Coverage](https://img.shields.io/codacy/coverage/54e56adbe15f43568a1819224319b423)
+![Travis Tests](https://img.shields.io/travis/com/gianluparri03/cucinassistant)
+![Travis Bagde](https://api.travis-ci.com/gianluparri03/cucinassistant.svg?token=95Axdsx3duw4srArH1WS&branch=rewrite)
+![Code Size](https://img.shields.io/github/languages/code-size/gianluparri03/cucinassistant)
+
+> [!WARNING]
+> As of today, CucinAssistant's UI is in Italian, while the code (and the docs) are in English. I plan to add the support for multiple languages in the next updates.
 
 You can look at the [docs file](docs.md) to see how the code is organized.
 Instead, the [running file](running.md) explains how to run CucinAssistant with docker compose.
@@ -27,9 +34,10 @@ Trusted Web Application, so it is the same of the website.
 ## A bit of history
 
 The first version of CucinAssistant was written in Python (with Flask) and used MariaDB as its database; then,
-after some experiments, I've decided to rewrite it completely, and now it is written in Go and uses PostgreSQL.
+after some experiments, I've decided to rewrite it completely, and now it is written in Go and uses PostgreSQL and HTMX.
 
-Note: the new versioning system consists of a progressive number and a codename; the old releases may still contain
+> [!NOTE]
+> The new versioning system consists of a progressive number and a codename; the old releases may still contain
 the old version number, with a major and a minor number.
 
 You can look at the [releases tab](https://github.com/gianluparri03/cucinassistant/releases/) for the complete list.

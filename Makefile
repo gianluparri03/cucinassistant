@@ -49,7 +49,7 @@ test: create_test_db
 
 # Runs the tests and shows a coverage report
 cover: create_test_db
-	@go test -coverprofile=/tmp/cover.out cucinassistant/database -args config/test.yml || true
+	@go test -coverprofile=/tmp/cover.out -covermode atomic cucinassistant/database -args config/test.yml || true
 	@go tool cover -html=/tmp/cover.out
 
 

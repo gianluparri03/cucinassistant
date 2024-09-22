@@ -1,2 +1,3 @@
 config/debug.yml
 .direnv
+.envrc
