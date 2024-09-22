@@ -1,4 +1,4 @@
-# Docs
+# Packages
 
 CucinAssistant is written in Go, and it is divided in 6+1 packages: here I will describe briefly all of them.
 
@@ -7,6 +7,10 @@ CucinAssistant is written in Go, and it is divided in 6+1 packages: here I will 
 
 It just contains a `main.go` file that runs everything.
 You can run everything just by using `make run`, or by hand with `go run main.go <config_file>`.
+
+The `broadcast.go` file is a program used in production to send an email to every user, like for scheduled manteinance.
+It will ask for the email subject and content, send a test email to the sender email and - if confirmed - broadcast it to
+each user. It needs the config file as argument.
 
 ## cucinassistant/config
 
@@ -29,7 +33,7 @@ This package is the only one with tests. They can be run with `make test`.
 
 ## cucinassistant/email
 
-This package exports only a function, `SendMail`, that sends an email to a recipient.
+This package exports only a function, `SendMail`, that sends an email to one (or more) recipients.
 There is also a `templates/` folder, that contains all the possible email templates.
 
 ## cucinassistant/web

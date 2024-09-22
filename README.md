@@ -10,9 +10,6 @@
 > [!WARNING]
 > As of today, CucinAssistant's UI is in Italian, while the code (and the docs) are in English. I plan to add the support for multiple languages in the next updates.
 
-You can look at the [docs file](docs.md) to see how the code is organized.
-Instead, the [running file](running.md) explains how to run CucinAssistant with docker compose.
-
 
 ## What is CucinAssistant
 
@@ -22,6 +19,12 @@ shopping list (with a two-phase checking system) and a storage section, where yo
 stored in your fridge or cupboard (even in two separate folders), both with their quantiy and their expiration
 date.  
 As said before, the next steps will be a multi-language UI and a recipes section.
+
+
+## Docs
+
+You can look at the [packages.md file](docs/packages.md) to see how the code is organized.
+Instead, the [docker.md file](docs/docker.md) explains how to run CucinAssistant with docker compose.
 
 
 ## Public instances
@@ -36,11 +39,11 @@ Trusted Web Application, so it is the same of the website.
 The first version of CucinAssistant was written in Python (with Flask) and used MariaDB as its database; then,
 after some experiments, I've decided to rewrite it completely, and now it is written in Go and uses PostgreSQL and HTMX.
 
+You can look at the [releases tab](https://github.com/gianluparri03/cucinassistant/releases/) for the complete version list.
+
 > [!NOTE]
 > The new versioning system consists of a progressive number and a codename; the old releases may still contain
 the old version number, with a major and a minor number.
-
-You can look at the [releases tab](https://github.com/gianluparri03/cucinassistant/releases/) for the complete list.
 
 
 ## Credits and license

@@ -29,7 +29,11 @@ func InitSessionStore() {
 func SaveUID(c *Context, UID int, msg string) {
 	c.S.Values["UID"] = UID
 	c.S.Save(c.R, c.W)
-	ShowAndRedirect(c, msg, "/")
+	if msg != "" {
+		ShowAndRedirect(c, msg, "/")
+	} else {
+		Redirect(c, "/")
+	}
 }
 
 // DropUID drops the UID from the session.

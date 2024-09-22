@@ -1,4 +1,4 @@
-# Running
+# Docker
 
 This guide will explain to you how to setup an instance of CucinAssistant with docker compose.
 
@@ -58,3 +58,8 @@ services:
 ```
 
 3. Run `docker compose up` (with an optional `-d` to hide the output) and we're done!
+
+4. It may happen that you need to tell something to your users. To do that, you can simply execute
+`docker exec -it cucinassistant-app-1 ./broadcast config.yml`. This will run a wizard that will ask for the
+email subject and body, then send a test email to the sender email. Then, after a confirm, it will broadcast it
+to each user.

@@ -3,6 +3,7 @@ package database
 import (
 	"fmt"
 	"reflect"
+	"slices"
 	"testing"
 )
 
@@ -478,5 +479,12 @@ func TestGetUser(t *testing.T) {
 func TestGetUsersNumber(t *testing.T) {
 	if gotUN := GetUsersNumber(); gotUN != testingUsersN {
 		t.Errorf("expected <%v>, got <%v>", testingUsersN, gotUN)
+	}
+}
+
+func TestGetUsersEmails(t *testing.T) {
+	user, _ := GetTestingUser(t)
+	if emails := GetUsersEmails(); !slices.Contains(emails, user.Email) {
+		t.Errorf("<%v> not in <%v>", user.Email, emails)
 	}
 }

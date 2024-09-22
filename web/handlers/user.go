@@ -45,7 +45,7 @@ func PostSignUp(c *utils.Context) (err error) {
 		var user *database.User
 		if user, err = database.SignUp(username, email_, password); err == nil {
 			// Sends the welcome email
-			go email.SendMail(email_, "Registrazione effettuata", "welcome", map[string]any{"Username": username})
+			go email.SendMail("Registrazione effettuata", "welcome", map[string]any{"Username": username}, email_)
 
 			// Saves the UID and redirects to /
 			utils.SaveUID(c, user.UID, "Account creato con successo")
@@ -85,7 +85,7 @@ func PostSignOut(c *utils.Context) error {
 
 // GetForgotPassword renders /user/forgot_password
 func GetForgotPassword(c *utils.Context) error {
-	utils.RenderPage(c, "user/forgot_pasword", nil)
+	utils.RenderPage(c, "user/forgot_password", nil)
 	return nil
 }
 
@@ -101,10 +101,10 @@ func PostForgotPassword(c *utils.Context) (err error) {
 		var token string
 		if token, err = user.GenerateToken(); err == nil {
 			// Sends it the email
-			go email.SendMail(user.Email, "Recupero password", "reset_password", map[string]any{
+			go email.SendMail("Recupero password", "reset_password", map[string]any{
 				"Username":  user.Username,
 				"ResetLink": config.Runtime.BaseURL + "/user/reset_password?token=" + url.QueryEscape(token),
-			})
+			}, user.Email)
 
 			// Shows the popup
 			utils.Show(c, MSG_EMAIL_SENT)
@@ -138,9 +138,9 @@ func PostResetPassword(c *utils.Context) (err error) {
 			var user *database.User
 			if user, err = database.GetUser("UID", user.UID); err == nil {
 				// Sends the email
-				go email.SendMail(user.Email, "Cambio password", "password_change", map[string]any{
+				go email.SendMail("Cambio password", "password_change", map[string]any{
 					"Username": user.Username,
-				})
+				}, user.Email)
 
 				// Saves the UID and redirects to /
 				utils.SaveUID(c, user.UID, "Password cambiata con successo")
@@ -210,9 +210,9 @@ func PostChangePassword(c *utils.Context) (err error) {
 		// Tries to change the password
 		if err = c.U.ChangePassword(c.R.FormValue("password"), newPassword); err == nil {
 			// Sends the email
-			go email.SendMail(c.U.Email, "Cambio password", "password_change", map[string]any{
+			go email.SendMail("Cambio password", "password_change", map[string]any{
 				"Username": c.U.Username,
-			})
+			}, c.U.Email)
 
 			// Shows the popup
 			utils.ShowAndRedirect(c, "Password cambiata con successo", "/user/settings")
@@ -234,10 +234,10 @@ func PostDeleteUser1(c *utils.Context) (err error) {
 	var token string
 	if token, err = c.U.GenerateToken(); err == nil {
 		// Sends the email
-		go email.SendMail(c.U.Email, "Eliminazione account", "delete_confirm", map[string]any{
+		go email.SendMail("Eliminazione account", "delete_confirm", map[string]any{
 			"Username":   c.U.Username,
 			"DeleteLink": config.Runtime.BaseURL + "/user/delete_2?token=" + url.QueryEscape(token),
-		})
+		}, c.U.Email)
 
 		utils.Show(c, MSG_EMAIL_SENT)
 	}
@@ -259,9 +259,9 @@ func PostDeleteUser2(c *utils.Context) (err error) {
 	// Tries to delete the user
 	if err = c.U.Delete(token); err == nil {
 		// Sends the goodbye email
-		go email.SendMail(c.U.Email, "Eliminazione account", "goodbye", map[string]any{
+		go email.SendMail("Eliminazione account", "goodbye", map[string]any{
 			"Username": c.U.Username,
-		})
+		}, c.U.Email)
 
 		// Drops the session and redirects to /user/signin
 		utils.DropUID(c, "Account eliminato con successo")

@@ -9,10 +9,10 @@ import (
 	"cucinassistant/config"
 )
 
-// SendMail sends an email to a recipient, with a given subject, whose
+// SendMail sends an email to one (or more) recipients, with a given subject, whose
 // content is generated from a template with some additional data.
 // TemplateName must contains only the basename of the file.
-func SendMail(recipient string, subject string, templateName string, data map[string]any) {
+func SendMail(subject string, templateName string, data map[string]any, recipients ...string) {
 	// Prepares the headers of the body
 	var body bytes.Buffer
 	body.Write([]byte("Subject: " + subject + "\n"))
@@ -23,8 +23,7 @@ func SendMail(recipient string, subject string, templateName string, data map[st
 
 	// Sends it to the recipient
 	if !config.Runtime.Testing {
-		sendBody(recipient, &body)
-		slog.Debug("Sent email:", "template", templateName, "recipient", recipient)
+		sendBody(&body, templateName, recipients...)
 	}
 }
 
@@ -53,8 +52,8 @@ func formatMessage(w *bytes.Buffer, templateName string, data map[string]any) {
 	}
 }
 
-// sendBody sends the message (a bytes.Buffer) to the recipient
-func sendBody(recipient string, body *bytes.Buffer) {
+// sendBody sends the message (a bytes.Buffer) to the recipients
+func sendBody(body *bytes.Buffer, emailType string, recipients ...string) {
 	// Prepares the credentials
 	credentials := smtp.PlainAuth(
 		"",
@@ -63,17 +62,21 @@ func sendBody(recipient string, body *bytes.Buffer) {
 		config.Runtime.Email.Server,
 	)
 
-	// Sends the message
-	err := smtp.SendMail(
-		config.Runtime.Email.Server+":"+config.Runtime.Email.Port,
-		credentials,
-		config.Runtime.Email.Address,
-		[]string{recipient},
-		body.Bytes(),
-	)
+	for _, recipient := range recipients {
+		// Sends the message
+		err := smtp.SendMail(
+			config.Runtime.Email.Server+":"+config.Runtime.Email.Port,
+			credentials,
+			config.Runtime.Email.Address,
+			[]string{recipient},
+			body.Bytes(),
+		)
 
-	// Checks for errors
-	if err != nil {
-		slog.Error("while sending email:", "err", err)
+		// Checks for errors
+		if err != nil {
+			slog.Error("while sending email:", "err", err)
+		} else {
+			slog.Debug("Sent email:", "emailType", emailType, "recipient", recipient)
+		}
 	}
 }

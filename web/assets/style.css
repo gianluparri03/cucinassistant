@@ -1,14 +1,12 @@
 /* --- VARIABLES --------------------- */
 :root {
     --red: #d50000;
-    --orange: #ff9900;
+    --orange: #f90;
     --background: #f9f9f9;
     --section: #e1e1e1;
     --text: #4a4a4a;
-
     --cursive: 'Satisfy', cursive;
     --sansserif: 'Inclusive Sans', sans-serif;
-
     --base-size: 2rem;
 }
 
@@ -146,26 +144,21 @@ button.icon-text {
 message {
     width: 100%;
     height: 100%;
-
     position: fixed;
     top: 0;
     left: 0;
     z-index: 1;
-
-    background-color: rgba(0, 0, 0, .6);
+    background-color: rgba(0 0 0 / 60%);
     overflow: hidden;
 }
 
 message > content {
     width: 60%;
-
     position: absolute;
     top: 30%;
     left: 20%;
-
     background-color: var(--orange);
     border-radius: 10px;
-
     padding: 50px 30px;
     box-sizing: border-box;
 }
@@ -210,7 +203,7 @@ message button {
 }
 
 .dashboard button.transparent:hover {
-    background-color: rgba(0, 0, 0, .2);
+    background-color: rgba(0 0 0 / 20%);
 }
 
 .dashboard button i {
@@ -236,7 +229,7 @@ message button {
     cursor: pointer;
 }
 
-.shopping-list input[type=checkbox] {
+.shopping-list input[type="checkbox"] {
     width: 20px;
     height: 20px;
 }
@@ -257,8 +250,7 @@ textarea {
 @media(orientation: landscape) {
     .menu-day {
         display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
+        flex-flow: row wrap;
     }
 
     .menu-day b {

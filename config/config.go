@@ -9,7 +9,7 @@ type Config struct {
 	Testing bool
 
 	// SessionSecret is used to encrypt session cookies
-	SessionSecret string
+	SessionSecret string `yaml:"sessionSecret"`
 
 	// BaseURL is an URL from which CucinAssistant will be accessed,
 	// like `https://ca.gianlucaparri.me`

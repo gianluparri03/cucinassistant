@@ -9,8 +9,9 @@ COPY config/. config
 COPY database/. database
 COPY email/. email
 COPY web/. web
-COPY main.go .
+COPY main.go broadcast.go .
 
-RUN go build
+RUN go build main.go
+RUN go build broadcast.go
 
-ENTRYPOINT ["./cucinassistant"]
+ENTRYPOINT ["./main"]

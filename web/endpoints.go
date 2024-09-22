@@ -79,10 +79,12 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 	},
 	{
 		Path:        "/user/signout",
+		Unprotected: true,
 		PostHandler: handlers.PostSignOut,
 	},
 	{
 		Path:        "/user/forgot_password",
+		Unprotected: true,
 		GetHandler:  handlers.GetForgotPassword,
 		PostHandler: handlers.PostForgotPassword,
 	},

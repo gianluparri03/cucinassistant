@@ -319,3 +319,20 @@ func GetUsersNumber() (n int) {
 
 	return
 }
+
+// GetUsersEmails returns the emails of all the users
+func GetUsersEmails() (emails []string) {
+	rows, err := db.Query(`SELECT email FROM ca_users;`)
+	if err != nil {
+		slog.Error("while selecting emails:", "err", err)
+	}
+
+	defer rows.Close()
+	for rows.Next() {
+		var email string
+		rows.Scan(&email)
+		emails = append(emails, email)
+	}
+
+	return
+}
