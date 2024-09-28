@@ -23,13 +23,11 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.23"
-      - name: Creating config file
-        run: "printf 'testing: true\ndatabase: \"user=catest password=catest dbname=catest sslmode=disable"\n' > config.yml"
+          go-version: '1.23'
       - name: Install dependencies
         run: go get .
       - name: Run tests
-        run: go test -coverprofile=cover.out cucinassistant/database -args config.yml
+        run: go test -coverprofile=cover.out cucinassistant/database -args config/ci.yml
       - name: Push coverage results
         uses: codacy/codacy-coverage-reporter-action@v1.3.0
         with:

@@ -1,0 +1,2 @@
+testing: true
+database: "user=catest password=catest dbname=catest sslmode=disable"
