@@ -3,8 +3,7 @@
 ![Website](https://img.shields.io/website?url=https%3A%2F%2Fca.gianlucaparri.me)
 ![Codacy Grade](https://img.shields.io/codacy/grade/54e56adbe15f43568a1819224319b423)
 ![Codacy Coverage](https://img.shields.io/codacy/coverage/54e56adbe15f43568a1819224319b423)
-![Travis Tests](https://img.shields.io/travis/com/gianluparri03/cucinassistant)
-![Travis Bagde](https://api.travis-ci.com/gianluparri03/cucinassistant.svg?token=95Axdsx3duw4srArH1WS&branch=rewrite)
+![GitHub Actions](https://img.shields.io/github/actions/workflow/status/gianluparri03/cucinassistant/push)
 ![Code Size](https://img.shields.io/github/languages/code-size/gianluparri03/cucinassistant)
 
 > [!WARNING]
