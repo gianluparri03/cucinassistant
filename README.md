@@ -17,13 +17,6 @@ related to the kitchen. In particular, CucinAssistant features, a section for th
 shopping list (with a two-phase checking system) and a storage section, where you can save the items
 stored in your fridge or cupboard (even in two separate folders), both with their quantiy and their expiration
 date.  
-As said before, the next steps will be a multi-language UI and a recipes section.
-
-
-## Docs
-
-You can look at the [packages.md file](docs/packages.md) to see how the code is organized.
-Instead, the [docker.md file](docs/docker.md) explains how to run CucinAssistant with docker compose.
 
 
 ## Public instances
@@ -33,6 +26,12 @@ from Google Play ([here](https://play.google.com/store/apps/details?id=me.gianlu
 Trusted Web Application, so it is the same of the website.
 
 
+## Docs
+
+You can look at the [packages.md file](docs/packages.md) to see how the code is organized.
+Instead, the [docker.md file](docs/docker.md) explains how to run CucinAssistant with docker compose.
+
+
 ## A bit of history
 
 The first version of CucinAssistant was written in Python (with Flask) and used MariaDB as its database; then,
@@ -40,15 +39,23 @@ after some experiments, I've decided to rewrite it completely, and now it is wri
 
 You can look at the [releases tab](https://github.com/gianluparri03/cucinassistant/releases/) for the complete version list.
 
-> [!NOTE]
-> The new versioning system consists of a progressive number and a codename; the old releases may still contain
-the old version number, with a major and a minor number.
+
+## Next features
+
+I plan to implement the following features:
+
+- [ ] A multi language UI
+- [ ] Recipe management
+- [ ] A confirmation email when signing up
+- [ ] Prepared statements everywhere
+
+If you have any suggestion, found a bug or want to contribute, you can
+send me an email at [gianlucaparri03@gmail.com](mailto:gianlucaparri03@gmail.com), or just open a PR/issue.
 
 
 ## Credits and license
 
-The author of the project is Gianluca Parri: if you have any suggestion, found a bug or want to contribute, you can
-send me an email at [gianlucaparri03@gmail.com](mailto:gianlucaparri03@gmail.com).
+The author of the project is Gianluca Parri.
 
 CucinAssistant is released with the MIT license.
 
