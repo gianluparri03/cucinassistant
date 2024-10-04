@@ -20,7 +20,7 @@ func TestGetSections(t *testing.T) {
 		User *User
 
 		ExpectedErr      error
-		ExpectedSections []*Section
+		ExpectedSections []Section
 	}
 
 	TestSuite[data]{
@@ -40,11 +40,11 @@ func TestGetSections(t *testing.T) {
 			},
 			{
 				"(empty)",
-				data{User: otherUser, ExpectedSections: []*Section{}},
+				data{User: otherUser},
 			},
 			{
 				"(filled)",
-				data{User: user, ExpectedSections: []*Section{s1, s2}},
+				data{User: user, ExpectedSections: []Section{s1, s2}},
 			},
 		},
 	}.Run(t)
@@ -62,27 +62,29 @@ func TestGetSection(t *testing.T) {
 		SID  int
 
 		ExpectedErr     error
-		ExpectedSection *Section
+		ExpectedSection Section
 	}
 
 	TestSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			var expectedSections map[bool]*Section
-			if withArticles := d.ExpectedSection; withArticles != nil {
-				withoutArticles := &Section{SID: withArticles.SID, Name: withArticles.Name}
-				expectedSections = map[bool]*Section{true: withArticles, false: withoutArticles}
+			expectedSections := map[bool]Section{}
+
+			if d.ExpectedSection.SID != 0 {
+				expectedSections[false] = Section{SID: d.ExpectedSection.SID, Name: d.ExpectedSection.Name}
+				expectedSections[true] = d.ExpectedSection
 			} else {
-				expectedSections = map[bool]*Section{true: nil, false: nil}
+				expectedSections[false] = Section{}
+				expectedSections[true] = Section{}
 			}
 
-			for _, withArticles := range []bool{true, false} {
-				expectedSection := expectedSections[withArticles]
+			for _, fetchArticlesValue := range []bool{true, false} {
+				expectedSection := expectedSections[fetchArticlesValue]
 
-				got, err := d.User.GetSection(d.SID, withArticles)
+				got, err := d.User.GetSection(d.SID, fetchArticlesValue)
 				if err != d.ExpectedErr {
-					t.Errorf("%s (%v): expected err <%v>, got <%v>", msg, withArticles, d.ExpectedErr, err)
+					t.Errorf("%s (%v): expected err <%v>, got <%v>", msg, fetchArticlesValue, d.ExpectedErr, err)
 				} else if !reflect.DeepEqual(got, expectedSection) {
-					t.Errorf("%s (%v): expected section <%v>, got <%v>", msg, withArticles, expectedSection, got)
+					t.Errorf("%s (%v): expected section <%v>, got <%v>", msg, fetchArticlesValue, expectedSection, got)
 				}
 			}
 		},
@@ -175,7 +177,7 @@ func TestEditSection(t *testing.T) {
 
 			if d.ExpectedErr == nil {
 				section, _ := d.User.GetSection(d.SID, false)
-				expected := &Section{SID: d.SID, Name: d.NewName}
+				expected := Section{SID: d.SID, Name: d.NewName}
 				if !reflect.DeepEqual(section, expected) {
 					t.Errorf("%v, changes not saved", msg)
 				}
@@ -229,9 +231,9 @@ func TestDeleteSection(t *testing.T) {
 			}
 
 			section, _ = user.GetSection(d.SID, true)
-			if !d.ShouldExist && section != nil {
+			if !d.ShouldExist && section.SID != 0 {
 				t.Errorf("%s, section wasn't deleted", msg)
-			} else if d.ShouldExist && section == nil {
+			} else if d.ShouldExist && section.SID == 0 {
 				t.Errorf("%s, section was deleted anyway", msg)
 			}
 		},

@@ -1,4 +1,4 @@
-# CucinAssistant
+<img src="web/assets/banner.png" height="200px">
 
 ![Website](https://img.shields.io/website?url=https%3A%2F%2Fca.gianlucaparri.me)
 ![Codacy Grade](https://img.shields.io/codacy/grade/54e56adbe15f43568a1819224319b423)
@@ -13,7 +13,7 @@
 ## What is CucinAssistant
 
 CucinAssistant is an utility website, with which you - and your roommates - can keep track of things
-related to the kitchen. In particular, CucinAssistant features, a section for the menus management, a
+related to the kitchen. In particular, it features, a section for the menus management, a
 shopping list (with a two-phase checking system) and a storage section, where you can save the items
 stored in your fridge or cupboard (even in two separate folders), both with their quantiy and their expiration
 date.  
@@ -47,7 +47,7 @@ I plan to implement the following features:
 - [ ] A multi language UI
 - [ ] Recipe management
 - [ ] A confirmation email when signing up
-- [ ] Prepared statements everywhere
+- [ ] A better config system (maybe environment variables with defaults?)
 
 If you have any suggestion, found a bug or want to contribute, you can
 send me an email at [gianlucaparri03@gmail.com](mailto:gianlucaparri03@gmail.com), or just open a PR/issue.

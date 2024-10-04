@@ -2,10 +2,25 @@ package database
 
 import (
 	"crypto/rand"
+	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/alexedwards/argon2id"
 	"log/slog"
 	"net/mail"
+	"strings"
+)
+
+const (
+	// menuDefaultName is the name given to new menus
+	menuDefaultName = "Nuovo Menù"
+
+	// mealSeparator is used to separate meals when packed
+	mealSeparator = ";"
+
+	// duplicatedMenuSuffix is added at the end of the name when
+	// duplicating a menu
+	duplicatedMenuSuffix = " (copia)"
 )
 
 // checkUsername ensures an username is valid.
@@ -92,6 +107,7 @@ func generateToken() (plain string, hash string, err error) {
 // ensureFetched checks if an user is builded
 // by hand or fetched form the database. In the
 // first case, it replaces it with a fetched one.
+// It is used for testing purposes.
 func (u *User) ensureFetched() error {
 	if u == nil {
 		return ERR_USER_UNKNOWN
@@ -107,4 +123,51 @@ func (u *User) ensureFetched() error {
 	}
 
 	return nil
+}
+
+// handleNoRowsError is an utility function that does the following.
+// If err is sql.ErrNoRows, checks if it happened because the user (with given
+// UID) does not exist (and in this case it returns ERR_USER_UNKNOWN), or just because
+// there are no rows (and in this case it returns ifExists).
+// If err is not sql.ErrNoRows, it prints a log (with whileDoing) and returns
+// ERR_UNKNOWN
+func handleNoRowsError(err error, UID int, ifExist error, whileDoing string) error {
+	if errors.Is(err, sql.ErrNoRows) {
+		if _, err = GetUser("UID", UID); err == nil {
+			return ifExist
+		} else {
+			return err
+		}
+	} else {
+		slog.Error("while "+whileDoing+":", "err", err)
+		return ERR_UNKNOWN
+	}
+}
+
+// packMeals packs the 14 meals in a string
+func packMeals(meals [14]string) string {
+	var sb strings.Builder
+
+	for index, meal := range meals {
+		sb.WriteString(meal)
+
+		if index < 13 {
+			sb.WriteString(mealSeparator)
+		}
+	}
+
+	return sb.String()
+}
+
+// unpackMeals unpacks a string in an array of meals
+func unpackMeals(meals string) (out [14]string) {
+	for index, meal := range strings.Split(meals, mealSeparator) {
+		if index == 14 {
+			break
+		}
+
+		out[index] = meal
+	}
+
+	return
 }

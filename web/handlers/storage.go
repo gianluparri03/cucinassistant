@@ -21,7 +21,7 @@ func GetSID(c *utils.Context) (SID int, err error) {
 
 // GetSections renders /storage
 func GetSections(c *utils.Context) (err error) {
-	var list []*database.Section
+	var list []database.Section
 	if list, err = c.U.GetSections(); err == nil {
 		utils.RenderPage(c, "storage/dashboard", map[string]any{"List": list})
 	}
@@ -37,7 +37,7 @@ func GetNewSection(c *utils.Context) (err error) {
 
 // PostNewSection tries to create a new section
 func PostNewSection(c *utils.Context) (err error) {
-	var s *database.Section
+	var s database.Section
 	if s, err = c.U.NewSection(c.R.FormValue("name")); err == nil {
 		utils.ShowAndRedirect(c, "Sezione creata con successo", "/storage/"+strconv.Itoa(s.SID))
 	}
@@ -49,7 +49,7 @@ func PostNewSection(c *utils.Context) (err error) {
 func GetSection(c *utils.Context) (err error) {
 	var SID int
 	if SID, err = GetSID(c); err == nil {
-		var section *database.Section
+		var section database.Section
 		if section, err = c.U.GetSection(SID, true); err == nil {
 			utils.RenderPage(c, "storage/view", map[string]any{"Section": section, "Filter": ""})
 		}
@@ -63,8 +63,7 @@ func GetEditSection(c *utils.Context) (err error) {
 	// Retrieves the SID
 	var SID int
 	if SID, err = GetSID(c); err == nil {
-		//
-		var section *database.Section
+		var section database.Section
 		if section, err = c.U.GetSection(SID, false); err == nil {
 			utils.RenderPage(c, "storage/edit_section", map[string]any{"Section": section})
 		}

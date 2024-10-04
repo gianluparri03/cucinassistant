@@ -9,7 +9,7 @@ import (
 var testingEntriesN int = 0
 
 // denerateEntry adds an entry to an user's shopping list
-func generateEntry(u *User) (entry *Entry) {
+func generateEntry(u *User) (entry Entry) {
 	testingEntriesN++
 
 	name := "entry-" + strconv.Itoa(testingEntriesN)
@@ -65,7 +65,7 @@ func TestGetShoppingList(t *testing.T) {
 		Cases: []TestCase[data]{
 			{
 				"got entries of unknown user",
-				data{User: unknownUser, ExpectedErr: ERR_USER_UNKNOWN},
+				data{User: unknownUser, ExpectedErr: ERR_USER_UNKNOWN, ExpectedList: ShoppingList{}},
 			},
 			{
 				"(empty)",
@@ -91,7 +91,7 @@ func TestGetEntry(t *testing.T) {
 		EID  int
 
 		ExpectedErr   error
-		ExpectedEntry *Entry
+		ExpectedEntry Entry
 	}
 
 	TestSuite[data]{
@@ -128,8 +128,8 @@ func TestGetEntry(t *testing.T) {
 func TestAppendEntries(t *testing.T) {
 	user, _ := GetTestingUser(t)
 	entry1 := generateEntry(user)
-	entry2 := &Entry{EID: testingEntriesN + 1, Name: "appended-2"}
-	entry3 := &Entry{EID: testingEntriesN + 2, Name: "appended-3"}
+	entry2 := Entry{EID: testingEntriesN + 1, Name: "appended-2"}
+	entry3 := Entry{EID: testingEntriesN + 2, Name: "appended-3"}
 	testingEntriesN += 2
 
 	names := []string{entry2.Name, entry3.Name, entry1.Name, entry2.Name}
@@ -159,7 +159,7 @@ func TestAppendEntries(t *testing.T) {
 		Cases: []TestCase[data]{
 			{
 				"unknown user appended entries",
-				data{User: unknownUser, Names: names, ExpectedErr: ERR_USER_UNKNOWN},
+				data{User: unknownUser, Names: names, ExpectedErr: ERR_USER_UNKNOWN, ExpectedList: ShoppingList{}},
 			},
 			{
 				"could not append entries",

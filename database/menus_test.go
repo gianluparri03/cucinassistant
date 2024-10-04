@@ -20,7 +20,7 @@ func TestGetMenus(t *testing.T) {
 		User *User
 
 		ExpectedErr   error
-		ExpectedMenus []*Menu
+		ExpectedMenus []Menu
 	}
 
 	TestSuite[data]{
@@ -40,11 +40,11 @@ func TestGetMenus(t *testing.T) {
 			},
 			{
 				"(empty)",
-				data{User: otherUser, ExpectedMenus: []*Menu{}},
+				data{User: otherUser},
 			},
 			{
 				"(filled)",
-				data{User: user, ExpectedMenus: []*Menu{m1, m2}},
+				data{User: user, ExpectedMenus: []Menu{m1, m2}},
 			},
 		},
 	}.Run(t)
@@ -62,7 +62,7 @@ func TestGetMenu(t *testing.T) {
 		MID  int
 
 		ExpectedErr  error
-		ExpectedMenu *Menu
+		ExpectedMenu Menu
 	}
 
 	TestSuite[data]{
@@ -156,7 +156,7 @@ func TestReplaceMenu(t *testing.T) {
 
 			if d.ExpectedErr == nil {
 				menu, _ := d.User.GetMenu(d.MID)
-				expected := &Menu{MID: d.MID, Name: d.NewName, Meals: d.NewMeals}
+				expected := Menu{MID: d.MID, Name: d.NewName, Meals: d.NewMeals}
 				if !reflect.DeepEqual(menu, expected) {
 					t.Errorf("%v, changes not saved", msg)
 				} else if !reflect.DeepEqual(menu, got) {
@@ -203,9 +203,9 @@ func TestDeleteMenu(t *testing.T) {
 			}
 
 			menu, _ = user.GetMenu(d.MID)
-			if !d.ShouldExist && menu != nil {
+			if !d.ShouldExist && menu.MID != 0 {
 				t.Errorf("%s, menu wasn't deleted", msg)
-			} else if d.ShouldExist && menu == nil {
+			} else if d.ShouldExist && menu.MID == 0 {
 				t.Errorf("%s, menu was deleted anyway", msg)
 			}
 		},

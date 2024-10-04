@@ -3,7 +3,6 @@ package database
 import (
 	"database/sql"
 	"log/slog"
-	"strings"
 )
 
 // Entry is an element of the shopping list
@@ -19,7 +18,7 @@ type Entry struct {
 }
 
 // ShoppingList is an alias for a map of entries
-type ShoppingList map[int]*Entry
+type ShoppingList map[int]Entry
 
 // GetShoppingList returns an user's shopping list
 func (u *User) GetShoppingList() (sl ShoppingList, err error) {
@@ -30,7 +29,8 @@ func (u *User) GetShoppingList() (sl ShoppingList, err error) {
 	rows, err = db.Query(`SELECT eid, name, marked FROM entries WHERE uid=$1;`, u.UID)
 	if err != nil {
 		slog.Error("while retrieving shopping list:", "err", err)
-		return nil, ERR_UNKNOWN
+		err = ERR_UNKNOWN
+		return
 	}
 
 	// Appends them to the list
@@ -38,36 +38,23 @@ func (u *User) GetShoppingList() (sl ShoppingList, err error) {
 	for rows.Next() {
 		var e Entry
 		rows.Scan(&e.EID, &e.Name, &e.Marked)
-		sl[e.EID] = &e
+		sl[e.EID] = e
 	}
 
 	// If no entries have been found, makes sure the user exists
 	if len(sl) == 0 {
-		if _, err = GetUser("UID", u.UID); err != nil {
-			sl = nil
-		}
+		_, err = GetUser("UID", u.UID)
 	}
 
 	return
 }
 
 // GetEntry returns a single entry of the shopping list
-func (u *User) GetEntry(EID int) (e *Entry, err error) {
-	e = &Entry{}
-
+func (u *User) GetEntry(EID int) (e Entry, err error) {
+	// Fetches them
 	err = db.QueryRow(`SELECT eid, name, marked FROM entries WHERE uid=$1 AND eid=$2;`, u.UID, EID).Scan(&e.EID, &e.Name, &e.Marked)
 	if err != nil {
-		e = nil
-
-		if strings.HasSuffix(err.Error(), "no rows in result set") {
-			// Makes sure the user exists
-			if _, err = GetUser("UID", u.UID); err == nil {
-				err = ERR_ENTRY_NOT_FOUND
-			}
-		} else {
-			slog.Error("while retrieving shopping entry:", "err", err)
-			err = ERR_UNKNOWN
-		}
+		err = handleNoRowsError(err, u.UID, ERR_ENTRY_NOT_FOUND, "retrireving entry")
 	}
 
 	return
@@ -76,19 +63,22 @@ func (u *User) GetEntry(EID int) (e *Entry, err error) {
 // AppendEntries appends some entries to the shopping list
 func (u *User) AppendEntries(names ...string) (err error) {
 	// Ensures the user exists
-	_, err = GetUser("UID", u.UID)
-	if err != nil {
+	if _, err = GetUser("UID", u.UID); err != nil {
 		return
 	}
 
 	// Prepares the statement
 	stmt, err := db.Prepare(`INSERT INTO entries (uid, name) VALUES ($1, $2) ON CONFLICT DO NOTHING;`)
+	if err != nil {
+		slog.Error("while preparing statement to append entries:", "err", err)
+		err = ERR_UNKNOWN
+		return
+	}
 
 	// Inserts the entries
 	for _, name := range names {
-		_, err_ := stmt.Exec(u.UID, name)
-		if err_ != nil {
-			slog.Error("while appending shopping entries:", "err", err_)
+		if _, err = stmt.Exec(u.UID, name); err != nil {
+			slog.Error("while appending shopping entry:", "err", err)
 			err = ERR_UNKNOWN
 		}
 	}
@@ -98,16 +88,15 @@ func (u *User) AppendEntries(names ...string) (err error) {
 
 // ToggleEntry toggles an entry's marked field
 func (u *User) ToggleEntry(EID int) (err error) {
-	// Gets the entry (to make sure it exists)
+	// Makes sure the entry exists
 	if _, err = u.GetEntry(EID); err != nil {
 		return
 	}
 
-	res, err := db.Exec(`UPDATE entries SET marked=(NOT marked) WHERE uid=$1 AND eid=$2;`, u.UID, EID)
+	// Updates it
+	_, err = db.Exec(`UPDATE entries SET marked=(NOT marked) WHERE uid=$1 AND eid=$2;`, u.UID, EID)
 	if err != nil {
 		slog.Error("while toggling shopping entries:", "err", err)
-		err = ERR_UNKNOWN
-	} else if ra, _ := res.RowsAffected(); ra < 1 {
 		err = ERR_UNKNOWN
 	}
 
@@ -116,6 +105,7 @@ func (u *User) ToggleEntry(EID int) (err error) {
 
 // ClearEntries drops all the marked entries
 func (u *User) ClearShoppingList() (err error) {
+	// Deletes the marked entries
 	res, err := db.Exec(`DELETE FROM entries WHERE uid=$1 AND marked;`, u.UID)
 	if err != nil {
 		slog.Error("while clearing entries:", "err", err)

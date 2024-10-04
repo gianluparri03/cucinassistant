@@ -5,7 +5,7 @@ sessionSecret: "<...>"
 baseURL: "http://localhost:8080"
 port: "8080"
 
-database: "user=cucinassistant password=cucinassistant dbname=cucinassistant ssl-mode=disable"
+database: "user=cucinassistant password=cucinassistant dbname=cucinassistant sslmode=disable"
 
 email:
   address: "<...>"

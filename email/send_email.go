@@ -57,7 +57,7 @@ func sendBody(body *bytes.Buffer, emailType string, recipients ...string) {
 	// Prepares the credentials
 	credentials := smtp.PlainAuth(
 		"",
-		config.Runtime.Email.Address,
+		config.Runtime.Email.Login,
 		config.Runtime.Email.Password,
 		config.Runtime.Email.Server,
 	)

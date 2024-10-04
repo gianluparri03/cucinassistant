@@ -43,13 +43,12 @@ const schema = `
     CREATE INDEX IF NOT EXISTS main ON sections (uid, name);
 
     CREATE TABLE IF NOT EXISTS articles (
-        uid INT NOT NULL,
         sid INT NOT NULL,
         aid SERIAL NOT NULL,
 
         name VARCHAR(250) NOT NULL,
-        quantity INT NOT NULL DEFAULT 0,
-        expiration DATE NOT NULL DEFAULT '2004-02-05',
+        quantity INT,
+        expiration DATE,
 
         PRIMARY KEY (aid),
         FOREIGN KEY (sid) REFERENCES sections (sid) ON DELETE CASCADE,

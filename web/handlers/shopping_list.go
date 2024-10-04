@@ -90,7 +90,7 @@ func GetEditEntry(c *utils.Context) (err error) {
 	var EID int
 	if EID, err = GetEID(c); err == nil {
 		// Retrieves the entry's name and renders the page
-		var entry *database.Entry
+		var entry database.Entry
 		if entry, err = c.U.GetEntry(EID); err == nil {
 			utils.RenderPage(c, "shopping_list/edit", map[string]any{"Name": entry.Name})
 		}

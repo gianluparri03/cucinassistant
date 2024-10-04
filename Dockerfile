@@ -1,4 +1,6 @@
-FROM golang:1.23
+FROM golang:1.23-alpine
+
+LABEL "org.opencontainers.image.source"="https://github.com/gianluparri03/cucinassistant"
 
 WORKDIR /cucinassistant
 

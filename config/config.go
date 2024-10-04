@@ -31,6 +31,9 @@ type Config struct {
 		// Port is the port of the smtp server
 		Port string
 
+		// Login is the value used when loggin in to the server
+		Login string
+
 		// Password is the password of the smtp server
 		Password string
 	}
