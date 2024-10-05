@@ -26,7 +26,6 @@ func Connect() {
 	// Makes sure the connection is valid
 	if err = db.Ping(); err != nil {
 		slog.Error("while pinging the db:", "err", err)
-		err = db.Ping()
 		os.Exit(1)
 	}
 }

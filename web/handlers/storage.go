@@ -50,7 +50,7 @@ func GetSection(c *utils.Context) (err error) {
 	var SID int
 	if SID, err = GetSID(c); err == nil {
 		var section database.Section
-		if section, err = c.U.GetSection(SID, true); err == nil {
+		if section, err = c.U.GetArticles(SID, ""); err == nil {
 			utils.RenderPage(c, "storage/view", map[string]any{"Section": section, "Filter": ""})
 		}
 	}
@@ -64,7 +64,7 @@ func GetEditSection(c *utils.Context) (err error) {
 	var SID int
 	if SID, err = GetSID(c); err == nil {
 		var section database.Section
-		if section, err = c.U.GetSection(SID, false); err == nil {
+		if section, err = c.U.GetSection(SID); err == nil {
 			utils.RenderPage(c, "storage/edit_section", map[string]any{"Section": section})
 		}
 	}

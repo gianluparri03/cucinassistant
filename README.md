@@ -56,7 +56,7 @@ I plan to implement the following features:
 - [ ] Cookie banner and privacy notice
 - [ ] +/- buttons when editing an article (storage)
 - [ ] A better config system (maybe environment variables with defaults?)
-- [ ] Caching external assets
+- [ ] Caching external assets (find a replacement for fontawesome)
 
 If you have any suggestion, found a bug or want to contribute, you can
 send me an email at [gianlucaparri03@gmail.com](mailto:gianlucaparri03@gmail.com), or just open a PR/issue.

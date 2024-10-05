@@ -259,7 +259,7 @@ func TestChangePassword(t *testing.T) {
 
 			if d.ExpectedErr == nil {
 				user, _ := GetUser("UID", d.User.UID)
-				if match, _ := CompareHash(d.NewPassword, user.Password); !match {
+				if match, _ := compareHash(d.NewPassword, user.Password); !match {
 					t.Errorf("%s, changes not saved", msg)
 				}
 			}
@@ -307,7 +307,7 @@ func TestGenerateToken(t *testing.T) {
 
 			if d.ExpectedErr == nil {
 				user, _ := GetUser("UID", d.User.UID)
-				if match, _ := CompareHash(token, user.Token); !match {
+				if match, _ := compareHash(token, user.Token); !match {
 					t.Errorf("%s, saved token does not match returned one", msg)
 				}
 			}
@@ -350,7 +350,7 @@ func TestResetPassword(t *testing.T) {
 				user, _ := GetUser("email", d.User.Email)
 				if user.Token != "" {
 					t.Errorf("%s, token wasn't dropped", msg)
-				} else if match, _ := CompareHash(d.NewPassword, user.Password); !match {
+				} else if match, _ := compareHash(d.NewPassword, user.Password); !match {
 					t.Errorf("%s, new password not saved", msg)
 				}
 			}
@@ -384,10 +384,10 @@ func TestResetPassword(t *testing.T) {
 func TestDeleteUser(t *testing.T) {
 	user, _ := GetTestingUser(t)
 	token, _ := user.GenerateToken()
-	// TODO: add an article
 	user.AppendEntries("e")
 	user.NewMenu()
-	user.NewSection("s")
+	section, _ := user.NewSection("s")
+	user.AddArticles(section.SID, StringArticle{"article", "", ""})
 
 	otherUser, _ := GetTestingUser(t)
 

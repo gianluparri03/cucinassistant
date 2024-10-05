@@ -16,11 +16,14 @@ var (
 	ERR_USER_WRONG_CREDENTIALS = errors.New("Credenziali non valide")
 	ERR_USER_WRONG_TOKEN       = errors.New("Qualcosa è andato storto. Riprova.")
 
-	ERR_ENTRY_NOT_FOUND  = errors.New("Elemento non trovato")
-	ERR_ENTRY_DUPLICATED = errors.New("Elemento già in lista")
-
 	ERR_MENU_NOT_FOUND = errors.New("Menù non trovato")
 
-	ERR_SECTION_DUPLICATED = errors.New("Esiste già una sezione con lo stesso nome")
-	ERR_SECTION_NOT_FOUND  = errors.New("Sezione non trovata")
+	ERR_SECTION_DUPLICATED         = errors.New("Esiste già una sezione con lo stesso nome")
+	ERR_SECTION_NOT_FOUND          = errors.New("Sezione non trovata")
+	ERR_ARTICLE_NOT_FOUND          = errors.New("Articolo non trovata")
+	ERR_ARTICLE_QUANTITY_INVALID   = errors.New("Quantità non valida")
+	ERR_ARTICLE_EXPIRATION_INVALID = errors.New("Scadenza non valida")
+
+	ERR_ENTRY_NOT_FOUND  = errors.New("Elemento non trovato")
+	ERR_ENTRY_DUPLICATED = errors.New("Elemento già in lista")
 )

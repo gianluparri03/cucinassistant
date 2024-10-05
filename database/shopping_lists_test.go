@@ -162,7 +162,7 @@ func TestAppendEntries(t *testing.T) {
 				data{User: unknownUser, Names: names, ExpectedErr: ERR_USER_UNKNOWN, ExpectedList: ShoppingList{}},
 			},
 			{
-				"could not append entries",
+				"",
 				data{User: user, Names: names, ExpectedList: list},
 			},
 		},

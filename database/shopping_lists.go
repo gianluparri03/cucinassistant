@@ -68,7 +68,8 @@ func (u *User) AppendEntries(names ...string) (err error) {
 	}
 
 	// Prepares the statement
-	stmt, err := db.Prepare(`INSERT INTO entries (uid, name) VALUES ($1, $2) ON CONFLICT DO NOTHING;`)
+	var stmt *sql.Stmt
+	stmt, err = db.Prepare(`INSERT INTO entries (uid, name) VALUES ($1, $2) ON CONFLICT DO NOTHING;`)
 	defer stmt.Close()
 	if err != nil {
 		slog.Error("while preparing statement to append entries:", "err", err)

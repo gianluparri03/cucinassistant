@@ -8,7 +8,9 @@ import (
 	"github.com/alexedwards/argon2id"
 	"log/slog"
 	"net/mail"
+	"strconv"
 	"strings"
+	"time"
 )
 
 const (
@@ -77,8 +79,8 @@ func createHash(plain string) (hash string, err error) {
 	return
 }
 
-// CompareHash compare a plain text with its hash
-func CompareHash(plain string, hash string) (match bool, err error) {
+// compareHash compare a plain text with its hash
+func compareHash(plain string, hash string) (match bool, err error) {
 	match, err = argon2id.ComparePasswordAndHash(plain, hash)
 	if err != nil {
 		slog.Error("while hashing string", "err", err)
@@ -102,27 +104,6 @@ func generateToken() (plain string, hash string, err error) {
 	}
 
 	return
-}
-
-// ensureFetched checks if an user is builded
-// by hand or fetched form the database. In the
-// first case, it replaces it with a fetched one.
-// It is used for testing purposes.
-func (u *User) ensureFetched() error {
-	if u == nil {
-		return ERR_USER_UNKNOWN
-	}
-
-	if !u.fetched {
-		if uFetched, err := GetUser("UID", u.UID); err == nil {
-			*u = *uFetched
-			return nil
-		} else {
-			return err
-		}
-	}
-
-	return nil
 }
 
 // handleNoRowsError is an utility function that does the following.
@@ -170,4 +151,35 @@ func unpackMeals(meals string) (out [14]string) {
 	}
 
 	return
+}
+
+// convertArticle converts a StringArticle into an Article.
+// Dates must be formatted like 2004-02-05 (time.DateOnly).
+func convertArticle(sa StringArticle) (Article, error) {
+	var a Article
+
+	// Converts quantity to an int or nil
+	if sa.Quantity == "" {
+		a.Quantity = nil
+	} else {
+		if qty, err := strconv.Atoi(sa.Quantity); err == nil {
+			a.Quantity = &qty
+		} else {
+			return a, ERR_ARTICLE_QUANTITY_INVALID
+		}
+	}
+
+	// Converts expiration to a time or nil
+	if sa.Expiration == "" {
+		a.Expiration = nil
+	} else {
+		if exp, err := time.Parse(time.DateOnly, sa.Expiration); err == nil {
+			a.Expiration = &exp
+		} else {
+			return a, ERR_ARTICLE_EXPIRATION_INVALID
+		}
+	}
+
+	a.Name = sa.Name
+	return a, nil
 }

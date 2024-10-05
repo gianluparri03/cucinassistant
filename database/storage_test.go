@@ -3,13 +3,13 @@ package database
 import (
 	"reflect"
 	"testing"
+	"time"
 )
 
 func TestGetSections(t *testing.T) {
 	user, _ := GetTestingUser(t)
 	s1, _ := user.NewSection("s1")
 	s2, _ := user.NewSection("s2")
-	// TODO add an article to s2
 
 	otherUser, _ := GetTestingUser(t)
 
@@ -53,7 +53,6 @@ func TestGetSections(t *testing.T) {
 func TestGetSection(t *testing.T) {
 	user, _ := GetTestingUser(t)
 	section, _ := user.NewSection("s")
-	// TODO add articles
 
 	otherUser, _ := GetTestingUser(t)
 
@@ -67,25 +66,11 @@ func TestGetSection(t *testing.T) {
 
 	TestSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			expectedSections := map[bool]Section{}
-
-			if d.ExpectedSection.SID != 0 {
-				expectedSections[false] = Section{SID: d.ExpectedSection.SID, Name: d.ExpectedSection.Name}
-				expectedSections[true] = d.ExpectedSection
-			} else {
-				expectedSections[false] = Section{}
-				expectedSections[true] = Section{}
-			}
-
-			for _, fetchArticlesValue := range []bool{true, false} {
-				expectedSection := expectedSections[fetchArticlesValue]
-
-				got, err := d.User.GetSection(d.SID, fetchArticlesValue)
-				if err != d.ExpectedErr {
-					t.Errorf("%s (%v): expected err <%v>, got <%v>", msg, fetchArticlesValue, d.ExpectedErr, err)
-				} else if !reflect.DeepEqual(got, expectedSection) {
-					t.Errorf("%s (%v): expected section <%v>, got <%v>", msg, fetchArticlesValue, expectedSection, got)
-				}
+			got, err := d.User.GetSection(d.SID)
+			if err != d.ExpectedErr {
+				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
+			} else if !reflect.DeepEqual(got, d.ExpectedSection) {
+				t.Errorf("%s: expected section <%v>, got <%v>", msg, d.ExpectedSection, got)
 			}
 		},
 
@@ -124,7 +109,7 @@ func TestNewSection(t *testing.T) {
 			}
 
 			if err == nil {
-				section, _ := d.User.GetSection(got.SID, false)
+				section, _ := d.User.GetSection(got.SID)
 				if !reflect.DeepEqual(section, got) {
 					t.Errorf("%v, returned bad section", msg)
 				}
@@ -176,7 +161,7 @@ func TestEditSection(t *testing.T) {
 			}
 
 			if d.ExpectedErr == nil {
-				section, _ := d.User.GetSection(d.SID, false)
+				section, _ := d.User.GetSection(d.SID)
 				expected := Section{SID: d.SID, Name: d.NewName}
 				if !reflect.DeepEqual(section, expected) {
 					t.Errorf("%v, changes not saved", msg)
@@ -212,7 +197,7 @@ func TestEditSection(t *testing.T) {
 func TestDeleteSection(t *testing.T) {
 	user, _ := GetTestingUser(t)
 	section, _ := user.NewSection("s")
-	// TODO add articles
+	user.AddArticles(section.SID, StringArticle{"article", "", ""})
 
 	otherUser, _ := GetTestingUser(t)
 
@@ -230,7 +215,7 @@ func TestDeleteSection(t *testing.T) {
 				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
 			}
 
-			section, _ = user.GetSection(d.SID, true)
+			section, _ = user.GetSection(d.SID)
 			if !d.ShouldExist && section.SID != 0 {
 				t.Errorf("%s, section wasn't deleted", msg)
 			} else if d.ShouldExist && section.SID == 0 {
@@ -250,6 +235,81 @@ func TestDeleteSection(t *testing.T) {
 			{
 				"",
 				data{User: user, SID: section.SID},
+			},
+		},
+	}.Run(t)
+}
+
+func TestAddArticles(t *testing.T) {
+	user, _ := GetTestingUser(t)
+	section, _ := user.NewSection("section")
+	SID := section.SID
+
+	otherUser, _ := GetTestingUser(t)
+
+	name := "article"
+	sQty := "10"
+	sExp := "2024-10-05"
+
+	qty := 10
+	exp := time.Date(2024, time.October, 5, 0, 0, 0, 0, time.FixedZone("", 0))
+
+	inList := []StringArticle{
+		{Name: "Full", Quantity: sQty, Expiration: sExp},
+		{Name: "NoQty", Quantity: "", Expiration: sExp},
+		{Name: "NoExp", Quantity: sQty, Expiration: ""},
+		{Name: "Empty", Quantity: "", Expiration: ""},
+	}
+
+	outList := []Article{
+		{AID: 2, Name: "Full", Quantity: &qty, Expiration: &exp},
+		{AID: 3, Name: "NoQty", Quantity: nil, Expiration: &exp},
+		{AID: 4, Name: "NoExp", Quantity: &qty, Expiration: nil},
+		{AID: 5, Name: "Empty", Quantity: nil, Expiration: nil},
+	}
+
+	type data struct {
+		User     *User
+		SID      int
+		Articles []StringArticle
+
+		ExpectedErr      error
+		ExpectedArticles []Article
+	}
+
+	TestSuite[data]{
+		Target: func(t *testing.T, msg string, d data) {
+			err := d.User.AddArticles(d.SID, d.Articles...)
+			if err != d.ExpectedErr {
+				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
+			} else {
+				section, _ := d.User.GetArticles(d.SID, "")
+				if !reflect.DeepEqual(section.Articles, d.ExpectedArticles) {
+					t.Errorf("%s: expected list <%v>, got <%v>", msg, d.ExpectedArticles, section.Articles)
+				}
+			}
+		},
+
+		Cases: []TestCase[data]{
+			{
+				"added articles to unknown section",
+				data{User: user, Articles: []StringArticle{{Name: name, Quantity: sQty, Expiration: sExp}}, ExpectedErr: ERR_SECTION_NOT_FOUND},
+			},
+			{
+				"other user added articles to section",
+				data{User: otherUser, SID: SID, Articles: []StringArticle{{Name: name, Quantity: sQty, Expiration: sExp}}, ExpectedErr: ERR_SECTION_NOT_FOUND},
+			},
+			{
+				"added article with invalid quantity",
+				data{User: user, SID: SID, Articles: []StringArticle{{Name: name, Quantity: "a lot", Expiration: sExp}}, ExpectedErr: ERR_ARTICLE_QUANTITY_INVALID},
+			},
+			{
+				"added article with invalid sExpiration",
+				data{User: user, SID: SID, Articles: []StringArticle{{Name: name, Quantity: sQty, Expiration: "dunno"}}, ExpectedErr: ERR_ARTICLE_EXPIRATION_INVALID},
+			},
+			{
+				"",
+				data{User: user, SID: SID, Articles: inList, ExpectedArticles: outList},
 			},
 		},
 	}.Run(t)
