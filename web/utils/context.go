@@ -35,9 +35,13 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	slog.Debug("[" + r.Method + "] " + r.URL.String())
 
 	// Executes the handler
-	s, _ := store.Get(r, "session")
+	s, err := store.Get(r, sessionName)
+	if err != nil {
+		slog.Warn("while retrieving session:", "err", err)
+	}
+
 	c := &Context{W: w, R: r, S: s}
-	err := h(c)
+	err = h(c)
 
 	// Shows the error (if present)
 	if err != nil {
@@ -56,7 +60,11 @@ func (ph PHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	slog.Debug("[" + r.Method + "*] " + r.URL.String())
 
 	// Lets the handlers use the session
-	s, _ := store.Get(r, "session")
+	s, err := store.Get(r, sessionName)
+	if err != nil {
+		slog.Warn("while retrieving session:", "err", err)
+	}
+
 	c := &Context{W: w, R: r, S: s}
 
 	// Gets the UID from the cookies

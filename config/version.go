@@ -1,4 +1,3 @@
 package config
 
-const VersionNumber = 5
-const VersionCodeName = "Asparagio"
+const Version = "5/Patata"

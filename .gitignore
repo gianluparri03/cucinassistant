@@ -5,3 +5,5 @@ config/debug.yml
 config/prod.yml
 
 docker-compose.yml
+
+data_gen.go

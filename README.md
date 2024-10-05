@@ -44,10 +44,19 @@ You can look at the [releases tab](https://github.com/gianluparri03/cucinassista
 
 I plan to implement the following features:
 
-- [ ] A multi language UI
+**Big Features**
+- [ ] Multi language UI
 - [ ] Recipe management
-- [ ] A confirmation email when signing up
+
+** Security**
+- [ ] Confirmation email when signing up
+- [ ] Limit data size
+
+**Other**
+- [ ] Cookie banner and privacy notice
+- [ ] +/- buttons when editing an article (storage)
 - [ ] A better config system (maybe environment variables with defaults?)
+- [ ] Caching external assets
 
 If you have any suggestion, found a bug or want to contribute, you can
 send me an email at [gianlucaparri03@gmail.com](mailto:gianlucaparri03@gmail.com), or just open a PR/issue.

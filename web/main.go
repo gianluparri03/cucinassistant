@@ -37,6 +37,11 @@ func registerAssets(router *mux.Router) {
 	fs := http.FileServer(http.Dir("web/assets"))
 	router.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", fs))
 
+	// Registers the service worker
+	router.HandleFunc("/sw.js", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "web/assets/service_worker.js")
+	})
+
 	// Registers the favicon
 	router.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/assets/logo_round.png", http.StatusMovedPermanently)

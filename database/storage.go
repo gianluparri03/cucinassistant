@@ -15,7 +15,7 @@ type Section struct {
 	Name string
 
 	// Articles contains all the articles in this section
-	Articles []*Article
+	Articles []Article
 }
 
 // GetSections returns all the sections created by an user.
@@ -73,8 +73,9 @@ func (u *User) NewSection(name string) (section Section, err error) {
 	return
 }
 
-// GetSection returns a specific section, with its articles
-// if fetchArticle is true
+// GetSection returns a specific section.
+// If fetchArticles is true, it will also add the articles
+// to the result. Filter
 func (u *User) GetSection(SID int, fetchArticles bool) (section Section, err error) {
 	// Scans the section
 	err = db.QueryRow(`SELECT sid, name FROM sections WHERE uid=$1 AND sid=$2;`, u.UID, SID).Scan(&section.SID, &section.Name)
@@ -149,6 +150,8 @@ func (u *User) DeleteSection(SID int) (err error) {
 }
 
 // Article is an item inside a storage section
+// An article is identified by the name and the expiration.
+// Both the expiration and the quantity can be null.
 type Article struct {
 	// AID is the Article ID
 	AID int
@@ -163,4 +166,35 @@ type Article struct {
 	// Quantity is the quantity of the article.
 	// It may be null
 	Quantity *int
+}
+
+// AddArticles adds some articles in a section. If they are already
+// present it will sum the quantities.
+// If at least one of the two quantities is not given, the result
+// will not have the quantity set.
+func (u *User) AddArticles(SID int, articles ...Article) (err error) {
+	// Ensures the section exists
+	if _, err = u.GetSection(SID, false); err != nil {
+		return
+	}
+
+	// Prepares the statement
+	stmt, err := db.Prepare(`INSERT INTO articles (sid, name, quantity, expiration) VALUES ($1, $2, $3, $4)
+                             ON CONFLICT (sid, name, expiration) DO UPDATE set quantity = articles.quantity+excluded.quantity;`)
+	defer stmt.Close()
+	if err != nil {
+		slog.Error("while preparing statement to add articles:", "err", err)
+		err = ERR_UNKNOWN
+		return
+	}
+
+	// Inserts the entries
+	for _, a := range articles {
+		if _, err = stmt.Exec(SID, a.Name, a.Quantity, a.Expiration); err != nil {
+			slog.Error("while adding article:", "err", err)
+			err = ERR_UNKNOWN
+		}
+	}
+
+	return
 }

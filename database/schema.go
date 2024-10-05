@@ -1,7 +1,7 @@
 package database
 
 const schema = `
-	CREATE TABLE IF NOT EXISTS ca_users (
+    CREATE TABLE IF NOT EXISTS ca_users (
         uid SERIAL NOT NULL,
 
         username VARCHAR(250) NOT NULL,
@@ -26,7 +26,7 @@ const schema = `
         FOREIGN KEY (uid) REFERENCES ca_users (uid) ON DELETE CASCADE
     );
 
-    CREATE INDEX IF NOT EXISTS main ON menus (uid);
+    CREATE INDEX IF NOT EXISTS menus_uid ON menus (uid);
 
 
     CREATE TABLE IF NOT EXISTS sections (
@@ -40,7 +40,7 @@ const schema = `
         UNIQUE (uid, name)
     );
 
-    CREATE INDEX IF NOT EXISTS main ON sections (uid, name);
+    CREATE INDEX IF NOT EXISTS sections_uid ON sections (uid);
 
     CREATE TABLE IF NOT EXISTS articles (
         sid INT NOT NULL,
@@ -55,6 +55,8 @@ const schema = `
         UNIQUE (sid, name, expiration)
     );
 
+    CREATE INDEX IF NOT EXISTS articles_sid_expiration ON articles (sid, expiration);
+
 
     CREATE TABLE IF NOT EXISTS entries (
         uid INT NOT NULL,
@@ -68,5 +70,10 @@ const schema = `
         UNIQUE (uid, name)
     );
 
-	CREATE INDEX IF NOT EXISTS main ON entries (uid);
+    CREATE INDEX IF NOT EXISTS entries_uid ON entries (uid);
 `
+
+// Index menus_uid should speed up u.GetMenus
+// Index sections_uid should speed up u.GetSections
+// Index articles_sid_expiration should speed up u.GetSection and u.GetArticle
+// Index entries_uid should speed up u.GetShoppingList
