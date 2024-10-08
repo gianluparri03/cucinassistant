@@ -48,7 +48,7 @@ I plan to implement the following features:
 - [ ] Multi language UI
 - [ ] Recipe management
 
-** Security**
+**Security**
 - [ ] Confirmation email when signing up
 - [ ] Limit data size
 

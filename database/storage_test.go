@@ -3,7 +3,6 @@ package database
 import (
 	"reflect"
 	"testing"
-	"time"
 )
 
 func TestGetSections(t *testing.T) {
@@ -198,6 +197,7 @@ func TestDeleteSection(t *testing.T) {
 	user, _ := GetTestingUser(t)
 	section, _ := user.NewSection("s")
 	user.AddArticles(section.SID, StringArticle{"article", "", ""})
+	testingArticlesN++
 
 	otherUser, _ := GetTestingUser(t)
 
@@ -248,25 +248,33 @@ func TestAddArticles(t *testing.T) {
 	otherUser, _ := GetTestingUser(t)
 
 	name := "article"
-	sQty := "10"
-	sExp := "2024-10-05"
-
-	qty := 10
-	exp := time.Date(2024, time.October, 5, 0, 0, 0, 0, time.FixedZone("", 0))
+	qty := "10"
+	exp := "2024-10-05"
 
 	inList := []StringArticle{
-		{Name: "Full", Quantity: sQty, Expiration: sExp},
-		{Name: "NoQty", Quantity: "", Expiration: sExp},
-		{Name: "NoExp", Quantity: sQty, Expiration: ""},
 		{Name: "Empty", Quantity: "", Expiration: ""},
+		{Name: "NoExp", Quantity: qty, Expiration: ""},
+		{Name: "NoQty", Quantity: "", Expiration: exp},
+		{Name: "Full", Quantity: qty, Expiration: exp},
 	}
 
-	outList := []Article{
-		{AID: 2, Name: "Full", Quantity: &qty, Expiration: &exp},
-		{AID: 3, Name: "NoQty", Quantity: nil, Expiration: &exp},
-		{AID: 4, Name: "NoExp", Quantity: &qty, Expiration: nil},
-		{AID: 5, Name: "Empty", Quantity: nil, Expiration: nil},
+	outList1 := []Article{}
+	outList2 := []Article{}
+	for _, sa := range inList {
+		original := sa.getExpectedArticle()
+		outList1 = append(outList1, original)
+
+		doubled := Article{AID: original.AID, Name: original.Name, Expiration: original.Expiration}
+		if original.Quantity == nil {
+			doubled.Quantity = nil
+		} else {
+			qty := (*original.Quantity) * 2
+			doubled.Quantity = &qty
+		}
+		outList2 = append(outList2, doubled)
 	}
+
+	testingArticlesN += 4
 
 	type data struct {
 		User     *User
@@ -293,23 +301,220 @@ func TestAddArticles(t *testing.T) {
 		Cases: []TestCase[data]{
 			{
 				"added articles to unknown section",
-				data{User: user, Articles: []StringArticle{{Name: name, Quantity: sQty, Expiration: sExp}}, ExpectedErr: ERR_SECTION_NOT_FOUND},
+				data{User: user, Articles: []StringArticle{{Name: name, Quantity: qty, Expiration: exp}}, ExpectedErr: ERR_SECTION_NOT_FOUND},
 			},
 			{
 				"other user added articles to section",
-				data{User: otherUser, SID: SID, Articles: []StringArticle{{Name: name, Quantity: sQty, Expiration: sExp}}, ExpectedErr: ERR_SECTION_NOT_FOUND},
+				data{User: otherUser, SID: SID, Articles: []StringArticle{{Name: name, Quantity: qty, Expiration: exp}}, ExpectedErr: ERR_SECTION_NOT_FOUND},
 			},
 			{
 				"added article with invalid quantity",
-				data{User: user, SID: SID, Articles: []StringArticle{{Name: name, Quantity: "a lot", Expiration: sExp}}, ExpectedErr: ERR_ARTICLE_QUANTITY_INVALID},
+				data{User: user, SID: SID, Articles: []StringArticle{{Name: name, Quantity: "a lot", Expiration: exp}}, ExpectedErr: ERR_ARTICLE_QUANTITY_INVALID},
 			},
 			{
 				"added article with invalid sExpiration",
-				data{User: user, SID: SID, Articles: []StringArticle{{Name: name, Quantity: sQty, Expiration: "dunno"}}, ExpectedErr: ERR_ARTICLE_EXPIRATION_INVALID},
+				data{User: user, SID: SID, Articles: []StringArticle{{Name: name, Quantity: qty, Expiration: "dunno"}}, ExpectedErr: ERR_ARTICLE_EXPIRATION_INVALID},
+			},
+			{
+				"(original)",
+				data{User: user, SID: SID, Articles: inList, ExpectedArticles: outList1},
+			},
+			{
+				"(doubled)",
+				data{User: user, SID: SID, Articles: inList, ExpectedArticles: outList2},
+			},
+		},
+	}.Run(t)
+}
+
+func TestGetArticles(t *testing.T) {
+	user, _ := GetTestingUser(t)
+
+	s1 := StringArticle{Name: "first", Expiration: "2024-11-08", Quantity: "2"}
+	s2 := StringArticle{Name: "second", Expiration: "2024-10-11"}
+	s3 := StringArticle{Name: "third", Expiration: "", Quantity: "15"}
+	a1 := s1.getExpectedArticle()
+	a2 := s2.getExpectedArticle()
+	a3 := s3.getExpectedArticle()
+
+	section, _ := user.NewSection("section")
+	user.AddArticles(section.SID, s1, s2, s3)
+	expected := []Article{a3, a2, a1}
+
+	otherSection, _ := user.NewSection("otherSection")
+	user.AddArticles(otherSection.SID, s1)
+	testingArticlesN++
+
+	otherUser, _ := GetTestingUser(t)
+	emptySection, _ := otherUser.NewSection("emptySection")
+
+	type data struct {
+		User   *User
+		SID    int
+		Filter string
+
+		ExpectedErr      error
+		ExpectedArticles []Article
+	}
+
+	TestSuite[data]{
+		Target: func(t *testing.T, msg string, d data) {
+			section, err := d.User.GetArticles(d.SID, d.Filter)
+			if err != d.ExpectedErr {
+				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
+			} else if !reflect.DeepEqual(section.Articles, d.ExpectedArticles) {
+				t.Errorf("%s: expected list <%v>, got <%v>", msg, d.ExpectedArticles, section.Articles)
+			}
+		},
+
+		Cases: []TestCase[data]{
+			{
+				"got articles of unknown user",
+				data{User: unknownUser, ExpectedErr: ERR_USER_UNKNOWN},
+			},
+			{
+				"got articles of unknown section",
+				data{User: user, ExpectedErr: ERR_SECTION_NOT_FOUND},
+			},
+			{
+				"other user retrieved section",
+				data{User: otherUser, SID: section.SID, ExpectedErr: ERR_SECTION_NOT_FOUND},
+			},
+			{
+				"(filled)",
+				data{User: user, SID: section.SID, ExpectedArticles: expected},
+			},
+			{
+				"(filtered)",
+				data{User: user, SID: section.SID, Filter: "th", ExpectedArticles: []Article{a3}},
+			},
+			{
+				"(empty)",
+				data{User: otherUser, SID: emptySection.SID},
+			},
+		},
+	}.Run(t)
+}
+
+func TestGetArticle(t *testing.T) {
+	user, _ := GetTestingUser(t)
+
+	stringEmpty := StringArticle{Name: "empty"}
+	stringFull := StringArticle{Name: "full", Expiration: "2024-06-02", Quantity: "900"}
+	empty := stringEmpty.getExpectedArticle()
+	full := stringFull.getExpectedArticle()
+
+	section, _ := user.NewSection("section")
+	user.AddArticles(section.SID, stringEmpty, stringFull)
+
+	otherSection, _ := user.NewSection("otherSection")
+	otherUser, _ := GetTestingUser(t)
+
+	type data struct {
+		User *User
+		SID  int
+		AID  int
+
+		ExpectedErr     error
+		ExpectedArticle Article
+	}
+
+	TestSuite[data]{
+		Target: func(t *testing.T, msg string, d data) {
+			article, err := d.User.GetArticle(d.SID, d.AID)
+			if err != d.ExpectedErr {
+				t.Errorf("(simple) %s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
+			} else if !reflect.DeepEqual(article, d.ExpectedArticle) {
+				t.Errorf("(simple) %s: expected article <%v>, got <%v>", msg, d.ExpectedArticle, article)
+			}
+
+			orderedArticle, err := d.User.GetOrderedArticle(d.SID, d.AID)
+			article = orderedArticle.GetArticle()
+			if err != d.ExpectedErr {
+				t.Errorf("(ordered) %s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
+			} else if !reflect.DeepEqual(article, d.ExpectedArticle) {
+				t.Errorf("(ordered) %s: expected article <%v>, got <%v>", msg, d.ExpectedArticle, article)
+			}
+		},
+
+		Cases: []TestCase[data]{
+			{
+				"got unknown article",
+				data{User: user, SID: section.SID, ExpectedErr: ERR_ARTICLE_NOT_FOUND},
+			},
+			{
+				"got article from wrong section",
+				data{User: user, SID: otherSection.SID, AID: full.AID, ExpectedErr: ERR_ARTICLE_NOT_FOUND},
+			},
+			{
+				"other user retrieved article",
+				data{User: otherUser, SID: section.SID, AID: full.AID, ExpectedErr: ERR_SECTION_NOT_FOUND},
+			},
+			{
+				"(filled)",
+				data{User: user, SID: section.SID, AID: full.AID, ExpectedArticle: full},
+			},
+			{
+				"(empty)",
+				data{User: user, SID: section.SID, AID: empty.AID, ExpectedArticle: empty},
+			},
+		},
+	}.Run(t)
+}
+
+func TestGetOrderedArticles(t *testing.T) {
+	user, _ := GetTestingUser(t)
+
+	section, _ := user.NewSection("section")
+	s1 := StringArticle{Name: "first", Expiration: "2024-11-08", Quantity: "2"}
+	s2 := StringArticle{Name: "second", Expiration: "2024-10-11"}
+	s3 := StringArticle{Name: "third", Expiration: "", Quantity: "15"}
+	user.AddArticles(section.SID, s1, s2, s3)
+
+	otherSection, _ := user.NewSection("otherSection")
+	s4 := StringArticle{Name: "middle", Expiration: "2024-10-31"}
+	user.AddArticles(otherSection.SID, s4)
+
+	a1 := s1.getExpectedArticle()
+	a2 := s2.getExpectedArticle()
+	a3 := s3.getExpectedArticle()
+	a4 := s4.getExpectedArticle()
+
+	type data struct {
+		User *User
+		SID  int
+		AID  int
+
+		ExpectedPrev *int
+		ExpectedNext *int
+	}
+
+	TestSuite[data]{
+		Target: func(t *testing.T, msg string, d data) {
+			oa, _ := user.GetOrderedArticle(d.SID, d.AID)
+			if !reflect.DeepEqual(oa.Prev, d.ExpectedPrev) {
+				t.Errorf("%s: expected prev <%d>, got <%d>", msg, *d.ExpectedPrev, *oa.Prev)
+			} else if !reflect.DeepEqual(oa.Next, d.ExpectedNext) {
+				t.Errorf("%s: expected next <%d>, got <%d>", msg, *d.ExpectedNext, *oa.Next)
+			}
+		},
+
+		Cases: []TestCase[data]{
+			{
+				"",
+				data{SID: section.SID, AID: a1.AID, ExpectedPrev: &a2.AID, ExpectedNext: nil},
 			},
 			{
 				"",
-				data{User: user, SID: SID, Articles: inList, ExpectedArticles: outList},
+				data{SID: section.SID, AID: a2.AID, ExpectedPrev: &a3.AID, ExpectedNext: &a1.AID},
+			},
+			{
+				"",
+				data{SID: section.SID, AID: a3.AID, ExpectedPrev: nil, ExpectedNext: &a2.AID},
+			},
+			{
+				"",
+				data{SID: otherSection.SID, AID: a4.AID, ExpectedPrev: nil, ExpectedNext: nil},
 			},
 		},
 	}.Run(t)

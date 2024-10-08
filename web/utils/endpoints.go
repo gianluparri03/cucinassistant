@@ -2,7 +2,6 @@ package utils
 
 import (
 	"github.com/gorilla/mux"
-	"net/http"
 )
 
 // Endpoint contains all the info to register automatically

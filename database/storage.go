@@ -149,14 +149,6 @@ type Article struct {
 	Quantity *int
 }
 
-// StringArticle is a container for name, quantity
-// and expiration as strings, used for inputs
-type StringArticle struct {
-	Name       string
-	Quantity   string
-	Expiration string
-}
-
 // AddArticles adds some articles in a section. If they are already
 // present it will sum the quantities.
 // If at least one of the two quantities is not given, the result
@@ -170,7 +162,7 @@ func (u *User) AddArticles(SID int, stringArticles ...StringArticle) (err error)
 	// Converts the string articles into articles
 	articles := make([]Article, len(stringArticles))
 	for i, sa := range stringArticles {
-		if articles[i], err = convertArticle(sa); err != nil {
+		if articles[i], err = sa.Parse(); err != nil {
 			return
 		}
 	}
@@ -210,6 +202,8 @@ func (u *User) GetArticle(SID int, AID int) (article Article, err error) {
 
 	if err != nil {
 		err = handleNoRowsError(err, u.UID, ERR_ARTICLE_NOT_FOUND, "retrieving article")
+	} else {
+		article.fixExpiration()
 	}
 
 	return
@@ -236,19 +230,12 @@ func (u *User) GetArticles(SID int, filter string) (section Section, err error) 
 		for rows.Next() {
 			var article Article
 			rows.Scan(&article.AID, &article.Name, &article.Expiration, &article.Quantity)
+			article.fixExpiration()
 			section.Articles = append(section.Articles, article)
 		}
 	}
 
 	return
-}
-
-// OrderedArticle is an article that can also
-// store the AIDs of the previous and the next articles.
-type OrderedArticle struct {
-	Article
-	Prev *int
-	Next *int
 }
 
 // GetOrderedArticle returns a specific article, as an OrderedArticle
@@ -267,6 +254,8 @@ func (u *User) GetOrderedArticle(SID int, AID int) (article OrderedArticle, err 
 
 	if err != nil {
 		err = handleNoRowsError(err, u.UID, ERR_ARTICLE_NOT_FOUND, "retrieving ordered article")
+	} else {
+		article.fixExpiration()
 	}
 
 	return

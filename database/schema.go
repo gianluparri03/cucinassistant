@@ -48,7 +48,7 @@ const schema = `
 
         name VARCHAR(250) NOT NULL,
         quantity INT,
-        expiration DATE,
+		expiration DATE NOT NULL,
 
         PRIMARY KEY (aid),
         FOREIGN KEY (sid) REFERENCES sections (sid) ON DELETE CASCADE,

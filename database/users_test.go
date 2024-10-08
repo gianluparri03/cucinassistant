@@ -1,40 +1,9 @@
 package database
 
 import (
-	"fmt"
 	"reflect"
-	"slices"
 	"testing"
 )
-
-var testingUsersN int = 0
-
-// generateTestingUser returns a testing user which has not been registered yet
-func generateTestingUser() *User {
-	testingUsersN++
-
-	return &User{
-		Username: fmt.Sprintf("username%d", testingUsersN),
-		Email:    fmt.Sprintf("email%d@email.com", testingUsersN),
-		Password: fmt.Sprintf("password%d", testingUsersN),
-	}
-}
-
-// GetTestingUser returns an user to be used for testing purposes
-func GetTestingUser(t *testing.T) (user *User, password string) {
-	user = generateTestingUser()
-	password = user.Password
-
-	// And tries to sign it up
-	var err error
-	if user, err = SignUp(user.Username, user.Email, user.Password); err != nil {
-		t.Fatalf("Cannot create testing user: %s", err.Error())
-	}
-
-	return
-}
-
-var unknownUser *User = &User{}
 
 func TestSignup(t *testing.T) {
 	user := generateTestingUser()
@@ -388,6 +357,7 @@ func TestDeleteUser(t *testing.T) {
 	user.NewMenu()
 	section, _ := user.NewSection("s")
 	user.AddArticles(section.SID, StringArticle{"article", "", ""})
+	testingArticlesN++
 
 	otherUser, _ := GetTestingUser(t)
 
@@ -479,12 +449,5 @@ func TestGetUser(t *testing.T) {
 func TestGetUsersNumber(t *testing.T) {
 	if gotUN := GetUsersNumber(); gotUN != testingUsersN {
 		t.Errorf("expected <%v>, got <%v>", testingUsersN, gotUN)
-	}
-}
-
-func TestGetUsersEmails(t *testing.T) {
-	user, _ := GetTestingUser(t)
-	if emails := GetUsersEmails(); !slices.Contains(emails, user.Email) {
-		t.Errorf("<%v> not in <%v>", user.Email, emails)
 	}
 }
