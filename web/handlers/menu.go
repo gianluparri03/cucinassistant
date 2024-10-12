@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"github.com/gorilla/mux"
 	"strconv"
 
 	"cucinassistant/database"
@@ -10,14 +9,7 @@ import (
 
 // getMID returns the MID written in the url
 func getMID(c *utils.Context) (MID int, err error) {
-	// Fetches the MID from the url, then converts
-	// it to an int
-	MID, err = strconv.Atoi(mux.Vars(c.R)["MID"])
-	if err != nil {
-		err = database.ERR_MENU_NOT_FOUND
-	}
-
-	return
+	return getID(c, "MID", database.ERR_MENU_NOT_FOUND)
 }
 
 // GetMenus renders /menus

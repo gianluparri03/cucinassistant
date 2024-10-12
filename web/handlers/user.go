@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"errors"
 	"net/url"
 
 	"cucinassistant/config"
@@ -9,22 +8,6 @@ import (
 	"cucinassistant/email"
 	"cucinassistant/web/utils"
 )
-
-var (
-	ERR_PASSWORDS_DO_NOT_MATCH = errors.New("Le due password non corrispondono")
-	MSG_EMAIL_SENT             = "Ti abbiamo inviato una mail. Controlla la casella di posta."
-)
-
-// comparePasswords returns an error if the value
-// of the fields field1 and field2 (in the request)
-// do not match
-func comparePasswords(c *utils.Context, field1 string, field2 string) error {
-	if c.R.FormValue(field1) == c.R.FormValue(field2) {
-		return nil
-	} else {
-		return ERR_PASSWORDS_DO_NOT_MATCH
-	}
-}
 
 // GetSignUp renders /user/signup
 func GetSignUp(c *utils.Context) error {
@@ -39,17 +22,14 @@ func PostSignUp(c *utils.Context) (err error) {
 	email_ := c.R.FormValue("email")
 	password := c.R.FormValue("password")
 
-	// Ensures the two passwords are equal
-	if err = comparePasswords(c, "password", "password2"); err == nil {
-		// Tries to sign it up
-		var user *database.User
-		if user, err = database.SignUp(username, email_, password); err == nil {
-			// Sends the welcome email
-			go email.SendMail("Registrazione effettuata", "welcome", map[string]any{"Username": username}, email_)
+	// Tries to sign it up
+	var user *database.User
+	if user, err = database.SignUp(username, email_, password); err == nil {
+		// Sends the welcome email
+		go email.SendMail("Registrazione effettuata", "welcome", map[string]any{"Username": username}, email_)
 
-			// Saves the UID and redirects to /
-			utils.SaveUID(c, user.UID, "Account creato con successo")
-		}
+		// Saves the UID and redirects to /
+		utils.SaveUID(c, user.UID, "Account creato con successo")
 	}
 
 	return
@@ -116,7 +96,7 @@ func PostForgotPassword(c *utils.Context) (err error) {
 
 // GetResetPassword renders /user/reset_password
 func GetResetPassword(c *utils.Context) error {
-	utils.RenderPage(c, "user/reset_pasword", map[string]any{
+	utils.RenderPage(c, "user/reset_password", map[string]any{
 		"Token": c.R.URL.Query().Get("token"),
 	})
 	return nil
@@ -126,25 +106,22 @@ func GetResetPassword(c *utils.Context) error {
 func PostResetPassword(c *utils.Context) (err error) {
 	// Fetches data
 	token := c.R.FormValue("token")
-	newPassword := c.R.FormValue("password-new1")
+	newPassword := c.R.FormValue("password")
 	user := database.User{
 		Email: c.R.FormValue("email"),
 	}
 
-	// Ensures the passwords are equal
-	if err = comparePasswords(c, "password-new1", "password-new2"); err == nil {
-		// Tries to reset the user's password
-		if err = user.ResetPassword(token, newPassword); err == nil {
-			var user *database.User
-			if user, err = database.GetUser("UID", user.UID); err == nil {
-				// Sends the email
-				go email.SendMail("Cambio password", "password_change", map[string]any{
-					"Username": user.Username,
-				}, user.Email)
+	// Tries to reset the user's password
+	if err = user.ResetPassword(token, newPassword); err == nil {
+		var user *database.User
+		if user, err = database.GetUser("UID", user.UID); err == nil {
+			// Sends the email
+			go email.SendMail("Cambio password", "password_change", map[string]any{
+				"Username": user.Username,
+			}, user.Email)
 
-				// Saves the UID and redirects to /
-				utils.SaveUID(c, user.UID, "Password cambiata con successo")
-			}
+			// Saves the UID and redirects to /
+			utils.SaveUID(c, user.UID, "Password cambiata con successo")
 		}
 	}
 
@@ -203,20 +180,18 @@ func GetChangePassword(c *utils.Context) error {
 
 // PostChangePassword lets an user change its password
 func PostChangePassword(c *utils.Context) (err error) {
-	// Ensures the two passwords are equal
-	if err = comparePasswords(c, "password-new-1", "password-new-2"); err == nil {
-		newPassword := c.R.FormValue("password-new-1")
+	oldPassword := c.R.FormValue("old-password")
+	newPassword := c.R.FormValue("new-password")
 
-		// Tries to change the password
-		if err = c.U.ChangePassword(c.R.FormValue("password"), newPassword); err == nil {
-			// Sends the email
-			go email.SendMail("Cambio password", "password_change", map[string]any{
-				"Username": c.U.Username,
-			}, c.U.Email)
+	// Tries to change the password
+	if err = c.U.ChangePassword(oldPassword, newPassword); err == nil {
+		// Sends the email
+		go email.SendMail("Cambio password", "password_change", map[string]any{
+			"Username": c.U.Username,
+		}, c.U.Email)
 
-			// Shows the popup
-			utils.ShowAndRedirect(c, "Password cambiata con successo", "/user/settings")
-		}
+		// Shows the popup
+		utils.ShowAndRedirect(c, "Password cambiata con successo", "/user/settings")
 	}
 
 	return

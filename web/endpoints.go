@@ -134,7 +134,7 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 	},
 	{
 		Path:       "/storage/{SID}",
-		GetHandler: handlers.GetSection,
+		GetHandler: handlers.GetArticles,
 	},
 	{
 		Path:        "/storage/{SID}/edit",
@@ -144,5 +144,18 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 	{
 		Path:        "/storage/{SID}/delete",
 		PostHandler: handlers.PostDeleteSection,
+	},
+	{
+		Path:        "/storage/{SID}/add",
+		GetHandler:  handlers.GetAddArticles,
+		PostHandler: handlers.PostAddArticles,
+	},
+	{
+		Path:       "/storage/{SID}/search",
+		GetHandler: handlers.GetSearchArticles,
+	},
+	{
+		Path:       "/storage/{SID}/{AID}",
+		GetHandler: handlers.GetEditArticle,
 	},
 }

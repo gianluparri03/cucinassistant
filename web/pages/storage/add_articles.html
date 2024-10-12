@@ -1,0 +1,11 @@
+{{ define "title" }}Aggiungi articoli{{ end }}
+{{ define "back_link" }}/storage/{{ .SID }}{{ end }}
+
+{{ define "content" }}
+    <form method="POST">
+        <div id="new-articles"></div>
+        <button class="icon-text"><i class="fas fa-check"></i> Conferma</button>
+    </form>
+
+    <script> inputN = 0; updateArticles(null, true); </script>
+{{ end }}

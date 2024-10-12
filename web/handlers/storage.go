@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"github.com/gorilla/mux"
 	"strconv"
+	"strings"
 
 	"cucinassistant/database"
 	"cucinassistant/web/utils"
@@ -10,13 +10,12 @@ import (
 
 // GetSID returns the SID written in the url
 func GetSID(c *utils.Context) (SID int, err error) {
-	// Fetches the SID from the url, then converts it to an int
-	SID, err = strconv.Atoi(mux.Vars(c.R)["SID"])
-	if err != nil {
-		err = database.ERR_SECTION_NOT_FOUND
-	}
+	return getID(c, "SID", database.ERR_SECTION_NOT_FOUND)
+}
 
-	return
+// GetAID returns the AID written in the url
+func GetAID(c *utils.Context) (SID int, err error) {
+	return getID(c, "AID", database.ERR_ARTICLE_NOT_FOUND)
 }
 
 // GetSections renders /storage
@@ -45,13 +44,18 @@ func PostNewSection(c *utils.Context) (err error) {
 	return
 }
 
-// GetSection renders /storage/{SID}
-func GetSection(c *utils.Context) (err error) {
+// GetArticles renders /storage/{SID}
+func GetArticles(c *utils.Context) (err error) {
 	var SID int
 	if SID, err = GetSID(c); err == nil {
+		search := c.R.URL.Query().Get("search")
+
 		var section database.Section
-		if section, err = c.U.GetArticles(SID, ""); err == nil {
-			utils.RenderPage(c, "storage/view", map[string]any{"Section": section, "Filter": ""})
+		if section, err = c.U.GetArticles(SID, search); err == nil {
+			utils.RenderPage(c, "storage/view_articles", map[string]any{
+				"Section": section,
+				"Search":  search,
+			})
 		}
 	}
 
@@ -90,6 +94,84 @@ func PostDeleteSection(c *utils.Context) (err error) {
 	if SID, err = GetSID(c); err == nil {
 		if err = c.U.DeleteSection(SID); err == nil {
 			utils.ShowAndRedirect(c, "Sezione eliminata con successo", "/storage")
+		}
+	}
+
+	return
+}
+
+// GetAddArticles renders /storage/{SID}/add
+func GetAddArticles(c *utils.Context) (err error) {
+	var SID int
+	if SID, err = GetSID(c); err == nil {
+		var section database.Section
+
+		if section, err = c.U.GetArticles(SID, ""); err == nil {
+			utils.RenderPage(c, "storage/add_articles", map[string]any{
+				"SID": section.SID,
+			})
+		}
+	}
+
+	return
+}
+
+// PostAddArticles tries to add articles to a section.
+func PostAddArticles(c *utils.Context) (err error) {
+	// Gets the destination SID
+	var SID int
+	if SID, err = GetSID(c); err == nil {
+		var articles []database.StringArticle
+		c.R.ParseForm()
+
+		// Insert all the articles that have a name
+		for nameKey, nameValues := range c.R.PostForm {
+			if strings.HasPrefix(nameKey, "article-") && strings.HasSuffix(nameKey, "-name") {
+				if len(nameValues) > 0 && nameValues[0] != "" {
+					articles = append(articles, database.StringArticle{
+						Name:       nameValues[0],
+						Expiration: c.R.PostFormValue(strings.Replace(nameKey, "-name", "-expiration", 1)),
+						Quantity:   c.R.PostFormValue(strings.Replace(nameKey, "-name", "-quantity", 1)),
+					})
+				}
+			}
+		}
+
+		// Tries to add them
+		if err = c.U.AddArticles(SID, articles...); err == nil {
+			utils.Redirect(c, "/storage/"+strconv.Itoa(SID))
+		}
+	}
+
+	return
+}
+
+// GetSearchArticles renders /storage/{SID}/search
+func GetSearchArticles(c *utils.Context) (err error) {
+	var SID int
+	if SID, err = GetSID(c); err == nil {
+		utils.RenderPage(c, "storage/search_articles", map[string]any{
+			"SID": SID,
+		})
+	}
+
+	return
+}
+
+// GetEditArticle renders /storage/{SID}/{AID}
+func GetEditArticle(c *utils.Context) (err error) {
+	var SID, AID int
+
+	if SID, err = GetSID(c); err == nil {
+		if AID, err = GetAID(c); err == nil {
+			var article database.OrderedArticle
+
+			if article, err = c.U.GetOrderedArticle(SID, AID); err == nil {
+				utils.RenderPage(c, "storage/edit_article", map[string]any{
+					"SID":     SID,
+					"Article": article,
+				})
+			}
 		}
 	}
 

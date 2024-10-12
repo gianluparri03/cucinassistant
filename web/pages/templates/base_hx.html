@@ -1,7 +1,5 @@
-<script>
-    {{ define "title" }}CucinAssistant{{ end }}
-    document.title = '{{ template "title" . }}';
-</script>
+{{ define "title" }}CucinAssistant{{ end }}
+<script> document.title = '{{ template "title" . }}'; </script>
 
 {{ define "error" }}{{ end }}
 {{ template "error" . }}

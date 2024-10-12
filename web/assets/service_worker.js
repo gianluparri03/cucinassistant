@@ -3,6 +3,7 @@ const CACHE_NAME = 'cucinassistant_v5';
 const CACHED_ASSETS = [
     '/assets/sakura.css',
     '/assets/style.css',
+    '/assets/scripts.js',
     '/assets/logo_round.png'
 ];
 

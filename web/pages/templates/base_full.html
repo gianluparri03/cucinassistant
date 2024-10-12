@@ -24,12 +24,9 @@
         <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/response-targets.js" crossorigin="anonymous"></script>
         <script src="https://kit.fontawesome.com/ca194095ec.js" crossorigin="anonymous"></script>
         <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" crossorigin="anonymous"></script>
+        <script src="/assets/scripts.js" crossorigin="anonymous"></script>
 
-        <script>
-            if (typeof navigator.serviceWorker !== 'undefined') {
-                navigator.serviceWorker.register('/sw.js');
-            }
-        </script>
+        <script> if (typeof navigator.serviceWorker !== 'undefined') { navigator.serviceWorker.register('/sw.js'); } </script>
     </head>
 
     <body hx-ext="response-targets" hx-target="#body-container" hx-target-error="#error-container" hx-boost="true" hx-push-url="true">

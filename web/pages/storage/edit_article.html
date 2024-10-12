@@ -1,0 +1,29 @@
+{{ define "title" }}Modifica articolo{{ end }}
+{{ define "back_link" }}/storage/{{ .SID }}{{ end }}
+
+{{ define "content" }}
+    <form method="POST">
+        <div class="article {{ if .Article.IsExpired }} expired {{ end }}">
+            <input class="name" placeholder="Nome" value="{{ .Article.Name }}" name="name">
+
+            <input class="expiration" placeholder="Scadenza"
+                {{ if .Article.Expiration }} value="{{ .Article.FormatExpiration }}" {{ end }}
+                type="date" name="expiration">
+
+            <input class="quantity" placeholder="Quantità"
+                {{ if .Article.Quantity }} value="{{ .Article.Quantity }}" {{ end }}
+                type="quantity" name="quantity">
+        </div>
+
+        {{ if .Article.Prev }}
+            <button class="icon" hx-get="/storage/{{ .SID }}/{{ .Article.Prev }}"><i class="fas fa-chevron-left"></i></button>
+        {{ end }}
+
+        <button class="icon-text" hx-post="/storage/{{ .SID }}/{{ .Article.AID }}/delete"><i class="fas fa-trash"></i> Elimina</button>
+        <button class="icon-text"><i class="fas fa-check"></i> Salva modifiche</button>
+
+        {{ if .Article.Next }}
+            <button class="icon" hx-get="/storage/{{ .SID }}/{{ .Article.Next }}"><i class="fas fa-chevron-right"></i></button>
+        {{ end }}
+    </form>
+{{ end }}

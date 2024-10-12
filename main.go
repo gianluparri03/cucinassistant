@@ -20,7 +20,7 @@ func main() {
 	}
 
 	// Prints a welcome text
-	title := fmt.Sprintf("CucinAssistant %s", config.Version)
+	title := fmt.Sprintf("CucinAssistant (version: %s)", config.Version)
 	slog.Warn(title)
 	slog.Warn(strings.Repeat("=", len(title)))
 

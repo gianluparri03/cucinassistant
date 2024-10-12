@@ -7,26 +7,5 @@
         <button class="icon-text"><i class="fas fa-check"></i> Conferma</button>
     </form>
 
-    <script>
-        // If the first input has been filled, it adds a new one
-        // on top of it. If one input is cleared, it will delete it.
-        // It always keep an input visible.
-        function updateEntries(e, bootstrap=false) {
-            if (bootstrap || (e.target == $("input[type=text]").get(0) && e.target.value)) {
-                let ne = $(`<div class="new-element">
-                                <input class="name" type="text" name="entry-${inputN}-name">
-                            </div>`);
-
-                $('#new-elements').prepend(ne);
-                ne.on("change", updateEntries);
-                inputN++;
-            } else if (!e.target.value) {
-                e.target.remove();
-            }
-        }
-
-        // Adds manually the first input
-        inputN = 0;
-        updateEntries(null, true);
-    </script>
+    <script> inputN = 0; updateEntries(null, true); </script>
 {{ end }}

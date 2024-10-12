@@ -274,7 +274,7 @@ func (u *User) DeleteArticle(SID int, AID int) (err error) {
 		slog.Error("while deleting article:", "err", err)
 		err = ERR_UNKNOWN
 	} else if ra, _ := res.RowsAffected(); ra < 1 {
-		// If the query has failed, makes sure that the menu (and the user) exist
+		// If the query has failed, makes sure that the article, the section and the user exist
 		_, err = u.GetArticle(SID, AID)
 	}
 

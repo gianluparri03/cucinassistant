@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"github.com/gorilla/mux"
-	"strconv"
 	"strings"
 
 	"cucinassistant/database"
@@ -11,14 +9,7 @@ import (
 
 // GetEID returns the EID written in the url
 func GetEID(c *utils.Context) (EID int, err error) {
-	// Fetches the EID from the url, then converts
-	// it to an int
-	EID, err = strconv.Atoi(mux.Vars(c.R)["EID"])
-	if err != nil {
-		err = database.ERR_ENTRY_NOT_FOUND
-	}
-
-	return
+	return getID(c, "EID", database.ERR_ENTRY_NOT_FOUND)
 }
 
 // GetShoppingList renders /shopping_list

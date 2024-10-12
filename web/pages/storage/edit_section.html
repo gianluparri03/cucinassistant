@@ -19,11 +19,4 @@
         Sei davvero sicuro? Tutti gli articoli in questa sezione verranno eliminati.
         <button class="icon-text" hx-post="/storage/{{ .Section.SID }}/delete"><i class="fas fa-trash"></i> Sì, sono sicuro</button> <br>
     </div>
-
-    <script>
-        function swapButtons() {
-            $('#pre-delete').remove();
-            $('#post-delete').show();
-        }
-    </script>
 {{ end }}

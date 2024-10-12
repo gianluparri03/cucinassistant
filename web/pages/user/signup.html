@@ -1,7 +1,7 @@
 {{ define "title" }}Registrati{{ end }}
 
 {{ define "content" }}
-    <form method="POST">
+    <form method="POST" onsubmit="comparePasswords();">
         <input name="action" value="signup" hidden>
 
         <label for="username">Nome utente</label> <br>
@@ -10,11 +10,11 @@
         <label for="email">Email</label> <br>
         <input type="email" name="email" required> <br>
 
-        <label for="password1">Password</label> <br>
-        <input type="password" name="password" id="password1" required> <br>
+        <label for="password-1">Password</label> <br>
+        <input type="password" name="password" id="password-1" required> <br>
 
-        <label for="password2">Ripeti password</label> <br>
-        <input type="password" name="password2" id="password2" required> <br>
+        <label for="password-2">Ripeti password</label> <br>
+        <input type="password" id="password-2" required> <br>
 
         <button class="icon-text"><i class="fas fa-user-plus"></i> Registrati</button> <br>
 

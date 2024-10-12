@@ -1,7 +1,5 @@
 # History
 
-## Intro
-
 I began this project in September 2023.
 The first version of CucinAssistant was written in Python (with Flask) and used MariaDB as its database; then,
 after some experiments, I've decided to rewrite it completely in Go, with PostgreSQL and HTMX.

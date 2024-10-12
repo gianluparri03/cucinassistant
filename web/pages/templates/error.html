@@ -7,7 +7,8 @@
                 <button class="icon-text"
                     hx-on:click="$(this).parents('message').remove();"
                     {{ if .Path }} hx-get="{{ .Path }}" {{ else if not .IsHx }} hx-get="/" {{ end }}
-                    hx-push-url="true">
+                    hx-push-url="true"
+                    autofocus>
 
                     <i class="fas fa-check"></i> Ok
                 </button>

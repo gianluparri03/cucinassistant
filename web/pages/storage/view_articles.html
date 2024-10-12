@@ -3,20 +3,18 @@
 
 {{ define "content" }}
     <div>
-        {{ if .Filter }}
-            <span>Ricerca corrente: <i>{{ .Filter }}</i>. <a href=".?filter=">Annulla</a>.</span> <br>
+        {{ if .Search }}
+            <span>Ricerca corrente: "<i>{{ .Search }}</i>". <a href="/storage/{{ .Section.SID }}">Annulla ricerca</a></span> <br>
         {{ else }}
             <button class="icon-text" hx-get="/storage/{{ .Section.SID }}/search"><i class="fas fa-search"></i> Cerca</button>
         {{ end }}
 
-        <button class="icon-text" hx-get="/storage/{{ .Section.SID }}/edit"><i class="fas fa-edit"></i> Modifica sezione</button>
-
         <br>
 
         {{ range .Section.Articles }}
-            <div class="storage-item" hx-get="/storage/{{ $.Section.SID }}/{{ .AID  }}/modifica">
+            <div class="article {{ if .IsExpired }} expired {{ end }}" hx-get="/storage/{{ $.Section.SID }}/{{ .AID  }}">
                 <input class="name" value="{{ .Name }}" readonly>
-                {{ if .Expiration }} <input class="expiration" value="{{ .Expiration }}" type="date" readonly> {{ end }}
+                {{ if .Expiration }} <input class="expiration" value="{{ .FormatExpiration }}" type="date" readonly> {{ end }}
                 {{ if .Quantity }} <input class="quantity" value="{{ .Quantity }}" type="quantity" readonly> {{ end }}
             </div>
         {{ else }}
@@ -24,5 +22,6 @@
         {{ end }}
     </div>
 
-    <button class="icon-text" hx-get="/storage/{{ .Section.SID }}/add/"><i class="fas fa-plus"></i> Aggiungi</button>
+    <button class="icon-text" hx-get="/storage/{{ .Section.SID }}/add"><i class="fas fa-plus"></i> Aggiungi</button>
+    <button class="icon-text" hx-get="/storage/{{ .Section.SID }}/edit"><i class="fas fa-edit"></i> Modifica sezione</button>
 {{ end }}

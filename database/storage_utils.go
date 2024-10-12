@@ -10,7 +10,24 @@ var dateLocale = time.FixedZone("", 0)
 
 // defaultExpiration is used to match two items with the same name
 // and null expiration
-var defaultExpiration = time.Date(2004, time.February, 5, 0, 0, 0, 0, dateLocale)
+var defaultExpiration = time.Date(3004, time.February, 5, 0, 0, 0, 0, dateLocale)
+
+// fixExpiration sets a nil expiration if it's the default
+func (a *Article) fixExpiration() {
+	if a != nil && *a.Expiration == defaultExpiration {
+		a.Expiration = nil
+	}
+}
+
+// FormatExpiration returns the expiration as a string
+func (a Article) FormatExpiration() string {
+	return a.Expiration.Format(time.DateOnly)
+}
+
+// IsExpired returns true if the article is expired
+func (a Article) IsExpired() bool {
+	return a.Expiration != nil && a.Expiration.Before(time.Now())
+}
 
 // StringArticle is a container for name, quantity
 // and expiration as strings, used for inputs
@@ -54,13 +71,6 @@ func (sa StringArticle) Parse() (Article, error) {
 
 	a.Name = sa.Name
 	return a, nil
-}
-
-// fixExpiration sets a nil expiration if it's the default
-func (a *Article) fixExpiration() {
-	if a != nil && *a.Expiration == defaultExpiration {
-		a.Expiration = nil
-	}
 }
 
 // OrderedArticle is an article that can also
