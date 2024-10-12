@@ -1,10 +1,98 @@
 package database
 
 import (
+	"crypto/rand"
 	"database/sql"
+	"fmt"
+	"github.com/alexedwards/argon2id"
 	"log/slog"
+	"net/mail"
 	"strings"
 )
+
+// checkUsername ensures an username is valid.
+// To be valid, it must be at least 5-characters long
+// and should not be already used by someone else.
+func checkUsername(username string) error {
+	if len(username) < 5 {
+		return ERR_USER_NAME_TOO_SHORT
+	}
+
+	var found bool
+	db.QueryRow(`SELECT 1 FROM ca_users WHERE username=$1;`, username).Scan(&found)
+	if found {
+		return ERR_USER_NAME_UNAVAIL
+	}
+
+	return nil
+}
+
+// checkEmail ensures an email is valid.
+// To be valid, it must be an actual email address
+// and should not be already used by someone else.
+func checkEmail(email string) error {
+	if _, err := mail.ParseAddress(email); err != nil {
+		return ERR_USER_MAIL_INVALID
+	}
+
+	var found int
+	db.QueryRow(`SELECT 1 FROM ca_users WHERE email=$1;`, email).Scan(&found)
+	if found > 0 {
+		return ERR_USER_MAIL_UNAVAIL
+	}
+
+	return nil
+}
+
+// checkPassword ensures a new password is valid.
+// To be valid, it must be at least 8-characters long.
+func checkPassword(password string) error {
+	if len(password) < 8 {
+		return ERR_USER_PASS_TOO_SHORT
+	} else {
+		return nil
+	}
+}
+
+// createHash returns the hash of a string
+func createHash(plain string) (hash string, err error) {
+	hash, err = argon2id.CreateHash(plain, argon2id.DefaultParams)
+	if err != nil {
+		err = ERR_UNKNOWN
+	}
+
+	return
+}
+
+// compareHash compare a plain text with its hash. If they
+// do not match, it returns NoMatch.
+func compareHash(plain string, hash string, noMatch error) error {
+	match, err := argon2id.ComparePasswordAndHash(plain, hash)
+	if err != nil {
+		slog.Error("while hashing string", "err", err)
+		return ERR_UNKNOWN
+	} else if !match {
+		return noMatch
+	} else {
+		return nil
+	}
+}
+
+// generateToken generates a new token. It returns both the plaintext and the hash.
+func generateToken() (plain string, hash string, err error) {
+	// Generates the token
+	buffer := make([]byte, 18)
+	rand.Read(buffer)
+	plain = fmt.Sprintf("%x", buffer)
+
+	// Hashes it
+	hash, err = argon2id.CreateHash(plain, argon2id.DefaultParams)
+	if err != nil {
+		err = ERR_UNKNOWN
+	}
+
+	return
+}
 
 // User represents a registered User
 type User struct {
@@ -27,8 +115,46 @@ type User struct {
 	fetched bool
 }
 
+// GetUser returns the user with the given field.
+func GetUser(field string, value any) (user User, err error) {
+	// Makes sure the field is valid
+	if field != "UID" && field != "username" && field != "email" {
+		slog.Error("invalid user identifier", "field", field)
+		err = ERR_UNKNOWN
+		return
+	}
+
+	// Prepares the user
+	user.fetched = true
+	var token *string
+
+	// Queries the data
+	err = db.QueryRow(`SELECT uid, username, email, password, token FROM ca_users WHERE `+field+`=$1;`, value).
+		Scan(&user.UID, &user.Username, &user.Email, &user.Password, &token)
+	if err != nil {
+		// Checks the error
+		if !strings.HasSuffix(err.Error(), "no rows in result set") {
+			slog.Error("while retrieving user data:", "err", err)
+			err = ERR_UNKNOWN
+		} else {
+			err = ERR_USER_UNKNOWN
+		}
+
+		return
+	}
+
+	// Dereferences token (can be null)
+	if token == nil {
+		user.Token = ""
+	} else {
+		user.Token = *token
+	}
+
+	return
+}
+
 // SignUp tries to sign up an user.
-func SignUp(username string, email string, password string) (user *User, err error) {
+func SignUp(username string, email string, password string) (user User, err error) {
 	// Checks if data is valid
 	if err = checkUsername(username); err != nil {
 		return
@@ -58,24 +184,21 @@ func SignUp(username string, email string, password string) (user *User, err err
 }
 
 // SignIn tries to sign in an user.
-func SignIn(username string, password string) (user *User, err error) {
+func SignIn(username string, password string) (user User, err error) {
 	// Fetches the hash
-	var user_ *User
-	if user_, err = GetUser("username", username); err != nil {
+	var fetched User
+	if fetched, err = GetUser("username", username); err != nil {
 		err = ERR_USER_WRONG_CREDENTIALS
 		return
 	}
 
 	// Compare the passwords
-	var match bool
-	if match, err = compareHash(password, user_.Password); err != nil {
-		return
-	} else if !match {
-		err = ERR_USER_WRONG_CREDENTIALS
+	err = compareHash(password, fetched.Password, ERR_USER_WRONG_CREDENTIALS)
+	if err != nil {
 		return
 	}
 
-	user = user_
+	user = fetched
 	return
 }
 
@@ -90,7 +213,7 @@ func (u *User) ensureFetched() error {
 
 	if !u.fetched {
 		if uFetched, err := GetUser("UID", u.UID); err == nil {
-			*u = *uFetched
+			*u = uFetched
 			return nil
 		} else {
 			return err
@@ -166,10 +289,9 @@ func (u *User) ChangePassword(oldPassword string, newPassword string) (err error
 	}
 
 	// Compares the old passwords
-	if match, err := compareHash(oldPassword, u.Password); err != nil {
-		return err
-	} else if !match {
-		return ERR_USER_WRONG_CREDENTIALS
+	err = compareHash(oldPassword, u.Password, ERR_USER_WRONG_CREDENTIALS)
+	if err != nil {
+		return
 	}
 
 	// Hashes the new one
@@ -222,7 +344,7 @@ func (u *User) ResetPassword(token string, newPassword string) (err error) {
 	}
 
 	// Fetches the user
-	u, err = GetUser("email", u.Email)
+	*u, err = GetUser("email", u.Email)
 	if err != nil {
 		return
 	} else if u.Token == "" {
@@ -231,11 +353,7 @@ func (u *User) ResetPassword(token string, newPassword string) (err error) {
 	}
 
 	// Compares the tokens
-	var match bool
-	if match, err = compareHash(token, u.Token); err != nil {
-		return
-	} else if !match {
-		err = ERR_USER_WRONG_TOKEN
+	if err = compareHash(token, u.Token, ERR_USER_WRONG_TOKEN); err != nil {
 		return
 	}
 
@@ -261,9 +379,9 @@ func (u *User) ResetPassword(token string, newPassword string) (err error) {
 }
 
 // Delete deletes the user and all of its content
-func (u *User) Delete(token string) (err error) {
-	// Ensures the token is present
-	u, err = GetUser("UID", u.UID)
+func (u User) Delete(token string) (err error) {
+	// Ensures all data is present and the token
+	// has been generated
 	if err = u.ensureFetched(); err != nil {
 		return
 	} else if u.Token == "" {
@@ -272,11 +390,7 @@ func (u *User) Delete(token string) (err error) {
 	}
 
 	// Compares the tokens
-	var match bool
-	if match, err = compareHash(token, u.Token); err != nil {
-		return
-	} else if !match {
-		err = ERR_USER_WRONG_TOKEN
+	if err = compareHash(token, u.Token, ERR_USER_WRONG_TOKEN); err != nil {
 		return
 	}
 
@@ -286,46 +400,6 @@ func (u *User) Delete(token string) (err error) {
 		slog.Error("while deleting user:", "err", err)
 		err = ERR_UNKNOWN
 		return
-	}
-
-	return
-}
-
-// GetUser returns the user with the given field.
-func GetUser(field string, value any) (user *User, err error) {
-	// Makes sure the field is valid
-	if field != "UID" && field != "username" && field != "email" {
-		slog.Error("invalid user identifier", "field", field)
-		err = ERR_UNKNOWN
-		return
-	}
-
-	// Prepares the user
-	user = &User{fetched: true}
-	var token *string
-
-	// Queries the data
-	err = db.QueryRow(`SELECT uid, username, email, password, token FROM ca_users WHERE `+field+`=$1;`, value).
-		Scan(&user.UID, &user.Username, &user.Email, &user.Password, &token)
-	if err != nil {
-		user = nil
-
-		// Checks the error
-		if !strings.HasSuffix(err.Error(), "no rows in result set") {
-			slog.Error("while retrieving user data:", "err", err)
-			err = ERR_UNKNOWN
-		} else {
-			err = ERR_USER_UNKNOWN
-		}
-
-		return
-	}
-
-	// Dereferences token (can be null)
-	if token == nil {
-		user.Token = ""
-	} else {
-		user.Token = *token
 	}
 
 	return

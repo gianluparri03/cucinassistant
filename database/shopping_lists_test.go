@@ -2,29 +2,57 @@ package database
 
 import (
 	"reflect"
+	"strconv"
 	"testing"
 )
 
+var testingEntriesN int = 0
+
+// generateEntry adds an entry to an user's shopping list
+func (u User) generateEntry() (entry Entry) {
+	testingEntriesN++
+
+	name := "entry-" + strconv.Itoa(testingEntriesN)
+	u.AppendEntries(name)
+
+	// Find its id
+	list, _ := u.GetShoppingList()
+	var EID int
+	for EID, entry = range list {
+		if entry.Name == name {
+			break
+		}
+	}
+
+	// Marks only the odd ones
+	if testingEntriesN%2 > 0 {
+		u.ToggleEntry(EID)
+		entry.Marked = true
+	}
+
+	return
+}
+
 func TestGetShoppingList(t *testing.T) {
 	user, _ := GetTestingUser(t)
-	entry1 := generateEntry(user)
-	entry2 := generateEntry(user)
-	entry3 := generateEntry(user)
+	entry1 := user.generateEntry()
+	entry2 := user.generateEntry()
+	entry3 := user.generateEntry()
 	list := ShoppingList{entry1.EID: entry1, entry2.EID: entry2, entry3.EID: entry3}
 
 	otherUser, _ := GetTestingUser(t)
 
 	otherOtherUser, _ := GetTestingUser(t)
-	generateEntry(otherOtherUser)
+	otherOtherUser.generateEntry()
 
 	type data struct {
-		User *User
+		User User
 
 		ExpectedErr  error
 		ExpectedList ShoppingList
 	}
 
-	TestSuite[data]{
+	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
 			list, err := d.User.GetShoppingList()
 			if err != d.ExpectedErr {
@@ -34,7 +62,7 @@ func TestGetShoppingList(t *testing.T) {
 			}
 		},
 
-		Cases: []TestCase[data]{
+		Cases: []testCase[data]{
 			{
 				"got entries of unknown user",
 				data{User: unknownUser, ExpectedErr: ERR_USER_UNKNOWN, ExpectedList: ShoppingList{}},
@@ -53,20 +81,20 @@ func TestGetShoppingList(t *testing.T) {
 
 func TestGetEntry(t *testing.T) {
 	user, _ := GetTestingUser(t)
-	entry1 := generateEntry(user)
-	entry2 := generateEntry(user)
+	entry1 := user.generateEntry()
+	entry2 := user.generateEntry()
 
 	otherUser, _ := GetTestingUser(t)
 
 	type data struct {
-		User *User
+		User User
 		EID  int
 
 		ExpectedErr   error
 		ExpectedEntry Entry
 	}
 
-	TestSuite[data]{
+	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
 			entry, err := d.User.GetEntry(d.EID)
 			if err != d.ExpectedErr {
@@ -76,7 +104,7 @@ func TestGetEntry(t *testing.T) {
 			}
 		},
 
-		Cases: []TestCase[data]{
+		Cases: []testCase[data]{
 			{
 				"other user retrieved entry",
 				data{User: otherUser, EID: entry1.EID, ExpectedErr: ERR_ENTRY_NOT_FOUND},
@@ -99,7 +127,7 @@ func TestGetEntry(t *testing.T) {
 
 func TestAppendEntries(t *testing.T) {
 	user, _ := GetTestingUser(t)
-	entry1 := generateEntry(user)
+	entry1 := user.generateEntry()
 	entry2 := Entry{EID: testingEntriesN + 1, Name: "appended-2"}
 	entry3 := Entry{EID: testingEntriesN + 2, Name: "appended-3"}
 	testingEntriesN += 2
@@ -108,14 +136,14 @@ func TestAppendEntries(t *testing.T) {
 	list := ShoppingList{entry1.EID: entry1, entry2.EID: entry2, entry3.EID: entry3}
 
 	type data struct {
-		User  *User
+		User  User
 		Names []string
 
 		ExpectedErr  error
 		ExpectedList ShoppingList
 	}
 
-	TestSuite[data]{
+	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
 			err := d.User.AppendEntries(d.Names...)
 			if err != d.ExpectedErr {
@@ -128,7 +156,7 @@ func TestAppendEntries(t *testing.T) {
 			}
 		},
 
-		Cases: []TestCase[data]{
+		Cases: []testCase[data]{
 			{
 				"unknown user appended entries",
 				data{User: unknownUser, Names: names, ExpectedErr: ERR_USER_UNKNOWN, ExpectedList: ShoppingList{}},
@@ -143,19 +171,19 @@ func TestAppendEntries(t *testing.T) {
 
 func TestToggleEntry(t *testing.T) {
 	user, _ := GetTestingUser(t)
-	entry := generateEntry(user)
+	entry := user.generateEntry()
 
 	otherUser, _ := GetTestingUser(t)
 
 	type data struct {
-		User *User
+		User User
 		EID  int
 
 		ExpectedErr    error
 		ExpectedStatus bool
 	}
 
-	TestSuite[data]{
+	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
 			err := d.User.ToggleEntry(d.EID)
 			if err != d.ExpectedErr {
@@ -168,7 +196,7 @@ func TestToggleEntry(t *testing.T) {
 			}
 		},
 
-		Cases: []TestCase[data]{
+		Cases: []testCase[data]{
 			{
 				"other user toggled entry",
 				data{User: otherUser, EID: entry.EID, ExpectedErr: ERR_ENTRY_NOT_FOUND},
@@ -191,21 +219,21 @@ func TestToggleEntry(t *testing.T) {
 
 func TestClearShoppingList(t *testing.T) {
 	user, _ := GetTestingUser(t)
-	generateEntry(user)
-	entry := generateEntry(user)
-	generateEntry(user)
+	user.generateEntry()
+	entry := user.generateEntry()
+	user.generateEntry()
 
 	otherUser, _ := GetTestingUser(t)
-	otherEntry := generateEntry(otherUser)
+	otherEntry := otherUser.generateEntry()
 
 	type data struct {
-		User *User
+		User User
 
 		ExpectedErr  error
 		ExpectedList ShoppingList
 	}
 
-	TestSuite[data]{
+	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
 			if err := d.User.ClearShoppingList(); err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
@@ -217,7 +245,7 @@ func TestClearShoppingList(t *testing.T) {
 			}
 		},
 
-		Cases: []TestCase[data]{
+		Cases: []testCase[data]{
 			{
 				"unknown user cleared shopping list",
 				data{User: unknownUser, ExpectedErr: ERR_USER_UNKNOWN},
@@ -237,20 +265,20 @@ func TestClearShoppingList(t *testing.T) {
 
 func TestEditEntry(t *testing.T) {
 	user, _ := GetTestingUser(t)
-	entry1 := generateEntry(user)
-	entry2 := generateEntry(user)
+	entry1 := user.generateEntry()
+	entry2 := user.generateEntry()
 
 	otherUser, _ := GetTestingUser(t)
 
 	type data struct {
-		User    *User
+		User    User
 		EID     int
 		NewName string
 
 		ExpectedErr error
 	}
 
-	TestSuite[data]{
+	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
 			err := d.User.EditEntry(d.EID, d.NewName)
 			if err != d.ExpectedErr {
@@ -263,7 +291,7 @@ func TestEditEntry(t *testing.T) {
 			}
 		},
 
-		Cases: []TestCase[data]{
+		Cases: []testCase[data]{
 			{
 				"other user edited entry",
 				data{User: otherUser, EID: entry1.EID, NewName: entry1.Name + "+", ExpectedErr: ERR_ENTRY_NOT_FOUND},

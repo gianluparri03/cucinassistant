@@ -23,7 +23,7 @@ func PostSignUp(c *utils.Context) (err error) {
 	password := c.R.FormValue("password")
 
 	// Tries to sign it up
-	var user *database.User
+	var user database.User
 	if user, err = database.SignUp(username, email_, password); err == nil {
 		// Sends the welcome email
 		go email.SendMail("Registrazione effettuata", "welcome", map[string]any{"Username": username}, email_)
@@ -48,7 +48,7 @@ func PostSignIn(c *utils.Context) (err error) {
 	password := c.R.FormValue("password")
 
 	// Tries to sign it in
-	var user *database.User
+	var user database.User
 	if user, err = database.SignIn(username, password); err == nil {
 		// Saves the UID and redirects to /
 		utils.SaveUID(c, user.UID, "")
@@ -75,7 +75,7 @@ func PostForgotPassword(c *utils.Context) (err error) {
 	userEmail := c.R.FormValue("email")
 
 	// Retrieves the user
-	var user *database.User
+	var user database.User
 	if user, err = database.GetUser("email", userEmail); err == nil {
 		// Tries to generate its token
 		var token string
@@ -113,7 +113,7 @@ func PostResetPassword(c *utils.Context) (err error) {
 
 	// Tries to reset the user's password
 	if err = user.ResetPassword(token, newPassword); err == nil {
-		var user *database.User
+		var user database.User
 		if user, err = database.GetUser("UID", user.UID); err == nil {
 			// Sends the email
 			go email.SendMail("Cambio password", "password_change", map[string]any{

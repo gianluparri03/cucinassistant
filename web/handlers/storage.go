@@ -8,14 +8,19 @@ import (
 	"cucinassistant/web/utils"
 )
 
-// GetSID returns the SID written in the url
-func GetSID(c *utils.Context) (SID int, err error) {
+// getSID returns the SID written in the url
+func getSID(c *utils.Context) (SID int, err error) {
 	return getID(c, "SID", database.ERR_SECTION_NOT_FOUND)
 }
 
-// GetAID returns the AID written in the url
-func GetAID(c *utils.Context) (SID int, err error) {
-	return getID(c, "AID", database.ERR_ARTICLE_NOT_FOUND)
+// getAID returns the SID and the AID written in the url
+func getAID(c *utils.Context) (SID int, AID int, err error) {
+	SID, err = getSID(c)
+	if err != nil {
+		AID, err = getID(c, "AID", database.ERR_ARTICLE_NOT_FOUND)
+	}
+
+	return
 }
 
 // GetSections renders /storage
@@ -47,7 +52,7 @@ func PostNewSection(c *utils.Context) (err error) {
 // GetArticles renders /storage/{SID}
 func GetArticles(c *utils.Context) (err error) {
 	var SID int
-	if SID, err = GetSID(c); err == nil {
+	if SID, err = getSID(c); err == nil {
 		search := c.R.URL.Query().Get("search")
 
 		var section database.Section
@@ -66,7 +71,7 @@ func GetArticles(c *utils.Context) (err error) {
 func GetEditSection(c *utils.Context) (err error) {
 	// Retrieves the SID
 	var SID int
-	if SID, err = GetSID(c); err == nil {
+	if SID, err = getSID(c); err == nil {
 		var section database.Section
 		if section, err = c.U.GetSection(SID); err == nil {
 			utils.RenderPage(c, "storage/edit_section", map[string]any{"Section": section})
@@ -79,7 +84,7 @@ func GetEditSection(c *utils.Context) (err error) {
 // PostEditSection tries to change a section's name
 func PostEditSection(c *utils.Context) (err error) {
 	var SID int
-	if SID, err = GetSID(c); err == nil {
+	if SID, err = getSID(c); err == nil {
 		if err = c.U.EditSection(SID, c.R.FormValue("name")); err == nil {
 			utils.ShowAndRedirect(c, "Modifiche applicate con successo", "/storage/"+strconv.Itoa(SID))
 		}
@@ -91,7 +96,7 @@ func PostEditSection(c *utils.Context) (err error) {
 // PostDeleteSection tries to delete a section
 func PostDeleteSection(c *utils.Context) (err error) {
 	var SID int
-	if SID, err = GetSID(c); err == nil {
+	if SID, err = getSID(c); err == nil {
 		if err = c.U.DeleteSection(SID); err == nil {
 			utils.ShowAndRedirect(c, "Sezione eliminata con successo", "/storage")
 		}
@@ -103,7 +108,7 @@ func PostDeleteSection(c *utils.Context) (err error) {
 // GetAddArticles renders /storage/{SID}/add
 func GetAddArticles(c *utils.Context) (err error) {
 	var SID int
-	if SID, err = GetSID(c); err == nil {
+	if SID, err = getSID(c); err == nil {
 		var section database.Section
 
 		if section, err = c.U.GetArticles(SID, ""); err == nil {
@@ -120,7 +125,7 @@ func GetAddArticles(c *utils.Context) (err error) {
 func PostAddArticles(c *utils.Context) (err error) {
 	// Gets the destination SID
 	var SID int
-	if SID, err = GetSID(c); err == nil {
+	if SID, err = getSID(c); err == nil {
 		var articles []database.StringArticle
 		c.R.ParseForm()
 
@@ -149,7 +154,7 @@ func PostAddArticles(c *utils.Context) (err error) {
 // GetSearchArticles renders /storage/{SID}/search
 func GetSearchArticles(c *utils.Context) (err error) {
 	var SID int
-	if SID, err = GetSID(c); err == nil {
+	if SID, err = getSID(c); err == nil {
 		utils.RenderPage(c, "storage/search_articles", map[string]any{
 			"SID": SID,
 		})
@@ -162,15 +167,32 @@ func GetSearchArticles(c *utils.Context) (err error) {
 func GetEditArticle(c *utils.Context) (err error) {
 	var SID, AID int
 
-	if SID, err = GetSID(c); err == nil {
-		if AID, err = GetAID(c); err == nil {
-			var article database.OrderedArticle
+	if SID, AID, err = getAID(c); err == nil {
+		var article database.OrderedArticle
 
-			if article, err = c.U.GetOrderedArticle(SID, AID); err == nil {
-				utils.RenderPage(c, "storage/edit_article", map[string]any{
-					"SID":     SID,
-					"Article": article,
-				})
+		if article, err = c.U.GetOrderedArticle(SID, AID); err == nil {
+			utils.RenderPage(c, "storage/edit_article", map[string]any{
+				"SID":     SID,
+				"Article": article,
+			})
+		}
+	}
+
+	return
+}
+
+// PostDeleteArticle tries to delete an article
+func PostDeleteArticle(c *utils.Context) (err error) {
+	var SID, AID int
+
+	if SID, AID, err = getAID(c); err == nil {
+		var next *int
+
+		if err, next = c.U.DeleteArticle(SID, AID); err == nil {
+			if next != nil {
+				utils.Redirect(c, "/storage/"+strconv.Itoa(*next))
+			} else {
+				utils.Redirect(c, "/storage")
 			}
 		}
 	}

@@ -7,8 +7,8 @@ import (
 	"cucinassistant/web/utils"
 )
 
-// GetEID returns the EID written in the url
-func GetEID(c *utils.Context) (EID int, err error) {
+// getEID returns the EID written in the url
+func getEID(c *utils.Context) (EID int, err error) {
 	return getID(c, "EID", database.ERR_ENTRY_NOT_FOUND)
 }
 
@@ -55,7 +55,7 @@ func PostAppendEntries(c *utils.Context) (err error) {
 func PostToggleEntry(c *utils.Context) (err error) {
 	// Retrieves the EID
 	var EID int
-	if EID, err = GetEID(c); err == nil {
+	if EID, err = getEID(c); err == nil {
 		// Tries to toggle the entry
 		if err = c.U.ToggleEntry(EID); err == nil {
 			utils.Redirect(c, "/shopping_list")
@@ -79,7 +79,7 @@ func PostClearShoppingList(c *utils.Context) (err error) {
 func GetEditEntry(c *utils.Context) (err error) {
 	// Retrieves the EID
 	var EID int
-	if EID, err = GetEID(c); err == nil {
+	if EID, err = getEID(c); err == nil {
 		// Retrieves the entry's name and renders the page
 		var entry database.Entry
 		if entry, err = c.U.GetEntry(EID); err == nil {
@@ -94,7 +94,7 @@ func GetEditEntry(c *utils.Context) (err error) {
 func PostEditEntry(c *utils.Context) (err error) {
 	// Retrieves the EID
 	var EID int
-	if EID, err = GetEID(c); err == nil {
+	if EID, err = getEID(c); err == nil {
 		// Retrieves the new name
 		newName := c.R.FormValue("name")
 

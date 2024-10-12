@@ -17,13 +17,13 @@ func TestGetMenus(t *testing.T) {
 	otherOtherUser.NewMenu()
 
 	type data struct {
-		User *User
+		User User
 
 		ExpectedErr   error
 		ExpectedMenus []Menu
 	}
 
-	TestSuite[data]{
+	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
 			menus, err := d.User.GetMenus()
 			if err != d.ExpectedErr {
@@ -33,7 +33,7 @@ func TestGetMenus(t *testing.T) {
 			}
 		},
 
-		Cases: []TestCase[data]{
+		Cases: []testCase[data]{
 			{
 				"got menus of unknown user",
 				data{User: unknownUser, ExpectedErr: ERR_USER_UNKNOWN},
@@ -58,14 +58,14 @@ func TestGetMenu(t *testing.T) {
 	otherUser, _ := GetTestingUser(t)
 
 	type data struct {
-		User *User
+		User User
 		MID  int
 
 		ExpectedErr  error
 		ExpectedMenu Menu
 	}
 
-	TestSuite[data]{
+	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
 			menu, err := d.User.GetMenu(d.MID)
 			if err != d.ExpectedErr {
@@ -75,7 +75,7 @@ func TestGetMenu(t *testing.T) {
 			}
 		},
 
-		Cases: []TestCase[data]{
+		Cases: []testCase[data]{
 			{
 				"got data of unknown menu",
 				data{User: user, ExpectedErr: ERR_MENU_NOT_FOUND},
@@ -96,13 +96,13 @@ func TestNewMenu(t *testing.T) {
 	user, _ := GetTestingUser(t)
 
 	type data struct {
-		User *User
+		User User
 
 		ExpectedErr error
 		ExpectedMN  int
 	}
 
-	TestSuite[data]{
+	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
 			if _, err := d.User.NewMenu(); err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
@@ -113,7 +113,7 @@ func TestNewMenu(t *testing.T) {
 			}
 		},
 
-		Cases: []TestCase[data]{
+		Cases: []testCase[data]{
 			{
 				"unknown user created menu",
 				data{User: unknownUser, ExpectedErr: ERR_USER_UNKNOWN},
@@ -139,7 +139,7 @@ func TestReplaceMenu(t *testing.T) {
 	otherUser, _ := GetTestingUser(t)
 
 	type data struct {
-		User     *User
+		User     User
 		MID      int
 		NewName  string
 		NewMeals [14]string
@@ -147,7 +147,7 @@ func TestReplaceMenu(t *testing.T) {
 		ExpectedErr error
 	}
 
-	TestSuite[data]{
+	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
 			got, err := d.User.ReplaceMenu(d.MID, d.NewName, d.NewMeals)
 			if err != d.ExpectedErr {
@@ -165,7 +165,7 @@ func TestReplaceMenu(t *testing.T) {
 			}
 		},
 
-		Cases: []TestCase[data]{
+		Cases: []testCase[data]{
 			{
 				"other user replaced menu",
 				data{User: otherUser, MID: menu.MID, NewName: newName, NewMeals: newMeals, ExpectedErr: ERR_MENU_NOT_FOUND},
@@ -189,14 +189,14 @@ func TestDeleteMenu(t *testing.T) {
 	otherUser, _ := GetTestingUser(t)
 
 	type data struct {
-		User *User
+		User User
 		MID  int
 
 		ExpectedErr error
 		ShouldExist bool
 	}
 
-	TestSuite[data]{
+	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
 			if err := d.User.DeleteMenu(d.MID); err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
@@ -210,7 +210,7 @@ func TestDeleteMenu(t *testing.T) {
 			}
 		},
 
-		Cases: []TestCase[data]{
+		Cases: []testCase[data]{
 			{
 				"other user deleted menu",
 				data{User: otherUser, MID: menu.MID, ExpectedErr: ERR_MENU_NOT_FOUND, ShouldExist: true},
@@ -235,14 +235,14 @@ func TestDuplicateMenu(t *testing.T) {
 	otherUser, _ := GetTestingUser(t)
 
 	type data struct {
-		User *User
+		User User
 		MID  int
 
 		ExpectedErr   error
 		ExpectedMenus []*Menu
 	}
 
-	TestSuite[data]{
+	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
 			got, err := d.User.DuplicateMenu(d.MID)
 			if err != d.ExpectedErr {
@@ -260,7 +260,7 @@ func TestDuplicateMenu(t *testing.T) {
 			}
 		},
 
-		Cases: []TestCase[data]{
+		Cases: []testCase[data]{
 			{
 				"other user duplicated menu",
 				data{User: otherUser, MID: menu.MID, ExpectedErr: ERR_MENU_NOT_FOUND},

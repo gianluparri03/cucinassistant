@@ -74,7 +74,7 @@ func (ph PHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	} else {
 		// Fetches the user from the database
 		var err error
-		if c.U, err = database.GetUser("UID", rawUID.(int)); err == nil {
+		if *c.U, err = database.GetUser("UID", rawUID.(int)); err == nil {
 			// If all was okay, executes the handler
 			err = ph(c)
 		}

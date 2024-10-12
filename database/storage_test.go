@@ -5,6 +5,19 @@ import (
 	"testing"
 )
 
+var testingArticlesN int = 0
+
+// getExpectedArticle returns an Article with
+// the expected AID
+func (sa StringArticle) getExpectedArticle() Article {
+	a, _ := sa.Parse()
+	a.fixExpiration()
+
+	testingArticlesN++
+	a.AID = testingArticlesN
+	return a
+}
+
 func TestGetSections(t *testing.T) {
 	user, _ := GetTestingUser(t)
 	s1, _ := user.NewSection("s1")
@@ -16,13 +29,13 @@ func TestGetSections(t *testing.T) {
 	otherOtherUser.NewSection("s")
 
 	type data struct {
-		User *User
+		User User
 
 		ExpectedErr      error
 		ExpectedSections []Section
 	}
 
-	TestSuite[data]{
+	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
 			sections, err := d.User.GetSections()
 			if err != d.ExpectedErr {
@@ -32,7 +45,7 @@ func TestGetSections(t *testing.T) {
 			}
 		},
 
-		Cases: []TestCase[data]{
+		Cases: []testCase[data]{
 			{
 				"got sections of unknown user",
 				data{User: unknownUser, ExpectedErr: ERR_USER_UNKNOWN},
@@ -56,14 +69,14 @@ func TestGetSection(t *testing.T) {
 	otherUser, _ := GetTestingUser(t)
 
 	type data struct {
-		User *User
+		User User
 		SID  int
 
 		ExpectedErr     error
 		ExpectedSection Section
 	}
 
-	TestSuite[data]{
+	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
 			got, err := d.User.GetSection(d.SID)
 			if err != d.ExpectedErr {
@@ -73,7 +86,7 @@ func TestGetSection(t *testing.T) {
 			}
 		},
 
-		Cases: []TestCase[data]{
+		Cases: []testCase[data]{
 			{
 				"got data of unknown section",
 				data{User: user, ExpectedErr: ERR_SECTION_NOT_FOUND},
@@ -94,13 +107,13 @@ func TestNewSection(t *testing.T) {
 	user, _ := GetTestingUser(t)
 
 	type data struct {
-		User *User
+		User User
 		Name string
 
 		ExpectedErr error
 	}
 
-	TestSuite[data]{
+	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
 			got, err := d.User.NewSection(d.Name)
 			if err != d.ExpectedErr {
@@ -115,7 +128,7 @@ func TestNewSection(t *testing.T) {
 			}
 		},
 
-		Cases: []TestCase[data]{
+		Cases: []testCase[data]{
 			{
 				"unknown user created section",
 				data{User: unknownUser, Name: "s", ExpectedErr: ERR_USER_UNKNOWN},
@@ -145,14 +158,14 @@ func TestEditSection(t *testing.T) {
 	otherUser.NewSection("s3")
 
 	type data struct {
-		User    *User
+		User    User
 		SID     int
 		NewName string
 
 		ExpectedErr error
 	}
 
-	TestSuite[data]{
+	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
 			err := d.User.EditSection(d.SID, d.NewName)
 			if err != d.ExpectedErr {
@@ -168,7 +181,7 @@ func TestEditSection(t *testing.T) {
 			}
 		},
 
-		Cases: []TestCase[data]{
+		Cases: []testCase[data]{
 			{
 				"other user edited section",
 				data{User: otherUser, SID: section.SID, NewName: "s3", ExpectedErr: ERR_SECTION_NOT_FOUND},
@@ -202,14 +215,14 @@ func TestDeleteSection(t *testing.T) {
 	otherUser, _ := GetTestingUser(t)
 
 	type data struct {
-		User *User
+		User User
 		SID  int
 
 		ExpectedErr error
 		ShouldExist bool
 	}
 
-	TestSuite[data]{
+	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
 			if err := d.User.DeleteSection(d.SID); err != d.ExpectedErr {
 				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
@@ -223,7 +236,7 @@ func TestDeleteSection(t *testing.T) {
 			}
 		},
 
-		Cases: []TestCase[data]{
+		Cases: []testCase[data]{
 			{
 				"other user deleted section",
 				data{User: otherUser, SID: section.SID, ExpectedErr: ERR_SECTION_NOT_FOUND, ShouldExist: true},
@@ -277,7 +290,7 @@ func TestAddArticles(t *testing.T) {
 	testingArticlesN += 4
 
 	type data struct {
-		User     *User
+		User     User
 		SID      int
 		Articles []StringArticle
 
@@ -285,7 +298,7 @@ func TestAddArticles(t *testing.T) {
 		ExpectedArticles []Article
 	}
 
-	TestSuite[data]{
+	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
 			err := d.User.AddArticles(d.SID, d.Articles...)
 			if err != d.ExpectedErr {
@@ -298,7 +311,7 @@ func TestAddArticles(t *testing.T) {
 			}
 		},
 
-		Cases: []TestCase[data]{
+		Cases: []testCase[data]{
 			{
 				"added articles to unknown section",
 				data{User: user, Articles: []StringArticle{{Name: name, Quantity: qty, Expiration: exp}}, ExpectedErr: ERR_SECTION_NOT_FOUND},
@@ -349,7 +362,7 @@ func TestGetArticles(t *testing.T) {
 	emptySection, _ := otherUser.NewSection("emptySection")
 
 	type data struct {
-		User   *User
+		User   User
 		SID    int
 		Filter string
 
@@ -357,7 +370,7 @@ func TestGetArticles(t *testing.T) {
 		ExpectedArticles []Article
 	}
 
-	TestSuite[data]{
+	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
 			section, err := d.User.GetArticles(d.SID, d.Filter)
 			if err != d.ExpectedErr {
@@ -367,7 +380,7 @@ func TestGetArticles(t *testing.T) {
 			}
 		},
 
-		Cases: []TestCase[data]{
+		Cases: []testCase[data]{
 			{
 				"got articles of unknown user",
 				data{User: unknownUser, ExpectedErr: ERR_USER_UNKNOWN},
@@ -411,7 +424,7 @@ func TestGetArticle(t *testing.T) {
 	otherUser, _ := GetTestingUser(t)
 
 	type data struct {
-		User *User
+		User User
 		SID  int
 		AID  int
 
@@ -419,7 +432,7 @@ func TestGetArticle(t *testing.T) {
 		ExpectedArticle Article
 	}
 
-	TestSuite[data]{
+	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
 			article, err := d.User.GetArticle(d.SID, d.AID)
 			if err != d.ExpectedErr {
@@ -437,7 +450,7 @@ func TestGetArticle(t *testing.T) {
 			}
 		},
 
-		Cases: []TestCase[data]{
+		Cases: []testCase[data]{
 			{
 				"got unknown article",
 				data{User: user, SID: section.SID, ExpectedErr: ERR_ARTICLE_NOT_FOUND},
@@ -481,7 +494,7 @@ func TestGetOrderedArticles(t *testing.T) {
 	a4 := s4.getExpectedArticle()
 
 	type data struct {
-		User *User
+		User User
 		SID  int
 		AID  int
 
@@ -489,17 +502,17 @@ func TestGetOrderedArticles(t *testing.T) {
 		ExpectedNext *int
 	}
 
-	TestSuite[data]{
+	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
 			oa, _ := user.GetOrderedArticle(d.SID, d.AID)
 			if !reflect.DeepEqual(oa.Prev, d.ExpectedPrev) {
-				t.Errorf("%s: expected prev <%d>, got <%d>", msg, d.ExpectedPrev, oa.Prev)
+				t.Errorf("%s: expected prev <%p>, got <%p>", msg, d.ExpectedPrev, oa.Prev)
 			} else if !reflect.DeepEqual(oa.Next, d.ExpectedNext) {
-				t.Errorf("%s: expected next <%d>, got <%d>", msg, d.ExpectedNext, oa.Next)
+				t.Errorf("%s: expected next <%p>, got <%p>", msg, d.ExpectedNext, oa.Next)
 			}
 		},
 
-		Cases: []TestCase[data]{
+		Cases: []testCase[data]{
 			{
 				"",
 				data{SID: section.SID, AID: a1.AID, ExpectedPrev: &a2.AID, ExpectedNext: &a3.AID},
@@ -522,32 +535,41 @@ func TestGetOrderedArticles(t *testing.T) {
 
 func TestDeleteArticle(t *testing.T) {
 	user, _ := GetTestingUser(t)
-
 	section, _ := user.NewSection("section")
-	sArticle := StringArticle{Name: "article", Expiration: "2024-12-18", Quantity: "5"}
-	user.AddArticles(section.SID, sArticle)
-	article := sArticle.getExpectedArticle()
 
-	similarSArticle := StringArticle{Name: "article", Expiration: "2025-02-18"}
-	user.AddArticles(section.SID, similarSArticle)
-	similarArticle := sArticle.getExpectedArticle()
+	sArticle := StringArticle{Name: "article", Expiration: "2024-12-18", Quantity: "5"}
+	article := sArticle.getExpectedArticle()
+	sNextArticle := StringArticle{Name: "next-article"}
+	nextArticle := sNextArticle.getExpectedArticle()
+	user.AddArticles(section.SID, sArticle, sNextArticle)
+
+	sSimilarArticle := StringArticle{Name: "article", Expiration: "2023-02-18"}
+	user.AddArticles(section.SID, sSimilarArticle)
+	similarArticle := sSimilarArticle.getExpectedArticle()
 
 	otherSection, _ := user.NewSection("otherSection")
 	otherUser, _ := GetTestingUser(t)
 
 	type data struct {
-		User *User
+		User User
 		SID  int
 		AID  int
 
-		ExpectedErr error
-		ShouldExist bool
+		ExpectedErr  error
+		ExpectedNext *int
+		ShouldExist  bool
 	}
 
-	TestSuite[data]{
+	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			if err := d.User.DeleteArticle(d.SID, d.AID); err != d.ExpectedErr {
-				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
+			if err, next := d.User.DeleteArticle(d.SID, d.AID); err != d.ExpectedErr {
+				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
+			} else if !reflect.DeepEqual(next, d.ExpectedNext) {
+				t.Errorf("%s: expected next <%p>, got <%p>", msg, d.ExpectedNext, next)
+			} else if d.AID != similarArticle.AID {
+				if _, err := user.GetArticle(section.SID, similarArticle.AID); err != nil {
+					t.Errorf("%s, deleted similar article", msg)
+				}
 			}
 
 			article, _ := user.GetArticle(section.SID, d.AID)
@@ -555,15 +577,10 @@ func TestDeleteArticle(t *testing.T) {
 				t.Errorf("%s, article wasn't deleted", msg)
 			} else if d.ShouldExist && article.AID == 0 {
 				t.Errorf("%s, article was deleted anyway", msg)
-			} else {
-				article, _ := user.GetArticle(section.SID, similarArticle.AID)
-				if article.AID == 0 {
-					t.Errorf("%s, deleted similar article", msg)
-				}
 			}
 		},
 
-		Cases: []TestCase[data]{
+		Cases: []testCase[data]{
 			{
 				"other user deleted article",
 				data{User: otherUser, SID: section.SID, AID: article.AID, ExpectedErr: ERR_SECTION_NOT_FOUND, ShouldExist: true},
@@ -577,8 +594,16 @@ func TestDeleteArticle(t *testing.T) {
 				data{User: user, SID: section.SID, ExpectedErr: ERR_ARTICLE_NOT_FOUND, ShouldExist: false},
 			},
 			{
-				"",
-				data{User: user, SID: section.SID, AID: article.AID, ShouldExist: false},
+				"(next=next)",
+				data{User: user, SID: section.SID, AID: article.AID, ShouldExist: false, ExpectedNext: &nextArticle.AID},
+			},
+			{
+				"(next=prev)",
+				data{User: user, SID: section.SID, AID: nextArticle.AID, ShouldExist: false, ExpectedNext: &similarArticle.AID},
+			},
+			{
+				"(next=nil)",
+				data{User: user, SID: section.SID, AID: similarArticle.AID, ShouldExist: false, ExpectedNext: nil},
 			},
 		},
 	}.Run(t)

@@ -158,4 +158,8 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 		Path:       "/storage/{SID}/{AID}",
 		GetHandler: handlers.GetEditArticle,
 	},
+	{
+		Path:        "/storage/{SID}/{AID}/delete",
+		PostHandler: handlers.PostDeleteArticle,
+	},
 }
