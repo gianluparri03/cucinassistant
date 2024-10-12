@@ -43,10 +43,6 @@ button[disabled]:hover {
     cursor: unset;
 }
 
-p {
-    text-align: justify;
-}
-
 
 
 /* --- NAV, MAIN AND FOOTER ---------- */

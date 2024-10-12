@@ -26,49 +26,18 @@ from Google Play ([here](https://play.google.com/store/apps/details?id=me.gianlu
 Trusted Web Application, so it is the same of the website.
 
 
-## Docs
+## Docs and contributing
 
-You can look at the [packages.md file](docs/packages.md) to see how the code is organized.
-Instead, the [docker.md file](docs/docker.md) explains how to run CucinAssistant with docker compose.
-
-
-## A bit of history
-
-The first version of CucinAssistant was written in Python (with Flask) and used MariaDB as its database; then,
-after some experiments, I've decided to rewrite it completely, and now it is written in Go and uses PostgreSQL and HTMX.
-
-You can look at the [releases tab](https://github.com/gianluparri03/cucinassistant/releases/) for the complete version list.
-
-
-## Next features
-
-I plan to implement the following features:
-
-**Big Features**
-- [ ] Multi language UI
-- [ ] Recipe management
-
-**Security**
-- [ ] Confirmation email when signing up
-- [ ] Limit data size
-
-**Other**
-- [ ] Cookie banner and privacy notice
-- [ ] +/- buttons when editing an article (storage)
-- [ ] A better config system (maybe environment variables with defaults?)
-- [ ] Caching external assets (find a replacement for fontawesome)
-
-If you have any suggestion, found a bug or want to contribute, you can
-send me an email at [gianlucaparri03@gmail.com](mailto:gianlucaparri03@gmail.com), or just open a PR/issue.
+Click [here](docs/).
 
 
 ## Credits and license
 
 The author of the project is Gianluca Parri.
 
-CucinAssistant is released with the MIT license.
+CucinAssistant is released with the [MIT license](LICENSE).
 
-In the website, CucinAssistant uses icons from [FontAwesome](https://fontawesome.com/),
+CucinAssistant uses icons from [FontAwesome](https://fontawesome.com/),
 the css from [sakura](https://github.com/oxalorg/sakura) and two fonts,
 [Inclusive Sans](https://fonts.google.com/specimen/Inclusive+Sans?query=inclusive+sans) and
 [Satisfy](https://fonts.google.com/specimen/Satisfy?query=satisfy).
