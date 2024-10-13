@@ -5,16 +5,16 @@ import (
 	"testing"
 )
 
-func TestGetMenus(t *testing.T) {
-	user, _ := GetTestingUser(t)
-	m1, _ := user.NewMenu()
-	m2, _ := user.NewMenu()
-	m2, _ = user.ReplaceMenu(m2.MID, "newName", m2.Meals)
+func TestMenusGetAll(t *testing.T) {
+	user, _ := getTestingUser(t)
+	m1, _ := user.Menus().New()
+	m2, _ := user.Menus().New()
+	m2, _ = user.Menus().Replace(m2.MID, "newName", m2.Meals)
 
-	otherUser, _ := GetTestingUser(t)
+	otherUser, _ := getTestingUser(t)
 
-	otherOtherUser, _ := GetTestingUser(t)
-	otherOtherUser.NewMenu()
+	otherOtherUser, _ := getTestingUser(t)
+	otherOtherUser.Menus().New()
 
 	type data struct {
 		User User
@@ -25,7 +25,7 @@ func TestGetMenus(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			menus, err := d.User.GetMenus()
+			menus, err := d.User.Menus().GetAll()
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
 			} else if !reflect.DeepEqual(menus, d.ExpectedMenus) {
@@ -50,12 +50,12 @@ func TestGetMenus(t *testing.T) {
 	}.Run(t)
 }
 
-func TestGetMenu(t *testing.T) {
-	user, _ := GetTestingUser(t)
-	menu, _ := user.NewMenu()
-	menu, _ = user.ReplaceMenu(menu.MID, "newName", [14]string{"a", "b", "c"})
+func TestMenusGetOne(t *testing.T) {
+	user, _ := getTestingUser(t)
+	menu, _ := user.Menus().New()
+	menu, _ = user.Menus().Replace(menu.MID, "newName", [14]string{"a", "b", "c"})
 
-	otherUser, _ := GetTestingUser(t)
+	otherUser, _ := getTestingUser(t)
 
 	type data struct {
 		User User
@@ -67,7 +67,7 @@ func TestGetMenu(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			menu, err := d.User.GetMenu(d.MID)
+			menu, err := d.User.Menus().GetOne(d.MID)
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
 			} else if !reflect.DeepEqual(menu, d.ExpectedMenu) {
@@ -92,8 +92,8 @@ func TestGetMenu(t *testing.T) {
 	}.Run(t)
 }
 
-func TestNewMenu(t *testing.T) {
-	user, _ := GetTestingUser(t)
+func TestMenusNew(t *testing.T) {
+	user, _ := getTestingUser(t)
 
 	type data struct {
 		User User
@@ -104,11 +104,11 @@ func TestNewMenu(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			if _, err := d.User.NewMenu(); err != d.ExpectedErr {
+			if _, err := d.User.Menus().New(); err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
 			}
 
-			if menus, _ := d.User.GetMenus(); len(menus) != d.ExpectedMN {
+			if menus, _ := d.User.Menus().GetAll(); len(menus) != d.ExpectedMN {
 				t.Errorf("%v, wrong number of menus", msg)
 			}
 		},
@@ -130,13 +130,13 @@ func TestNewMenu(t *testing.T) {
 	}.Run(t)
 }
 
-func TestReplaceMenu(t *testing.T) {
-	user, _ := GetTestingUser(t)
-	menu, _ := user.NewMenu()
+func TestMenusReplace(t *testing.T) {
+	user, _ := getTestingUser(t)
+	menu, _ := user.Menus().New()
 	newName := "newName"
 	newMeals := [14]string{"a", "b", "c"}
 
-	otherUser, _ := GetTestingUser(t)
+	otherUser, _ := getTestingUser(t)
 
 	type data struct {
 		User     User
@@ -149,13 +149,13 @@ func TestReplaceMenu(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			got, err := d.User.ReplaceMenu(d.MID, d.NewName, d.NewMeals)
+			got, err := d.User.Menus().Replace(d.MID, d.NewName, d.NewMeals)
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
 			}
 
 			if d.ExpectedErr == nil {
-				menu, _ := d.User.GetMenu(d.MID)
+				menu, _ := d.User.Menus().GetOne(d.MID)
 				expected := Menu{MID: d.MID, Name: d.NewName, Meals: d.NewMeals}
 				if !reflect.DeepEqual(menu, expected) {
 					t.Errorf("%v, changes not saved", msg)
@@ -182,11 +182,11 @@ func TestReplaceMenu(t *testing.T) {
 	}.Run(t)
 }
 
-func TestDeleteMenu(t *testing.T) {
-	user, _ := GetTestingUser(t)
-	menu, _ := user.NewMenu()
+func TestMenusDelete(t *testing.T) {
+	user, _ := getTestingUser(t)
+	menu, _ := user.Menus().New()
 
-	otherUser, _ := GetTestingUser(t)
+	otherUser, _ := getTestingUser(t)
 
 	type data struct {
 		User User
@@ -198,11 +198,11 @@ func TestDeleteMenu(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			if err := d.User.DeleteMenu(d.MID); err != d.ExpectedErr {
+			if err := d.User.Menus().Delete(d.MID); err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
 			}
 
-			menu, _ = user.GetMenu(d.MID)
+			menu, _ = user.Menus().GetOne(d.MID)
 			if !d.ShouldExist && menu.MID != 0 {
 				t.Errorf("%s, menu wasn't deleted", msg)
 			} else if d.ShouldExist && menu.MID == 0 {
@@ -227,12 +227,12 @@ func TestDeleteMenu(t *testing.T) {
 	}.Run(t)
 }
 
-func TestDuplicateMenu(t *testing.T) {
-	user, _ := GetTestingUser(t)
-	menu, _ := user.NewMenu()
-	menu, _ = user.ReplaceMenu(menu.MID, "newName", [14]string{"a", "b", "c"})
+func TestMenusDuplicate(t *testing.T) {
+	user, _ := getTestingUser(t)
+	menu, _ := user.Menus().New()
+	menu, _ = user.Menus().Replace(menu.MID, "newName", [14]string{"a", "b", "c"})
 
-	otherUser, _ := GetTestingUser(t)
+	otherUser, _ := getTestingUser(t)
 
 	type data struct {
 		User User
@@ -244,14 +244,14 @@ func TestDuplicateMenu(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			got, err := d.User.DuplicateMenu(d.MID)
+			got, err := d.User.Menus().Duplicate(d.MID)
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
 			}
 
 			if d.ExpectedErr == nil {
-				srcMenu, _ := d.User.GetMenu(d.MID)
-				dstMenu, _ := d.User.GetMenu(got.MID)
+				srcMenu, _ := d.User.Menus().GetOne(d.MID)
+				dstMenu, _ := d.User.Menus().GetOne(got.MID)
 				if srcMenu.Meals != dstMenu.Meals {
 					t.Errorf("%v, changes not saved", msg)
 				} else if !reflect.DeepEqual(dstMenu, got) {

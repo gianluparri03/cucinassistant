@@ -15,6 +15,11 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 		Unprotected: true,
 		GetHandler:  handlers.GetInfo,
 	},
+	{
+		Path:        "/stats",
+		Unprotected: true,
+		GetHandler:  handlers.GetStats,
+	},
 
 	{
 		Path:       "/menus",

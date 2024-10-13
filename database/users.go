@@ -379,7 +379,7 @@ func (u *User) ResetPassword(token string, newPassword string) (err error) {
 }
 
 // Delete deletes the user and all of its content
-func (u User) Delete(token string) (err error) {
+func (u *User) Delete(token string) (err error) {
 	// Ensures all data is present and the token
 	// has been generated
 	if err = u.ensureFetched(); err != nil {
@@ -400,16 +400,6 @@ func (u User) Delete(token string) (err error) {
 		slog.Error("while deleting user:", "err", err)
 		err = ERR_UNKNOWN
 		return
-	}
-
-	return
-}
-
-// GetUsersNumber returns the number of users currently registered
-func GetUsersNumber() (n int) {
-	err := db.QueryRow(`SELECT COUNT(*) FROM ca_users;`).Scan(&n)
-	if err != nil {
-		slog.Error("while selecting users number:", "err", err)
 	}
 
 	return

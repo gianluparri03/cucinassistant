@@ -7,8 +7,6 @@ import (
 
 var testingArticlesN int = 0
 
-// getExpectedArticle returns an Article with
-// the expected AID
 func (sa StringArticle) getExpectedArticle() Article {
 	a, _ := sa.Parse()
 	a.fixExpiration()
@@ -18,15 +16,15 @@ func (sa StringArticle) getExpectedArticle() Article {
 	return a
 }
 
-func TestGetSections(t *testing.T) {
-	user, _ := GetTestingUser(t)
-	s1, _ := user.NewSection("s1")
-	s2, _ := user.NewSection("s2")
+func TestStorageGetSections(t *testing.T) {
+	user, _ := getTestingUser(t)
+	s1, _ := user.Storage().NewSection("s1")
+	s2, _ := user.Storage().NewSection("s2")
 
-	otherUser, _ := GetTestingUser(t)
+	otherUser, _ := getTestingUser(t)
 
-	otherOtherUser, _ := GetTestingUser(t)
-	otherOtherUser.NewSection("s")
+	otherOtherUser, _ := getTestingUser(t)
+	otherOtherUser.Storage().NewSection("s")
 
 	type data struct {
 		User User
@@ -37,7 +35,7 @@ func TestGetSections(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			sections, err := d.User.GetSections()
+			sections, err := d.User.Storage().GetSections()
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
 			} else if !reflect.DeepEqual(sections, d.ExpectedSections) {
@@ -62,11 +60,11 @@ func TestGetSections(t *testing.T) {
 	}.Run(t)
 }
 
-func TestGetSection(t *testing.T) {
-	user, _ := GetTestingUser(t)
-	section, _ := user.NewSection("s")
+func TestStorageGetSection(t *testing.T) {
+	user, _ := getTestingUser(t)
+	section, _ := user.Storage().NewSection("s")
 
-	otherUser, _ := GetTestingUser(t)
+	otherUser, _ := getTestingUser(t)
 
 	type data struct {
 		User User
@@ -78,7 +76,7 @@ func TestGetSection(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			got, err := d.User.GetSection(d.SID)
+			got, err := d.User.Storage().GetSection(d.SID)
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
 			} else if !reflect.DeepEqual(got, d.ExpectedSection) {
@@ -103,8 +101,8 @@ func TestGetSection(t *testing.T) {
 	}.Run(t)
 }
 
-func TestNewSection(t *testing.T) {
-	user, _ := GetTestingUser(t)
+func TestStorageNewSection(t *testing.T) {
+	user, _ := getTestingUser(t)
 
 	type data struct {
 		User User
@@ -115,13 +113,13 @@ func TestNewSection(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			got, err := d.User.NewSection(d.Name)
+			got, err := d.User.Storage().NewSection(d.Name)
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
 			}
 
 			if err == nil {
-				section, _ := d.User.GetSection(got.SID)
+				section, _ := d.User.Storage().GetSection(got.SID)
 				if !reflect.DeepEqual(section, got) {
 					t.Errorf("%v, returned bad section", msg)
 				}
@@ -149,13 +147,13 @@ func TestNewSection(t *testing.T) {
 	}.Run(t)
 }
 
-func TestEditSection(t *testing.T) {
-	user, _ := GetTestingUser(t)
-	section, _ := user.NewSection("s1")
-	user.NewSection("s2")
+func TestStorageEditSection(t *testing.T) {
+	user, _ := getTestingUser(t)
+	section, _ := user.Storage().NewSection("s1")
+	user.Storage().NewSection("s2")
 
-	otherUser, _ := GetTestingUser(t)
-	otherUser.NewSection("s3")
+	otherUser, _ := getTestingUser(t)
+	otherUser.Storage().NewSection("s3")
 
 	type data struct {
 		User    User
@@ -167,13 +165,13 @@ func TestEditSection(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			err := d.User.EditSection(d.SID, d.NewName)
+			err := d.User.Storage().EditSection(d.SID, d.NewName)
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
 			}
 
 			if d.ExpectedErr == nil {
-				section, _ := d.User.GetSection(d.SID)
+				section, _ := d.User.Storage().GetSection(d.SID)
 				expected := Section{SID: d.SID, Name: d.NewName}
 				if !reflect.DeepEqual(section, expected) {
 					t.Errorf("%v, changes not saved", msg)
@@ -206,13 +204,13 @@ func TestEditSection(t *testing.T) {
 	}.Run(t)
 }
 
-func TestDeleteSection(t *testing.T) {
-	user, _ := GetTestingUser(t)
-	section, _ := user.NewSection("s")
-	user.AddArticles(section.SID, StringArticle{"article", "", ""})
+func TestStorageDeleteSection(t *testing.T) {
+	user, _ := getTestingUser(t)
+	section, _ := user.Storage().NewSection("s")
+	user.Storage().AddArticles(section.SID, StringArticle{"article", "", ""})
 	testingArticlesN++
 
-	otherUser, _ := GetTestingUser(t)
+	otherUser, _ := getTestingUser(t)
 
 	type data struct {
 		User User
@@ -224,11 +222,11 @@ func TestDeleteSection(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			if err := d.User.DeleteSection(d.SID); err != d.ExpectedErr {
+			if err := d.User.Storage().DeleteSection(d.SID); err != d.ExpectedErr {
 				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
 			}
 
-			section, _ = user.GetSection(d.SID)
+			section, _ = user.Storage().GetSection(d.SID)
 			if !d.ShouldExist && section.SID != 0 {
 				t.Errorf("%s, section wasn't deleted", msg)
 			} else if d.ShouldExist && section.SID == 0 {
@@ -253,12 +251,12 @@ func TestDeleteSection(t *testing.T) {
 	}.Run(t)
 }
 
-func TestAddArticles(t *testing.T) {
-	user, _ := GetTestingUser(t)
-	section, _ := user.NewSection("section")
+func TestStorageAddArticles(t *testing.T) {
+	user, _ := getTestingUser(t)
+	section, _ := user.Storage().NewSection("section")
 	SID := section.SID
 
-	otherUser, _ := GetTestingUser(t)
+	otherUser, _ := getTestingUser(t)
 
 	name := "article"
 	qty := "10"
@@ -300,11 +298,11 @@ func TestAddArticles(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			err := d.User.AddArticles(d.SID, d.Articles...)
+			err := d.User.Storage().AddArticles(d.SID, d.Articles...)
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
 			} else {
-				section, _ := d.User.GetArticles(d.SID, "")
+				section, _ := d.User.Storage().GetArticles(d.SID, "")
 				if !reflect.DeepEqual(section.Articles, d.ExpectedArticles) {
 					t.Errorf("%s: expected list <%v>, got <%v>", msg, d.ExpectedArticles, section.Articles)
 				}
@@ -340,8 +338,8 @@ func TestAddArticles(t *testing.T) {
 	}.Run(t)
 }
 
-func TestGetArticles(t *testing.T) {
-	user, _ := GetTestingUser(t)
+func TestStorageGetArticles(t *testing.T) {
+	user, _ := getTestingUser(t)
 
 	s1 := StringArticle{Name: "first", Expiration: "2024-11-08", Quantity: "2"}
 	s2 := StringArticle{Name: "second", Expiration: "2024-10-11"}
@@ -350,16 +348,16 @@ func TestGetArticles(t *testing.T) {
 	a2 := s2.getExpectedArticle()
 	a3 := s3.getExpectedArticle()
 
-	section, _ := user.NewSection("section")
-	user.AddArticles(section.SID, s1, s2, s3)
+	section, _ := user.Storage().NewSection("section")
+	user.Storage().AddArticles(section.SID, s1, s2, s3)
 	expected := []Article{a2, a1, a3}
 
-	otherSection, _ := user.NewSection("otherSection")
-	user.AddArticles(otherSection.SID, s1)
+	otherSection, _ := user.Storage().NewSection("otherSection")
+	user.Storage().AddArticles(otherSection.SID, s1)
 	testingArticlesN++
 
-	otherUser, _ := GetTestingUser(t)
-	emptySection, _ := otherUser.NewSection("emptySection")
+	otherUser, _ := getTestingUser(t)
+	emptySection, _ := otherUser.Storage().NewSection("emptySection")
 
 	type data struct {
 		User   User
@@ -372,7 +370,7 @@ func TestGetArticles(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			section, err := d.User.GetArticles(d.SID, d.Filter)
+			section, err := d.User.Storage().GetArticles(d.SID, d.Filter)
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
 			} else if !reflect.DeepEqual(section.Articles, d.ExpectedArticles) {
@@ -409,19 +407,19 @@ func TestGetArticles(t *testing.T) {
 	}.Run(t)
 }
 
-func TestGetArticle(t *testing.T) {
-	user, _ := GetTestingUser(t)
+func TestStorageGetArticle(t *testing.T) {
+	user, _ := getTestingUser(t)
 
 	stringEmpty := StringArticle{Name: "empty"}
 	stringFull := StringArticle{Name: "full", Expiration: "2024-06-02", Quantity: "900"}
 	empty := stringEmpty.getExpectedArticle()
 	full := stringFull.getExpectedArticle()
 
-	section, _ := user.NewSection("section")
-	user.AddArticles(section.SID, stringEmpty, stringFull)
+	section, _ := user.Storage().NewSection("section")
+	user.Storage().AddArticles(section.SID, stringEmpty, stringFull)
 
-	otherSection, _ := user.NewSection("otherSection")
-	otherUser, _ := GetTestingUser(t)
+	otherSection, _ := user.Storage().NewSection("otherSection")
+	otherUser, _ := getTestingUser(t)
 
 	type data struct {
 		User User
@@ -434,14 +432,14 @@ func TestGetArticle(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			article, err := d.User.GetArticle(d.SID, d.AID)
+			article, err := d.User.Storage().GetArticle(d.SID, d.AID)
 			if err != d.ExpectedErr {
 				t.Errorf("(simple) %s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
 			} else if !reflect.DeepEqual(article, d.ExpectedArticle) {
 				t.Errorf("(simple) %s: expected article <%v>, got <%v>", msg, d.ExpectedArticle, article)
 			}
 
-			orderedArticle, err := d.User.GetOrderedArticle(d.SID, d.AID)
+			orderedArticle, err := d.User.Storage().GetOrderedArticle(d.SID, d.AID)
 			article = orderedArticle.GetArticle()
 			if err != d.ExpectedErr {
 				t.Errorf("(ordered) %s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
@@ -475,18 +473,18 @@ func TestGetArticle(t *testing.T) {
 	}.Run(t)
 }
 
-func TestGetOrderedArticles(t *testing.T) {
-	user, _ := GetTestingUser(t)
+func TestStorageGetOrderedArticles(t *testing.T) {
+	user, _ := getTestingUser(t)
 
-	section, _ := user.NewSection("section")
+	section, _ := user.Storage().NewSection("section")
 	s1 := StringArticle{Name: "first", Expiration: "2024-11-08", Quantity: "2"}
 	s2 := StringArticle{Name: "second", Expiration: "2024-10-11"}
 	s3 := StringArticle{Name: "third", Expiration: "", Quantity: "15"}
-	user.AddArticles(section.SID, s1, s2, s3)
+	user.Storage().AddArticles(section.SID, s1, s2, s3)
 
-	otherSection, _ := user.NewSection("otherSection")
+	otherSection, _ := user.Storage().NewSection("otherSection")
 	s4 := StringArticle{Name: "middle", Expiration: "2024-10-31"}
-	user.AddArticles(otherSection.SID, s4)
+	user.Storage().AddArticles(otherSection.SID, s4)
 
 	a1 := s1.getExpectedArticle()
 	a2 := s2.getExpectedArticle()
@@ -504,7 +502,7 @@ func TestGetOrderedArticles(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			oa, _ := user.GetOrderedArticle(d.SID, d.AID)
+			oa, _ := user.Storage().GetOrderedArticle(d.SID, d.AID)
 			if !reflect.DeepEqual(oa.Prev, d.ExpectedPrev) {
 				t.Errorf("%s: expected prev <%p>, got <%p>", msg, d.ExpectedPrev, oa.Prev)
 			} else if !reflect.DeepEqual(oa.Next, d.ExpectedNext) {
@@ -533,22 +531,22 @@ func TestGetOrderedArticles(t *testing.T) {
 	}.Run(t)
 }
 
-func TestDeleteArticle(t *testing.T) {
-	user, _ := GetTestingUser(t)
-	section, _ := user.NewSection("section")
+func TestStorageDeleteArticle(t *testing.T) {
+	user, _ := getTestingUser(t)
+	section, _ := user.Storage().NewSection("section")
 
 	sArticle := StringArticle{Name: "article", Expiration: "2024-12-18", Quantity: "5"}
 	article := sArticle.getExpectedArticle()
 	sNextArticle := StringArticle{Name: "next-article"}
 	nextArticle := sNextArticle.getExpectedArticle()
-	user.AddArticles(section.SID, sArticle, sNextArticle)
+	user.Storage().AddArticles(section.SID, sArticle, sNextArticle)
 
 	sSimilarArticle := StringArticle{Name: "article", Expiration: "2023-02-18"}
-	user.AddArticles(section.SID, sSimilarArticle)
+	user.Storage().AddArticles(section.SID, sSimilarArticle)
 	similarArticle := sSimilarArticle.getExpectedArticle()
 
-	otherSection, _ := user.NewSection("otherSection")
-	otherUser, _ := GetTestingUser(t)
+	otherSection, _ := user.Storage().NewSection("otherSection")
+	otherUser, _ := getTestingUser(t)
 
 	type data struct {
 		User User
@@ -562,17 +560,17 @@ func TestDeleteArticle(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			if err, next := d.User.DeleteArticle(d.SID, d.AID); err != d.ExpectedErr {
+			if err, next := d.User.Storage().DeleteArticle(d.SID, d.AID); err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
 			} else if !reflect.DeepEqual(next, d.ExpectedNext) {
 				t.Errorf("%s: expected next <%p>, got <%p>", msg, d.ExpectedNext, next)
 			} else if d.AID != similarArticle.AID {
-				if _, err := user.GetArticle(section.SID, similarArticle.AID); err != nil {
+				if _, err := user.Storage().GetArticle(section.SID, similarArticle.AID); err != nil {
 					t.Errorf("%s, deleted similar article", msg)
 				}
 			}
 
-			article, _ := user.GetArticle(section.SID, d.AID)
+			article, _ := user.Storage().GetArticle(section.SID, d.AID)
 			if !d.ShouldExist && article.AID != 0 {
 				t.Errorf("%s, article wasn't deleted", msg)
 			} else if d.ShouldExist && article.AID == 0 {

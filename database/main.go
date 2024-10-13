@@ -61,3 +61,23 @@ func handleNoRowsError(err error, UID int, ifExist error, whileDoing string) err
 		return ERR_UNKNOWN
 	}
 }
+
+// Stats is a report of the current database population
+type Stats struct {
+	UsersNumber    int
+	MenusNumber    int
+	SectionsNumber int
+	ArticlesNumber int
+	EntriesNumber  int
+}
+
+// GetStats returns a Stats instance
+func GetStats() (s Stats) {
+	// Counts the records
+	db.QueryRow(`SELECT COUNT(*) FROM ca_users;`).Scan(&s.UsersNumber)
+	db.QueryRow(`SELECT COUNT(*) FROM menus;`).Scan(&s.MenusNumber)
+	db.QueryRow(`SELECT COUNT(*) FROM sections;`).Scan(&s.SectionsNumber)
+	db.QueryRow(`SELECT COUNT(*) FROM articles;`).Scan(&s.ArticlesNumber)
+	db.QueryRow(`SELECT COUNT(*) FROM entries;`).Scan(&s.EntriesNumber)
+	return
+}

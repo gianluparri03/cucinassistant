@@ -1,0 +1,26 @@
+{{ define "title" }}Statistiche{{ end }}
+{{ define "back_link" }}/{{ end }}
+
+{{ define "content" }}
+    <div class="dashboard">
+        <button class="transparent" disabled>
+            <i class="fas fa-user"></i>
+            <span>{{ .Stats.UsersNumber }} utenti</span>
+        </button>
+
+        <button class="transparent" disabled>
+            <i class="fas fa-utensils"></i>
+            <span>{{ .Stats.MenusNumber }} menù</span>
+        </button>
+
+        <button class="transparent" disabled>
+            <i class="fas fa-box"></i>
+            <span>{{ .Stats.ArticlesNumber }} articoli in dispensa, divisi in {{ .Stats.SectionsNumber }} sezioni</span>
+        </button>
+
+        <button class="transparent" disabled>
+            <i class="fas fa-shopping-cart"></i>
+            <span>{{ .Stats.EntriesNumber }} elementi nelle liste della spesa</span>
+        </button>
+    </div>
+{{ end }}

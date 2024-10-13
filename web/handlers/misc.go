@@ -15,9 +15,16 @@ func GetIndex(c *utils.Context) error {
 // GetInfo renders /info
 func GetInfo(c *utils.Context) error {
 	utils.RenderPage(c, "misc/info", map[string]any{
-		"Config":      config.Runtime,
-		"Version":     config.Version,
-		"UsersNumber": database.GetUsersNumber(),
+		"Config":  config.Runtime,
+		"Version": config.Version,
+	})
+	return nil
+}
+
+// GetStats renders /stats
+func GetStats(c *utils.Context) error {
+	utils.RenderPage(c, "misc/stats", map[string]any{
+		"Stats": database.GetStats(),
 	})
 	return nil
 }

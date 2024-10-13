@@ -65,7 +65,7 @@ func (ph PHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		slog.Warn("while retrieving session:", "err", err)
 	}
 
-	c := &Context{W: w, R: r, S: s}
+	c := &Context{W: w, R: r, S: s, U: &database.User{}}
 
 	// Gets the UID from the cookies
 	if rawUID, found := s.Values["UID"]; !found {

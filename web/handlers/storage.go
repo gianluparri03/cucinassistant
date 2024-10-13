@@ -26,7 +26,7 @@ func getAID(c *utils.Context) (SID int, AID int, err error) {
 // GetSections renders /storage
 func GetSections(c *utils.Context) (err error) {
 	var list []database.Section
-	if list, err = c.U.GetSections(); err == nil {
+	if list, err = c.U.Storage().GetSections(); err == nil {
 		utils.RenderPage(c, "storage/dashboard", map[string]any{"List": list})
 	}
 
@@ -42,7 +42,7 @@ func GetNewSection(c *utils.Context) (err error) {
 // PostNewSection tries to create a new section
 func PostNewSection(c *utils.Context) (err error) {
 	var s database.Section
-	if s, err = c.U.NewSection(c.R.FormValue("name")); err == nil {
+	if s, err = c.U.Storage().NewSection(c.R.FormValue("name")); err == nil {
 		utils.ShowAndRedirect(c, "Sezione creata con successo", "/storage/"+strconv.Itoa(s.SID))
 	}
 
@@ -56,7 +56,7 @@ func GetArticles(c *utils.Context) (err error) {
 		search := c.R.URL.Query().Get("search")
 
 		var section database.Section
-		if section, err = c.U.GetArticles(SID, search); err == nil {
+		if section, err = c.U.Storage().GetArticles(SID, search); err == nil {
 			utils.RenderPage(c, "storage/view_articles", map[string]any{
 				"Section": section,
 				"Search":  search,
@@ -73,7 +73,7 @@ func GetEditSection(c *utils.Context) (err error) {
 	var SID int
 	if SID, err = getSID(c); err == nil {
 		var section database.Section
-		if section, err = c.U.GetSection(SID); err == nil {
+		if section, err = c.U.Storage().GetSection(SID); err == nil {
 			utils.RenderPage(c, "storage/edit_section", map[string]any{"Section": section})
 		}
 	}
@@ -85,7 +85,7 @@ func GetEditSection(c *utils.Context) (err error) {
 func PostEditSection(c *utils.Context) (err error) {
 	var SID int
 	if SID, err = getSID(c); err == nil {
-		if err = c.U.EditSection(SID, c.R.FormValue("name")); err == nil {
+		if err = c.U.Storage().EditSection(SID, c.R.FormValue("name")); err == nil {
 			utils.ShowAndRedirect(c, "Modifiche applicate con successo", "/storage/"+strconv.Itoa(SID))
 		}
 	}
@@ -97,7 +97,7 @@ func PostEditSection(c *utils.Context) (err error) {
 func PostDeleteSection(c *utils.Context) (err error) {
 	var SID int
 	if SID, err = getSID(c); err == nil {
-		if err = c.U.DeleteSection(SID); err == nil {
+		if err = c.U.Storage().DeleteSection(SID); err == nil {
 			utils.ShowAndRedirect(c, "Sezione eliminata con successo", "/storage")
 		}
 	}
@@ -111,7 +111,7 @@ func GetAddArticles(c *utils.Context) (err error) {
 	if SID, err = getSID(c); err == nil {
 		var section database.Section
 
-		if section, err = c.U.GetArticles(SID, ""); err == nil {
+		if section, err = c.U.Storage().GetArticles(SID, ""); err == nil {
 			utils.RenderPage(c, "storage/add_articles", map[string]any{
 				"SID": section.SID,
 			})
@@ -143,7 +143,7 @@ func PostAddArticles(c *utils.Context) (err error) {
 		}
 
 		// Tries to add them
-		if err = c.U.AddArticles(SID, articles...); err == nil {
+		if err = c.U.Storage().AddArticles(SID, articles...); err == nil {
 			utils.Redirect(c, "/storage/"+strconv.Itoa(SID))
 		}
 	}
@@ -170,7 +170,7 @@ func GetEditArticle(c *utils.Context) (err error) {
 	if SID, AID, err = getAID(c); err == nil {
 		var article database.OrderedArticle
 
-		if article, err = c.U.GetOrderedArticle(SID, AID); err == nil {
+		if article, err = c.U.Storage().GetOrderedArticle(SID, AID); err == nil {
 			utils.RenderPage(c, "storage/edit_article", map[string]any{
 				"SID":     SID,
 				"Article": article,
@@ -188,7 +188,7 @@ func PostDeleteArticle(c *utils.Context) (err error) {
 	if SID, AID, err = getAID(c); err == nil {
 		var next *int
 
-		if err, next = c.U.DeleteArticle(SID, AID); err == nil {
+		if err, next = c.U.Storage().DeleteArticle(SID, AID); err == nil {
 			if next != nil {
 				utils.Redirect(c, "/storage/"+strconv.Itoa(*next))
 			} else {

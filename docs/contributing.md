@@ -26,3 +26,4 @@ Below there is a list of features that I'd like to add to the project.
 - [ ] +/- buttons when editing an article (storage)
 - [ ] A better config system (maybe environment variables with defaults?)
 - [ ] Caching external assets (find a replacement for fontawesome)
+- [ ] A better API for the storage

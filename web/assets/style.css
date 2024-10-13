@@ -38,9 +38,8 @@ button:hover {
     border-color: var(--text);
 }
 
-button[disabled]:hover {
-    background-color: var(--red);
-    cursor: unset;
+button:disabled:hover {
+    cursor: default;
 }
 
 #unmatching_passwords {
@@ -191,7 +190,7 @@ message button {
     margin-bottom: 1.5rem;
 }
 
-.dashboard button:hover {
+.dashboard button:enabled:hover {
     cursor: pointer;
     background-color: var(--red);
 }
@@ -202,7 +201,7 @@ message button {
     color: var(--text);
 }
 
-.dashboard button.transparent:hover {
+.dashboard button.transparent:enabled:hover {
     background-color: rgba(0 0 0 / 20%);
 }
 

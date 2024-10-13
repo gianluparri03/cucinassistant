@@ -8,15 +8,13 @@ import (
 
 var testingEntriesN int = 0
 
-// generateEntry adds an entry to an user's shopping list
-func (u User) generateEntry() (entry Entry) {
+func (sl ShoppingList) generate() (entry Entry) {
 	testingEntriesN++
-
 	name := "entry-" + strconv.Itoa(testingEntriesN)
-	u.AppendEntries(name)
+	sl.Append(name)
 
 	// Find its id
-	list, _ := u.GetShoppingList()
+	list, _ := sl.GetAll()
 	var EID int
 	for EID, entry = range list {
 		if entry.Name == name {
@@ -26,35 +24,35 @@ func (u User) generateEntry() (entry Entry) {
 
 	// Marks only the odd ones
 	if testingEntriesN%2 > 0 {
-		u.ToggleEntry(EID)
+		sl.Toggle(EID)
 		entry.Marked = true
 	}
 
 	return
 }
 
-func TestGetShoppingList(t *testing.T) {
-	user, _ := GetTestingUser(t)
-	entry1 := user.generateEntry()
-	entry2 := user.generateEntry()
-	entry3 := user.generateEntry()
-	list := ShoppingList{entry1.EID: entry1, entry2.EID: entry2, entry3.EID: entry3}
+func TestShoppingListGetAll(t *testing.T) {
+	user, _ := getTestingUser(t)
+	entry1 := user.ShoppingList().generate()
+	entry2 := user.ShoppingList().generate()
+	entry3 := user.ShoppingList().generate()
+	list := map[int]Entry{entry1.EID: entry1, entry2.EID: entry2, entry3.EID: entry3}
 
-	otherUser, _ := GetTestingUser(t)
+	otherUser, _ := getTestingUser(t)
 
-	otherOtherUser, _ := GetTestingUser(t)
-	otherOtherUser.generateEntry()
+	otherOtherUser, _ := getTestingUser(t)
+	otherOtherUser.ShoppingList().generate()
 
 	type data struct {
 		User User
 
 		ExpectedErr  error
-		ExpectedList ShoppingList
+		ExpectedList map[int]Entry
 	}
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			list, err := d.User.GetShoppingList()
+			list, err := d.User.ShoppingList().GetAll()
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
 			} else if !reflect.DeepEqual(list, d.ExpectedList) {
@@ -65,11 +63,11 @@ func TestGetShoppingList(t *testing.T) {
 		Cases: []testCase[data]{
 			{
 				"got entries of unknown user",
-				data{User: unknownUser, ExpectedErr: ERR_USER_UNKNOWN, ExpectedList: ShoppingList{}},
+				data{User: unknownUser, ExpectedErr: ERR_USER_UNKNOWN, ExpectedList: map[int]Entry{}},
 			},
 			{
 				"(empty)",
-				data{User: otherUser, ExpectedList: ShoppingList{}},
+				data{User: otherUser, ExpectedList: map[int]Entry{}},
 			},
 			{
 				"(filled)",
@@ -79,12 +77,12 @@ func TestGetShoppingList(t *testing.T) {
 	}.Run(t)
 }
 
-func TestGetEntry(t *testing.T) {
-	user, _ := GetTestingUser(t)
-	entry1 := user.generateEntry()
-	entry2 := user.generateEntry()
+func TestShoppingListGetOne(t *testing.T) {
+	user, _ := getTestingUser(t)
+	entry1 := user.ShoppingList().generate()
+	entry2 := user.ShoppingList().generate()
 
-	otherUser, _ := GetTestingUser(t)
+	otherUser, _ := getTestingUser(t)
 
 	type data struct {
 		User User
@@ -96,7 +94,7 @@ func TestGetEntry(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			entry, err := d.User.GetEntry(d.EID)
+			entry, err := d.User.ShoppingList().GetOne(d.EID)
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
 			} else if !reflect.DeepEqual(entry, d.ExpectedEntry) {
@@ -125,31 +123,31 @@ func TestGetEntry(t *testing.T) {
 	}.Run(t)
 }
 
-func TestAppendEntries(t *testing.T) {
-	user, _ := GetTestingUser(t)
-	entry1 := user.generateEntry()
+func TestShoppingListAppend(t *testing.T) {
+	user, _ := getTestingUser(t)
+	entry1 := user.ShoppingList().generate()
 	entry2 := Entry{EID: testingEntriesN + 1, Name: "appended-2"}
 	entry3 := Entry{EID: testingEntriesN + 2, Name: "appended-3"}
 	testingEntriesN += 2
 
 	names := []string{entry2.Name, entry3.Name, entry1.Name, entry2.Name}
-	list := ShoppingList{entry1.EID: entry1, entry2.EID: entry2, entry3.EID: entry3}
+	list := map[int]Entry{entry1.EID: entry1, entry2.EID: entry2, entry3.EID: entry3}
 
 	type data struct {
 		User  User
 		Names []string
 
 		ExpectedErr  error
-		ExpectedList ShoppingList
+		ExpectedList map[int]Entry
 	}
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			err := d.User.AppendEntries(d.Names...)
+			err := d.User.ShoppingList().Append(d.Names...)
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
 			} else {
-				list, _ := d.User.GetShoppingList()
+				list, _ := d.User.ShoppingList().GetAll()
 				if !reflect.DeepEqual(list, d.ExpectedList) {
 					t.Errorf("%s: expected list <%v>, got <%v>", msg, d.ExpectedList, list)
 				}
@@ -159,7 +157,7 @@ func TestAppendEntries(t *testing.T) {
 		Cases: []testCase[data]{
 			{
 				"unknown user appended entries",
-				data{User: unknownUser, Names: names, ExpectedErr: ERR_USER_UNKNOWN, ExpectedList: ShoppingList{}},
+				data{User: unknownUser, Names: names, ExpectedErr: ERR_USER_UNKNOWN, ExpectedList: map[int]Entry{}},
 			},
 			{
 				"",
@@ -169,11 +167,11 @@ func TestAppendEntries(t *testing.T) {
 	}.Run(t)
 }
 
-func TestToggleEntry(t *testing.T) {
-	user, _ := GetTestingUser(t)
-	entry := user.generateEntry()
+func TestShoppingListToggle(t *testing.T) {
+	user, _ := getTestingUser(t)
+	entry := user.ShoppingList().generate()
 
-	otherUser, _ := GetTestingUser(t)
+	otherUser, _ := getTestingUser(t)
 
 	type data struct {
 		User User
@@ -185,11 +183,11 @@ func TestToggleEntry(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			err := d.User.ToggleEntry(d.EID)
+			err := d.User.ShoppingList().Toggle(d.EID)
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
 			} else if err == nil {
-				entry, _ := d.User.GetEntry(d.EID)
+				entry, _ := d.User.ShoppingList().GetOne(d.EID)
 				if entry.Marked != d.ExpectedStatus {
 					t.Errorf("%s: expected status <%v>, got <%v>", msg, d.ExpectedStatus, entry.Marked)
 				}
@@ -217,28 +215,28 @@ func TestToggleEntry(t *testing.T) {
 	}.Run(t)
 }
 
-func TestClearShoppingList(t *testing.T) {
-	user, _ := GetTestingUser(t)
-	user.generateEntry()
-	entry := user.generateEntry()
-	user.generateEntry()
+func TestShoppingListClear(t *testing.T) {
+	user, _ := getTestingUser(t)
+	user.ShoppingList().generate()
+	entry := user.ShoppingList().generate()
+	user.ShoppingList().generate()
 
-	otherUser, _ := GetTestingUser(t)
-	otherEntry := otherUser.generateEntry()
+	otherUser, _ := getTestingUser(t)
+	otherEntry := otherUser.ShoppingList().generate()
 
 	type data struct {
 		User User
 
 		ExpectedErr  error
-		ExpectedList ShoppingList
+		ExpectedList map[int]Entry
 	}
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			if err := d.User.ClearShoppingList(); err != d.ExpectedErr {
+			if err := d.User.ShoppingList().Clear(); err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
 			} else if err == nil {
-				list, _ := d.User.GetShoppingList()
+				list, _ := d.User.ShoppingList().GetAll()
 				if !reflect.DeepEqual(list, d.ExpectedList) {
 					t.Errorf("%s: expected list <%v>, got <%v>", msg, d.ExpectedList, list)
 				}
@@ -252,23 +250,23 @@ func TestClearShoppingList(t *testing.T) {
 			},
 			{
 				"",
-				data{User: user, ExpectedList: ShoppingList{entry.EID: entry}},
+				data{User: user, ExpectedList: map[int]Entry{entry.EID: entry}},
 			},
 		},
 	}.Run(t)
 
-	list, _ := otherUser.GetShoppingList()
-	if !reflect.DeepEqual(list, ShoppingList{otherEntry.EID: otherEntry}) {
+	list, _ := otherUser.ShoppingList().GetAll()
+	if !reflect.DeepEqual(list, map[int]Entry{otherEntry.EID: otherEntry}) {
 		t.Errorf("cleared shopping list of everyone")
 	}
 }
 
-func TestEditEntry(t *testing.T) {
-	user, _ := GetTestingUser(t)
-	entry1 := user.generateEntry()
-	entry2 := user.generateEntry()
+func TestShoppingListEdit(t *testing.T) {
+	user, _ := getTestingUser(t)
+	entry1 := user.ShoppingList().generate()
+	entry2 := user.ShoppingList().generate()
 
-	otherUser, _ := GetTestingUser(t)
+	otherUser, _ := getTestingUser(t)
 
 	type data struct {
 		User    User
@@ -280,11 +278,11 @@ func TestEditEntry(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			err := d.User.EditEntry(d.EID, d.NewName)
+			err := d.User.ShoppingList().Edit(d.EID, d.NewName)
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
 			} else if err == nil {
-				entry, _ := d.User.GetEntry(d.EID)
+				entry, _ := d.User.ShoppingList().GetOne(d.EID)
 				if entry.Name != d.NewName {
 					t.Errorf("%s: name not changed", msg)
 				}

@@ -1,3 +1,5 @@
+let inputN; // ( used by updateArticles and updateEntries )
+
 // Makes sure the fields password-1 and password-2 match,
 // otherwise shows an error.
 // ( used by /user/sign_up, /user/change_password and /user/reset_password )

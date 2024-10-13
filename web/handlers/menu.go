@@ -15,7 +15,7 @@ func getMID(c *utils.Context) (MID int, err error) {
 // GetMenus renders /menus
 func GetMenus(c *utils.Context) (err error) {
 	var menus []database.Menu
-	if menus, err = c.U.GetMenus(); err == nil {
+	if menus, err = c.U.Menus().GetAll(); err == nil {
 		utils.RenderPage(c, "menu/dashboard", map[string]any{"Menus": menus})
 	}
 
@@ -25,7 +25,7 @@ func GetMenus(c *utils.Context) (err error) {
 // PostNewMenu tries to create a new menu
 func PostNewMenu(c *utils.Context) (err error) {
 	var menu database.Menu
-	if menu, err = c.U.NewMenu(); err == nil {
+	if menu, err = c.U.Menus().New(); err == nil {
 		utils.Redirect(c, "/menus/"+strconv.Itoa(menu.MID)+"/edit")
 	}
 
@@ -39,7 +39,7 @@ func GetMenu(c *utils.Context) (err error) {
 	if MID, err = getMID(c); err == nil {
 		// Retrieves the menu
 		var menu database.Menu
-		if menu, err = c.U.GetMenu(MID); err == nil {
+		if menu, err = c.U.Menus().GetOne(MID); err == nil {
 			utils.RenderPage(c, "menu/view", map[string]any{"Menu": menu})
 		}
 	}
@@ -54,7 +54,7 @@ func GetEditMenu(c *utils.Context) (err error) {
 	if MID, err = getMID(c); err == nil {
 		// Retrieves the menu
 		var menu database.Menu
-		if menu, err = c.U.GetMenu(MID); err == nil {
+		if menu, err = c.U.Menus().GetOne(MID); err == nil {
 			utils.RenderPage(c, "menu/edit", map[string]any{"Menu": menu})
 		}
 	}
@@ -74,7 +74,7 @@ func PostEditMenu(c *utils.Context) (err error) {
 		}
 
 		// Tries to replace the menu
-		if _, err = c.U.ReplaceMenu(MID, c.R.FormValue("name"), meals); err == nil {
+		if _, err = c.U.Menus().Replace(MID, c.R.FormValue("name"), meals); err == nil {
 			utils.Redirect(c, "/menus/"+strconv.Itoa(MID))
 		}
 	}
@@ -89,7 +89,7 @@ func PostDuplicateMenu(c *utils.Context) (err error) {
 	if MID, err = getMID(c); err == nil {
 		// Tries to duplicate the menu
 		var menu database.Menu
-		if menu, err = c.U.DuplicateMenu(MID); err == nil {
+		if menu, err = c.U.Menus().Duplicate(MID); err == nil {
 			utils.Redirect(c, "/menus/"+strconv.Itoa(menu.MID)+"/edit")
 		}
 	}
@@ -103,7 +103,7 @@ func PostDeleteMenu(c *utils.Context) (err error) {
 	var MID int
 	if MID, err = getMID(c); err == nil {
 		// Tries to delete the menu
-		if err = c.U.DeleteMenu(MID); err == nil {
+		if err = c.U.Menus().Delete(MID); err == nil {
 			utils.ShowAndRedirect(c, "Menù eliminato con successo", "/menus")
 		}
 	}

@@ -14,8 +14,8 @@ func getEID(c *utils.Context) (EID int, err error) {
 
 // GetShoppingList renders /shopping_list
 func GetShoppingList(c *utils.Context) (err error) {
-	var list database.ShoppingList
-	if list, err = c.U.GetShoppingList(); err == nil {
+	var list map[int]database.Entry
+	if list, err = c.U.ShoppingList().GetAll(); err == nil {
 		utils.RenderPage(c, "shopping_list/view", map[string]any{"List": list})
 	}
 
@@ -44,7 +44,7 @@ func PostAppendEntries(c *utils.Context) (err error) {
 	}
 
 	// Tries to append them to the list
-	if err = c.U.AppendEntries(names...); err == nil {
+	if err = c.U.ShoppingList().Append(names...); err == nil {
 		utils.Redirect(c, "/shopping_list")
 	}
 
@@ -57,7 +57,7 @@ func PostToggleEntry(c *utils.Context) (err error) {
 	var EID int
 	if EID, err = getEID(c); err == nil {
 		// Tries to toggle the entry
-		if err = c.U.ToggleEntry(EID); err == nil {
+		if err = c.U.ShoppingList().Toggle(EID); err == nil {
 			utils.Redirect(c, "/shopping_list")
 		}
 	}
@@ -68,7 +68,7 @@ func PostToggleEntry(c *utils.Context) (err error) {
 // PostClearShoppingList tries to deletes all the marked entries
 func PostClearShoppingList(c *utils.Context) (err error) {
 	// Tries to clear the list
-	if err = c.U.ClearShoppingList(); err == nil {
+	if err = c.U.ShoppingList().Clear(); err == nil {
 		utils.ShowAndRedirect(c, "Lista svuotata con successo", "/shopping_list")
 	}
 
@@ -82,7 +82,7 @@ func GetEditEntry(c *utils.Context) (err error) {
 	if EID, err = getEID(c); err == nil {
 		// Retrieves the entry's name and renders the page
 		var entry database.Entry
-		if entry, err = c.U.GetEntry(EID); err == nil {
+		if entry, err = c.U.ShoppingList().GetOne(EID); err == nil {
 			utils.RenderPage(c, "shopping_list/edit", map[string]any{"Name": entry.Name})
 		}
 	}
@@ -99,7 +99,7 @@ func PostEditEntry(c *utils.Context) (err error) {
 		newName := c.R.FormValue("name")
 
 		// Tries to toggle the entry
-		if err = c.U.EditEntry(EID, newName); err == nil {
+		if err = c.U.ShoppingList().Edit(EID, newName); err == nil {
 			utils.Redirect(c, "/shopping_list")
 		}
 	}

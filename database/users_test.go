@@ -19,8 +19,8 @@ func generateTestingUser() User {
 	}
 }
 
-// GetTestingUser returns an user to be used for testing purposes
-func GetTestingUser(t *testing.T) (user User, password string) {
+// getTestingUser returns an user to be used for testing purposes
+func getTestingUser(t *testing.T) (user User, password string) {
 	user = generateTestingUser()
 	password = user.Password
 
@@ -48,14 +48,14 @@ func TestSignup(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			preUN := GetUsersNumber()
+			preUN := GetStats().UsersNumber
 
 			_, err := SignUp(d.Username, d.Email, d.Password)
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
 			}
 
-			postUN := GetUsersNumber()
+			postUN := GetStats().UsersNumber
 
 			// UsersNumber should be incremented only if there are no errors
 			if (d.ExpectedErr != nil) != (preUN == postUN) {
@@ -97,7 +97,7 @@ func TestSignup(t *testing.T) {
 }
 
 func TestSignIn(t *testing.T) {
-	user, password := GetTestingUser(t)
+	user, password := getTestingUser(t)
 
 	type data struct {
 		Username string
@@ -137,8 +137,8 @@ func TestSignIn(t *testing.T) {
 }
 
 func TestChangeUsername(t *testing.T) {
-	user, _ := GetTestingUser(t)
-	otherUser, _ := GetTestingUser(t)
+	user, _ := getTestingUser(t)
+	otherUser, _ := getTestingUser(t)
 
 	type data struct {
 		User        User
@@ -188,8 +188,8 @@ func TestChangeUsername(t *testing.T) {
 }
 
 func TestChangeEmail(t *testing.T) {
-	user, _ := GetTestingUser(t)
-	otherUser, _ := GetTestingUser(t)
+	user, _ := getTestingUser(t)
+	otherUser, _ := getTestingUser(t)
 
 	type data struct {
 		User     User
@@ -239,7 +239,7 @@ func TestChangeEmail(t *testing.T) {
 }
 
 func TestChangePassword(t *testing.T) {
-	user, password := GetTestingUser(t)
+	user, password := getTestingUser(t)
 
 	type data struct {
 		User        *User
@@ -290,7 +290,7 @@ func TestChangePassword(t *testing.T) {
 }
 
 func TestGenerateToken(t *testing.T) {
-	user, _ := GetTestingUser(t)
+	user, _ := getTestingUser(t)
 
 	type data struct {
 		User        User
@@ -326,9 +326,9 @@ func TestGenerateToken(t *testing.T) {
 }
 
 func TestResetPassword(t *testing.T) {
-	user, password := GetTestingUser(t)
+	user, password := getTestingUser(t)
 	token, _ := user.GenerateToken()
-	otherUser, _ := GetTestingUser(t)
+	otherUser, _ := getTestingUser(t)
 
 	type data struct {
 		User        User
@@ -381,15 +381,15 @@ func TestResetPassword(t *testing.T) {
 }
 
 func TestDeleteUser(t *testing.T) {
-	user, _ := GetTestingUser(t)
+	user, _ := getTestingUser(t)
 	token, _ := user.GenerateToken()
-	user.AppendEntries("e")
-	user.NewMenu()
-	section, _ := user.NewSection("s")
-	user.AddArticles(section.SID, StringArticle{"article", "", ""})
+	user.ShoppingList().Append("e")
+	user.Menus().New()
+	section, _ := user.Storage().NewSection("s")
+	user.Storage().AddArticles(section.SID, StringArticle{"article", "", ""})
 	testingArticlesN++
 
-	otherUser, _ := GetTestingUser(t)
+	otherUser, _ := getTestingUser(t)
 
 	type data struct {
 		User  User
@@ -435,7 +435,7 @@ func TestDeleteUser(t *testing.T) {
 }
 
 func TestGetUser(t *testing.T) {
-	user, _ := GetTestingUser(t)
+	user, _ := getTestingUser(t)
 
 	type data struct {
 		Field string
@@ -474,10 +474,4 @@ func TestGetUser(t *testing.T) {
 			},
 		},
 	}.Run(t)
-}
-
-func TestGetUsersNumber(t *testing.T) {
-	if gotUN := GetUsersNumber(); gotUN != testingUsersN {
-		t.Errorf("expected <%v>, got <%v>", testingUsersN, gotUN)
-	}
 }
