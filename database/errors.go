@@ -23,6 +23,7 @@ var (
 	ERR_ARTICLE_NOT_FOUND          = errors.New("Articolo non trovata")
 	ERR_ARTICLE_QUANTITY_INVALID   = errors.New("Quantità non valida")
 	ERR_ARTICLE_EXPIRATION_INVALID = errors.New("Scadenza non valida")
+	ERR_ARTICLE_DUPLICATED         = errors.New("Esiste già un articolo con stesso nome e scadenza")
 
 	ERR_ENTRY_NOT_FOUND  = errors.New("Elemento non trovato")
 	ERR_ENTRY_DUPLICATED = errors.New("Elemento già in lista")

@@ -531,6 +531,91 @@ func TestStorageGetOrderedArticles(t *testing.T) {
 	}.Run(t)
 }
 
+func TestStorageEditArticle(t *testing.T) {
+	user, _ := getTestingUser(t)
+	section, _ := user.Storage().NewSection("section")
+
+	sArticle := StringArticle{Name: "article", Expiration: "2024-12-18", Quantity: "5"}
+	article := sArticle.getExpectedArticle()
+	sOtherArticle := StringArticle{Name: "otherArticle", Quantity: "9"}
+	user.Storage().AddArticles(section.SID, sArticle, sOtherArticle)
+	testingArticlesN++
+
+	newQty := StringArticle{Name: "article", Expiration: "2024-12-18"}
+	newAll := StringArticle{Name: "Article", Expiration: "2024-12-31", Quantity: "6"}
+
+	otherSection, _ := user.Storage().NewSection("otherSection")
+	otherUser, _ := getTestingUser(t)
+
+	type data struct {
+		User    User
+		SID     int
+		AID     int
+		NewData StringArticle
+
+		ExpectedErr error
+		CheckEdits  bool
+	}
+
+	testSuite[data]{
+		Target: func(t *testing.T, msg string, d data) {
+			if err := d.User.Storage().EditArticle(d.SID, d.AID, d.NewData); err != d.ExpectedErr {
+				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
+			} else if d.CheckEdits {
+				gotData, _ := user.Storage().GetArticle(d.SID, d.AID)
+				expectedData, _ := d.NewData.Parse()
+
+				if !reflect.DeepEqual(gotData.Name, expectedData.Name) {
+					t.Errorf("%s, name not saved", msg)
+				} else if !reflect.DeepEqual(gotData.Expiration, expectedData.Expiration) {
+					t.Errorf("%s, expiration not saved", msg)
+				} else if !reflect.DeepEqual(gotData.Quantity, expectedData.Quantity) {
+					t.Errorf("%s, quantity not saved", msg)
+				}
+			}
+		},
+
+		Cases: []testCase[data]{
+			{
+				"other user edited article",
+				data{User: otherUser, SID: section.SID, AID: article.AID, NewData: newAll, ExpectedErr: ERR_SECTION_NOT_FOUND},
+			},
+			{
+				"edited article from other section",
+				data{User: user, SID: otherSection.SID, AID: article.AID, NewData: newAll, ExpectedErr: ERR_ARTICLE_NOT_FOUND},
+			},
+			{
+				"edited unknown article",
+				data{User: user, SID: section.SID, NewData: newAll, ExpectedErr: ERR_ARTICLE_NOT_FOUND},
+			},
+			{
+				"invalid quantity",
+				data{User: user, SID: section.SID, AID: article.AID, NewData: StringArticle{Quantity: "a few"}, ExpectedErr: ERR_ARTICLE_QUANTITY_INVALID},
+			},
+			{
+				"invalid expiration",
+				data{User: user, SID: section.SID, AID: article.AID, NewData: StringArticle{Expiration: "next year"}, ExpectedErr: ERR_ARTICLE_EXPIRATION_INVALID},
+			},
+			{
+				"duplicated article",
+				data{User: user, SID: section.SID, AID: article.AID, NewData: sOtherArticle, ExpectedErr: ERR_ARTICLE_DUPLICATED},
+			},
+			{
+				"(same)",
+				data{User: user, SID: section.SID, AID: article.AID, NewData: sArticle, CheckEdits: true},
+			},
+			{
+				"(only quantity)",
+				data{User: user, SID: section.SID, AID: article.AID, NewData: newQty, CheckEdits: true},
+			},
+			{
+				"(all)",
+				data{User: user, SID: section.SID, AID: article.AID, NewData: newAll, CheckEdits: true},
+			},
+		},
+	}.Run(t)
+}
+
 func TestStorageDeleteArticle(t *testing.T) {
 	user, _ := getTestingUser(t)
 	section, _ := user.Storage().NewSection("section")

@@ -160,8 +160,9 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 		GetHandler: handlers.GetSearchArticles,
 	},
 	{
-		Path:       "/storage/{SID}/{AID}",
-		GetHandler: handlers.GetEditArticle,
+		Path:        "/storage/{SID}/{AID}",
+		GetHandler:  handlers.GetEditArticle,
+		PostHandler: handlers.PostEditArticle,
 	},
 	{
 		Path:        "/storage/{SID}/{AID}/delete",

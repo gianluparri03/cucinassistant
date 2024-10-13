@@ -16,7 +16,7 @@ func getSID(c *utils.Context) (SID int, err error) {
 // getAID returns the SID and the AID written in the url
 func getAID(c *utils.Context) (SID int, AID int, err error) {
 	SID, err = getSID(c)
-	if err != nil {
+	if err == nil {
 		AID, err = getID(c, "AID", database.ERR_ARTICLE_NOT_FOUND)
 	}
 
@@ -175,6 +175,26 @@ func GetEditArticle(c *utils.Context) (err error) {
 				"SID":     SID,
 				"Article": article,
 			})
+		}
+	}
+
+	return
+}
+
+// PostEditArticle tries to edit an article
+func PostEditArticle(c *utils.Context) (err error) {
+	var SID, AID int
+
+	if SID, AID, err = getAID(c); err == nil {
+		c.R.ParseForm()
+		newData := database.StringArticle{
+			Name:       c.R.PostFormValue("name"),
+			Expiration: c.R.PostFormValue("expiration"),
+			Quantity:   c.R.PostFormValue("quantity"),
+		}
+
+		if err = c.U.Storage().EditArticle(SID, AID, newData); err == nil {
+			utils.ShowAndRedirect(c, "Modifiche salvate", "/storage/"+strconv.Itoa(SID)+"/"+strconv.Itoa(AID))
 		}
 	}
 

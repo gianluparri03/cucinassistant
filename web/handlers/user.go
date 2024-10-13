@@ -9,6 +9,10 @@ import (
 	"cucinassistant/web/utils"
 )
 
+var (
+	MSG_EMAIL_SENT = "Ti abbiamo inviato una mail. Controlla la casella di posta."
+)
+
 // GetSignUp renders /user/signup
 func GetSignUp(c *utils.Context) error {
 	utils.RenderPage(c, "user/signup", nil)

@@ -2,7 +2,9 @@ package database
 
 import (
 	"database/sql"
+	"errors"
 	"log/slog"
+	"reflect"
 	"strconv"
 	"time"
 )
@@ -353,6 +355,53 @@ func (s Storage) GetOrderedArticle(SID int, AID int) (article OrderedArticle, er
 		err = handleNoRowsError(err, s.uid, ERR_ARTICLE_NOT_FOUND, "retrieving ordered article")
 	} else {
 		article.fixExpiration()
+	}
+
+	return
+}
+
+func (s Storage) EditArticle(SID int, AID int, newData StringArticle) (err error) {
+	// Gets the current data
+	var oldArticle Article
+	if oldArticle, err = s.GetArticle(SID, AID); err != nil {
+		return
+	}
+
+	// Parse the new data
+	var newArticle Article
+	if newArticle, err = newData.Parse(); err != nil {
+		return
+	} else {
+		newArticle.AID = oldArticle.AID
+	}
+
+	// If nothing has changed, it stops here
+	if reflect.DeepEqual(oldArticle, newArticle) {
+		return
+	}
+
+	// If the name or the expiration has changed, checks if
+	// the new data is already in storage
+	var found int
+	err = db.QueryRow(`SELECT 1 FROM articles WHERE sid=$1 AND aid!=$2 AND name=$3 AND expiration=$4;`,
+		SID, AID, newArticle.Name, newArticle.Expiration).Scan(&found)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		slog.Error("while scanning articles:", "err", err)
+		err = ERR_UNKNOWN
+		return
+	} else if err != nil {
+		err = nil
+	} else if found > 0 {
+		err = ERR_ARTICLE_DUPLICATED
+		return
+	}
+
+	// Executes the query
+	_, err = db.Exec(`UPDATE articles SET name=$2, expiration=$3, quantity=$4 WHERE aid=$1;`,
+		AID, newArticle.Name, newArticle.Expiration, newArticle.Quantity)
+	if err != nil {
+		slog.Error("while editing article:", "err", err)
+		err = ERR_UNKNOWN
 	}
 
 	return
