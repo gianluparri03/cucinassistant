@@ -1,5 +1,3 @@
-let inputN; // ( used by updateArticles and updateEntries )
-
 // Makes sure the fields password-1 and password-2 match,
 // otherwise shows an error.
 // ( used by /user/sign_up, /user/change_password and /user/reset_password )
@@ -28,43 +26,64 @@ function comparePasswords() {
     }
 }
 
-// If the first article's name has been filled, it adds a new one
-// on top of it. If an article's name is cleared, the article will be dropped.
-// It always keep an input visible.
-// ( used by: /storage/{SID}/add )
-function updateArticles(e, bootstrap=false) {
-    if (bootstrap || (e.target == $("input[type=text]").get(0) && e.target.value)) {
-        let na = $(`<div class="article">
-                        <input class="name" name="article-${inputN}-name" type="text" placeholder="Nome">
-                        <input class="expiration" name="article-${inputN}-expiration" type="date" placeholder="Scadenza">
-                        <input class="quantity" name="article-${inputN}-quantity" type="number" min="0" step="1" placeholder="Quantità">
-                    </div>`);
 
-        $('#new-articles').prepend(na);
-        na.on("change", updateArticles);
-        inputN++;
-    } else if (e.target.type == 'text' && !e.target.value) {
-        e.target.parentNode.remove();
-    }
-}
 
-// If the first input has been filled, it adds a new one
-// on top of it. If one input is cleared, it will delete it.
-// It always keep an input visible.
 // ( used by: /shopping_list/append )
-function updateEntries(e, bootstrap=false) {
-    if (bootstrap || (e.target == $("input[type=text]").get(0) && e.target.value)) {
-        let ne = $(`<div class="new-element">
-                        <input class="name" type="text" name="entry-${inputN}-name">
-                    </div>`);
+let entriesN = 0;
 
-        $('#new-elements').prepend(ne);
-        ne.on("change", updateEntries);
-        inputN++;
-    } else if (!e.target.value) {
-        e.target.remove();
-    }
+// Adds the inputs for a new entry
+// ( used by: /shopping_list/append )
+function addEntry(e) {
+    entriesN++;
+
+    $('#new-entries').prepend(`<div class="entry">
+        <input class="name" type="text" name="entry-${entriesN}-name" placeholder="Nome">
+    </div>`);
+
+    if (e) { e.preventDefault(); }
 }
+
+// Removes the first entry's inputs
+// ( used by: /shopping_list/append )
+function removeEntry(e) {
+    if (entriesN > 1) {
+        entriesN--;
+        $('.entry')[0].remove();
+    }
+
+    if (e) { e.preventDefault(); }
+} 
+
+
+
+// ( used by: /storage/{sid}/add )
+let articlesN = 0;
+
+// Adds the inputs for a new article
+// ( used by: /storage/{sid}/add )
+function addArticle(e) {
+    articlesN++;
+
+    $('#new-articles').prepend(`<div class="article">
+        <input class="name" name="article-${articlesN}-name" type="text" placeholder="Nome">
+        <input class="expiration" name="article-${articlesN}-expiration" type="date" placeholder="Scadenza">
+        <input class="quantity" name="article-${articlesN}-quantity" type="number" min="0" step="1" placeholder="Quantità">
+    </div>`);
+
+    if (e) { e.preventDefault(); }
+}
+
+// Removes the first article's inputs
+// ( used by: /storage/{sid}/add )
+function removeArticle(e) {
+    if (articlesN > 1) {
+        articlesN--;
+        $('.article')[0].remove();
+    }
+
+    if (e) { e.preventDefault(); }
+} 
+
 
 // Changes the shown message
 // ( used by: /storage/{SID}/edit )

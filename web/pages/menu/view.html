@@ -2,6 +2,9 @@
 {{ define "back_link" }}/menus{{ end }}
 
 {{ define "content" }}
+    <button class="icon-text" hx-get="/menus/{{ .Menu.MID }}/edit"><i class="fas fa-edit"></i> Modifica</button>
+    <button class="icon-text" hx-post="/menus/{{ .Menu.MID }}/duplicate"><i class="fas fa-clone"></i> Clona</button>
+
     <div class="menu-day">
         <b>Lunedì</b>
         <textarea readonly>{{ index .Menu.Meals 0 }}</textarea>
@@ -43,7 +46,4 @@
         <textarea readonly>{{ index .Menu.Meals 12 }}</textarea>
         <textarea readonly>{{ index .Menu.Meals 13 }}</textarea>
     </div>
-
-    <button class="icon-text" hx-get="/menus/{{ .Menu.MID }}/edit"><i class="fas fa-edit"></i> Modifica</button>
-    <button class="icon-text" hx-post="/menus/{{ .Menu.MID }}/duplicate"><i class="fas fa-clone"></i> Clona</button>
 {{ end }}

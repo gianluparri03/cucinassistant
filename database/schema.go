@@ -55,7 +55,7 @@ const schema = `
         UNIQUE (sid, name, expiration)
     );
 
-    CREATE INDEX IF NOT EXISTS articles_sid_expiration ON articles (sid, expiration);
+    CREATE INDEX IF NOT EXISTS articles_sid_expiration ON articles (sid, expiration, aid);
 
 
     CREATE TABLE IF NOT EXISTS entries (

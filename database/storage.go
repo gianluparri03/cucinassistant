@@ -307,7 +307,7 @@ func (s Storage) GetArticles(SID int, filter string) (section Section, err error
 	// Scans the articles
 	var rows *sql.Rows
 	rows, err = db.Query(`SELECT aid, name, expiration, quantity FROM articles
-						  WHERE sid=$1 AND name ILIKE CONCAT('%', $2::VARCHAR, '%') ORDER BY expiration;`, SID, filter)
+						  WHERE sid=$1 AND name ILIKE CONCAT('%', $2::VARCHAR, '%') ORDER BY expiration, aid;`, SID, filter)
 	if err != nil {
 		slog.Error("while retrieving articles:", "err", err)
 		err = ERR_UNKNOWN
@@ -346,8 +346,8 @@ func (s Storage) GetOrderedArticle(SID int, AID int) (article OrderedArticle, er
 
 	// Fetches the article and its neighbours aids
 	err = db.QueryRow(`WITH ordered AS (SELECT aid, name, expiration, quantity,
-						LAG(aid) OVER (PARTITION BY sid ORDER BY expiration) as prev,
-						LEAD(aid) OVER (PARTITION BY sid ORDER BY expiration) as next
+						LAG(aid) OVER (PARTITION BY sid ORDER BY expiration, aid) as prev,
+						LEAD(aid) OVER (PARTITION BY sid ORDER BY expiration, aid) as next
 						FROM articles WHERE sid=$1) SELECT * FROM ordered WHERE aid=$2;`, SID, AID).
 		Scan(&article.AID, &article.Name, &article.Expiration, &article.Quantity, &article.Prev, &article.Next)
 

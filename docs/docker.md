@@ -26,7 +26,7 @@ name: cucinassistant
 
 services:
   app:
-    image: github.com/gianluparri03/cucinassistant:latest
+    image: ghcr.io/gianluparri03/cucinassistant:latest
 
     depends_on:
       database:
@@ -51,10 +51,16 @@ services:
     healthcheck:
       test: pg_isready
 
+    volumes:
+      - database:/var/lib/postgresql/data
+
     environment:
       POSTGRES_USER: <db_user>
       POSTGRES_PASSWORD: <db_pass>
       POSTGRES_DB: <db_name>
+
+volumes:
+  database:
 ```
 
 3. Run `docker compose up` (with an optional `-d` to hide the output) and we're done!

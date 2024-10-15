@@ -4,8 +4,10 @@
 {{ define "content" }}
     <form method="POST">
         <div id="new-articles"></div>
+        <button class="icon" onclick="removeArticle(event);"><i class="fas fa-minus"></i></button>
+        <button class="icon" onclick="addArticle(event);"><i class="fas fa-plus"></i></button>
         <button class="icon-text"><i class="fas fa-check"></i> Conferma</button>
     </form>
 
-    <script> inputN = 0; updateArticles(null, true); </script>
+    <script> articlesN = 0; addArticle(); </script>
 {{ end }}

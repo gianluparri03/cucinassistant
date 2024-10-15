@@ -4,7 +4,7 @@ const CACHED_ASSETS = [
     '/assets/sakura.css',
     '/assets/style.css',
     '/assets/scripts.js',
-    '/assets/logo_round.png'
+    '/favicon.ico'
 ];
 
 

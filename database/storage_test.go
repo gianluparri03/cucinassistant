@@ -359,6 +359,9 @@ func TestStorageGetArticles(t *testing.T) {
 	otherUser, _ := getTestingUser(t)
 	emptySection, _ := otherUser.Storage().NewSection("emptySection")
 
+	// Makes sure that it works even after edits
+	user.Storage().EditArticle(section.SID, a1.AID, s1)
+
 	type data struct {
 		User   User
 		SID    int
@@ -490,6 +493,9 @@ func TestStorageGetOrderedArticles(t *testing.T) {
 	a2 := s2.getExpectedArticle()
 	a3 := s3.getExpectedArticle()
 	a4 := s4.getExpectedArticle()
+
+	// Makes sure that it works even after edits
+	user.Storage().EditArticle(section.SID, a1.AID, s1)
 
 	type data struct {
 		User User

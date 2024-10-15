@@ -13,10 +13,12 @@
 
     <b>Altro</b>
     <div id="pre-delete">
-        <button class="icon-text" onclick="swapButtons();"><i class="fas fa-trash"></i> Elimina sezione</button> <br>
+        <button class="icon-text" onclick="swapButtons();"><i class="fas fa-trash"></i> Elimina sezione</button>
     </div>
     <div id="post-delete" hidden>
         Sei davvero sicuro? Tutti gli articoli in questa sezione verranno eliminati.
-        <button class="icon-text" hx-post="/storage/{{ .Section.SID }}/delete"><i class="fas fa-trash"></i> Sì, sono sicuro</button> <br>
+        <button class="icon-text" hx-post="/storage/{{ .Section.SID }}/delete" hx-push-url="false">
+            <i class="fas fa-trash"></i> Sì, sono sicuro
+        </button>
     </div>
 {{ end }}

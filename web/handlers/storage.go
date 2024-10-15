@@ -209,11 +209,12 @@ func PostDeleteArticle(c *utils.Context) (err error) {
 		var next *int
 
 		if err, next = c.U.Storage().DeleteArticle(SID, AID); err == nil {
+			path := "/storage/" + strconv.Itoa(SID)
 			if next != nil {
-				utils.Redirect(c, "/storage/"+strconv.Itoa(*next))
-			} else {
-				utils.Redirect(c, "/storage")
+				path += "/" + strconv.Itoa(*next)
 			}
+
+			utils.Redirect(c, path)
 		}
 	}
 

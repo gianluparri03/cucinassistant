@@ -71,7 +71,7 @@ nav {
     font-size: 30px;
     width: 50px;
     color: white;
-    padding: 20px;
+    padding: 10px;
     position: relative;
 }
 
@@ -184,10 +184,22 @@ message button {
 
 .dashboard button {
     background-color: var(--orange);
-    height: min(17vmax, 170px);
-    width: min(17vmax, 170px);
     margin-right: 1.5rem;
     margin-bottom: 1.5rem;
+}
+
+@media (orientation: portrait) {
+    .dashboard button {
+        height: 18.5vh;
+        width: 18.5vh;
+    }
+}
+
+@media (orientation: landscape) {
+    .dashboard button {
+        height: 12vw;
+        width: 12vw;
+    }
 }
 
 .dashboard button:enabled:hover {
@@ -275,6 +287,7 @@ textarea {
 /* --- PAGE SPECIFIC: Storage --- */
 .article {
     margin: 10px auto;
+    display: flex;
     border-left: 3px solid var(--orange);
     padding-left: 5px;
 }

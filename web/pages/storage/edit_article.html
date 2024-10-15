@@ -19,8 +19,13 @@
             <button class="icon" hx-get="/storage/{{ .SID }}/{{ .Article.Prev }}"><i class="fas fa-chevron-left"></i></button>
         {{ end }}
 
-        <button class="icon-text" hx-post="/storage/{{ .SID }}/{{ .Article.AID }}/delete"><i class="fas fa-trash"></i> Elimina</button>
-        <button class="icon-text"><i class="fas fa-check"></i> Salva modifiche</button>
+        <button class="icon-text" hx-post="/storage/{{ .SID }}/{{ .Article.AID }}/delete" hx-push-url="false">
+            <i class="fas fa-trash"></i> Elimina
+        </button>
+
+        <button class="icon-text" hx-push-url="false">
+            <i class="fas fa-check"></i> Salva modifiche
+        </button>
 
         {{ if .Article.Next }}
             <button class="icon" hx-get="/storage/{{ .SID }}/{{ .Article.Next }}"><i class="fas fa-chevron-right"></i></button>

@@ -23,7 +23,7 @@
 
     "icons": [
         {
-            "src": "/static/logo_square.png",
+            "src": "/assets/logo_square.png",
             "type": "image/png",
             "sizes": "512x512"
         }

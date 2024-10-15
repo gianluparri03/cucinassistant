@@ -44,7 +44,7 @@ func registerAssets(router *mux.Router) {
 
 	// Registers the favicon
 	router.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "/assets/logo_round.png", http.StatusMovedPermanently)
+		http.ServeFile(w, r, "web/assets/logo_round.png")
 	})
 
 	// Registers the 404 handler
