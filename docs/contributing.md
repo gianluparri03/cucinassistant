@@ -14,16 +14,15 @@ Below there is a list of features that I'd like to add to the project.
 ## Next features
 
 **Big Features**
-- [ ] Multi language UI
-- [ ] Recipe management
+- [ ] Recipe management _{scheduled for version 6}
+- [ ] Multi language UI _{scheduled for version 7}_
 
 **Security**
 - [ ] Confirmation email when signing up
 - [ ] Limit data size
 
 **Other**
-- [ ] Cookie banner and privacy notice
-- [ ] +/- buttons when editing an article (storage)
+- [ ] A better API for the storage _{scheduled for version 6}_
+- [ ] Caching external assets? (especially fontawesome) _{scheduled for version 6}_
 - [ ] A better config system (maybe environment variables with defaults?)
-- [ ] Caching external assets (find a replacement for fontawesome)
-- [ ] A better API for the storage
+- [ ] Cookie banner and privacy notice

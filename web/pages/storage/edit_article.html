@@ -12,7 +12,7 @@
 
             <input class="quantity" placeholder="Quantità"
                 {{ if .Article.Quantity }} value="{{ .Article.Quantity }}" {{ end }}
-                type="quantity" name="quantity">
+                type="number" name="quantity">
         </div>
 
         {{ if .Article.Prev }}
