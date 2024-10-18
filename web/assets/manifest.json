@@ -18,7 +18,7 @@
 
     "display": "standalone",
     "orientation": "natural",
-    "background_color": "#f9f9f9",
+    "background_color": "#d50000",
     "theme_color": "#d50000",
 
     "icons": [
@@ -26,6 +26,21 @@
             "src": "/assets/logo_square.png",
             "type": "image/png",
             "sizes": "512x512"
+        }
+    ],
+    
+    "shortcuts": [
+        {
+          "name": "Menù",
+          "url": "/menus"
+        },
+        {
+          "name": "Dispensa",
+          "url": "/storage"
+        },
+        {
+          "name": "Lista della spesa",
+          "url": "/shopping_list"
         }
     ]
 }

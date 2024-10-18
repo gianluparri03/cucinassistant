@@ -22,6 +22,7 @@ Below there is a list of features that I'd like to add to the project.
 - [ ] Limit data size
 
 **Other**
+- [ ] Fix next and prev buttons when changing the articles' expiration _{scheduled for version 6}_
 - [ ] A better API for the storage _{scheduled for version 6}_
 - [ ] Caching external assets? (especially fontawesome) _{scheduled for version 6}_
 - [ ] A better config system (maybe environment variables with defaults?)
