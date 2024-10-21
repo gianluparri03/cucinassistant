@@ -3,6 +3,16 @@
 
 {{ define "content" }}
     <div class="shopping-list">
+        <button class="icon-text" hx-get="/shopping_list/append">
+            <i class="fas fa-plus"></i> Aggiungi elementi
+        </button>
+
+        {{ if .List }}
+            <button class="icon-text" hx-post="/shopping_list/clear" hx-push-url="false">
+                <i class="fas fa-trash"></i> Elimina selezionati
+            </button>
+        {{ end }}
+
         {{ range .List }}
             <div class="shopping-item">
                 <input type="checkbox" {{ if .Marked }} checked {{ end }} autocomplete="off" readonly
@@ -12,16 +22,6 @@
             </div>
         {{ else }}
             <span id="empty-label">La lista è vuota.</span>
-        {{ end }}
-
-        <button class="icon-text" hx-get="/shopping_list/append">
-            <i class="fas fa-plus"></i> Aggiungi elementi
-        </button>
-
-        {{ if .List }}
-            <button class="icon-text" hx-post="/shopping_list/clear" hx-push-url="false">
-                <i class="fas fa-trash"></i> Elimina selezionati
-            </button>
         {{ end }}
     </div>
 {{ end }}

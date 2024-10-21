@@ -11,6 +11,11 @@
 
         <br>
 
+        <button class="icon-text" hx-get="/storage/{{ .Section.SID }}/add"><i class="fas fa-plus"></i> Aggiungi</button>
+        <button class="icon-text" hx-get="/storage/{{ .Section.SID }}/edit"><i class="fas fa-edit"></i> Modifica sezione</button>
+
+        <br>
+
         {{ range .Section.Articles }}
             <div class="article {{ if .IsExpired }} expired {{ end }}" hx-get="/storage/{{ $.Section.SID }}/{{ .AID  }}">
                 <input class="name" value="{{ .Name }}" readonly>
@@ -21,7 +26,4 @@
             <i>Nessun articolo in dispensa</i>
         {{ end }}
     </div>
-
-    <button class="icon-text" hx-get="/storage/{{ .Section.SID }}/add"><i class="fas fa-plus"></i> Aggiungi</button>
-    <button class="icon-text" hx-get="/storage/{{ .Section.SID }}/edit"><i class="fas fa-edit"></i> Modifica sezione</button>
 {{ end }}
