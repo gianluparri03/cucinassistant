@@ -95,6 +95,7 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 	},
 	{
 		Path:        "/user/reset_password",
+		Unprotected: true,
 		GetHandler:  handlers.GetResetPassword,
 		PostHandler: handlers.PostResetPassword,
 	},
