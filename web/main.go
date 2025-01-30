@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"net/http"
 
-	"cucinassistant/config"
+	"cucinassistant/configs"
 	"cucinassistant/web/utils"
 )
 
@@ -26,7 +26,7 @@ func Start() {
 	utils.InitSessionStore()
 
 	// Starts the server
-	if err := http.ListenAndServe(":"+config.Runtime.Port, router); err != nil {
+	if err := http.ListenAndServe(":"+configs.Port, router); err != nil {
 		slog.Error("while running web server:", "err", err)
 	}
 }

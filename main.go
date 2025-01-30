@@ -6,27 +6,21 @@ import (
 	"os"
 	"strings"
 
-	"cucinassistant/config"
+	"cucinassistant/configs"
 	"cucinassistant/database"
 	"cucinassistant/web"
 )
 
 // main runs everything
 func main() {
-	// Ensures the config file is given
-	if len(os.Args) < 2 {
-		fmt.Println("Please provide a config file.")
-		os.Exit(1)
-	}
-
 	// Prints a welcome text
-	title := fmt.Sprintf("CucinAssistant (version: %s)", config.Version)
+	title := fmt.Sprintf("CucinAssistant [v%d (%s)]", configs.VersionCode, configs.VersionName)
 	slog.Warn(title)
 	slog.Warn(strings.Repeat("=", len(title)))
 
-	// Parses the config
-	slog.Warn("Reading configs...")
-	config.Read(os.Args[1])
+	// Loads the configs
+	slog.Warn("Loading configs...")
+	configs.LoadAndParse()
 
 	// Connects to the database
 	slog.Warn("Connecting to the database...")
@@ -38,7 +32,7 @@ func main() {
 
 	// Adds a listener for shutting down the server if it's on debug mode
 	slog.Warn("Starting web server...")
-	if config.Runtime.Debugging {
+	if debug := os.Getenv("CA_DEBUG"); debug == "1" || debug == "true" {
 		go func() {
 			fmt.Scanln()
 			os.Exit(0)
@@ -48,6 +42,6 @@ func main() {
 	}
 
 	// Starts the server
-	slog.Warn("Running on http://localhost:" + config.Runtime.Port + "/")
+	slog.Warn("Running on http://localhost:" + os.Getenv("CA_PORT") + "/")
 	web.Start()
 }

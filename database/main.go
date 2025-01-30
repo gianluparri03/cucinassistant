@@ -8,17 +8,16 @@ import (
 	"os"
 	"strings"
 
-	"cucinassistant/config"
+	"cucinassistant/configs"
 )
 
 var db *sql.DB
 
 // Connect creates a connection to the database.
-// It gets all the needed information from config.Runtime
 func Connect() {
 	// Connects to the database
 	var err error
-	db, err = sql.Open("postgres", config.Runtime.Database)
+	db, err = sql.Open("postgres", configs.Database)
 	if err != nil {
 		slog.Error("while connecting to the db:", "err", err)
 		os.Exit(1)

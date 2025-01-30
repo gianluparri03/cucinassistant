@@ -4,29 +4,27 @@ This guide will explain to you how to setup an instance of CucinAssistant with d
 
 0. Make sure that both `docker` and `docker compose` are installed.
 
-1. Create a config file (like `prod.yml`) in your working directory, containing
-```yaml
-sessionSecret: "<a random string>"
-
-baseURL: "<the host from which it will be accessible, like https://ca.gianlucaparri.me>"
-port: "80"
-
-database: "user=<db_user> password=<db_pass> dbname=<db_name> host=database sslmode=disable"
-
-email:
-  address: "<...>"
-  server: "<...>"
-  port: "<...>"
-  password: "<...>"
+1. Create a config file (like `.env`) in your working directory, containing all the required
+variables (see [configs/configs.go](configs/configs.go) for details), like this:
+```
+CA_BASEURL="http://localhost:8080"
+CA_PORT=80
+CA_SESSIONSECRET="random-string"
+CA_DATABASE="user=ca password=ca dbname=ca host=database sslmode=disable"
+CA_EMAIL_ENABLED=0
+# with CA_EMAIL_ENABLED=0, the server will not send any email. to enable it,
+# you need to provide additional informations.
 ```
 
-2. Then, create a `docker-compose.yml` file in the same directory, like
+2. Then, create a `docker-compose.yml` file in the same directory, containing
 ```yaml
 name: cucinassistant
 
 services:
   app:
-    image: ghcr.io/gianluparri03/cucinassistant:latest
+    build: .
+    # or (if you want the latest stable version)
+    # image: ghcr.io/gianluparri03/cucinassistant
 
     depends_on:
       database:
@@ -36,13 +34,10 @@ services:
     healthcheck:
       test: "curl --fail localhost/info || exit 1"
 
-    volumes:
-      - ./prod.yml:/cucinassistant/config.yml
-
-    command: config.yml
+    env_file: ".env"
 
     ports:
-      - "<host_port>:80"
+        - "127.0.0.1:8080:80"
 
   database:
     image: postgres
@@ -55,9 +50,9 @@ services:
       - database:/var/lib/postgresql/data
 
     environment:
-      POSTGRES_USER: <db_user>
-      POSTGRES_PASSWORD: <db_pass>
-      POSTGRES_DB: <db_name>
+      POSTGRES_USER: ca
+      POSTGRES_PASSWORD: ca
+      POSTGRES_DB: ca
 
 volumes:
   database:

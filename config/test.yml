@@ -1,2 +1,0 @@
-testing: true
-database: "user=cucinassistant password=cucinassistant dbname=test sslmode=disable"

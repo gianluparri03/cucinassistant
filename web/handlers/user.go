@@ -3,7 +3,7 @@ package handlers
 import (
 	"net/url"
 
-	"cucinassistant/config"
+	"cucinassistant/configs"
 	"cucinassistant/database"
 	"cucinassistant/email"
 	"cucinassistant/web/utils"
@@ -87,7 +87,7 @@ func PostForgotPassword(c *utils.Context) (err error) {
 			// Sends it the email
 			go email.SendMail("Recupero password", "reset_password", map[string]any{
 				"Username":  user.Username,
-				"ResetLink": config.Runtime.BaseURL + "/user/reset_password?token=" + url.QueryEscape(token),
+				"ResetLink": configs.BaseURL + "/user/reset_password?token=" + url.QueryEscape(token),
 			}, user.Email)
 
 			// Shows the popup
@@ -215,7 +215,7 @@ func PostDeleteUser1(c *utils.Context) (err error) {
 		// Sends the email
 		go email.SendMail("Eliminazione account", "delete_confirm", map[string]any{
 			"Username":   c.U.Username,
-			"DeleteLink": config.Runtime.BaseURL + "/user/delete_2?token=" + url.QueryEscape(token),
+			"DeleteLink": configs.BaseURL + "/user/delete_2?token=" + url.QueryEscape(token),
 		}, c.U.Email)
 
 		utils.Show(c, MSG_EMAIL_SENT)

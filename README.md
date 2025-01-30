@@ -1,6 +1,6 @@
 <img src="web/assets/banner.png" height="200px">
 
-![Website](https://img.shields.io/website?url=https%3A%2F%2Fca.gianlucaparri.me)
+![Website](https://up.gianlucaparri.me/api/badge/8/status)
 ![Codacy Grade](https://img.shields.io/codacy/grade/54e56adbe15f43568a1819224319b423)
 ![Codacy Coverage](https://img.shields.io/codacy/coverage/54e56adbe15f43568a1819224319b423)
 ![GitHub Actions](https://img.shields.io/github/actions/workflow/status/gianluparri03/cucinassistant/push.yml)
@@ -21,14 +21,26 @@ date.
 
 ## Public instances
 
-You can try it online, on [https://ca.gianlucaparri.me](https://ca.gianlucaparri.me), or you can also download it
+You can try it online, on [https://cucinassistant.com](https://cucinassistant.com), or you can also download it
 from Google Play ([here](https://play.google.com/store/apps/details?id=me.gianlucaparri.ca.twa)); the app is a
 Trusted Web Application, so it is the same of the website.
 
 
-## Docs and contributing
+## Docs
 
 Click [here](docs/).
+
+## Contributing
+
+Every contribution is highly appreciated.
+
+If you have any suggestion, you've found a bug, or you just want more informations,
+you can send an email at [cucinassistant@gmail.com](mailto:cucinassistant@gmail.com) or at
+[gianlucaparri03@gmail.com](mailto:gianlucaparri03@gmail.com).
+
+Otherwise, you can also open issues or pull requests in this repository.
+
+You can see a list of new features I'd like to implement [here](https://github.com/users/gianluparri03/projects/4).
 
 
 ## Credits and license

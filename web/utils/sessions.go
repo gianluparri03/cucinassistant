@@ -9,11 +9,16 @@ import (
 	"strings"
 	"time"
 
-	"cucinassistant/config"
+	"cucinassistant/configs"
 )
 
+// store is used to store the cookies
 var store *pgstore.PGStore
+
+// sessionName is the session's name
 var sessionName = "ca_session"
+
+// sessionField is the field in which the UID is saved
 var sessionField = "UID"
 
 // InitSessionStore initializes the cookie session store.
@@ -21,7 +26,7 @@ var sessionField = "UID"
 func InitSessionStore() {
 	// Initializes the session store
 	var err error
-	store, err = pgstore.NewPGStore(config.Runtime.Database, []byte(config.Runtime.SessionSecret))
+	store, err = pgstore.NewPGStore(configs.Database, []byte(configs.SessionSecret))
 	if err != nil {
 		slog.Error("while initializing session store:", "err", err)
 		os.Exit(1)
@@ -30,7 +35,7 @@ func InitSessionStore() {
 	store.Options = &sessions.Options{
 		Path:     "/",
 		MaxAge:   60 * 60 * 24 * 90,
-		Secure:   strings.HasPrefix(config.Runtime.BaseURL, "https://"),
+		Secure:   strings.HasPrefix(configs.BaseURL, "https://"),
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
 	}

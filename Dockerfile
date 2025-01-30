@@ -7,7 +7,7 @@ WORKDIR /cucinassistant
 COPY go.mod go.sum ./
 RUN go mod download
 
-COPY config/. config/
+COPY configs/. configs/
 COPY database/. database/
 COPY email/. email/
 COPY web/. web/
@@ -16,4 +16,5 @@ COPY main.go broadcast.go ./
 RUN go build main.go
 RUN go build broadcast.go
 
-ENTRYPOINT ["./main"]
+ENV CA_ENV=production
+CMD ["./main"]

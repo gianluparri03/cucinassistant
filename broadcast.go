@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"cucinassistant/config"
+	"cucinassistant/configs"
 	"cucinassistant/database"
 	"cucinassistant/email"
 )
@@ -15,19 +15,13 @@ import (
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 
-	// Ensures the config file is given
-	if len(os.Args) < 2 {
-		fmt.Println("Please provide a config file.")
-		os.Exit(1)
-	}
-
 	// Prints a welcome text
 	welcome := "CucinAssistant Broadcast Email Sender"
 	fmt.Println(welcome)
 	fmt.Println(strings.Repeat("=", len(welcome)))
 
 	// Reads the configs and connects to the database
-	config.Read(os.Args[1])
+	configs.LoadAndParse()
 	database.Connect()
 
 	// Reads from stdin both the subject and the body
@@ -40,8 +34,8 @@ func main() {
 
 	// Sends a test email
 	data := map[string]any{"Body": body}
-	email.SendMail(subject, "empty", data, config.Runtime.Email.Address)
-	fmt.Println("\nSent a test email at " + config.Runtime.Email.Address)
+	email.SendMail(subject, "empty", data, configs.EmailSender)
+	fmt.Println("\nSent a test email at " + configs.EmailSender)
 
 	// Asks if it's okay
 	fmt.Printf("Type BROADCAST to send it to everyone\n> ")

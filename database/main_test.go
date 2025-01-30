@@ -4,13 +4,15 @@ import (
 	"os"
 	"testing"
 
-	"cucinassistant/config"
+	"cucinassistant/configs"
 )
 
 // TestMain sets up the testing environment
 func TestMain(m *testing.M) {
+	os.Chdir("..")
+
 	// Loads the configuration
-	config.Read("../" + os.Args[len(os.Args)-1])
+	configs.LoadAndParse()
 
 	// Connects to the database and do the bootstrap
 	Connect()

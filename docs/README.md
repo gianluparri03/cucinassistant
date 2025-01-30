@@ -5,8 +5,6 @@
 - [packages.md](packages.md) contains explains how the code is organized.
 - [docker.md](docker.md) explains how to run your own instance of CucinAssistant with docker compose.
 - [history.md](history.md) contains a brief history of the project and a list of all the released versions.
-- [contributing.md](contributing.md) contains some informations about how to contribute to the project and a list
-  of the next features to be implemented.
 
 ## Additional notes
 

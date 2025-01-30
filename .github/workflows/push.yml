@@ -1,4 +1,4 @@
-name: Tests
+name: Tests and coverage
 on: [push]
 
 jobs:
@@ -11,9 +11,9 @@ jobs:
       postgres:
         image: postgres
         env:
-          POSTGRES_USER: catest
-          POSTGRES_PASSWORD: catest
-          POSTGRES_DB: catest
+          POSTGRES_USER: ca
+          POSTGRES_PASSWORD: ca
+          POSTGRES_DB: ca_test
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -30,7 +30,9 @@ jobs:
       - name: Install dependencies
         run: go get .
       - name: Run tests
-        run: go test -coverprofile=cover.out cucinassistant/database -args config/ci.yml
+        env:
+            CA_ENV: "testing"
+        run: go test -coverprofile=cover.out cucinassistant/database
       - name: Push coverage results
         uses: codacy/codacy-coverage-reporter-action@v1.3.0
         with:

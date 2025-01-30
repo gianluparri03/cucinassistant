@@ -4,7 +4,7 @@ import (
 	"github.com/gorilla/mux"
 	"strconv"
 
-	"cucinassistant/config"
+	"cucinassistant/configs"
 	"cucinassistant/database"
 	"cucinassistant/web/utils"
 )
@@ -18,8 +18,9 @@ func GetIndex(c *utils.Context) error {
 // GetInfo renders /info
 func GetInfo(c *utils.Context) error {
 	utils.RenderPage(c, "misc/info", map[string]any{
-		"Config":  config.Runtime,
-		"Version": config.Version,
+		"BaseURL":     configs.BaseURL,
+		"VersionCode": configs.VersionCode,
+		"VersionName": configs.VersionName,
 	})
 	return nil
 }

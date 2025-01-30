@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"net/smtp"
 
-	"cucinassistant/config"
+	"cucinassistant/configs"
 )
 
 // SendMail sends an email to one (or more) recipients, with a given subject, whose
@@ -22,9 +22,7 @@ func SendMail(subject string, templateName string, data map[string]any, recipien
 	formatMessage(&body, templateName, data)
 
 	// Sends it to the recipient
-	if !config.Runtime.Testing {
-		sendBody(&body, templateName, recipients...)
-	}
+	sendBody(&body, templateName, recipients...)
 }
 
 // formatMessage executes the template with the given data, writing all
@@ -43,7 +41,7 @@ func formatMessage(w *bytes.Buffer, templateName string, data map[string]any) {
 	}
 
 	// Adds the banner path
-	data["Banner"] = config.Runtime.BaseURL + "/assets/banner.png"
+	data["Banner"] = configs.BaseURL + "/assets/banner.png"
 
 	// Formats the template
 	err = tmpl.Execute(w, data)
@@ -57,26 +55,30 @@ func sendBody(body *bytes.Buffer, emailType string, recipients ...string) {
 	// Prepares the credentials
 	credentials := smtp.PlainAuth(
 		"",
-		config.Runtime.Email.Login,
-		config.Runtime.Email.Password,
-		config.Runtime.Email.Server,
+		configs.EmailLogin,
+		configs.EmailPassword,
+		configs.EmailServer,
 	)
 
 	for _, recipient := range recipients {
-		// Sends the message
-		err := smtp.SendMail(
-			config.Runtime.Email.Server+":"+config.Runtime.Email.Port,
-			credentials,
-			config.Runtime.Email.Address,
-			[]string{recipient},
-			body.Bytes(),
-		)
+		// Sends the message (or prints it in the console)
+		if configs.EmailEnabled {
+			err := smtp.SendMail(
+				configs.EmailServer+":"+configs.EmailPort,
+				credentials,
+				configs.EmailSender,
+				[]string{recipient},
+				body.Bytes(),
+			)
 
-		// Checks for errors
-		if err != nil {
-			slog.Error("while sending email:", "err", err)
+			// Checks for errors
+			if err != nil {
+				slog.Error("while sending email:", "err", err)
+			} else {
+				slog.Debug("Sent email:", "emailType", emailType, "recipient", recipient)
+			}
 		} else {
-			slog.Debug("Sent email:", "emailType", emailType, "recipient", recipient)
+			slog.Warn("--- [Begin Email] ---\n" + string(body.Bytes()) + "\n--- [End Email] ---")
 		}
 	}
 }
