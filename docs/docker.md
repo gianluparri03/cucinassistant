@@ -5,7 +5,7 @@ This guide will explain to you how to setup an instance of CucinAssistant with d
 0. Make sure that both `docker` and `docker compose` are installed.
 
 1. Create a config file (like `.env`) in your working directory, containing all the required
-variables (see [configs/configs.go](configs/configs.go) for details), like this:
+variables (see [configs/configs.go](../configs/configs.go) for details), like this:
 ```
 CA_BASEURL="http://localhost:8080"
 CA_PORT=80

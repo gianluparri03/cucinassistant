@@ -36,17 +36,17 @@ dbsh: start_db
 
 # Runs the webserver
 run: start_db
-	@CA_ENV=development go run .
+	@cd src; CA_ENV=development go run .
 
 # Runs the tests
 test: create_test_db
-	@-CA_ENV=testing go test -v cucinassistant/database
+	@-cd src; CA_ENV=testing go test -v cucinassistant/database
 
 # Runs the tests and shows a coverage report
 cover: create_test_db
-	@CA_ENV=testing go test -coverprofile=/tmp/cover.out -covermode atomic cucinassistant/database
+	@cd src; CA_ENV=testing go test -coverprofile=/tmp/cover.out -covermode atomic cucinassistant/database
 	@go tool cover -html=/tmp/cover.out
 
 # Runs go fmt
 fmt:
-	@go fmt ./...
+	@cd src; go fmt ./...

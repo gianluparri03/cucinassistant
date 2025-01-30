@@ -4,17 +4,11 @@ LABEL "org.opencontainers.image.source"="https://github.com/gianluparri03/cucina
 
 WORKDIR /cucinassistant
 
-COPY go.mod go.sum ./
+COPY src/ ./
+
 RUN go mod download
-
-COPY configs/. configs/
-COPY database/. database/
-COPY email/. email/
-COPY web/. web/
-COPY main.go broadcast.go ./
-
 RUN go build main.go
-RUN go build broadcast.go
+RUN go build tools/broadcast.go
 
 ENV CA_ENV=production
 CMD ["./main"]

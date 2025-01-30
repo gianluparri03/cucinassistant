@@ -40,9 +40,6 @@ func formatMessage(w *bytes.Buffer, templateName string, data map[string]any) {
 		return
 	}
 
-	// Adds the banner path
-	data["Banner"] = configs.BaseURL + "/assets/banner.png"
-
 	// Formats the template
 	err = tmpl.Execute(w, data)
 	if err != nil {

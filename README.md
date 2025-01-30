@@ -1,4 +1,4 @@
-<img src="web/assets/banner.png" height="200px">
+<img src="banner.png" height="200px">
 
 ![Website](https://up.gianlucaparri.me/api/badge/8/status)
 ![Codacy Grade](https://img.shields.io/codacy/grade/54e56adbe15f43568a1819224319b423)

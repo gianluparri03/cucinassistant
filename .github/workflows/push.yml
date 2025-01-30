@@ -31,7 +31,7 @@ jobs:
         run: go get .
       - name: Run tests
         env:
-            CA_ENV: "testing"
+            CA_ENV: "testing_ci"
         run: go test -coverprofile=cover.out cucinassistant/database
       - name: Push coverage results
         uses: codacy/codacy-coverage-reporter-action@v1.3.0
