@@ -1,8 +1,6 @@
 <img src="banner.png" height="200px">
 
 ![Website](https://up.gianlucaparri.me/api/badge/8/status)
-![Codacy Grade](https://img.shields.io/codacy/grade/54e56adbe15f43568a1819224319b423)
-![Codacy Coverage](https://img.shields.io/codacy/coverage/54e56adbe15f43568a1819224319b423)
 ![GitHub Actions](https://img.shields.io/github/actions/workflow/status/gianluparri03/cucinassistant/push.yml)
 ![Code Size](https://img.shields.io/github/languages/code-size/gianluparri03/cucinassistant)
 

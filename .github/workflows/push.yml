@@ -1,9 +1,9 @@
-name: Tests and coverage
+name: Tests
 on: [push]
 
 jobs:
   tester:
-    name: Runs the tests and sends the report to Codacy
+    name: Runs the tests
     runs-on: ubuntu-latest
     container: golang:1.23
 
@@ -37,9 +37,3 @@ jobs:
         env:
             CA_ENV: "testing_ci"
         run: go test -coverprofile=cover.out cucinassistant/database
-      - name: Push coverage results
-        uses: codacy/codacy-coverage-reporter-action@v1.3.0
-        with:
-          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          coverage-reports: src/cover.out
-          force-coverage-parser: go
