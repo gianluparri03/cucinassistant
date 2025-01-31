@@ -1,26 +1,23 @@
 # Packages
 
-CucinAssistant is written in Go, and it is divided in 6+1 packages: here I will describe briefly all of them.
+CucinAssistant is written in Go, and it is divided in some packages: here I will describe briefly all of them.
 
 
 ## cucinassistant (main)
 
 It just contains a `main.go` file that runs everything.
-You can run everything just by using `make run`, or by hand with `go run main.go <config_file>`.
+You can run everything just by using `make run` (this will create and start a postgresql container with docker),
+or by hand with `go run .` inside the `src/` directory; in this case, make sure to also set the `CA_ENV` environment variable.
 
 The `broadcast.go` file is a program used in production to send an email to every user, like for scheduled manteinance.
 It will ask for the email subject and content, send a test email to the sender email and - if confirmed - broadcast it to
 each user. It needs the config file as argument.
 
-## cucinassistant/config
+## cucinassistant/configs
 
-This package contains `test.yml` and `debug_sample.yml`, two configs file, and the Go files that parses them.
-You can look at `config.go` to see what the fields mean.
+This package contains some config files (for debugging, testing and for the ci), and the Go files that parses them.
+You can look at `configs.go` to see what the fields mean.
 It also contains `version.go`, that contains the current version of CucinAssistant.
-
-The three exported things are
-- `Runtime`, that contains the config read during the startup
-- `VersionNumber` (int) and `VersionCodeName` (strings)
 
 ## cucinassistant/database
 
@@ -60,3 +57,11 @@ This package contains all the handlers, used in `cucinassistant/web/endpoints.go
 Thanks to the `utils` module, the handling is simplified both for the authentication part (in fact
 the user who requested the page is already an input), and in the error handling part (in fact the function
 has an `error` return type; if not nil, it will be shown to the user).
+
+## cucinassistant/tools
+
+This folder contains some tools that can be used in pair with CucinAssistant.
+
+- `broadcast.go` can be used in production to send an email to every user, like for scheduled manteinance.
+It runs interactively, sending a test email to the sender email and - after a confirm - broadcast it to
+each user. As for the `main.go` file, it needs the `CA_ENV` variable to be set.

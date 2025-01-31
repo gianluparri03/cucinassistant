@@ -69,14 +69,15 @@ type Menu struct {
 }
 
 // GetAll returns a list of menus (meals not included)
-func (m Menus) GetAll() (menus []Menu, err error) {
+func (m Menus) GetAll() ([]Menu, error) {
+	var menus []Menu
+
 	// Queries the entries
 	var rows *sql.Rows
-	rows, err = db.Query(`SELECT mid, name FROM menus WHERE uid=$1;`, m.uid)
+	rows, err := db.Query(`SELECT mid, name FROM menus WHERE uid=$1;`, m.uid)
 	if err != nil {
 		slog.Error("while retrieving menus:", "err", err)
-		err = ERR_UNKNOWN
-		return
+		return menus, ERR_UNKNOWN
 	}
 
 	// Appends them to the list
@@ -89,96 +90,92 @@ func (m Menus) GetAll() (menus []Menu, err error) {
 
 	// If no menus have been found, makes sure the user exists
 	if len(menus) == 0 {
-		_, err = GetUser("UID", m.uid)
+		_, err := GetUser("UID", m.uid)
+		return menus, err
 	}
 
-	return
+	return menus, nil
 }
 
 // GetOne returns a specific menu, with the meals
-func (m Menus) GetOne(MID int) (menu Menu, err error) {
+func (m Menus) GetOne(MID int) (Menu, error) {
+	var menu Menu
 	var meals string
 
 	// Scans the menu
-	err = db.QueryRow(`SELECT mid, name, meals FROM menus WHERE uid=$1 AND mid=$2;`, m.uid, MID).Scan(&menu.MID, &menu.Name, &meals)
+	err := db.QueryRow(`SELECT mid, name, meals FROM menus WHERE uid=$1 AND mid=$2;`, m.uid, MID).Scan(&menu.MID, &menu.Name, &meals)
 	if err != nil {
-		err = handleNoRowsError(err, m.uid, ERR_MENU_NOT_FOUND, "retrieving menu")
-		return
+		return menu, handleNoRowsError(err, m.uid, ERR_MENU_NOT_FOUND, "retrieving menu")
 	}
 
 	// Unpacks the meals
 	menu.Meals = unpackMeals(meals)
-	return
+	return menu, nil
 }
 
 // New creates a new menu
-func (m Menus) New() (menu Menu, err error) {
+func (m Menus) New() (Menu, error) {
 	// Ensures the user exists
-	if _, err = GetUser("UID", m.uid); err != nil {
-		return
+	if _, err := GetUser("UID", m.uid); err != nil {
+		return Menu{}, err
 	}
-
-	// Uses the default name
-	menu.Name = menuDefaultName
 
 	// Adds the new menu
-	err = db.QueryRow(`INSERT INTO menus (uid, name, meals) VALUES ($1, $2, $3) RETURNING mid;`, m.uid, menu.Name, packMeals(menu.Meals)).Scan(&menu.MID)
+	menu := Menu{Name: menuDefaultName}
+	err := db.QueryRow(`INSERT INTO menus (uid, name, meals) VALUES ($1, $2, $3) RETURNING mid;`, m.uid, menu.Name, packMeals(menu.Meals)).Scan(&menu.MID)
 	if err != nil {
 		slog.Error("while creating new menu:", "err", err)
-		err = ERR_UNKNOWN
+		return Menu{}, ERR_UNKNOWN
 	}
 
-	return
+	return menu, nil
 }
 
 // Replace replaces the menu's name and all of its meals
-func (m Menus) Replace(MID int, newName string, newMeals [14]string) (menu Menu, err error) {
+func (m Menus) Replace(MID int, newName string, newMeals [14]string) (Menu, error) {
 	// Ensures the menu (and the user) exist
-	if _, err = m.GetOne(MID); err != nil {
-		return
+	if _, err := m.GetOne(MID); err != nil {
+		return Menu{}, err
 	}
 
 	// Executes the query
-	_, err = db.Exec(`UPDATE menus SET name=$3, meals=$4 WHERE uid=$1 AND mid=$2;`, m.uid, MID, newName, packMeals(newMeals))
+	_, err := db.Exec(`UPDATE menus SET name=$3, meals=$4 WHERE uid=$1 AND mid=$2;`, m.uid, MID, newName, packMeals(newMeals))
 	if err != nil {
 		slog.Error("while replacing menu:", "err", err)
 		err = ERR_UNKNOWN
+		return Menu{}, err
 	}
 
 	// Returns the new menu
-	menu, err = m.GetOne(MID)
-	return
+	return m.GetOne(MID)
 }
 
 // Delete deletes a menu
-func (m Menus) Delete(MID int) (err error) {
+func (m Menus) Delete(MID int) error {
 	// Deletes the menu
 	res, err := db.Exec(`DELETE FROM menus WHERE uid=$1 AND mid=$2;`, m.uid, MID)
 	if err != nil {
 		slog.Error("while deleting menu:", "err", err)
-		err = ERR_UNKNOWN
+		return ERR_UNKNOWN
 	} else if ra, _ := res.RowsAffected(); ra < 1 {
 		// If the query has failed, makes sure that the menu (and the user) exist
-		_, err = m.GetOne(MID)
+		_, err := m.GetOne(MID)
+		return err
 	}
 
-	return
+	return nil
 }
 
 // Duplicate creates a copy of a menu
-func (m Menus) Duplicate(MID int) (menu Menu, err error) {
+func (m Menus) Duplicate(MID int) (Menu, error) {
 	// Gets the source menu
-	var src Menu
-	if src, err = m.GetOne(MID); err != nil {
-		return
+	if src, err := m.GetOne(MID); err != nil {
+		return Menu{}, err
+		// Creates a new one
+	} else if menu, err := m.New(); err != nil {
+		return Menu{}, err
+		// Copies data from the srcMenu
+	} else {
+		return m.Replace(menu.MID, src.Name+duplicatedMenuSuffix, src.Meals)
 	}
-
-	// Creates a new one
-	if menu, err = m.New(); err != nil {
-		return
-	}
-
-	// Copies data from the srcMenu
-	menu, err = m.Replace(menu.MID, src.Name+duplicatedMenuSuffix, src.Meals)
-	return
 }

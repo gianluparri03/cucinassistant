@@ -42,18 +42,18 @@ type Section struct {
 
 // GetSections returns all the sections created by an user.
 // The articles are not fetched
-func (s Storage) GetSections() (sections []Section, err error) {
+func (s Storage) GetSections() ([]Section, error) {
+	var sections []Section
+
 	// Queries the sections
-	var rows *sql.Rows
-	rows, err = db.Query(`SELECT sid, name FROM sections WHERE uid=$1;`, s.uid)
+	rows, err := db.Query(`SELECT sid, name FROM sections WHERE uid=$1;`, s.uid)
+	defer rows.Close()
 	if err != nil {
 		slog.Error("while retrieving sections:", "err", err)
-		err = ERR_UNKNOWN
-		return
+		return sections, ERR_UNKNOWN
 	}
 
 	// Appends them to the list
-	defer rows.Close()
 	for rows.Next() {
 		var s Section
 		rows.Scan(&s.SID, &s.Name)
@@ -63,93 +63,94 @@ func (s Storage) GetSections() (sections []Section, err error) {
 	// If no sections have been found, makes sure the user exists
 	if len(sections) == 0 {
 		_, err = GetUser("UID", s.uid)
+		return sections, err
 	}
 
-	return
+	return sections, nil
 }
 
 // NewSection tries to create a new section
-func (s Storage) NewSection(name string) (section Section, err error) {
+func (s Storage) NewSection(name string) (Section, error) {
 	// Ensures the user exists
-	if _, err = GetUser("UID", s.uid); err != nil {
-		return
+	if _, err := GetUser("UID", s.uid); err != nil {
+		return Section{}, err
 	}
 
 	// Checks if the name is used
 	var found bool
 	db.QueryRow(`SELECT 1 FROM sections WHERE uid=$1 AND name=$2;`, s.uid, name).Scan(&found)
 	if found {
-		err = ERR_SECTION_DUPLICATED
-		return
+		return Section{}, ERR_SECTION_DUPLICATED
 	}
 
 	// Tries to save it in the database
-	err = db.QueryRow(`INSERT INTO sections (uid, name) VALUES ($1, $2) RETURNING sid;`, s.uid, name).Scan(&section.SID)
+	section := Section{Name: name}
+	err := db.QueryRow(`INSERT INTO sections (uid, name) VALUES ($1, $2) RETURNING sid;`, s.uid, name).Scan(&section.SID)
 	if err != nil {
 		slog.Error("while creating section:", "err", err)
-		err = ERR_UNKNOWN
-		return
+		return Section{}, ERR_UNKNOWN
 	}
 
-	section.Name = name
-	return
+	return section, nil
 }
 
 // GetSection returns a specific section, without the articles
-func (s Storage) GetSection(SID int) (section Section, err error) {
+func (s Storage) GetSection(SID int) (Section, error) {
+	var section Section
+
 	// Scans the section
-	err = db.QueryRow(`SELECT sid, name FROM sections WHERE uid=$1 AND sid=$2;`, s.uid, SID).Scan(&section.SID, &section.Name)
+	err := db.QueryRow(`SELECT sid, name FROM sections WHERE uid=$1 AND sid=$2;`, s.uid, SID).Scan(&section.SID, &section.Name)
 	if err != nil {
-		err = handleNoRowsError(err, s.uid, ERR_SECTION_NOT_FOUND, "retrieving section")
+		return section, handleNoRowsError(err, s.uid, ERR_SECTION_NOT_FOUND, "retrieving section")
 	}
 
-	return
+	return section, nil
 }
 
 // EditSection changes a section name
-func (s Storage) EditSection(SID int, newName string) (err error) {
+func (s Storage) EditSection(SID int, newName string) error {
 	// Gets the section
-	var section Section
-	if section, err = s.GetSection(SID); err != nil {
-		return
+	section, err := s.GetSection(SID)
+	if err != nil {
+		return err
 	}
 
 	// Makes sure the new name is actually new
 	if section.Name == newName {
-		return
+		return nil
 	}
 
 	// Makes sure the new name is not used
 	var found int
 	db.QueryRow(`SELECT 1 FROM sections WHERE uid=$1 AND name=$2;`, s.uid, newName).Scan(&found)
 	if found > 0 {
-		err = ERR_SECTION_DUPLICATED
-		return
+		return ERR_SECTION_DUPLICATED
 	}
 
 	// Change the name
 	_, err = db.Exec(`UPDATE sections SET name=$3 WHERE uid=$1 AND sid=$2;`, s.uid, SID, newName)
 	if err != nil {
 		slog.Error("while editing section:", "err", err)
-		err = ERR_UNKNOWN
+		return ERR_UNKNOWN
 	}
 
-	return
+	return nil
 }
 
 // DeleteSection tries to delete a section, with all the related articles
-func (s Storage) DeleteSection(SID int) (err error) {
+func (s Storage) DeleteSection(SID int) error {
 	// Executes the query
 	res, err := db.Exec(`DELETE FROM sections WHERE uid=$1 AND sid=$2;`, s.uid, SID)
 	if err != nil {
 		slog.Error("while deleting section:", "err", err)
-		err = ERR_UNKNOWN
+		return ERR_UNKNOWN
 	} else if ra, _ := res.RowsAffected(); ra < 1 {
 		// If the query has failed, makes sure that the section (and the user) exist
 		_, err = s.GetSection(SID)
+		return err
 	}
 
-	return
+	return nil
 }
 
 // Article is an item inside a storage section
@@ -236,83 +237,81 @@ func (sa StringArticle) Parse() (Article, error) {
 // present it will sum the quantities.
 // If at least one of the two quantities is not given, the result
 // will not have the quantity set.
-func (s Storage) AddArticles(SID int, stringArticles ...StringArticle) (err error) {
+func (s Storage) AddArticles(SID int, stringArticles ...StringArticle) error {
 	// Ensures the section exists
-	if _, err = s.GetSection(SID); err != nil {
-		return
+	_, err := s.GetSection(SID)
+	if err != nil {
+		return err
 	}
 
 	// Converts the string articles into articles
 	articles := make([]Article, len(stringArticles))
 	for i, sa := range stringArticles {
 		if articles[i], err = sa.Parse(); err != nil {
-			return
+			return err
 		}
 	}
 
 	// Prepares the statement
-	var stmt *sql.Stmt
-	stmt, err = db.Prepare(`INSERT INTO articles (sid, name, quantity, expiration) VALUES ($1, $2, $3, $4)
+	stmt, err := db.Prepare(`INSERT INTO articles (sid, name, quantity, expiration) VALUES ($1, $2, $3, $4)
                              ON CONFLICT (sid, name, expiration) DO UPDATE set quantity = articles.quantity+excluded.quantity;`)
 	defer stmt.Close()
 	if err != nil {
 		slog.Error("while preparing statement to add articles:", "err", err)
-		err = ERR_UNKNOWN
-		return
+		return ERR_UNKNOWN
 	}
 
 	// Inserts the entries
 	for _, a := range articles {
 		if _, err = stmt.Exec(SID, a.Name, a.Quantity, a.Expiration); err != nil {
 			slog.Error("while adding article:", "err", err)
-			err = ERR_UNKNOWN
+			return ERR_UNKNOWN
 		}
 	}
 
-	return
+	return nil
 }
 
 // GetArticle returns a specific article
 // This function is not used directly by the frontend, but it
 // may be faster than GetOrderedArticle when Prev and Next are
 // not necessary.
-func (s Storage) GetArticle(SID int, AID int) (article Article, err error) {
+func (s Storage) GetArticle(SID int, AID int) (Article, error) {
 	// Makes sure the section is owned by the user
-	if _, err = s.GetSection(SID); err != nil {
-		return
+	if _, err := s.GetSection(SID); err != nil {
+		return Article{}, err
 	}
 
 	// Fetches the article
-	err = db.QueryRow(`SELECT aid, name, expiration, quantity FROM articles WHERE sid=$1 AND aid=$2;`, SID, AID).
+	var article Article
+	err := db.QueryRow(`SELECT aid, name, expiration, quantity FROM articles WHERE sid=$1 AND aid=$2;`, SID, AID).
 		Scan(&article.AID, &article.Name, &article.Expiration, &article.Quantity)
-
 	if err != nil {
-		err = handleNoRowsError(err, s.uid, ERR_ARTICLE_NOT_FOUND, "retrieving article")
-	} else {
-		article.fixExpiration()
+		return Article{}, handleNoRowsError(err, s.uid, ERR_ARTICLE_NOT_FOUND, "retrieving article")
 	}
 
-	return
+	article.fixExpiration()
+	return article, nil
 }
 
 // GetArticles returns a specific section, filled with
 // its articles. It is possible to specify a filter,
 // that will filter the name.
-func (s Storage) GetArticles(SID int, filter string) (section Section, err error) {
+func (s Storage) GetArticles(SID int, filter string) (Section, error) {
 	// Gets the empty section
-	if section, err = s.GetSection(SID); err != nil {
-		return
+	section, err := s.GetSection(SID)
+	if err != nil {
+		return section, err
 	}
 
 	// Scans the articles
-	var rows *sql.Rows
-	rows, err = db.Query(`SELECT aid, name, expiration, quantity FROM articles
+	rows, err := db.Query(`SELECT aid, name, expiration, quantity FROM articles
 						  WHERE sid=$1 AND name ILIKE CONCAT('%', $2::VARCHAR, '%') ORDER BY expiration, aid;`, SID, filter)
+	defer rows.Close()
 	if err != nil {
 		slog.Error("while retrieving articles:", "err", err)
-		err = ERR_UNKNOWN
+		return section, ERR_UNKNOWN
 	} else {
-		defer rows.Close()
 		for rows.Next() {
 			var article Article
 			rows.Scan(&article.AID, &article.Name, &article.Expiration, &article.Quantity)
@@ -321,7 +320,7 @@ func (s Storage) GetArticles(SID int, filter string) (section Section, err error
 		}
 	}
 
-	return
+	return section, nil
 }
 
 // OrderedArticle is an article that can also
@@ -338,46 +337,46 @@ func (oa OrderedArticle) GetArticle() Article {
 }
 
 // GetOrderedArticle returns a specific article, as an OrderedArticle
-func (s Storage) GetOrderedArticle(SID int, AID int) (article OrderedArticle, err error) {
+func (s Storage) GetOrderedArticle(SID int, AID int) (OrderedArticle, error) {
+	var article OrderedArticle
+
 	// Makes sure the section is owned by the user
-	if _, err = s.GetSection(SID); err != nil {
-		return
+	if _, err := s.GetSection(SID); err != nil {
+		return article, err
 	}
 
 	// Fetches the article and its neighbours aids
-	err = db.QueryRow(`WITH ordered AS (SELECT aid, name, expiration, quantity,
+	err := db.QueryRow(`WITH ordered AS (SELECT aid, name, expiration, quantity,
 						LAG(aid) OVER (PARTITION BY sid ORDER BY expiration, aid) as prev,
 						LEAD(aid) OVER (PARTITION BY sid ORDER BY expiration, aid) as next
 						FROM articles WHERE sid=$1) SELECT * FROM ordered WHERE aid=$2;`, SID, AID).
 		Scan(&article.AID, &article.Name, &article.Expiration, &article.Quantity, &article.Prev, &article.Next)
-
 	if err != nil {
-		err = handleNoRowsError(err, s.uid, ERR_ARTICLE_NOT_FOUND, "retrieving ordered article")
-	} else {
-		article.fixExpiration()
+		return article, handleNoRowsError(err, s.uid, ERR_ARTICLE_NOT_FOUND, "retrieving ordered article")
 	}
 
-	return
+	article.fixExpiration()
+	return article, nil
 }
 
-func (s Storage) EditArticle(SID int, AID int, newData StringArticle) (err error) {
+func (s Storage) EditArticle(SID int, AID int, newData StringArticle) error {
 	// Gets the current data
-	var oldArticle Article
-	if oldArticle, err = s.GetArticle(SID, AID); err != nil {
-		return
+	oldArticle, err := s.GetArticle(SID, AID)
+	if err != nil {
+		return err
 	}
 
 	// Parse the new data
-	var newArticle Article
-	if newArticle, err = newData.Parse(); err != nil {
-		return
+	newArticle, err := newData.Parse()
+	if err != nil {
+		return err
 	} else {
 		newArticle.AID = oldArticle.AID
 	}
 
 	// If nothing has changed, it stops here
 	if reflect.DeepEqual(oldArticle, newArticle) {
-		return
+		return nil
 	}
 
 	// If the name or the expiration has changed, checks if
@@ -385,15 +384,17 @@ func (s Storage) EditArticle(SID int, AID int, newData StringArticle) (err error
 	var found int
 	err = db.QueryRow(`SELECT 1 FROM articles WHERE sid=$1 AND aid!=$2 AND name=$3 AND expiration=$4;`,
 		SID, AID, newArticle.Name, newArticle.Expiration).Scan(&found)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		slog.Error("while scanning articles:", "err", err)
-		err = ERR_UNKNOWN
-		return
+	if found > 0 {
+		return ERR_ARTICLE_DUPLICATED
 	} else if err != nil {
-		err = nil
-	} else if found > 0 {
-		err = ERR_ARTICLE_DUPLICATED
-		return
+		// If the error is sql.ErrNoRows, actually that's not an error, but
+		// the desired output
+		if !errors.Is(err, sql.ErrNoRows) {
+			slog.Error("while scanning articles:", "err", err)
+			return ERR_UNKNOWN
+		} else {
+			err = nil
+		}
 	}
 
 	// Executes the query
@@ -401,37 +402,34 @@ func (s Storage) EditArticle(SID int, AID int, newData StringArticle) (err error
 		AID, newArticle.Name, newArticle.Expiration, newArticle.Quantity)
 	if err != nil {
 		slog.Error("while editing article:", "err", err)
-		err = ERR_UNKNOWN
+		return ERR_UNKNOWN
 	}
 
-	return
+	return nil
 }
 
 // DeleteArticle deletes an article and returns the AID of the
 // following article (if it exists); if it was the last one, it
 // returns the previous article's AID; if it was the only one, it
 // returns nil.
-func (s Storage) DeleteArticle(SID int, AID int) (err error, next *int) {
+func (s Storage) DeleteArticle(SID int, AID int) (error, *int) {
 	// Makes sure the article exists and the user owns it
-	var article OrderedArticle
-	if article, err = s.GetOrderedArticle(SID, AID); err != nil {
-		return
+	article, err := s.GetOrderedArticle(SID, AID)
+	if err != nil {
+		return err, nil
 	}
 
 	// Deletes the article
 	_, err = db.Exec(`DELETE FROM articles WHERE sid=$1 AND aid=$2;`, SID, AID)
 	if err != nil {
 		slog.Error("while deleting article:", "err", err)
-		err = ERR_UNKNOWN
-		return
+		return ERR_UNKNOWN, nil
 	}
 
 	// Returns the "next" article's AID
 	if article.Next != nil {
-		next = article.Next
+		return nil, article.Next
 	} else {
-		next = article.Prev
+		return nil, article.Prev
 	}
-
-	return
 }

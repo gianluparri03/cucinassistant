@@ -45,7 +45,7 @@ test: create_test_db
 # Runs the tests and shows a coverage report
 cover: create_test_db
 	@cd src; CA_ENV=testing go test -coverprofile=/tmp/cover.out -covermode atomic cucinassistant/database
-	@go tool cover -html=/tmp/cover.out
+	@cd src; go tool cover -html=/tmp/cover.out
 
 # Runs go fmt
 fmt:

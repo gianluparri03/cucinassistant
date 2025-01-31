@@ -1,6 +1,7 @@
 package database
 
 import (
+	"log/slog"
 	"os"
 	"testing"
 
@@ -9,6 +10,7 @@ import (
 
 // TestMain sets up the testing environment
 func TestMain(m *testing.M) {
+	slog.SetLogLoggerLevel(slog.LevelError)
 	os.Chdir("..")
 
 	// Loads the configuration

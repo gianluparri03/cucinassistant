@@ -32,7 +32,15 @@ func Connect() {
 
 // Bootstrap makes sure that the database schema is ready
 func Bootstrap() {
-	for _, query := range strings.Split(schema, ";") {
+	// Loads the schema
+	schema, err := os.ReadFile("database/schema.sql")
+	if err != nil {
+		slog.Error("while reading the schema:", "err", err)
+		os.Exit(1)
+	}
+
+	// Splits it and executes it
+	for _, query := range strings.Split(string(schema), ";") {
 		if strings.TrimSpace(query) != "" {
 			if _, err := db.Exec(query + ";"); err != nil {
 				slog.Error("while creating table:", "err", err)
