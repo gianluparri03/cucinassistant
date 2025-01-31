@@ -8,7 +8,7 @@ jobs:
     container: golang:1.23
 
     services:
-      postgres:
+      database:
         image: postgres
         env:
           POSTGRES_USER: ca
