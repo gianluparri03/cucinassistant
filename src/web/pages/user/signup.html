@@ -21,5 +21,8 @@
         <a hx-get="/user/signin">{{ t "STR_SIGNIN" . }}</a>
     </form>
 
-    <script> $("nav i").remove(); </script>
+    <script>
+        $('nav i').remove();
+        unmatchingPasswords = '{{ t "MSG_UNMATCHING_PASSWORDS" . }}';
+    </script>
 {{ end }}

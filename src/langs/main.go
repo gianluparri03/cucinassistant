@@ -37,9 +37,9 @@ func Load() {
 	}
 }
 
-// GetString returns the string with that id
+// Translate returns the string with that id
 // in the given language
-func GetString(lang string, id string, data any) string {
+func Translate(lang string, id string, data any) string {
 	// Gets the required localizer (or the default one)
 	l, found := localizers[lang]
 	if !found {
@@ -49,7 +49,7 @@ func GetString(lang string, id string, data any) string {
 	// Gets the string
 	str, err := l.Localize(&i18n.LocalizeConfig{MessageID: id, TemplateData: data})
 	if err != nil {
-		slog.Error("while translating string:", "err", err, "lang", lang)
+		slog.Error("while translating:", "id", id, "lang", lang, "err", err)
 	}
 
 	return str

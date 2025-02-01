@@ -7,14 +7,13 @@ import (
 
 func TestMenusGetAll(t *testing.T) {
 	user, _ := getTestingUser(t)
-	m1, _ := user.Menus().New()
-	m2, _ := user.Menus().New()
-	m2, _ = user.Menus().Replace(m2.MID, "newName", m2.Meals)
+	m1, _ := user.Menus().New("m1")
+	m2, _ := user.Menus().New("m2")
 
 	otherUser, _ := getTestingUser(t)
 
 	otherOtherUser, _ := getTestingUser(t)
-	otherOtherUser.Menus().New()
+	otherOtherUser.Menus().New("m0")
 
 	type data struct {
 		User User
@@ -52,8 +51,8 @@ func TestMenusGetAll(t *testing.T) {
 
 func TestMenusGetOne(t *testing.T) {
 	user, _ := getTestingUser(t)
-	menu, _ := user.Menus().New()
-	menu, _ = user.Menus().Replace(menu.MID, "newName", [14]string{"a", "b", "c"})
+	menu, _ := user.Menus().New("m")
+	menu, _ = user.Menus().Replace(menu.MID, "m", [14]string{"a", "b", "c"})
 
 	otherUser, _ := getTestingUser(t)
 
@@ -97,6 +96,7 @@ func TestMenusNew(t *testing.T) {
 
 	type data struct {
 		User User
+		Name string
 
 		ExpectedErr error
 		ExpectedMN  int
@@ -104,8 +104,10 @@ func TestMenusNew(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			if _, err := d.User.Menus().New(); err != d.ExpectedErr {
+			if m, err := d.User.Menus().New("name"); err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
+			} else if err == nil && m.Name != "name" {
+				t.Errorf("%s: expected name <test>, got <%v>", msg, m.Name)
 			}
 
 			if menus, _ := d.User.Menus().GetAll(); len(menus) != d.ExpectedMN {
@@ -132,7 +134,7 @@ func TestMenusNew(t *testing.T) {
 
 func TestMenusReplace(t *testing.T) {
 	user, _ := getTestingUser(t)
-	menu, _ := user.Menus().New()
+	menu, _ := user.Menus().New("oldName")
 	newName := "newName"
 	newMeals := [14]string{"a", "b", "c"}
 
@@ -184,7 +186,7 @@ func TestMenusReplace(t *testing.T) {
 
 func TestMenusDelete(t *testing.T) {
 	user, _ := getTestingUser(t)
-	menu, _ := user.Menus().New()
+	menu, _ := user.Menus().New("")
 
 	otherUser, _ := getTestingUser(t)
 
@@ -229,8 +231,8 @@ func TestMenusDelete(t *testing.T) {
 
 func TestMenusDuplicate(t *testing.T) {
 	user, _ := getTestingUser(t)
-	menu, _ := user.Menus().New()
-	menu, _ = user.Menus().Replace(menu.MID, "newName", [14]string{"a", "b", "c"})
+	menu, _ := user.Menus().New("")
+	menu, _ = user.Menus().Replace(menu.MID, "name", [14]string{"a", "b", "c"})
 
 	otherUser, _ := getTestingUser(t)
 

@@ -43,7 +43,7 @@ func GetNewSection(c *utils.Context) (err error) {
 func PostNewSection(c *utils.Context) (err error) {
 	var s database.Section
 	if s, err = c.U.Storage().NewSection(c.R.FormValue("name")); err == nil {
-		utils.ShowAndRedirect(c, "Sezione creata con successo", "/storage/"+strconv.Itoa(s.SID))
+		utils.Redirect(c, "/storage/"+strconv.Itoa(s.SID))
 	}
 
 	return
@@ -86,7 +86,7 @@ func PostEditSection(c *utils.Context) (err error) {
 	var SID int
 	if SID, err = getSID(c); err == nil {
 		if err = c.U.Storage().EditSection(SID, c.R.FormValue("name")); err == nil {
-			utils.ShowAndRedirect(c, "Modifiche applicate con successo", "/storage/"+strconv.Itoa(SID))
+			utils.Redirect(c, "/storage/"+strconv.Itoa(SID))
 		}
 	}
 
@@ -98,7 +98,7 @@ func PostDeleteSection(c *utils.Context) (err error) {
 	var SID int
 	if SID, err = getSID(c); err == nil {
 		if err = c.U.Storage().DeleteSection(SID); err == nil {
-			utils.ShowAndRedirect(c, "Sezione eliminata con successo", "/storage")
+			utils.ShowAndRedirect(c, "MSG_SECTION_DELETED", "/storage")
 		}
 	}
 
@@ -194,7 +194,7 @@ func PostEditArticle(c *utils.Context) (err error) {
 		}
 
 		if err = c.U.Storage().EditArticle(SID, AID, newData); err == nil {
-			utils.ShowAndRedirect(c, "Modifiche salvate", "/storage/"+strconv.Itoa(SID)+"/"+strconv.Itoa(AID))
+			utils.Redirect(c, "/storage/"+strconv.Itoa(SID)+"/"+strconv.Itoa(AID))
 		}
 	}
 

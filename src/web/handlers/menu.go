@@ -22,10 +22,16 @@ func GetMenus(c *utils.Context) (err error) {
 	return
 }
 
+// GetNewMenu renders /menus/new
+func GetNewMenu(c *utils.Context) (err error) {
+	utils.RenderPage(c, "menu/new", nil)
+	return
+}
+
 // PostNewMenu tries to create a new menu
 func PostNewMenu(c *utils.Context) (err error) {
 	var menu database.Menu
-	if menu, err = c.U.Menus().New(); err == nil {
+	if menu, err = c.U.Menus().New(c.R.FormValue("name")); err == nil {
 		utils.Redirect(c, "/menus/"+strconv.Itoa(menu.MID)+"/edit")
 	}
 
@@ -104,7 +110,7 @@ func PostDeleteMenu(c *utils.Context) (err error) {
 	if MID, err = getMID(c); err == nil {
 		// Tries to delete the menu
 		if err = c.U.Menus().Delete(MID); err == nil {
-			utils.ShowAndRedirect(c, "Menù eliminato con successo", "/menus")
+			utils.ShowAndRedirect(c, "MSG_MENU_DELETED", "/menus")
 		}
 	}
 

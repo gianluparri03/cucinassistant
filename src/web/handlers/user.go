@@ -9,10 +9,6 @@ import (
 	"cucinassistant/web/utils"
 )
 
-var (
-	MSG_EMAIL_SENT = "Ti abbiamo inviato una mail. Controlla la casella di posta."
-)
-
 // GetSignUp renders /user/signup
 func GetSignUp(c *utils.Context) error {
 	utils.RenderPage(c, "user/signup", nil)
@@ -33,7 +29,7 @@ func PostSignUp(c *utils.Context) (err error) {
 		go email.SendMail("Registrazione effettuata", "welcome", map[string]any{"Username": username}, email_)
 
 		// Saves the UID and redirects to /
-		utils.SaveUID(c, user.UID, "Account creato con successo")
+		utils.SaveUID(c, user.UID, "MSG_USER_CREATED")
 	}
 
 	return
@@ -91,7 +87,7 @@ func PostForgotPassword(c *utils.Context) (err error) {
 			}, user.Email)
 
 			// Shows the popup
-			utils.Show(c, MSG_EMAIL_SENT)
+			utils.Show(c, "MSG_EMAIL_SENT")
 		}
 	}
 
@@ -125,7 +121,7 @@ func PostResetPassword(c *utils.Context) (err error) {
 			}, user.Email)
 
 			// Saves the UID and redirects to /
-			utils.SaveUID(c, user.UID, "Password cambiata con successo")
+			utils.SaveUID(c, user.UID, "MSG_PASSWORD_CHANGED")
 		}
 	}
 
@@ -151,7 +147,7 @@ func PostChangeUsername(c *utils.Context) (err error) {
 
 	// Tries to change it
 	if err = c.U.ChangeUsername(newUsername); err == nil {
-		utils.ShowAndRedirect(c, "Nome utente cambiato con successo", "/user/settings")
+		utils.ShowAndRedirect(c, "MSG_USERNAME_CHANGED", "/user/settings")
 	}
 
 	return
@@ -170,7 +166,7 @@ func PostChangeEmail(c *utils.Context) (err error) {
 
 	// Tries to change it
 	if err = c.U.ChangeEmail(newEmail); err == nil {
-		utils.ShowAndRedirect(c, "Email cambiata con successo", "/user/settings")
+		utils.ShowAndRedirect(c, "MSG_EMAIL_CHANGED", "/user/settings")
 	}
 
 	return
@@ -195,7 +191,7 @@ func PostChangePassword(c *utils.Context) (err error) {
 		}, c.U.Email)
 
 		// Shows the popup
-		utils.ShowAndRedirect(c, "Password cambiata con successo", "/user/settings")
+		utils.ShowAndRedirect(c, "MSG_PASSWORD_CHANGED", "/user/settings")
 	}
 
 	return
@@ -218,7 +214,7 @@ func PostDeleteUser1(c *utils.Context) (err error) {
 			"DeleteLink": configs.BaseURL + "/user/delete_2?token=" + url.QueryEscape(token),
 		}, c.U.Email)
 
-		utils.Show(c, MSG_EMAIL_SENT)
+		utils.Show(c, "MSG_EMAIL_SENT")
 	}
 
 	return
@@ -243,7 +239,7 @@ func PostDeleteUser2(c *utils.Context) (err error) {
 		}, c.U.Email)
 
 		// Drops the session and redirects to /user/signin
-		utils.DropUID(c, "Account eliminato con successo")
+		utils.DropUID(c, "MSG_USER_DELETED")
 	}
 
 	return

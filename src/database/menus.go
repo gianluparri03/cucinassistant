@@ -7,9 +7,6 @@ import (
 )
 
 const (
-	// menuDefaultName is the name given to new menus
-	menuDefaultName = "Nuovo Menù"
-
 	// mealSeparator is used to separate meals when packed
 	mealSeparator = ";"
 
@@ -114,14 +111,14 @@ func (m Menus) GetOne(MID int) (Menu, error) {
 }
 
 // New creates a new menu
-func (m Menus) New() (Menu, error) {
+func (m Menus) New(name string) (Menu, error) {
 	// Ensures the user exists
 	if _, err := GetUser("UID", m.uid); err != nil {
 		return Menu{}, err
 	}
 
 	// Adds the new menu
-	menu := Menu{Name: menuDefaultName}
+	menu := Menu{Name: name}
 	err := db.QueryRow(`INSERT INTO menus (uid, name, meals) VALUES ($1, $2, $3) RETURNING mid;`, m.uid, menu.Name, packMeals(menu.Meals)).Scan(&menu.MID)
 	if err != nil {
 		slog.Error("while creating new menu:", "err", err)
@@ -172,7 +169,7 @@ func (m Menus) Duplicate(MID int) (Menu, error) {
 	if src, err := m.GetOne(MID); err != nil {
 		return Menu{}, err
 		// Creates a new one
-	} else if menu, err := m.New(); err != nil {
+	} else if menu, err := m.New(src.Name); err != nil {
 		return Menu{}, err
 		// Copies data from the srcMenu
 	} else {

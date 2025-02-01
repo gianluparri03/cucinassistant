@@ -1,25 +1,4 @@
-{{ define "title" }}Informazioni{{ end }}
+{{ define "title" }}{{ t "STR_INFO" . }}{{ end }}
 {{ define "back_link" }}/{{ end }}
 
-{{ define "content" }}
-    <p>
-        <b>CucinAssistant</b> è un progetto sviluppato interamente da
-        <a href="https://gianlucaparri.me" target="_blank"><b>Gianluca Parri</b></a>, ideato nel 2023
-        in seguito alla sua nuova vita da fuorisede universitario. Da quel momento
-        è in continua evoluzione, anche se lentamente. <br>
-        La versione corrente è la <b>{{ .VersionCode }}</b> (<b>{{ .VersionName }}</b>). <br> <br>
-
-        Al momento è disponibile sia <a href="{{ .BaseURL }}" target="_blank">
-        come <b>sito web</b></a> sia come applicazione Android, disponibile sul
-        <a href="https://play.google.com/store/apps/details?id=me.gianlucaparri.ca.twa" target="_blank"><b>Play Store</b></a>; per gli utenti iOS non
-        è disponibile un'app sullo store, ma si può installare dal browser. <br> <br>
-
-        CucinAssistant è completamente <b>open source</b>; il codice <b>sorgente</b> è disponibile su
-        <a href="https://github.com/gianluparri03/cucinassistant/" target="_blank">GitHub</a>. <br> <br>
-
-        Per ulteriori informazioni, potete scrivere una <b>mail</b> a
-        <a href="mailto:cucinassistant@gmail.com" target="_blank">cucinassistant@gmail.com</a>. <br> <br>
-
-        È disponibile una pagina di <b><a hx-get="/stats">statistiche</a></b>.
-    </p>
-{{ end }}
+{{ define "content" }}{{ t "STR_INFO_TEXT" . }}{{ end }}

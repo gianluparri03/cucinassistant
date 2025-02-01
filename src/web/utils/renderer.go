@@ -9,6 +9,11 @@ import (
 	"cucinassistant/langs"
 )
 
+// getLang returns the desired language
+func getLang(c *Context) string {
+	return "it"
+}
+
 // render executes the given templates witth the given data.
 // It adds the base template in automatic, looking if it's a
 // normal request or a request made by htmx.
@@ -31,8 +36,8 @@ func render(c *Context, pages []string, data map[string]any) {
 
 	// Prepares the FuncMap
 	funcs := template.FuncMap{
-		"t": func(id string, data any) string {
-			return langs.GetString("it", id, data)
+		"t": func(id string, data any) template.HTML {
+			return template.HTML(langs.Translate(getLang(c), id, data))
 		},
 	}
 
@@ -63,20 +68,20 @@ func RenderPage(c *Context, pageName string, data map[string]any) {
 	render(c, []string{"templates/body", pageName}, data)
 }
 
-// Show shows a popup message to the user.
-func Show(c *Context, msg string) {
-	c.W.WriteHeader(http.StatusBadRequest)
-	render(c, []string{"templates/error"}, map[string]any{"Message": msg})
-}
-
 // Redirect redirects to a given path
 func Redirect(c *Context, path string) {
 	http.Redirect(c.W, c.R, path, http.StatusSeeOther)
 }
 
-// ShowAndRedirect shows a popup to the user, then
-// redirects him away
+// ShowAndRedirect shows a popup message to the user,
+// then redirects him away
 func ShowAndRedirect(c *Context, msg string, path string) {
 	c.W.WriteHeader(http.StatusBadRequest)
-	render(c, []string{"templates/error"}, map[string]any{"Message": msg, "Path": path})
+	tMsg := langs.Translate(getLang(c), msg, nil)
+	render(c, []string{"templates/error"}, map[string]any{"Message": tMsg, "Path": path})
+}
+
+// Show shows a popup message to the user.
+func Show(c *Context, msg string) {
+	ShowAndRedirect(c, msg, "")
 }

@@ -27,6 +27,7 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 	},
 	{
 		Path:        "/menus/new",
+		GetHandler:  handlers.GetNewMenu,
 		PostHandler: handlers.PostNewMenu,
 	},
 	{

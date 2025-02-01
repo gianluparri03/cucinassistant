@@ -1,3 +1,123 @@
+[ERR_ARTICLE_DUPLICATED]
+hash = "sha1-e8bd4ab43729660a5be8cabc9ff165dcd9a7224a"
+other = "Esiste già un articolo con stesso nome e scadenza"
+
+[ERR_ARTICLE_EXPIRATION_INVALID]
+hash = "sha1-6d6a0c989d3b4a1a5f92bf06107d1b6195259bba"
+other = "Scadenza non valida"
+
+[ERR_ARTICLE_NOT_FOUND]
+hash = "sha1-aceab162d2fae9dffba793d4ac72b246fbbe7b85"
+other = "Articolo non trovata"
+
+[ERR_ARTICLE_QUANTITY_INVALID]
+hash = "sha1-85089bc48e309e7f77efd1fd6f8d46737c74aec6"
+other = "Quantità non valida"
+
+[ERR_ENTRY_DUPLICATED]
+hash = "sha1-f8e084a2d8650b06d93c21286a6b6efe084d4cd6"
+other = "Elemento già in lista"
+
+[ERR_ENTRY_NOT_FOUND]
+hash = "sha1-998d95bcbc6ec41eca86ca0e7504e531371cb804"
+other = "Elemento non trovato"
+
+[ERR_MENU_NOT_FOUND]
+hash = "sha1-579b4ac2971a99642e1a0d4c1a18b7b4861b4978"
+other = "Menù non trovato"
+
+[ERR_SECTION_DUPLICATED]
+hash = "sha1-e14c2c241e36279458fa1336e4c0e5d443920564"
+other = "Esiste già una sezione con lo stesso nome"
+
+[ERR_SECTION_NOT_FOUND]
+hash = "sha1-17daae9533f73f739ef3828f0028cfb210b324c4"
+other = "Sezione non trovata"
+
+[ERR_UNKNOWN]
+hash = "sha1-e5fd9aa24c9417e7332e6f25936ae2a6ec8f1524"
+other = "Errore sconosciuto"
+
+[ERR_USER_MAIL_INVALID]
+hash = "sha1-899a38bce7006977ad73f63becf1341ac4f28cc6"
+other = "Email non valida"
+
+[ERR_USER_MAIL_UNAVAIL]
+hash = "sha1-73f3a3f213d20d8561065746b31a073231ffa199"
+other = "Email non disponibile"
+
+[ERR_USER_NAME_TOO_SHORT]
+hash = "sha1-317439217444ee78a5f6d80467d3e8ae70786de1"
+other = "Nome utente non valido: lunghezza minima 5 caratteri"
+
+[ERR_USER_NAME_UNAVAIL]
+hash = "sha1-c9b61f9d676826708652179850e66d1db8fa6eed"
+other = "Nome utente non disponibile"
+
+[ERR_USER_PASS_TOO_SHORT]
+hash = "sha1-069c0fd0faf73dad65246b0902ec67932a521be0"
+other = "Password non valida: lunghezza minima 8 caratteri"
+
+[ERR_USER_UNKNOWN]
+hash = "sha1-3048dd9c09da253d2c7a254f6ee07364a1f30024"
+other = "Utente sconosciuto"
+
+[ERR_USER_WRONG_CREDENTIALS]
+hash = "sha1-0658dec8ec9871259584e8371bacc483d4a68d09"
+other = "Credenziali non valide"
+
+[ERR_USER_WRONG_TOKEN]
+hash = "sha1-8d886c0ba6f2b683daba5f19568a316226ce3e4c"
+other = "Qualcosa è andato storto"
+
+[MSG_EMAIL_CHANGED]
+hash = "sha1-ba6e318074031438a3d25e5d4b6eef5312d15b7c"
+other = "Email cambiata con successo"
+
+[MSG_EMAIL_SENT]
+hash = "sha1-b2c9a288df4da97877376f398c662b8cded7f597"
+other = "Ti abbiamo inviato un'email: controlla la tua casella di posta"
+
+[MSG_MENU_DELETED]
+hash = "sha1-00c0b7923b6a5cdc03b2d69aff28304c7cb62dad"
+other = "Menù elimnato con successo"
+
+[MSG_PAGE_NOT_FOUND]
+hash = "sha1-bc3023b36063a7681db24681472b54fa11f0d4ec"
+other = "Pagina non trovata"
+
+[MSG_PASSWORD_CHANGED]
+hash = "sha1-e12081a4a6d4521224c6eba397f2db9b0f6fb798"
+other = "Password cambiata con successo"
+
+[MSG_SECTION_DELETED]
+hash = "sha1-3ae5a8b2decbc0d9420a7cc293076c64426b76ef"
+other = "Sezione eliminata con successo"
+
+[MSG_SHOPPINGLIST_EMPTIED]
+hash = "sha1-6ae41d8106c55ef2780fbd95760270ad43b087b1"
+other = "Lista svuotata con successo"
+
+[MSG_UNKNOWN_REQUEST]
+hash = "sha1-fe8ec53cd4ffb3bf15a8bb27152cc06ebd59c45b"
+other = "Richiesta sconosciuta"
+
+[MSG_UNMATCHING_PASSWORDS]
+hash = "sha1-e0be8d69b37fb203c770ac060c490c82053cc520"
+other = "Le due password non corrispondono"
+
+[MSG_USERNAME_CHANGED]
+hash = "sha1-303a1dcda61b79aebea16014d6d2d92d205a983e"
+other = "Nome cambiato con successo"
+
+[MSG_USER_CREATED]
+hash = "sha1-d31ca65747477fa7060e86efbad15272b42cb1df"
+other = "Account creato con successo"
+
+[MSG_USER_DELETED]
+hash = "sha1-c758f56f12fbb48c0b6d8e80b344d4dab6ad5cac"
+other = "Account eliminato con successo"
+
 [STR_ADD]
 hash = "sha1-61cc55aa0453184734c3fa0b621eda6fa874bd83"
 other = "Aggiungi"
@@ -95,8 +215,12 @@ hash = "sha1-d166e844a3f3f87149cc4f866eb998e9a751c72a"
 other = "Venerdì"
 
 [STR_INFO]
-hash = "sha1-4b631f69842530d659306c8f06dbad594a6b1807"
-other = "Ulteriori informazioni"
+hash = "sha1-4c53eb52568a369776f7d6d6c6ab28215de64ed2"
+other = "Maggiori informazioni"
+
+[STR_INFO_TEXT]
+hash = "sha1-992dfedb89ddbed81ab477592acb4e12c19273f6"
+other = "<p>CucinAssistant è un progetto sviluppato da <a href=\"https://gianlucaparri.me\" target=\"_blank\">Gianluca Parri</a>, ideato nel 2023 in seguito alla sua nuova vita da fuorisede universitario.<br>Da quel momento è in continua evoluzione, anche se lentamente.<br>La versione corrente è la {{ .VersionCode }} ({{ .VersionName }}).</p><p> Al momento è disponibile sia come sito web (<a href=\"{{ .BaseURL }}\" target=\"_blank\">{{ .BaseURL }}</a>) sia come applicazione Android sul <a href=\"https://play.google.com/store/apps/details?id=me.gianlucaparri.ca.twa\" target=\"_blank\">Play Store</a>; gli utenti iOS possono installarla dal browser.<br>In ogni caso, le app e il sito sono la stessa identica cosa.</p><p>CucinAssistant è open source; il codice sorgente è disponibile su <a href=\"https://github.com/gianluparri03/cucinassistant/\" target=\"_blank\">GitHub</a>.</p><p>È disponibile una pagina di <a hx-get=\"/stats\">statistiche</a>.</p><p>Per ulteriori informazioni, potete scrivere una mail a <a href=\"mailto:cucinassistant@gmail.com\" target=\"_blank\">cucinassistant@gmail.com</a>.</p>"
 
 [STR_LOGOUT]
 hash = "sha1-e43d612e11f1568f2373e719d4c4b08dcecdc7cc"
@@ -133,6 +257,10 @@ other = "Nuova sezione"
 [STR_NEW_USERNAME]
 hash = "sha1-d48b52683f7d85cf8d733163c6b05cd6a4380899"
 other = "Nuovo nome utente"
+
+[STR_OK]
+hash = "sha1-b0a98216a32426b9e66a4ac1eb6df2e96e1b495c"
+other = "Va bene"
 
 [STR_OLD_PASSWORD]
 hash = "sha1-e3053fbaa7622ccae5f59565e7fb553f9c2d79c8"

@@ -52,11 +52,7 @@ func SaveUID(c *Context, UID int, msg string) {
 		slog.Error("while saving session:", "err", err)
 	}
 
-	if msg != "" {
-		ShowAndRedirect(c, msg, "/")
-	} else {
-		Redirect(c, "/")
-	}
+	ShowAndRedirect(c, msg, "/")
 }
 
 // DropUID drops the UID from the session.

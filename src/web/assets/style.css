@@ -17,6 +17,10 @@
     font-family: var(--sansserif);
 }
 
+p {
+    margin-bottom: 1.5rem;
+}
+
 a, a:visited {
     color: var(--orange);
     text-decoration: underline;

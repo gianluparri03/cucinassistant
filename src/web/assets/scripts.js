@@ -1,6 +1,7 @@
 // Makes sure the fields password-1 and password-2 match,
 // otherwise shows an error.
 // ( used by /user/sign_up, /user/change_password and /user/reset_password )
+let unmatchingPasswords;
 function comparePasswords() {
     // Remove the previous warning
     $('#unmatching_passwords').remove();
@@ -16,7 +17,7 @@ function comparePasswords() {
         p2.val("");
 
         // Shows the warning
-        $('button').before('<div id="unmatching_passwords">Le due password non corrispondono</div>');
+        $('button').before('<div id="unmatching_passwords">'+unmatchingPasswords+'</div>');
 
         // And stop the process
         event.preventDefault();

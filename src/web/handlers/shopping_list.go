@@ -69,7 +69,7 @@ func PostToggleEntry(c *utils.Context) (err error) {
 func PostClearShoppingList(c *utils.Context) (err error) {
 	// Tries to clear the list
 	if err = c.U.ShoppingList().Clear(); err == nil {
-		utils.ShowAndRedirect(c, "Lista svuotata con successo", "/shopping_list")
+		utils.ShowAndRedirect(c, "MSG_SHOPPINGLIST_EMPTIED", "/shopping_list")
 	}
 
 	return

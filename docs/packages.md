@@ -9,10 +9,6 @@ It just contains a `main.go` file that runs everything.
 You can run everything just by using `make run` (this will create and start a postgresql container with docker),
 or by hand with `go run .` inside the `src/` directory; in this case, make sure to also set the `CA_ENV` environment variable.
 
-The `broadcast.go` file is a program used in production to send an email to every user, like for scheduled manteinance.
-It will ask for the email subject and content, send a test email to the sender email and - if confirmed - broadcast it to
-each user. It needs the config file as argument.
-
 ## cucinassistant/configs
 
 This package contains some config files (for debugging, testing and for the ci), and the Go files that parses them.
@@ -57,6 +53,16 @@ This package contains all the handlers, used in `cucinassistant/web/endpoints.go
 Thanks to the `utils` module, the handling is simplified both for the authentication part (in fact
 the user who requested the page is already an input), and in the error handling part (in fact the function
 has an `error` return type; if not nil, it will be shown to the user).
+
+## cucinassistant/langs
+
+This package exports a function, `Translate`, used to translate all the UI, using `i18n`.
+Inside the folder there are the `.toml` files for all the supported languages.
+
+The IDs of the strings to be translated are always in uppercase and snake case; if they start with
+`ERR_` it means they come from the `database` package, if they start with `MSG_` they come from the
+`web/utils` or `web/handlers`, and if they start with `STR_` they come from the page templates.
+
 
 ## cucinassistant/tools
 
