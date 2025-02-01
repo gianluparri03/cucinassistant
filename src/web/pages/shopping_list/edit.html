@@ -1,9 +1,9 @@
-{{ define "title" }}Modifica elemento{{ end }}
+{{ define "title" }}{{ t "STR_EDIT_ENTRY" . }}{{ end }}
 {{ define "back_link" }}/shopping_list{{ end }}
 
 {{ define "content" }}
     <form method="POST">
         <input name="name" value="{{ .Name }}" required> <br>
-        <button class="icon-text"><i class="fas fa-check"></i> Conferma</button>
+        <button class="icon-text"><i class="fas fa-check"></i> {{ t "STR_CONFIRM" . }}</button>
     </form>
 {{ end }}

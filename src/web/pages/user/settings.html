@@ -2,27 +2,27 @@
     <div class="dashboard">
         <button hx-post="/user/signout">
             <i class="fas fa-sign-out-alt"></i>
-            <span>Esci</span>
+            <span>{{ t "STR_LOGOUT" . }}</span>
         </button>
 
         <button hx-get="/user/change_username">
             <i class="fas fa-user"></i>
-            <span>Cambia nome utente</span>
+            <span>{{ t "STR_CHANGE_USERNAME" . }}</span>
         </button>
 
         <button hx-get="/user/change_email">
             <i class="fas fa-envelope"></i>
-            <span>Cambia email</span>
+            <span>{{ t "STR_CHANGE_EMAIL" . }}</span>
         </button>
 
         <button hx-get="/user/change_password">
             <i class="fas fa-key"></i>
-            <span>Cambia password</span>
+            <span>{{ t "STR_CHANGE_PASSWORD" . }}</span>
         </button>
 
         <button hx-get="/user/delete_1">
             <i class="fas fa-trash"></i>
-            <span>Elimina account</span>
+            <span>{{ t "STR_DELETE_USER" . }}</span>
         </button>
     </div>
 {{ end }}

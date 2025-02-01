@@ -1,24 +1,24 @@
-{{ define "title" }}Registrati{{ end }}
+{{ define "title" }}{{ t "STR_SIGNUP" . }}{{ end }}
 
 {{ define "content" }}
     <form method="POST" onsubmit="comparePasswords();">
         <input name="action" value="signup" hidden>
 
-        <label for="username">Nome utente</label> <br>
+        <label for="username">{{ t "STR_USERNAME" . }}</label> <br>
         <input type="text" name="username" required> <br>
 
-        <label for="email">Email</label> <br>
+        <label for="email">{{ t "STR_EMAIL" . }}</label> <br>
         <input type="email" name="email" required> <br>
 
-        <label for="password-1">Password</label> <br>
+        <label for="password-1">{{ t "STR_PASSWORD" . }}</label> <br>
         <input type="password" name="password" id="password-1" required> <br>
 
-        <label for="password-2">Ripeti password</label> <br>
+        <label for="password-2">{{ t "STR_REPEAT_PASSWORD" . }}</label> <br>
         <input type="password" id="password-2" required> <br>
 
-        <button class="icon-text"><i class="fas fa-user-plus"></i> Registrati</button> <br>
+        <button class="icon-text"><i class="fas fa-user-plus"></i> {{ t "STR_SIGNUP" . }}</button> <br>
 
-        Hai già un account? <a hx-get="/user/signin">Accedi</a>
+        <a hx-get="/user/signin">{{ t "STR_SIGNIN" . }}</a>
     </form>
 
     <script> $("nav i").remove(); </script>

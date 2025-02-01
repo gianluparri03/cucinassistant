@@ -1,11 +1,11 @@
-{{ define "title" }}Nuova sezione{{ end }}
+{{ define "title" }}{{ t "STR_NEW_SECTION" . }}{{ end }}
 {{ define "back_link" }}/storage{{ end }}
 
 {{ define "content" }}
     <form method="POST">
-        Inserisci un nome per la nuova sezione <br>
+        {{ t "STR_NAME" . }} <br>
 		<input type="text" name="name" required> <br>
 
-        <button class="icon-text"><i class="fas fa-check"></i> Continua</button>
+        <button class="icon-text"><i class="fas fa-check"></i> {{ t "STR_CONFIRM" . }}</button>
     </form>
 {{ end }}

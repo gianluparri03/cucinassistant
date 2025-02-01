@@ -1,18 +1,17 @@
-{{ define "title" }}Elimina account{{ end }}
+{{ define "title" }}{{ t "STR_DELETE_USER" . }}{{ end }}
 {{ define "back_link" }}/user/settings{{ end }}
 
 {{ define "content" }}
     <form method="POST">
         <span>
             {{ if .Warning }}
-                Sei davvero sicuro di voler eliminare l'account? <br>
+                {{ t "STR_DELETE_USER_TEXT1" . }} <br>
             {{ else }}
-                Sei <b>SICURISSIMO</b> di voler eliminare l'account? <br>
-                Tutti i tuoi dati saranno persi per sempre. <br>
+                {{ t "STR_DELETE_USER_TEXT2" . }} <br>
             {{ end }}
         </span> <br>
 
         <input name="token" value="{{ .Token }}" hidden>
-        <button class="icon-text"><i class="fas fa-check"></i> Sì, sono sicuro</button>
+        <button class="icon-text"><i class="fas fa-check"></i> {{ t "STR_CONFIRM" . }}</button>
     </form>
 {{ end }}

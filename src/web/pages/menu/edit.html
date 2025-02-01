@@ -1,61 +1,61 @@
-{{ define "title" }}Modifica {{ .Menu.Name }}{{ end }}
+{{ define "title" }}{{ t "STR_EDIT" . }} {{ .Menu.Name }}{{ end }}
 {{ define "back_link" }}/menus/{{ .Menu.MID }}{{ end }}
 
 {{ define "content" }}
     <form method="POST">
         <div class="menu-day">
-            <b>Nome</b> <br>
+            <b>{{ t "STR_NAME" . }}</b> <br>
             <input name="name" value="{{ .Menu.Name }}">
         </div>
 
         <br>
 
         <div class="menu-day">
-            <b>Lunedì</b>
+            <b>{{ t "STR_MONDAY" . }}</b>
             <textarea name="meal-0">{{ index .Menu.Meals 0 }}</textarea>
             <textarea name="meal-1">{{ index .Menu.Meals 1 }}</textarea>
         </div>
 
         <div class="menu-day">
-            <b>Martedì</b>
+            <b>{{ t "STR_TUESDAY" . }}</b>
             <textarea name="meal-2">{{ index .Menu.Meals 2 }}</textarea>
             <textarea name="meal-3">{{ index .Menu.Meals 3 }}</textarea>
         </div>
 
         <div class="menu-day">
-            <b>Mercoledì</b>
+            <b>{{ t "STR_WEDNESDAY" . }}</b>
             <textarea name="meal-4">{{ index .Menu.Meals 4 }}</textarea>
             <textarea name="meal-5">{{ index .Menu.Meals 5 }}</textarea>
         </div>
 
         <div class="menu-day">
-            <b>Giovedì</b>
+            <b>{{ t "STR_THURSDAY" . }}</b>
             <textarea name="meal-6">{{ index .Menu.Meals 6 }}</textarea>
             <textarea name="meal-7">{{ index .Menu.Meals 7 }}</textarea>
         </div>
 
         <div class="menu-day">
-            <b>Venerdì</b>
+            <b>{{ t "STR_FRIDAY" . }}</b>
             <textarea name="meal-8">{{ index .Menu.Meals 8 }}</textarea>
             <textarea name="meal-9">{{ index .Menu.Meals 9 }}</textarea>
         </div>
 
         <div class="menu-day">
-            <b>Sabato</b>
+            <b>{{ t "STR_SATURDAY" . }}</b>
             <textarea name="meal-10">{{ index .Menu.Meals 10 }}</textarea>
             <textarea name="meal-11">{{ index .Menu.Meals 11 }}</textarea>
         </div>
 
         <div class="menu-day">
-            <b>Domenica</b>
+            <b>{{ t "STR_SUNDAY" . }}</b>
             <textarea name="meal-12">{{ index .Menu.Meals 12 }}</textarea>
             <textarea name="meal-13">{{ index .Menu.Meals 13 }}</textarea>
         </div>
 
-        <button class="icon-text"><i class="fas fa-check"></i> Salva</button>
+        <button class="icon-text"><i class="fas fa-check"></i> {{ t "STR_SAVE" . }}</button>
     </form>
 
     <button class="icon-text" hx-post="/menus/{{ .Menu.MID }}/delete" hx-push-url="false">
-        <i class="fas fa-trash-alt"></i> Elimina menù
+        <i class="fas fa-trash-alt"></i> {{ t "STR_DELETE" . }}
     </button>
 {{ end }}

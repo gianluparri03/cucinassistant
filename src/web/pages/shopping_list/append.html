@@ -1,14 +1,18 @@
-{{ define "title" }}Aggiungi elementi{{ end }}
+{{ define "title" }}{{ t "STR_APPEND_ENTRIES" . }}{{ end }}
 {{ define "back_link" }}/shopping_list{{ end }}
 
 {{ define "content" }}
     <form method="POST">
         <button class="icon" onclick="removeEntry(event);"><i class="fas fa-minus"></i></button>
         <button class="icon" onclick="addEntry(event);"><i class="fas fa-plus"></i></button>
-        <button class="icon-text"><i class="fas fa-check"></i> Conferma</button>
+        <button class="icon-text"><i class="fas fa-check"></i> {{ t "STR_CONFIRM" . }}</button>
 
         <div id="new-entries"></div>
     </form>
 
-    <script> entriesN = 0; addEntry(); </script>
+    <script>
+        entriesN = 0;
+        entryName = '{{ t "STR_NAME" . }}';
+        addEntry();
+    </script>
 {{ end }}

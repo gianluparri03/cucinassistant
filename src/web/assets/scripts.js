@@ -29,7 +29,7 @@ function comparePasswords() {
 
 
 // ( used by: /shopping_list/append )
-let entriesN = 0;
+let entriesN, entryName;
 
 // Adds the inputs for a new entry
 // ( used by: /shopping_list/append )
@@ -37,7 +37,7 @@ function addEntry(e) {
     entriesN++;
 
     $('#new-entries').prepend(`<div class="entry">
-        <input class="name" type="text" name="entry-${entriesN}-name" placeholder="Nome">
+        <input class="name" type="text" name="entry-${entriesN}-name" placeholder="${entryName}">
     </div>`);
 
     if (e) { e.preventDefault(); }
@@ -57,7 +57,7 @@ function removeEntry(e) {
 
 
 // ( used by: /storage/{sid}/add )
-let articlesN = 0;
+let articlesN, articleName, articleExpiration, articleQuantity;
 
 // Adds the inputs for a new article
 // ( used by: /storage/{sid}/add )
@@ -65,9 +65,9 @@ function addArticle(e) {
     articlesN++;
 
     $('#new-articles').prepend(`<div class="article">
-        <input class="name" name="article-${articlesN}-name" type="text" placeholder="Nome">
-        <input class="expiration" name="article-${articlesN}-expiration" type="date" placeholder="Scadenza">
-        <input class="quantity" name="article-${articlesN}-quantity" type="number" min="0" step="1" placeholder="Quantità">
+        <input class="name" name="article-${articlesN}-name" type="text" placeholder="${articleName}">
+        <input class="expiration" name="article-${articlesN}-expiration" type="date" placeholder="${articleExpiration}">
+        <input class="quantity" name="article-${articlesN}-quantity" type="number" min="0" step="1" placeholder="${articleQuantity}">
     </div>`);
 
     if (e) { e.preventDefault(); }

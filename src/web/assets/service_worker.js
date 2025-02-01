@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cucinassistant_v5';
+const CACHE_NAME = 'cucinassistant_v6';
 
 const CACHED_ASSETS = [
     '/assets/sakura.css',

@@ -1,14 +1,20 @@
-{{ define "title" }}Aggiungi articoli{{ end }}
+{{ define "title" }}{{ t "STR_ADD_ARTICLES" . }}{{ end }}
 {{ define "back_link" }}/storage/{{ .SID }}{{ end }}
 
 {{ define "content" }}
     <form method="POST">
         <button class="icon" onclick="removeArticle(event);"><i class="fas fa-minus"></i></button>
         <button class="icon" onclick="addArticle(event);"><i class="fas fa-plus"></i></button>
-        <button class="icon-text"><i class="fas fa-check"></i> Conferma</button>
+        <button class="icon-text"><i class="fas fa-check"></i> {{ t "STR_CONFIRM" . }}</button>
 
         <div id="new-articles"></div>
     </form>
 
-    <script> articlesN = 0; addArticle(); </script>
+    <script>
+        articlesN = 0;
+        articleName = '{{ t "STR_NAME" . }}';
+        articleExpiration = '{{ t "STR_EXPIRATION" . }}';
+        articleQuantity = '{{ t "STR_QUANTITY" . }}';
+        addArticle();
+    </script>
 {{ end }}

@@ -1,25 +1,29 @@
+
 {{ define "content" }}
     <div class="dashboard">
         <button hx-get="/menus">
             <i class="fas fa-utensils"></i>
-            <span>Menù</span>
+            <span>{{ t "STR_MENUS" . }}</span>
         </button>
 
         <button hx-get="/storage">
             <i class="fas fa-box"></i>
-            <span>Dispensa</span>
+            <span>{{ t "STR_STORAGE" . }} </span>
         </button>
 
         <button hx-get="/shopping_list">
             <i class="fas fa-shopping-cart"></i>
-            <span>Lista della spesa</span>
+            <span>{{ t "STR_SHOPPINGLIST" . }}</span>
         </button>
 
         <button hx-get="/user/settings" class="transparent">
             <i class="fas fa-cog"></i>
-            <span>Impostazioni</span>
+            <span>{{ t "STR_SETTINGS" . }}</span>
         </button>
     </div>
 
-    <script> $('h1').text('Bentornato, {{ .Username }}!'); $('nav i').remove(); </script>
+    <script>
+        $('h1').text('{{ t "STR_WELCOMEBACK" . }}');
+        $('nav i').remove();
+    </script>
 {{ end }}

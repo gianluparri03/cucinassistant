@@ -4,15 +4,18 @@
 {{ define "content" }}
     <div>
         {{ if .Search }}
-            <span>Ricerca corrente: "<i>{{ .Search }}</i>". <a href="/storage/{{ .Section.SID }}">Annulla ricerca</a></span> <br>
+            <span>
+                {{ t "STR_CURRENT_SEARCH" . }}: "<i>{{ .Search }}</i>".
+                <a href="/storage/{{ .Section.SID }}">{{ t "STR_CANCEL" . }}</a>
+            </span>
         {{ else }}
-            <button class="icon-text" hx-get="/storage/{{ .Section.SID }}/search"><i class="fas fa-search"></i> Cerca</button>
+            <button class="icon-text" hx-get="/storage/{{ .Section.SID }}/search"><i class="fas fa-search"></i> {{ t "STR_SEARCH_ARTICLES" . }}</button>
         {{ end }}
 
         <br>
 
-        <button class="icon-text" hx-get="/storage/{{ .Section.SID }}/add"><i class="fas fa-plus"></i> Aggiungi</button>
-        <button class="icon-text" hx-get="/storage/{{ .Section.SID }}/edit"><i class="fas fa-edit"></i> Modifica sezione</button>
+        <button class="icon-text" hx-get="/storage/{{ .Section.SID }}/add"><i class="fas fa-plus"></i> {{ t "STR_ADD_ARTICLES" . }}</button>
+        <button class="icon-text" hx-get="/storage/{{ .Section.SID }}/edit"><i class="fas fa-edit"></i> {{ t "STR_EDIT_SECTION" . }}</button>
 
         <br>
 
@@ -23,7 +26,7 @@
                 {{ if .Quantity }} <input class="quantity" value="{{ .Quantity }}" type="quantity" readonly> {{ end }}
             </div>
         {{ else }}
-            <i>Nessun articolo in dispensa</i>
+            <i>{{ t "STR_SECTION_EMPTY" . }}</i>
         {{ end }}
     </div>
 {{ end }}

@@ -4,6 +4,9 @@ import (
 	"html/template"
 	"log/slog"
 	"net/http"
+	"path"
+
+	"cucinassistant/langs"
 )
 
 // render executes the given templates witth the given data.
@@ -18,13 +21,23 @@ func render(c *Context, pages []string, data map[string]any) {
 		pages = append([]string{"templates/base_hx"}, pages...)
 	}
 
+	// Stores the template name
+	name := path.Base(pages[0] + ".html")
+
 	// Completes the pages names
 	for i, p := range pages {
 		pages[i] = "web/pages/" + p + ".html"
 	}
 
+	// Prepares the FuncMap
+	funcs := template.FuncMap{
+		"t": func(id string, data any) string {
+			return langs.GetString("it", id, data)
+		},
+	}
+
 	// Loads the templates
-	tmpl, err := template.ParseFiles(pages...)
+	tmpl, err := template.New(name).Funcs(funcs).ParseFiles(pages...)
 	if err != nil {
 		slog.Error("while fetching page template:", "err", err, "pages", pages)
 		return

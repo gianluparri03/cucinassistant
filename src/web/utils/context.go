@@ -20,7 +20,7 @@ type Context struct {
 	// S is a sessions.Session
 	S *sessions.Session
 
-	// User is the user currently logged in
+	// U is the user currently logged in
 	U *database.User
 }
 

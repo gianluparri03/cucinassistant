@@ -1,10 +1,10 @@
-{{ define "title" }}Ricerca articoli{{ end }}
+{{ define "title" }}{{ t "STR_SEARCH_ARTICLES" . }}{{ end }}
 {{ define "back_link" }}/storage/{{ .SID }}{{ end }}
 
 {{ define "content" }}
     <form method="GET" action="/storage/{{ .SID }}">
-        Nome dell'articolo <br>
+        {{ t "STR_NAME" . }} <br>
         <input name="search" required> <br>
-        <button class="icon-text"><i class="fas fa-search"></i> Ricerca</button>
+        <button class="icon"><i class="fas fa-search"></i></button>
     </form>
 {{ end }}

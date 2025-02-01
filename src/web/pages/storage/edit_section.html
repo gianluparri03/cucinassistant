@@ -1,24 +1,23 @@
-{{ define "title" }}Modifica sezione{{ end }}
+{{ define "title" }}{{ t "STR_EDIT_SECTION" . }}{{ end }}
 {{ define "back_link" }}/storage/{{ .Section.SID }}{{ end }}
 
 {{ define "content" }}
-    <b>Nome</b>
+    <b>{{ t "STR_NAME" . }}</b>
     <form method="POST">
-        Nuovo nome per la sezione<br>
         <input type="text" name="name" value="{{ .Section.Name }}"required> <br>
-        <button class="icon-text"><i class="fas fa-check"></i> Continua</button>
+        <button class="icon-text"><i class="fas fa-check"></i> {{ t "STR_SAVE" . }}</button>
     </form>
 
     <br>
 
-    <b>Altro</b>
+    <b>{{ t "STR_DELETE" . }}</b>
     <div id="pre-delete">
-        <button class="icon-text" onclick="swapButtons();"><i class="fas fa-trash"></i> Elimina sezione</button>
+        <button class="icon-text" onclick="swapButtons();"><i class="fas fa-trash"></i> {{ t "STR_DELETE" . }}</button>
     </div>
     <div id="post-delete" hidden>
-        Sei davvero sicuro? Tutti gli articoli in questa sezione verranno eliminati.
+        {{ t "STR_DELETE_SECTION_TEXT" . }} <br>
         <button class="icon-text" hx-post="/storage/{{ .Section.SID }}/delete" hx-push-url="false">
-            <i class="fas fa-trash"></i> Sì, sono sicuro
+            <i class="fas fa-check"></i> {{ t "STR_CONFIRM" . }}
         </button>
     </div>
 {{ end }}
