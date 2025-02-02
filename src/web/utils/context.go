@@ -26,6 +26,48 @@ type Context struct {
 
 	// s is a sessions.Session
 	s *sessions.Session
+
+	// h is true if the request is from htmx
+	h bool
+}
+
+// buildContext creates a Context instance
+func buildContext(w http.ResponseWriter, r *http.Request, protected bool) *Context {
+	// Initializes the context with W, R and isHx
+	c := Context{
+		W: w,
+		R: r,
+		h: r.Header.Get("HX-Request") != "",
+	}
+
+	// Loads the session
+	var err error
+	c.s, err = store.Get(r, sessionName)
+	if err != nil {
+		slog.Warn("while retrieving session:", "err", err)
+	}
+
+	// Loads the language
+	if lang, found := c.s.Values["Lang"]; found {
+		c.L = lang.(string)
+	} else {
+		c.L = langs.Default
+	}
+
+	// Gets the user, if it's protected
+	if protected {
+		if rawUID, found := c.s.Values["UID"]; found {
+			u, _ := database.GetUser("UID", rawUID.(int))
+			c.U = &u
+		}
+	}
+
+	return &c
+}
+
+// logRoute logs every route visited
+func logRoute(c *Context, attr string) {
+	slog.Debug("[" + c.R.Method + attr + "] " + c.R.URL.String())
 }
 
 // Handler is a function that accepts a context and returns an error.
@@ -35,29 +77,10 @@ type Handler func(*Context) error
 
 // ServeHTTP is used by net/http to serve an http request
 func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// Logs each visit
-	slog.Debug("[" + r.Method + "] " + r.URL.String())
+	c := buildContext(w, r, false)
+	logRoute(c, "")
 
-	// Executes the handler
-	s, err := store.Get(r, sessionName)
-	if err != nil {
-		slog.Warn("while retrieving session:", "err", err)
-	}
-
-	c := &Context{W: w, R: r, s: s}
-
-	// Gets the language
-	if lang, found := s.Values["Lang"]; found {
-		c.L = lang.(string)
-	} else {
-		c.L = langs.Default
-	}
-
-	// Executes the handler
-	err = h(c)
-
-	// Shows the error (if present)
-	if err != nil {
+	if err := h(c); err != nil {
 		Show(c, err.Error())
 	}
 }
@@ -69,43 +92,19 @@ type PHandler func(*Context) error
 
 // ServeHTTP is used by net/http to serve an http request
 func (ph PHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// Logs each visit
-	slog.Debug("[" + r.Method + "*] " + r.URL.String())
+	c := buildContext(w, r, true)
+	logRoute(c, "*")
 
-	// Lets the handlers use the session
-	s, err := store.Get(r, sessionName)
-	if err != nil {
-		slog.Warn("while retrieving session:", "err", err)
-	}
-
-	c := &Context{W: w, R: r, U: &database.User{}, s: s}
-
-	// Gets the language
-	if lang, found := s.Values["Lang"]; found {
-		c.L = lang.(string)
-	} else {
-		c.L = langs.Default
-	}
-
-	// Gets the UID from the cookies
-	if rawUID, found := s.Values["UID"]; !found {
-		// If there isn't an UID, redirects to the signin
-		Redirect(c, "/user/signin")
-	} else {
-		// Fetches the user from the database
-		var err error
-		if *c.U, err = database.GetUser("UID", rawUID.(int)); err == nil {
-			// If all was okay, executes the handler
-			err = ph(c)
-		}
-
-		// Shows the error (if present)
-		if err != nil {
+	if c.U != nil {
+		if err := ph(c); err != nil {
 			if err == database.ERR_USER_UNKNOWN {
 				DropUID(c, "")
 			}
 
 			Show(c, err.Error())
 		}
+	} else {
+		// If there isn't an UID, redirects to the signin
+		Redirect(c, "/user/signin")
 	}
 }

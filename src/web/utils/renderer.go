@@ -14,11 +14,10 @@ import (
 // normal request or a request made by htmx.
 func render(c *Context, pages []string, data map[string]any) {
 	// Adds the base template
-	isHx := c.R.Header.Get("HX-Request") != ""
-	if !isHx {
-		pages = append([]string{"templates/base_full"}, pages...)
-	} else {
+	if c.h {
 		pages = append([]string{"templates/base_hx"}, pages...)
+	} else {
+		pages = append([]string{"templates/base_full"}, pages...)
 	}
 
 	// Stores the template name
@@ -45,10 +44,9 @@ func render(c *Context, pages []string, data map[string]any) {
 
 	// Adds the isHx field to the data
 	if data == nil {
-		data = map[string]any{"IsHx": isHx}
-	} else {
-		data["IsHx"] = isHx
+		data = make(map[string]any)
 	}
+	data["IsHx"] = c.h
 
 	// Parses them
 	if err = tmpl.Execute(c.W, data); err != nil {

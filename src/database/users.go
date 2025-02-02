@@ -195,19 +195,18 @@ func SignIn(username string, password string) (User, error) {
 	return user, nil
 }
 
-// ensureFetched checks if an user is builded
+// fetch checks if an user is builded
 // by hand or fetched form the database. In the
 // first case, it replaces it with a fetched one.
 // It is used for testing purposes.
-func (u *User) ensureFetched() error {
+func (u *User) fetch() error {
 	if u == nil {
 		return ERR_USER_UNKNOWN
 	}
 
 	if !u.fetched {
-		if uFetched, err := GetUser("UID", u.UID); err == nil {
-			*u = uFetched
-			return nil
+		if uF, err := GetUser("UID", u.UID); err == nil {
+			*u = uF
 		} else {
 			return err
 		}
@@ -219,7 +218,7 @@ func (u *User) ensureFetched() error {
 // ChangeUsername changes the user's username with a new one.
 func (u *User) ChangeUsername(newUsername string) error {
 	// Ensures all data is present
-	if err := u.ensureFetched(); err != nil {
+	if err := u.fetch(); err != nil {
 		return err
 	}
 
@@ -245,7 +244,7 @@ func (u *User) ChangeUsername(newUsername string) error {
 // ChangeEmail changes the user's email with a new one.
 func (u *User) ChangeEmail(newEmail string) error {
 	// Ensures all data is present
-	if err := u.ensureFetched(); err != nil {
+	if err := u.fetch(); err != nil {
 		return err
 	}
 
@@ -271,7 +270,7 @@ func (u *User) ChangeEmail(newEmail string) error {
 // ChangePassword changes the user's password with a new one.
 func (u *User) ChangePassword(oldPassword string, newPassword string) error {
 	// Ensures all data is present
-	if err := u.ensureFetched(); err != nil {
+	if err := u.fetch(); err != nil {
 		return err
 	}
 
@@ -372,7 +371,7 @@ func (u *User) ResetPassword(token string, newPassword string) error {
 func (u *User) Delete(token string) error {
 	// Ensures all data is present and the token
 	// has been generated
-	if err := u.ensureFetched(); err != nil {
+	if err := u.fetch(); err != nil {
 		return err
 	} else if u.Token == "" {
 		return ERR_USER_WRONG_TOKEN

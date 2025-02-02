@@ -75,5 +75,9 @@ func SetLang(c *Context, lang string) {
 	c.L = lang
 	c.s.Save(c.R, c.W)
 
-	ShowAndRedirect(c, "MSG_LANG_CHANGED", "/")
+	if c.h {
+		ShowAndRedirect(c, "MSG_LANG_CHANGED", "/")
+	} else {
+		Redirect(c, "/")
+	}
 }
