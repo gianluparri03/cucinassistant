@@ -6,8 +6,25 @@ import (
 
 	"cucinassistant/configs"
 	"cucinassistant/database"
+	"cucinassistant/langs"
 	"cucinassistant/web/utils"
 )
+
+// GetLang renders /lang
+// If it has the 'tag' query param, it sets the current
+// language; otherwise, it shows the form
+func GetLang(c *utils.Context) error {
+	if tag := c.R.URL.Query().Get("tag"); tag == "" {
+		utils.RenderPage(c, "misc/lang", map[string]any{
+			"Langs":   langs.Available,
+			"Current": c.L,
+		})
+	} else {
+		utils.SetLang(c, tag)
+	}
+
+	return nil
+}
 
 // GetIndex renders /
 func GetIndex(c *utils.Context) error {

@@ -30,10 +30,26 @@
     </head>
 
     <body hx-ext="response-targets" hx-target="#body-container" hx-target-error="#error-container" hx-boost="true" hx-push-url="true">
-        {{ define "error" }}{{ end }}
-        <div id="error-container">{{ template "error" . }}</div>
+        <div>
+            <nav>
+                <span><i id="home" class="fas fa-home" hx-get="/"></i></span>
+                <span id="logo">CucinAssistant</span>
+                <span><i id="lang" class="fas fa-language" hx-get="/lang"></i></span>
+            </nav>
 
-        {{ define "body" }}{{ end }}
-        <div id="body-container">{{ template "body" . }}</div>
+            <main id="body-container">
+                {{ block "body" . }}{{ end }}
+            </main>
+
+            <div id="error-container">
+                {{ block "error" . }}{{ end }}
+            </div>
+
+            <footer>
+                CucinAssistant &copy; 2023, Gianluca Parri <br>
+                <a hx-get="/info">{{ t "STR_INFO" . }}</a> &bullet;
+                <a href="https://cucinassistant.com/tutorial.pdf" hx-disable>{{ t "STR_TUTORIAL" . }}</a>
+            </footer>
+        </div>
     </body>
 </html>

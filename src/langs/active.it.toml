@@ -78,6 +78,10 @@ other = "Email cambiata con successo"
 hash = "sha1-b2c9a288df4da97877376f398c662b8cded7f597"
 other = "Ti abbiamo inviato un'email: controlla la tua casella di posta"
 
+[MSG_LANG_CHANGED]
+hash = "sha1-537c815bf1cfd05321911a3ebf8f7487c5526953"
+other = "Lingua cambiata correttamente"
+
 [MSG_MENU_DELETED]
 hash = "sha1-00c0b7923b6a5cdc03b2d69aff28304c7cb62dad"
 other = "Menù elimnato con successo"
@@ -97,6 +101,10 @@ other = "Sezione eliminata con successo"
 [MSG_SHOPPINGLIST_EMPTIED]
 hash = "sha1-6ae41d8106c55ef2780fbd95760270ad43b087b1"
 other = "Lista svuotata con successo"
+
+[MSG_UNKNOWN_LANG]
+hash = "sha1-e4f2add9e4a52a1731e581cf7bbcb9b6c4b7d77c"
+other = "Lingua sconosciuta"
 
 [MSG_UNKNOWN_REQUEST]
 hash = "sha1-fe8ec53cd4ffb3bf15a8bb27152cc06ebd59c45b"
@@ -221,6 +229,10 @@ other = "Maggiori informazioni"
 [STR_INFO_TEXT]
 hash = "sha1-992dfedb89ddbed81ab477592acb4e12c19273f6"
 other = "<p>CucinAssistant è un progetto sviluppato da <a href=\"https://gianlucaparri.me\" target=\"_blank\">Gianluca Parri</a>, ideato nel 2023 in seguito alla sua nuova vita da fuorisede universitario.<br>Da quel momento è in continua evoluzione, anche se lentamente.<br>La versione corrente è la {{ .VersionCode }} ({{ .VersionName }}).</p><p> Al momento è disponibile sia come sito web (<a href=\"{{ .BaseURL }}\" target=\"_blank\">{{ .BaseURL }}</a>) sia come applicazione Android sul <a href=\"https://play.google.com/store/apps/details?id=me.gianlucaparri.ca.twa\" target=\"_blank\">Play Store</a>; gli utenti iOS possono installarla dal browser.<br>In ogni caso, le app e il sito sono la stessa identica cosa.</p><p>CucinAssistant è open source; il codice sorgente è disponibile su <a href=\"https://github.com/gianluparri03/cucinassistant/\" target=\"_blank\">GitHub</a>.</p><p>È disponibile una pagina di <a hx-get=\"/stats\">statistiche</a>.</p><p>Per ulteriori informazioni, potete scrivere una mail a <a href=\"mailto:cucinassistant@gmail.com\" target=\"_blank\">cucinassistant@gmail.com</a>.</p>"
+
+[STR_LANGUAGE]
+hash = "sha1-89b86ab0e66f527166d98df92ddbcf5416ed58f6"
+other = "Lingua"
 
 [STR_LOGOUT]
 hash = "sha1-e43d612e11f1568f2373e719d4c4b08dcecdc7cc"

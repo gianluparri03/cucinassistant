@@ -7,6 +7,11 @@ import (
 
 var endpoints []utils.Endpoint = []utils.Endpoint{
 	{
+		Path:        "/lang",
+		Unprotected: true,
+		GetHandler:  handlers.GetLang,
+	},
+	{
 		Path:       "/",
 		GetHandler: handlers.GetIndex,
 	},

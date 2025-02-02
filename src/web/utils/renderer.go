@@ -9,11 +9,6 @@ import (
 	"cucinassistant/langs"
 )
 
-// getLang returns the desired language
-func getLang(c *Context) string {
-	return "it"
-}
-
 // render executes the given templates witth the given data.
 // It adds the base template in automatic, looking if it's a
 // normal request or a request made by htmx.
@@ -37,7 +32,7 @@ func render(c *Context, pages []string, data map[string]any) {
 	// Prepares the FuncMap
 	funcs := template.FuncMap{
 		"t": func(id string, data any) template.HTML {
-			return template.HTML(langs.Translate(getLang(c), id, data))
+			return template.HTML(langs.Translate(c.L, id, data))
 		},
 	}
 
@@ -77,7 +72,7 @@ func Redirect(c *Context, path string) {
 // then redirects him away
 func ShowAndRedirect(c *Context, msg string, path string) {
 	c.W.WriteHeader(http.StatusBadRequest)
-	tMsg := langs.Translate(getLang(c), msg, nil)
+	tMsg := langs.Translate(c.L, msg, nil)
 	render(c, []string{"templates/error"}, map[string]any{"Message": tMsg, "Path": path})
 }
 

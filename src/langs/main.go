@@ -8,8 +8,15 @@ import (
 	"os"
 )
 
-// Supported is the list of supported languages
-var Supported []language.Tag = []language.Tag{language.English, language.Italian}
+// Available contains all the supported languages
+// in the form tag: Name (the name is in that language's language)
+var Available map[string]string = map[string]string{
+	"en": "English",
+	"it": "Italiano",
+}
+
+// Default is the default language
+var Default string = "en"
 
 // localizers is a collection of localizers
 var localizers map[string]*i18n.Localizer
@@ -17,15 +24,13 @@ var localizers map[string]*i18n.Localizer
 // Load initializes the undle and loads the translations
 func Load() {
 	// Creates the bundle
-	bundle := i18n.NewBundle(Supported[0])
+	bundle := i18n.NewBundle(language.English)
 	bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
 
 	// Initializes the localizers map
 	localizers = make(map[string]*i18n.Localizer)
 
-	for _, l := range Supported {
-		lang := l.String()
-
+	for lang, _ := range Available {
 		// Loads the files and the localizers
 		if _, err := bundle.LoadMessageFile("langs/active." + lang + ".toml"); err != nil {
 			slog.Error("cannot load language:", "lang", lang, "err", err)
@@ -43,7 +48,7 @@ func Translate(lang string, id string, data any) string {
 	// Gets the required localizer (or the default one)
 	l, found := localizers[lang]
 	if !found {
-		l = localizers[Supported[0].String()]
+		l = localizers[Default]
 	}
 
 	// Gets the string

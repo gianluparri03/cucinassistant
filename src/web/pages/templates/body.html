@@ -1,20 +1,8 @@
-{{ define "back_link" }}/{{ end }}
-
 {{ define "body" }}
-    <nav>
-        <span><i id="back" class="fas fa-arrow-circle-left" hx-trigger="click" hx-get="{{ template "back_link" . }}"></i></span>
-        <span id="logo">CucinAssistant</span>
-        <span><i id="home" class="fas fa-home" hx-get="/"></i></span>
-    </nav>
+    <h1>
+        <i id="back" class="fas fa-arrow-circle-left" hx-get="{{ block "back_link" . }}{{ end }}"></i>
+        {{ template "title" . }}
+    </h1>
 
-    <main>
-        <h1>{{ template "title" . }}</h1>
-        {{ template "content" . }}
-    </main>
-
-    <footer>
-        CucinAssistant &copy; 2023, Gianluca Parri &bullet; 
-        <a hx-get="/info">{{ t "STR_INFO" . }}</a> &bullet;
-        <a href="https://cucinassistant.com/tutorial.pdf" hx-disable>{{ t "STR_TUTORIAL" . }}</a>
-    </footer>
+    {{ template "content" . }}
 {{ end }}

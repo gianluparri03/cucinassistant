@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"cucinassistant/database"
+	"cucinassistant/langs"
 )
 
 // Context is a container for all the things needed
@@ -17,11 +18,14 @@ type Context struct {
 	// R is a http.Response
 	R *http.Request
 
-	// S is a sessions.Session
-	S *sessions.Session
-
 	// U is the user currently logged in
 	U *database.User
+
+	// L is the language
+	L string
+
+	// s is a sessions.Session
+	s *sessions.Session
 }
 
 // Handler is a function that accepts a context and returns an error.
@@ -40,7 +44,16 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		slog.Warn("while retrieving session:", "err", err)
 	}
 
-	c := &Context{W: w, R: r, S: s}
+	c := &Context{W: w, R: r, s: s}
+
+	// Gets the language
+	if lang, found := s.Values["Lang"]; found {
+		c.L = lang.(string)
+	} else {
+		c.L = langs.Default
+	}
+
+	// Executes the handler
 	err = h(c)
 
 	// Shows the error (if present)
@@ -65,7 +78,14 @@ func (ph PHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		slog.Warn("while retrieving session:", "err", err)
 	}
 
-	c := &Context{W: w, R: r, S: s, U: &database.User{}}
+	c := &Context{W: w, R: r, U: &database.User{}, s: s}
+
+	// Gets the language
+	if lang, found := s.Values["Lang"]; found {
+		c.L = lang.(string)
+	} else {
+		c.L = langs.Default
+	}
 
 	// Gets the UID from the cookies
 	if rawUID, found := s.Values["UID"]; !found {

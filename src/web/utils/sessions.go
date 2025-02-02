@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"cucinassistant/configs"
+	"cucinassistant/langs"
 )
 
 // store is used to store the cookies
@@ -17,9 +18,6 @@ var store *pgstore.PGStore
 
 // sessionName is the session's name
 var sessionName = "ca_session"
-
-// sessionField is the field in which the UID is saved
-var sessionField = "UID"
 
 // InitSessionStore initializes the cookie session store.
 // It lasts 90 days.
@@ -47,8 +45,8 @@ func InitSessionStore() {
 // SaveUID adds the UID to the session.
 // It also redirects to /, with an optional message
 func SaveUID(c *Context, UID int, msg string) {
-	c.S.Values[sessionField] = UID
-	if err := c.S.Save(c.R, c.W); err != nil {
+	c.s.Values["UID"] = UID
+	if err := c.s.Save(c.R, c.W); err != nil {
 		slog.Error("while saving session:", "err", err)
 	}
 
@@ -58,10 +56,24 @@ func SaveUID(c *Context, UID int, msg string) {
 // DropUID drops the UID from the session.
 // It also redirects to /user/signin, with an optional message
 func DropUID(c *Context, msg string) {
-	delete(c.S.Values, sessionField)
-	if err := c.S.Save(c.R, c.W); err != nil {
+	delete(c.s.Values, "UID")
+	if err := c.s.Save(c.R, c.W); err != nil {
 		slog.Error("while saving session:", "err", err)
 	}
 
 	ShowAndRedirect(c, msg, "/user/signin")
+}
+
+// SetLang sets the session language
+func SetLang(c *Context, lang string) {
+	if _, found := langs.Available[lang]; !found {
+		Show(c, "MSG_UNKNOWN_LANG")
+		return
+	}
+
+	c.s.Values["Lang"] = lang
+	c.L = lang
+	c.s.Save(c.R, c.W)
+
+	ShowAndRedirect(c, "MSG_LANG_CHANGED", "/")
 }

@@ -27,7 +27,7 @@ type Endpoint struct {
 func (e Endpoint) Register(router *mux.Router) {
 	// Returns an error message if the method is not allowed
 	unknownHandler := func(c *Context) error {
-		ShowAndRedirect(c, "Richiesta sconosciuta", "/")
+		ShowAndRedirect(c, "MSG_UNKNOWN_REQUEST", "/")
 		return nil
 	}
 

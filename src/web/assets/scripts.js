@@ -1,3 +1,10 @@
+// Hides the back and the home button
+// ( used by /user/sign_up, /user/sign_in, /user/reset_password and /misc/home )
+function disableNavigation() {
+    $("#back").remove();
+    $("#home").css("opacity", "0");
+}
+
 // Makes sure the fields password-1 and password-2 match,
 // otherwise shows an error.
 // ( used by /user/sign_up, /user/change_password and /user/reset_password )

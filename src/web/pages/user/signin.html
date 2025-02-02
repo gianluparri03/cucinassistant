@@ -14,5 +14,7 @@
         <a hx-get="/user/signup">{{ t "STR_SIGNUP" . }}</a>
     </form>
 
-    <script> $("nav i").remove(); </script>
+    <script>
+        disableNavigation();
+    </script>
 {{ end }}
