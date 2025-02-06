@@ -1,2 +1,2 @@
 src/configs/*.local
-src/langs/translate.*
+src/langs/translate.*.toml

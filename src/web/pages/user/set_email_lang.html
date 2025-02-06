@@ -1,0 +1,17 @@
+{{ define "title" }}{{ t "STR_SET_EMAIL_LANG" . }}{{ end }}
+{{ define "back_link" }}/user/settings{{ end }}
+
+{{ define "content" }}
+    <form method="POST">
+        <select name="lang">
+            {{ $current := .Current }}
+            {{ range $tag, $name := .Langs }}
+                <option value="{{ $tag }}" {{ if eq $current $tag }}selected{{ end }}>
+                    {{ $name }}
+                </option>
+            {{ end }}
+        </select>
+
+        <button class="icon-text"><i class="fas fa-check"></i> {{ t "STR_SAVE" . }}</button>
+    </form>
+{{ end }}

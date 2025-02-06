@@ -1,0 +1,21 @@
+<html>
+    <body>
+        <td style="font-size: 1.3em">
+            <main>
+                <h2>{{ t .Subject . }}</h2>
+
+                <p>
+                    {{ t "STR_GOOD_MORNING" . }}
+                    <br><br>
+                    {{ t .Content . }}
+                    <br><br><br>
+                    {{ t "STR_REGARDS" . }}
+                </p>
+            </main>
+
+            <hr width="700">
+
+            <small> {{ t "STR_NOREPLY" . }}</small>
+        </td>
+    </body>
+</html>

@@ -6,6 +6,7 @@ import (
 	"cucinassistant/configs"
 	"cucinassistant/database"
 	"cucinassistant/email"
+	"cucinassistant/langs"
 	"cucinassistant/web/utils"
 )
 
@@ -25,8 +26,11 @@ func PostSignUp(c *utils.Context) (err error) {
 	// Tries to sign it up
 	var user database.User
 	if user, err = database.SignUp(username, email_, password); err == nil {
+		// Saves the email language (based on the current one)
+		user.SetEmailLang(c.L)
+
 		// Sends the welcome email
-		go email.SendMail("Registrazione effettuata", "welcome", map[string]any{"Username": username}, email_)
+		go email.Welcome.Send(user.Email, user.EmailLang, map[string]any{"Username": user.Username})
 
 		// Saves the UID and redirects to /
 		utils.SaveUID(c, user.UID, "MSG_USER_CREATED")
@@ -81,10 +85,10 @@ func PostForgotPassword(c *utils.Context) (err error) {
 		var token string
 		if token, err = user.GenerateToken(); err == nil {
 			// Sends it the email
-			go email.SendMail("Recupero password", "reset_password", map[string]any{
+			go email.ResetPassword.Send(user.Email, user.EmailLang, map[string]any{
 				"Username":  user.Username,
 				"ResetLink": configs.BaseURL + "/user/reset_password?token=" + url.QueryEscape(token),
-			}, user.Email)
+			})
 
 			// Shows the popup
 			utils.Show(c, "MSG_EMAIL_SENT")
@@ -116,9 +120,7 @@ func PostResetPassword(c *utils.Context) (err error) {
 		var user database.User
 		if user, err = database.GetUser("UID", user.UID); err == nil {
 			// Sends the email
-			go email.SendMail("Cambio password", "password_change", map[string]any{
-				"Username": user.Username,
-			}, user.Email)
+			go email.PasswordChanged.Send(user.Email, user.EmailLang, map[string]any{"Username": user.Username})
 
 			// Saves the UID and redirects to /
 			utils.SaveUID(c, user.UID, "MSG_PASSWORD_CHANGED")
@@ -186,12 +188,32 @@ func PostChangePassword(c *utils.Context) (err error) {
 	// Tries to change the password
 	if err = c.U.ChangePassword(oldPassword, newPassword); err == nil {
 		// Sends the email
-		go email.SendMail("Cambio password", "password_change", map[string]any{
-			"Username": c.U.Username,
-		}, c.U.Email)
+		go email.PasswordChanged.Send(c.U.Email, c.U.EmailLang, map[string]any{"Username": c.U.Username})
 
 		// Shows the popup
 		utils.ShowAndRedirect(c, "MSG_PASSWORD_CHANGED", "/user/settings")
+	}
+
+	return
+}
+
+// GetSetEmailLang renders /user/set_email_lang
+func GetSetEmailLang(c *utils.Context) error {
+	utils.RenderPage(c, "user/set_email_lang", map[string]any{
+		"Langs":   langs.Available,
+		"Current": c.U.EmailLang,
+	})
+	return nil
+}
+
+// PostSetEmailLang lets an user change its username
+func PostSetEmailLang(c *utils.Context) (err error) {
+	// Fetches data
+	lang := c.R.FormValue("lang")
+
+	// Tries to change it
+	if err = c.U.SetEmailLang(lang); err == nil {
+		utils.ShowAndRedirect(c, "MSG_LANG_CHANGED", "/user/settings")
 	}
 
 	return
@@ -209,10 +231,10 @@ func PostDeleteUser1(c *utils.Context) (err error) {
 	var token string
 	if token, err = c.U.GenerateToken(); err == nil {
 		// Sends the email
-		go email.SendMail("Eliminazione account", "delete_confirm", map[string]any{
+		go email.DeleteConfirm.Send(c.U.Email, c.U.EmailLang, map[string]any{
 			"Username":   c.U.Username,
 			"DeleteLink": configs.BaseURL + "/user/delete_2?token=" + url.QueryEscape(token),
-		}, c.U.Email)
+		})
 
 		utils.Show(c, "MSG_EMAIL_SENT")
 	}
@@ -234,9 +256,7 @@ func PostDeleteUser2(c *utils.Context) (err error) {
 	// Tries to delete the user
 	if err = c.U.Delete(token); err == nil {
 		// Sends the goodbye email
-		go email.SendMail("Eliminazione account", "goodbye", map[string]any{
-			"Username": c.U.Username,
-		}, c.U.Email)
+		go email.Goodbye.Send(c.U.Email, c.U.EmailLang, map[string]any{"Username": c.U.Username})
 
 		// Drops the session and redirects to /user/signin
 		utils.DropUID(c, "MSG_USER_DELETED")

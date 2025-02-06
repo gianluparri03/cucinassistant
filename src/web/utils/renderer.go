@@ -1,10 +1,7 @@
 package utils
 
 import (
-	"html/template"
-	"log/slog"
 	"net/http"
-	"path"
 
 	"cucinassistant/langs"
 )
@@ -20,26 +17,9 @@ func render(c *Context, pages []string, data map[string]any) {
 		pages = append([]string{"templates/base_full"}, pages...)
 	}
 
-	// Stores the template name
-	name := path.Base(pages[0] + ".html")
-
 	// Completes the pages names
 	for i, p := range pages {
 		pages[i] = "web/pages/" + p + ".html"
-	}
-
-	// Prepares the FuncMap
-	funcs := template.FuncMap{
-		"t": func(id string, data any) template.HTML {
-			return template.HTML(langs.Translate(c.L, id, data))
-		},
-	}
-
-	// Loads the templates
-	tmpl, err := template.New(name).Funcs(funcs).ParseFiles(pages...)
-	if err != nil {
-		slog.Error("while fetching page template:", "err", err, "pages", pages)
-		return
 	}
 
 	// Adds the isHx field to the data
@@ -48,10 +28,8 @@ func render(c *Context, pages []string, data map[string]any) {
 	}
 	data["IsHx"] = c.h
 
-	// Parses them
-	if err = tmpl.Execute(c.W, data); err != nil {
-		slog.Error("while executing page template:", "err", err, "pages", pages)
-	}
+	// Executes the template
+	langs.ExecuteTemplates(c.W, c.L, pages, data)
 }
 
 // RenderPage renders a specific page, with some data.

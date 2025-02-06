@@ -6,6 +6,8 @@ CREATE TABLE IF NOT EXISTS ca_users (
     email VARCHAR(250) NOT NULL,
     token VARCHAR(250),
 
+    email_lang CHAR(2) NOT NULL DEFAULT '',
+
     PRIMARY KEY (uid),
     UNIQUE (username),
     UNIQUE (email)
@@ -19,11 +21,13 @@ CREATE TABLE IF NOT EXISTS menus (
     name VARCHAR(64) NOT NULL,
     meals VARCHAR(4096),
 
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
     PRIMARY KEY (mid),
     FOREIGN KEY (uid) REFERENCES ca_users (uid) ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS menus_uid ON menus (uid);
+CREATE INDEX IF NOT EXISTS menus_uid_name ON menus (uid, created_at);
 
 
 CREATE TABLE IF NOT EXISTS sections (

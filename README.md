@@ -4,9 +4,6 @@
 ![GitHub Actions](https://img.shields.io/github/actions/workflow/status/gianluparri03/cucinassistant/push.yml)
 ![Code Size](https://img.shields.io/github/languages/code-size/gianluparri03/cucinassistant)
 
-> [!WARNING]
-> As of today, CucinAssistant's UI is in Italian, while the code (and the docs) are in English. I plan to add the support for multiple languages in the next updates.
-
 
 ## What is CucinAssistant
 
@@ -15,6 +12,9 @@ related to the kitchen. In particular, it features, a section for the menus mana
 shopping list (with a two-phase checking system) and a storage section, where you can save the items
 stored in your fridge or cupboard (even in two separate folders), both with their quantiy and their expiration
 date.  
+
+Right now it is currently available in English and in Italian; if you wish to add the support for another message,
+you can contact me, or just open a pull request with the translations.
 
 
 ## Public instances

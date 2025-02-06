@@ -66,12 +66,13 @@ type Menu struct {
 }
 
 // GetAll returns a list of menus (meals not included)
+// ordered by creation date
 func (m Menus) GetAll() ([]Menu, error) {
 	var menus []Menu
 
 	// Queries the entries
 	var rows *sql.Rows
-	rows, err := db.Query(`SELECT mid, name FROM menus WHERE uid=$1;`, m.uid)
+	rows, err := db.Query(`SELECT mid, name FROM menus WHERE uid=$1 ORDER BY created_at;`, m.uid)
 	if err != nil {
 		slog.Error("while retrieving menus:", "err", err)
 		return menus, ERR_UNKNOWN

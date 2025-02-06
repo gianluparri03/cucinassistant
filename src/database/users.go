@@ -101,9 +101,18 @@ type User struct {
 	// receivers.
 	UID int
 
+	// Username is the user's username
 	Username string
+
+	// Password is the user's password
 	Password string
-	Email    string
+
+	// Email is the user's email
+	Email string
+
+	// EmailLang is the language in which
+	// the users wishes to receive emails
+	EmailLang string
 
 	// Token is an optional string, that
 	// can be generated to delete an user
@@ -128,8 +137,8 @@ func GetUser(field string, value any) (User, error) {
 	var token *string
 
 	// Queries the data
-	err := db.QueryRow(`SELECT uid, username, email, password, token FROM ca_users WHERE `+field+`=$1;`, value).
-		Scan(&user.UID, &user.Username, &user.Email, &user.Password, &token)
+	err := db.QueryRow(`SELECT uid, username, email, password, token, email_lang FROM ca_users WHERE `+field+`=$1;`, value).
+		Scan(&user.UID, &user.Username, &user.Email, &user.Password, &token, &user.EmailLang)
 	if err != nil {
 		// Checks the error
 		if !strings.HasSuffix(err.Error(), "no rows in result set") {
@@ -392,18 +401,38 @@ func (u *User) Delete(token string) error {
 	return nil
 }
 
-// GetUsersEmails returns the emails of all the users
-func GetUsersEmails() (emails []string) {
-	rows, err := db.Query(`SELECT email FROM ca_users;`)
+// SetEmailLang sets the EmailLang field
+func (u *User) SetEmailLang(lang string) error {
+	// Ensures all data is present
+	if err := u.fetch(); err != nil {
+		return err
+	}
+
+	// Saves the new value
+	_, err := db.Exec(`UPDATE ca_users SET email_lang=$2 WHERE uid=$1;`, u.UID, lang)
 	if err != nil {
-		slog.Error("while selecting emails:", "err", err)
+		slog.Error("while changing user email_lang:", "err", err)
+		return ERR_UNKNOWN
+	}
+
+	// Updates struct
+	u.EmailLang = lang
+	return nil
+}
+
+// GetUsersForBroadcast returns the users, with only
+// their username, email and email_lang
+func GetUsersForBroadcast() (users []User) {
+	rows, err := db.Query(`SELECT username, email, email_lang FROM ca_users;`)
+	if err != nil {
+		slog.Error("while selecting users for broadcast:", "err", err)
 	}
 
 	defer rows.Close()
 	for rows.Next() {
-		var email string
-		rows.Scan(&email)
-		emails = append(emails, email)
+		var user User
+		rows.Scan(&user.Username, &user.Email, &user.EmailLang)
+		users = append(users, user)
 	}
 
 	return

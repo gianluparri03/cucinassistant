@@ -125,6 +125,11 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 		PostHandler: handlers.PostChangePassword,
 	},
 	{
+		Path:        "/user/set_email_lang",
+		GetHandler:  handlers.GetSetEmailLang,
+		PostHandler: handlers.PostSetEmailLang,
+	},
+	{
 		Path:        "/user/delete_1",
 		GetHandler:  handlers.GetDeleteUser1,
 		PostHandler: handlers.PostDeleteUser1,

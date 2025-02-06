@@ -50,7 +50,11 @@ func SaveUID(c *Context, UID int, msg string) {
 		slog.Error("while saving session:", "err", err)
 	}
 
-	ShowAndRedirect(c, msg, "/")
+	if msg != "" {
+		ShowAndRedirect(c, msg, "/")
+	} else {
+		Redirect(c, "/")
+	}
 }
 
 // DropUID drops the UID from the session.
@@ -61,7 +65,11 @@ func DropUID(c *Context, msg string) {
 		slog.Error("while saving session:", "err", err)
 	}
 
-	ShowAndRedirect(c, msg, "/user/signin")
+	if msg != "" {
+		ShowAndRedirect(c, msg, "/user/signin")
+	} else {
+		Redirect(c, "/user/signin")
+	}
 }
 
 // SetLang sets the session language

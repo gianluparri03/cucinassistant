@@ -1,3 +1,19 @@
+[EMA_DELETE_CONFIRM]
+hash = "sha1-78eee2ae31be61cca084664369bf94f6611f8da9"
+other = "per eliminare definitivamente il tuo account, <a href=\"{{ .DeleteLink }}\">clicca qui</a>."
+
+[EMA_GOODBYE]
+hash = "sha1-f535a3136ee4df91f0132b116e45c1c09cd58e95"
+other = "il tuo account è stato eliminato definitivamente."
+
+[EMA_PASSWORD_CHANGED]
+hash = "sha1-b35d68383225e2744ab54cd568f3d8d02fec5557"
+other = "la tua password è stata cambiata di recente."
+
+[EMA_RESET_PASSWORD]
+hash = "sha1-0400375ded8367df2e37eda027f4f7b251611b28"
+other = "per resettare la tua password, <a href=\"{{ .ResetLink }}\">clicca qui</a>."
+
 [ERR_ARTICLE_DUPLICATED]
 hash = "sha1-e8bd4ab43729660a5be8cabc9ff165dcd9a7224a"
 other = "Esiste già un articolo con stesso nome e scadenza"
@@ -126,6 +142,10 @@ other = "Account creato con successo"
 hash = "sha1-c758f56f12fbb48c0b6d8e80b344d4dab6ad5cac"
 other = "Account eliminato con successo"
 
+[PAG_INFO]
+hash = "sha1-992dfedb89ddbed81ab477592acb4e12c19273f6"
+other = "<p>CucinAssistant è un progetto sviluppato da <a href=\"https://gianlucaparri.me\" target=\"_blank\">Gianluca Parri</a>, ideato nel 2023 in seguito alla sua nuova vita da fuorisede universitario.<br>Da quel momento è in continua evoluzione, anche se lentamente.<br>La versione corrente è la {{ .VersionCode }} ({{ .VersionName }}).</p><p> Al momento è disponibile sia come sito web (<a href=\"{{ .BaseURL }}\" target=\"_blank\">{{ .BaseURL }}</a>) sia come applicazione Android sul <a href=\"https://play.google.com/store/apps/details?id=me.gianlucaparri.ca.twa\" target=\"_blank\">Play Store</a>; gli utenti iOS possono installarla dal browser.<br>In ogni caso, le app e il sito sono la stessa identica cosa.</p><p>CucinAssistant è open source; il codice sorgente è disponibile su <a href=\"https://github.com/gianluparri03/cucinassistant/\" target=\"_blank\">GitHub</a>.</p><p>È disponibile una pagina di <a hx-get=\"/stats\">statistiche</a>.</p><p>Per ulteriori informazioni, potete scrivere una mail a <a href=\"mailto:cucinassistant@gmail.com\" target=\"_blank\">cucinassistant@gmail.com</a>.</p>"
+
 [STR_ADD]
 hash = "sha1-61cc55aa0453184734c3fa0b621eda6fa874bd83"
 other = "Aggiungi"
@@ -222,13 +242,13 @@ other = "Password dimenticata"
 hash = "sha1-d166e844a3f3f87149cc4f866eb998e9a751c72a"
 other = "Venerdì"
 
+[STR_GOOD_MORNING]
+hash = "sha1-890c64abfcf32954ed32fd00ca5ed4c5bc332f9a"
+other = "Buongiorno {{ .Username }},"
+
 [STR_INFO]
 hash = "sha1-4c53eb52568a369776f7d6d6c6ab28215de64ed2"
 other = "Maggiori informazioni"
-
-[STR_INFO_TEXT]
-hash = "sha1-992dfedb89ddbed81ab477592acb4e12c19273f6"
-other = "<p>CucinAssistant è un progetto sviluppato da <a href=\"https://gianlucaparri.me\" target=\"_blank\">Gianluca Parri</a>, ideato nel 2023 in seguito alla sua nuova vita da fuorisede universitario.<br>Da quel momento è in continua evoluzione, anche se lentamente.<br>La versione corrente è la {{ .VersionCode }} ({{ .VersionName }}).</p><p> Al momento è disponibile sia come sito web (<a href=\"{{ .BaseURL }}\" target=\"_blank\">{{ .BaseURL }}</a>) sia come applicazione Android sul <a href=\"https://play.google.com/store/apps/details?id=me.gianlucaparri.ca.twa\" target=\"_blank\">Play Store</a>; gli utenti iOS possono installarla dal browser.<br>In ogni caso, le app e il sito sono la stessa identica cosa.</p><p>CucinAssistant è open source; il codice sorgente è disponibile su <a href=\"https://github.com/gianluparri03/cucinassistant/\" target=\"_blank\">GitHub</a>.</p><p>È disponibile una pagina di <a hx-get=\"/stats\">statistiche</a>.</p><p>Per ulteriori informazioni, potete scrivere una mail a <a href=\"mailto:cucinassistant@gmail.com\" target=\"_blank\">cucinassistant@gmail.com</a>.</p>"
 
 [STR_LANGUAGE]
 hash = "sha1-89b86ab0e66f527166d98df92ddbcf5416ed58f6"
@@ -270,6 +290,10 @@ other = "Nuova sezione"
 hash = "sha1-d48b52683f7d85cf8d733163c6b05cd6a4380899"
 other = "Nuovo nome utente"
 
+[STR_NOREPLY]
+hash = "sha1-751e4a1fb2325efec61ee3df177e1defe44ef5b6"
+other = "Questa email è stata generata automaticamente. Si prega di non rispondere."
+
 [STR_OK]
 hash = "sha1-b0a98216a32426b9e66a4ac1eb6df2e96e1b495c"
 other = "Va bene"
@@ -285,6 +309,10 @@ other = "Password"
 [STR_QUANTITY]
 hash = "sha1-44f6af6945544c0bab016a9160df6abb0cefcb60"
 other = "Quantità"
+
+[STR_REGARDS]
+hash = "sha1-f39492f77c8ada5234e54eb4bba72e79722912b5"
+other = "Saluti,<br>CucinAssistant"
 
 [STR_REPEAT_PASSWORD]
 hash = "sha1-366c2415f45eda358aa31b5d67c61f41a43a2bd0"
@@ -317,6 +345,10 @@ other = "Questa sezione è vuota."
 [STR_SETTINGS]
 hash = "sha1-c7f73bb54d928922c3838bb789ee9fb8a5b1eb37"
 other = "Impostazioni"
+
+[STR_SET_EMAIL_LANG]
+hash = "sha1-e28573c462240d8e1b9307c1b3bf513e86abb036"
+other = "Imposta lingua delle email"
 
 [STR_SHOPPINGLIST]
 hash = "sha1-44f44c815f3ebb9b9efef94c6c93b8645cf01bd7"
@@ -385,3 +417,7 @@ other = "Mercoledì"
 [STR_WELCOMEBACK]
 hash = "sha1-6ed09c2005d90b402bfdb7e04c8cf0a4d60239ca"
 other = "Bentornato/a, {{ .Username }}!"
+
+[STR_WELCOME_TO_CA]
+hash = "sha1-4d70a53086c4d9e22ae529a8dfd43c7214bd1f40"
+other = "Benvenuto su CucinAssistant, {{ .Username }}!"

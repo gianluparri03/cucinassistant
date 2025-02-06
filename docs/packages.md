@@ -26,8 +26,21 @@ This package is the only one with tests. They can be run with `make test`.
 
 ## cucinassistant/email
 
-This package exports only a function, `SendMail`, that sends an email to one (or more) recipients.
-There is also a `templates/` folder, that contains all the possible email templates.
+This package exports the method, `Email.Send(...)`, that sends an email to a recipient.
+The file `template.html` is the base template of all the emails.
+
+## cucinassistant/langs
+
+This package exports two functions: `Translate`, used to translate all the UI, using `i18n`,
+and `ExecuteTemplates`, which loads html template files and executes them, using the `Translate`
+function when specified.
+Inside the folder there are the `.toml` files for all the supported languages.
+
+The IDs of the strings to be translated are always in uppercase and snake case; if they start with
+`ERR_` it means they come from the `database` package; if they start with `MSG_` they come from the
+`web/utils` or `web/handlers`; if they start with `PAG_` or `EMA_` they represent the content
+of an entire web page or email; if they start with `STR_` they can come from both the pages and the
+email titles.
 
 ## cucinassistant/web
 
@@ -53,16 +66,6 @@ This package contains all the handlers, used in `cucinassistant/web/endpoints.go
 Thanks to the `utils` module, the handling is simplified both for the authentication part (in fact
 the user who requested the page is already an input), and in the error handling part (in fact the function
 has an `error` return type; if not nil, it will be shown to the user).
-
-## cucinassistant/langs
-
-This package exports a function, `Translate`, used to translate all the UI, using `i18n`.
-Inside the folder there are the `.toml` files for all the supported languages.
-
-The IDs of the strings to be translated are always in uppercase and snake case; if they start with
-`ERR_` it means they come from the `database` package, if they start with `MSG_` they come from the
-`web/utils` or `web/handlers`, and if they start with `STR_` they come from the page templates.
-
 
 ## cucinassistant/tools
 
