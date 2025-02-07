@@ -1,7 +1,7 @@
 {{ define "title" }}{{ t "STR_SIGNUP" . }}{{ end }}
 
 {{ define "content" }}
-    <form method="POST" onsubmit="comparePasswords();">
+    <form method="POST" onsubmit="comparePasswords('{{ t "MSG_UNMATCHING_PASSWORDS" . }}');">
         <input name="action" value="signup" hidden>
 
         <label for="username">{{ t "STR_USERNAME" . }}</label> <br>
@@ -23,6 +23,5 @@
 
     <script>
         disableNavigation();
-        unmatchingPasswords = '{{ t "MSG_UNMATCHING_PASSWORDS" . }}';
     </script>
 {{ end }}

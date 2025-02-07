@@ -3,18 +3,20 @@
 
 {{ define "content" }}
     <form method="POST">
-        <button class="icon" onclick="removeArticle(event);"><i class="fas fa-minus"></i></button>
-        <button class="icon" onclick="addArticle(event);"><i class="fas fa-plus"></i></button>
+        <button class="icon" onclick="removeItem(event);"><i class="fas fa-minus"></i></button>
+        <button class="icon" onclick="addItem(event);"><i class="fas fa-plus"></i></button>
         <button class="icon-text"><i class="fas fa-check"></i> {{ t "STR_CONFIRM" . }}</button>
 
-        <div id="new-articles"></div>
+        <div id="new-items">
+            <div class="item" hidden>
+                <input class="name" nametemplate="article-ID-name" type="text" placeholder="{{ t "STR_NAME" . }}">
+                <input class="expiration" nametemplate="article-ID-expiration" type="date" placeholder="{{ t "STR_EXPIRATION" . }}">
+                <input class="quantity" nametemplate="articleID-quantity" type="number" min="0" step="1" placeholder="{{ t "STR_QUANTITY" . }}">
+            </div>
+        </div>
     </form>
 
     <script>
-        articlesN = 0;
-        articleName = '{{ t "STR_NAME" . }}';
-        articleExpiration = '{{ t "STR_EXPIRATION" . }}';
-        articleQuantity = '{{ t "STR_QUANTITY" . }}';
-        addArticle();
+        addItem();
     </script>
 {{ end }}

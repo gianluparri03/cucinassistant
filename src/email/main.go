@@ -6,6 +6,7 @@ import (
 	"net/smtp"
 
 	"cucinassistant/configs"
+	"cucinassistant/database"
 	"cucinassistant/langs"
 )
 
@@ -16,6 +17,11 @@ type Email struct {
 
 	// Content is the text sent with the email
 	Content string
+
+	// Raw indicates if Subject and Content are IDs
+	// that need to be translated (false) or are already
+	// translated (true)
+	Raw bool
 }
 
 var (
@@ -35,38 +41,50 @@ var (
 	Goodbye = Email{Subject: "STR_GOODBYE", Content: "EMA_GOODBYE"}
 )
 
-// Write executes the email template with the given language and data
-func (e Email) Write(recipient string, lang string, data map[string]any) bytes.Buffer {
+// Write executes the email template with the given data.
+// It reads from the user the username, the recipient and the language.
+func (e Email) Write(user *database.User, data map[string]any) EmailBody {
+	// Translates subject and content if the email is not raw
+	subject := e.Subject
+	content := e.Content
+	if !e.Raw {
+		subject = langs.Translate(user.EmailLang, subject, nil)
+		content = langs.Translate(user.EmailLang, content, data)
+	}
+
 	// Prepares the headers of the body
 	var body bytes.Buffer
-	body.Write([]byte("Subject: " + langs.Translate(lang, e.Subject, nil) + "\n"))
+	body.Write([]byte("Subject: " + subject + "\n"))
 	body.Write([]byte("From: CucinAssistant <" + configs.EmailSender + ">\n"))
-	body.Write([]byte("To: " + recipient + "\n"))
+	body.Write([]byte("To: " + user.Email + "\n"))
 	body.Write([]byte("MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n\n\n"))
 
 	// Adds the subject and the content of the email
 	if data == nil {
 		data = make(map[string]any)
 	}
-	data["Subject"] = e.Subject
-	data["Content"] = e.Content
+	data["Username"] = user.Username
+	data["Subject"] = subject
+	data["Content"] = content
 
 	// Executes the templates
-	langs.ExecuteTemplates(&body, lang, []string{"email/template.html"}, data)
-	return body
+	langs.ExecuteTemplates(&body, user.EmailLang, []string{"email/template.html"}, data)
+	return EmailBody{Body: &body, Recipient: user.Email}
 }
 
-// Send sends an email to a recipient.
-// It uses e.Write() and sendBody().
-func (e Email) Send(recipient string, lang string, data map[string]any) {
-	body := e.Write(recipient, lang, data)
-	SendBody(&body, recipient)
+// EmailBody is an email ready to be sent
+type EmailBody struct {
+	// Body contains the email
+	Body *bytes.Buffer
+
+	// Recipient is the recipient of the email
+	Recipient string
 }
 
-// SendBody sends the body (a bytes.Buffer) to the recipients.
+// Send sends the body to the recipient.
 // If emails are not enabled in the configs, it writes it in the terminal instead
 // of sending it.
-func SendBody(body *bytes.Buffer, recipients ...string) {
+func (b EmailBody) Send() {
 	// Prepares the credentials
 	credentials := smtp.PlainAuth(
 		"",
@@ -75,27 +93,25 @@ func SendBody(body *bytes.Buffer, recipients ...string) {
 		configs.EmailServer,
 	)
 
-	for _, recipient := range recipients {
-		// Prints the mesasge in the console if emails aren't enabled
-		if !configs.EmailEnabled {
-			slog.Warn("--- [Begin Email] ---\n" + string(body.Bytes()) + "\n--- [End Email] ---")
-			continue
-		}
+	// Prints the mesasge in the console if emails aren't enabled
+	if !configs.EmailEnabled {
+		slog.Warn("--- [Begin Email] ---\n" + string(b.Body.Bytes()) + "\n--- [End Email] ---")
+		return
+	}
 
-		// Sends the message
-		err := smtp.SendMail(
-			configs.EmailServer+":"+configs.EmailPort,
-			credentials,
-			configs.EmailSender,
-			[]string{recipient},
-			body.Bytes(),
-		)
+	// Sends the message
+	err := smtp.SendMail(
+		configs.EmailServer+":"+configs.EmailPort,
+		credentials,
+		configs.EmailSender,
+		[]string{b.Recipient},
+		b.Body.Bytes(),
+	)
 
-		// Checks for errors
-		if err != nil {
-			slog.Error("while sending email:", "err", err)
-		} else {
-			slog.Debug("Sent email", "to", recipient)
-		}
+	// Checks for errors
+	if err != nil {
+		slog.Error("while sending email:", "err", err)
+	} else {
+		slog.Debug("Sent email", "to", b.Recipient)
 	}
 }

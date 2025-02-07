@@ -30,7 +30,7 @@ func PostSignUp(c *utils.Context) (err error) {
 		user.SetEmailLang(c.L)
 
 		// Sends the welcome email
-		go email.Welcome.Send(user.Email, user.EmailLang, map[string]any{"Username": user.Username})
+		go email.Welcome.Write(&user, nil).Send()
 
 		// Saves the UID and redirects to /
 		utils.SaveUID(c, user.UID, "MSG_USER_CREATED")
@@ -85,10 +85,9 @@ func PostForgotPassword(c *utils.Context) (err error) {
 		var token string
 		if token, err = user.GenerateToken(); err == nil {
 			// Sends it the email
-			go email.ResetPassword.Send(user.Email, user.EmailLang, map[string]any{
-				"Username":  user.Username,
+			go email.ResetPassword.Write(&user, map[string]any{
 				"ResetLink": configs.BaseURL + "/user/reset_password?token=" + url.QueryEscape(token),
-			})
+			}).Send()
 
 			// Shows the popup
 			utils.Show(c, "MSG_EMAIL_SENT")
@@ -120,7 +119,7 @@ func PostResetPassword(c *utils.Context) (err error) {
 		var user database.User
 		if user, err = database.GetUser("UID", user.UID); err == nil {
 			// Sends the email
-			go email.PasswordChanged.Send(user.Email, user.EmailLang, map[string]any{"Username": user.Username})
+			go email.PasswordChanged.Write(&user, nil).Send()
 
 			// Saves the UID and redirects to /
 			utils.SaveUID(c, user.UID, "MSG_PASSWORD_CHANGED")
@@ -188,7 +187,7 @@ func PostChangePassword(c *utils.Context) (err error) {
 	// Tries to change the password
 	if err = c.U.ChangePassword(oldPassword, newPassword); err == nil {
 		// Sends the email
-		go email.PasswordChanged.Send(c.U.Email, c.U.EmailLang, map[string]any{"Username": c.U.Username})
+		go email.PasswordChanged.Write(c.U, nil).Send()
 
 		// Shows the popup
 		utils.ShowAndRedirect(c, "MSG_PASSWORD_CHANGED", "/user/settings")
@@ -231,10 +230,9 @@ func PostDeleteUser1(c *utils.Context) (err error) {
 	var token string
 	if token, err = c.U.GenerateToken(); err == nil {
 		// Sends the email
-		go email.DeleteConfirm.Send(c.U.Email, c.U.EmailLang, map[string]any{
-			"Username":   c.U.Username,
+		go email.DeleteConfirm.Write(c.U, map[string]any{
 			"DeleteLink": configs.BaseURL + "/user/delete_2?token=" + url.QueryEscape(token),
-		})
+		}).Send()
 
 		utils.Show(c, "MSG_EMAIL_SENT")
 	}
@@ -256,7 +254,7 @@ func PostDeleteUser2(c *utils.Context) (err error) {
 	// Tries to delete the user
 	if err = c.U.Delete(token); err == nil {
 		// Sends the goodbye email
-		go email.Goodbye.Send(c.U.Email, c.U.EmailLang, map[string]any{"Username": c.U.Username})
+		go email.Goodbye.Write(c.U, nil).Send()
 
 		// Drops the session and redirects to /user/signin
 		utils.DropUID(c, "MSG_USER_DELETED")

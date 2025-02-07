@@ -2,13 +2,11 @@
     <body>
         <td style="font-size: 1.3em">
             <main>
-                <h2>{{ t .Subject . }}</h2>
+                <h2>{{ .Subject }}</h2>
 
                 <p>
-                    {{ t "STR_GOOD_MORNING" . }}
-                    <br><br>
-                    {{ t .Content . }}
-                    <br><br><br>
+                    {{ t "STR_GOOD_MORNING" . }}<br><br>
+                    {{ .Content }}<br><br><br>
                     {{ t "STR_REGARDS" . }}
                 </p>
             </main>

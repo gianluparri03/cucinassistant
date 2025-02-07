@@ -72,5 +72,6 @@ has an `error` return type; if not nil, it will be shown to the user).
 This folder contains some tools that can be used in pair with CucinAssistant.
 
 - `broadcast.go` can be used in production to send an email to every user, like for scheduled manteinance.
-It runs interactively, sending a test email to the sender email and - after a confirm - broadcast it to
-each user. As for the `main.go` file, it needs the `CA_ENV` variable to be set.
+It runs interactively, asking (for every language) a subject and a content. Then, after a confirm, it sends
+the email to every user, in their preferred language.
+As for the `main.go` file, it needs the `CA_ENV` variable to be set.

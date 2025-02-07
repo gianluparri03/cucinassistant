@@ -2,7 +2,7 @@
 {{ define "back_link" }}/{{ end }}
 
 {{ define "content" }}
-    <form method="GET">
+    <form method="GET" hx-disable>
         <select name="tag">
             {{ $current := .Current }}
             {{ range $tag, $name := .Langs }}

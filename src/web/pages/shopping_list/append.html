@@ -3,16 +3,18 @@
 
 {{ define "content" }}
     <form method="POST">
-        <button class="icon" onclick="removeEntry(event);"><i class="fas fa-minus"></i></button>
-        <button class="icon" onclick="addEntry(event);"><i class="fas fa-plus"></i></button>
+        <button class="icon" onclick="removeItem(event);"><i class="fas fa-minus"></i></button>
+        <button class="icon" onclick="addItem(event);"><i class="fas fa-plus"></i></button>
         <button class="icon-text"><i class="fas fa-check"></i> {{ t "STR_CONFIRM" . }}</button>
 
-        <div id="new-entries"></div>
+        <div id="new-items">
+            <div class="item" hidden>
+                <input class="name" type="text" nametemplate="entry-ID-name" placeholder="{{ t "STR_NAME" . }}">
+            </div>
+        </div>
     </form>
 
     <script>
-        entriesN = 0;
-        entryName = '{{ t "STR_NAME" . }}';
-        addEntry();
+        addItem();
     </script>
 {{ end }}
