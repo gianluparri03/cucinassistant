@@ -105,8 +105,8 @@ func PostDeleteSection(c *utils.Context) (err error) {
 	return
 }
 
-// GetAddArticles renders /storage/{SID}/add
-func GetAddArticles(c *utils.Context) (err error) {
+// GetAddArticlesSection renders /storage/{SID}/add
+func GetAddArticlesSection(c *utils.Context) (err error) {
 	var SID int
 	if SID, err = getSID(c); err == nil {
 		var section database.Section
@@ -121,31 +121,80 @@ func GetAddArticles(c *utils.Context) (err error) {
 	return
 }
 
-// PostAddArticles tries to add articles to a section.
-func PostAddArticles(c *utils.Context) (err error) {
+// PostAddArticlesSection tries to add articles to a section.
+func PostAddArticlesSection(c *utils.Context) (err error) {
 	// Gets the destination SID
 	var SID int
 	if SID, err = getSID(c); err == nil {
 		var articles []database.StringArticle
-		c.R.ParseForm()
+		prefix := "article-"
 
-		// Insert all the articles that have a name
-		for nameKey, nameValues := range c.R.PostForm {
-			if strings.HasPrefix(nameKey, "article-") && strings.HasSuffix(nameKey, "-name") {
-				if len(nameValues) > 0 && nameValues[0] != "" {
+		// Parse all the articles that have a name
+		for key, values := range c.R.PostForm {
+			if strings.HasPrefix(key, prefix) && strings.HasSuffix(key, "-name") {
+				if len(values) > 0 && values[0] != "" {
+					id := key[len(prefix) : len(key)-len("-name")]
+
+					name := values[0]
+					exp := c.R.PostFormValue(prefix + id + "-expiration")
+					qty := c.R.PostFormValue(prefix + id + "-quantity")
+
 					articles = append(articles, database.StringArticle{
-						Name:       nameValues[0],
-						Expiration: c.R.PostFormValue(strings.Replace(nameKey, "-name", "-expiration", 1)),
-						Quantity:   c.R.PostFormValue(strings.Replace(nameKey, "-name", "-quantity", 1)),
+						Name: name, Expiration: exp, Quantity: qty, Section: SID,
 					})
 				}
 			}
 		}
 
 		// Tries to add them
-		if err = c.U.Storage().AddArticles(SID, articles...); err == nil {
+		if err = c.U.Storage().AddArticles(articles...); err == nil {
 			utils.Redirect(c, "/storage/"+strconv.Itoa(SID))
 		}
+	}
+
+	return
+}
+
+// GetAddArticlesCommon renders /storage/add
+func GetAddArticlesCommon(c *utils.Context) (err error) {
+	var sections []database.Section
+
+	if sections, err = c.U.Storage().GetSections(); err == nil {
+		utils.RenderPage(c, "storage/add_articles", map[string]any{
+			"Sections": sections,
+		})
+	}
+
+	return
+}
+
+// PostAddArticlesCommon tries to add articles to multiple sections
+func PostAddArticlesCommon(c *utils.Context) (err error) {
+	var articles []database.StringArticle
+	c.R.ParseForm()
+	prefix := "article-"
+
+	// Parse all the articles that have a name
+	for key, values := range c.R.PostForm {
+		if strings.HasPrefix(key, prefix) && strings.HasSuffix(key, "-name") {
+			if len(values) > 0 && values[0] != "" {
+				id := key[len(prefix) : len(key)-len("-name")]
+
+				name := values[0]
+				exp := c.R.PostFormValue(prefix + id + "-expiration")
+				qty := c.R.PostFormValue(prefix + id + "-quantity")
+				sid, _ := strconv.Atoi(c.R.PostFormValue(prefix + id + "-section"))
+
+				articles = append(articles, database.StringArticle{
+					Name: name, Expiration: exp, Quantity: qty, Section: sid,
+				})
+			}
+		}
+	}
+
+	// Tries to add them
+	if err = c.U.Storage().AddArticles(articles...); err == nil {
+		utils.ShowAndRedirect(c, "MSG_ARTICLES_ADDED", "/storage")
 	}
 
 	return
@@ -170,7 +219,7 @@ func GetEditArticle(c *utils.Context) (err error) {
 	if SID, AID, err = getAID(c); err == nil {
 		var article database.OrderedArticle
 
-		if article, err = c.U.Storage().GetOrderedArticle(SID, AID); err == nil {
+		if article, err = c.U.Storage().GetOrderedArticle(AID); err == nil {
 			utils.RenderPage(c, "storage/edit_article", map[string]any{
 				"SID":     SID,
 				"Article": article,
@@ -193,7 +242,7 @@ func PostEditArticle(c *utils.Context) (err error) {
 			Quantity:   c.R.PostFormValue("quantity"),
 		}
 
-		if err = c.U.Storage().EditArticle(SID, AID, newData); err == nil {
+		if err = c.U.Storage().EditArticle(AID, newData); err == nil {
 			utils.Redirect(c, "/storage/"+strconv.Itoa(SID)+"/"+strconv.Itoa(AID))
 		}
 	}
@@ -208,7 +257,7 @@ func PostDeleteArticle(c *utils.Context) (err error) {
 	if SID, AID, err = getAID(c); err == nil {
 		var next *int
 
-		if err, next = c.U.Storage().DeleteArticle(SID, AID); err == nil {
+		if err, next = c.U.Storage().DeleteArticle(AID); err == nil {
 			path := "/storage/" + strconv.Itoa(SID)
 			if next != nil {
 				path += "/" + strconv.Itoa(*next)

@@ -150,6 +150,11 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 		PostHandler: handlers.PostNewSection,
 	},
 	{
+		Path:        "/storage/add",
+		GetHandler:  handlers.GetAddArticlesCommon,
+		PostHandler: handlers.PostAddArticlesCommon,
+	},
+	{
 		Path:       "/storage/{SID}",
 		GetHandler: handlers.GetArticles,
 	},
@@ -164,8 +169,8 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 	},
 	{
 		Path:        "/storage/{SID}/add",
-		GetHandler:  handlers.GetAddArticles,
-		PostHandler: handlers.PostAddArticles,
+		GetHandler:  handlers.GetAddArticlesSection,
+		PostHandler: handlers.PostAddArticlesSection,
 	},
 	{
 		Path:       "/storage/{SID}/search",

@@ -3,7 +3,7 @@
 
 {{ define "content" }}
     <form method="GET" hx-disable>
-        <select name="tag">
+        <select name="tag" id="languages">
             {{ $current := .Current }}
             {{ range $tag, $name := .Langs }}
                 <option value="{{ $tag }}" {{ if eq $current $tag }}selected{{ end }}>

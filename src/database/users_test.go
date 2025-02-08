@@ -386,7 +386,7 @@ func TestDeleteUser(t *testing.T) {
 	user.ShoppingList().Append("e")
 	user.Menus().New("m")
 	section, _ := user.Storage().NewSection("s")
-	user.Storage().AddArticles(section.SID, StringArticle{"article", "", ""})
+	user.Storage().AddArticles(StringArticle{Name: "article", Section: section.SID})
 	testingArticlesN++
 
 	otherUser, _ := getTestingUser(t)

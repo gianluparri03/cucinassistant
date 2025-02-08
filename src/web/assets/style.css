@@ -139,11 +139,11 @@ label {
     display: inline;
 }
 
-input {
+input, select {
     margin: 5px 0;
 }
 
-select {
+#languages {
     display: block;
     width: 30vmax;
 }
@@ -354,7 +354,7 @@ textarea {
         width: 15vw;
     }
 
-    .article input+input {
+    .article input+input, .article input+select {
         margin-left: 5px;
     }
 }

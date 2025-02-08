@@ -1,5 +1,5 @@
 [EMA_DELETE_CONFIRM]
-hash = "sha1-78eee2ae31be61cca084664369bf94f6611f8da9"
+hash = "sha1-ef7baa863053a64283a15ef3beb53680f55cbe84"
 other = "per eliminare definitivamente il tuo account, <a href=\"{{ .DeleteLink }}\">clicca qui</a>."
 
 [EMA_GOODBYE]
@@ -11,7 +11,7 @@ hash = "sha1-b35d68383225e2744ab54cd568f3d8d02fec5557"
 other = "la tua password è stata cambiata di recente."
 
 [EMA_RESET_PASSWORD]
-hash = "sha1-0400375ded8367df2e37eda027f4f7b251611b28"
+hash = "sha1-6b4964d72a86d6e7a26705909c576c103a657acd"
 other = "per resettare la tua password, <a href=\"{{ .ResetLink }}\">clicca qui</a>."
 
 [ERR_ARTICLE_DUPLICATED]
@@ -85,6 +85,10 @@ other = "Credenziali non valide"
 [ERR_USER_WRONG_TOKEN]
 hash = "sha1-8d886c0ba6f2b683daba5f19568a316226ce3e4c"
 other = "Qualcosa è andato storto"
+
+[MSG_ARTICLES_ADDED]
+hash = "sha1-c1e54a074f57b88889cbab83da4ad96d23972647"
+other = "Articoli aggiunti correttamente."
 
 [MSG_EMAIL_CHANGED]
 hash = "sha1-ba6e318074031438a3d25e5d4b6eef5312d15b7c"
@@ -333,6 +337,14 @@ other = "Salva"
 [STR_SEARCH_ARTICLES]
 hash = "sha1-809b141a7641a2b2e915a9cf9fa83b132064fcc7"
 other = "Ricerca articoli"
+
+[STR_SEARCH_EMPTY]
+hash = "sha1-7aeaf59776434b20b9ccdccbdb7fb94b595847e2"
+other = "Nessun articolo trovato"
+
+[STR_SECTION]
+hash = "sha1-f2c6b564bd8119e16a3e573a6f9e7c6d1ac7820f"
+other = "Sezione"
 
 [STR_SECTIONS]
 hash = "sha1-cea828c52cd8fb8249d738b3120788e53767c3d3"
