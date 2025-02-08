@@ -8,10 +8,10 @@
         <button class="icon-text"><i class="fas fa-check"></i> {{ t "STR_CONFIRM" . }}</button>
 
         <div id="new-items">
-            <div class="item" hidden>
+            <div class="item article hidden">
                 <input class="name" nametemplate="article-ID-name" type="text" placeholder="{{ t "STR_NAME" . }}">
                 <input class="expiration" nametemplate="article-ID-expiration" type="date" placeholder="{{ t "STR_EXPIRATION" . }}">
-                <input class="quantity" nametemplate="articleID-quantity" type="number" min="0" step="1" placeholder="{{ t "STR_QUANTITY" . }}">
+                <input class="quantity" nametemplate="articleID-quantity" type="number" step="any" placeholder="{{ t "STR_QUANTITY" . }}">
             </div>
         </div>
     </form>

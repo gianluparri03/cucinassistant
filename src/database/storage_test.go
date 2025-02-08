@@ -259,7 +259,7 @@ func TestStorageAddArticles(t *testing.T) {
 	otherUser, _ := getTestingUser(t)
 
 	name := "article"
-	qty := "10"
+	qty := "10.07"
 	exp := "2024-10-05"
 
 	inList := []StringArticle{

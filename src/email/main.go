@@ -2,6 +2,7 @@ package email
 
 import (
 	"bytes"
+	"html/template"
 	"log/slog"
 	"net/smtp"
 
@@ -65,7 +66,7 @@ func (e Email) Write(user *database.User, data map[string]any) EmailBody {
 	}
 	data["Username"] = user.Username
 	data["Subject"] = subject
-	data["Content"] = content
+	data["Content"] = template.HTML(content)
 
 	// Executes the templates
 	langs.ExecuteTemplates(&body, user.EmailLang, []string{"email/template.html"}, data)

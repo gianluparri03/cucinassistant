@@ -23,7 +23,7 @@
             <div class="article {{ if .IsExpired }} expired {{ end }}" hx-get="/storage/{{ $.Section.SID }}/{{ .AID  }}">
                 <input class="name" value="{{ .Name }}" readonly>
                 {{ if .Expiration }} <input class="expiration" value="{{ .FormatExpiration }}" type="date" readonly> {{ end }}
-                {{ if .Quantity }} <input class="quantity" value="{{ .Quantity }}" type="quantity" readonly> {{ end }}
+                {{ if .Quantity }} <input class="quantity" value="{{ .Quantity }}" type="number" readonly> {{ end }}
             </div>
         {{ else }}
             <i>{{ t "STR_SECTION_EMPTY" . }}</i>

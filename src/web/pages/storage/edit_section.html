@@ -11,10 +11,10 @@
     <br>
 
     <b>{{ t "STR_DELETE" . }}</b>
-    <div id="pre-delete">
-        <button class="icon-text" onclick="swapButtons();"><i class="fas fa-trash"></i> {{ t "STR_DELETE" . }}</button>
+    <div class="pre-swap">
+        <button class="icon-text" onclick="swapContent();"><i class="fas fa-trash"></i> {{ t "STR_DELETE" . }}</button>
     </div>
-    <div id="post-delete" hidden>
+    <div class="post-swap hidden">
         {{ t "STR_DELETE_SECTION_TEXT" . }} <br>
         <button class="icon-text" hx-post="/storage/{{ .Section.SID }}/delete" hx-push-url="false">
             <i class="fas fa-check"></i> {{ t "STR_CONFIRM" . }}

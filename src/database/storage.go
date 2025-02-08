@@ -169,7 +169,7 @@ type Article struct {
 
 	// Quantity is the quantity of the article.
 	// It may be null
-	Quantity *int
+	Quantity *float32
 }
 
 // fixExpiration sets a nil expiration if it's the default
@@ -211,8 +211,9 @@ func (sa StringArticle) Parse() (Article, error) {
 	if sa.Quantity == "" {
 		a.Quantity = nil
 	} else {
-		if qty, err := strconv.Atoi(sa.Quantity); err == nil {
-			a.Quantity = &qty
+		if qty64, err := strconv.ParseFloat(sa.Quantity, 32); err == nil {
+			qty32 := float32(qty64)
+			a.Quantity = &qty32
 		} else {
 			return a, ERR_ARTICLE_QUANTITY_INVALID
 		}

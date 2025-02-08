@@ -2,16 +2,24 @@
 {{ define "back_link" }}/user/settings{{ end }}
 
 {{ define "content" }}
-    <form method="POST">
         <span>
             {{ if .Warning }}
-                {{ t "STR_DELETE_USER_TEXT1" . }} <br>
+                <form method="POST">
+                    {{ t "STR_DELETE_USER_TEXT1" . }} <br><br>
+                    <button class="icon-text"><i class="fas fa-check"></i> {{ t "STR_CONFIRM" . }}</button>
+                </form>
             {{ else }}
-                {{ t "STR_DELETE_USER_TEXT2" . }} <br>
+                <div class="pre-swap">
+                    {{ t "STR_DELETE_USER_TEXT1" . }} <br><br>
+                    <button class="icon-text" onclick="swapContent();">
+                        <i class="fas fa-check"></i> {{ t "STR_CONFIRM" . }}
+                    </button>
+                </div>
+                <form method="POST" class="post-swap hidden">
+                    {{ t "STR_DELETE_USER_TEXT2" . }} <br><br>
+                    <input name="token" value="{{ .Token }}" hidden>
+                    <button class="icon-text"><i class="fas fa-check"></i> {{ t "STR_CONFIRM" . }}</button>
+                </div>
             {{ end }}
-        </span> <br>
-
-        <input name="token" value="{{ .Token }}" hidden>
-        <button class="icon-text"><i class="fas fa-check"></i> {{ t "STR_CONFIRM" . }}</button>
-    </form>
+        </span>
 {{ end }}

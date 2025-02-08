@@ -3,7 +3,7 @@
 
 {{ define "content" }}
     <form method="POST">
-        <div class="article {{ if .Article.IsExpired }} expired {{ end }}">
+        <div class="article {{ if .Article.IsExpired }} expired {{ end }}" onchange="swapContent();">
             <input class="name" placeholder="Nome" value="{{ .Article.Name }}" name="name">
 
             <input class="expiration" placeholder="Scadenza"
@@ -12,23 +12,29 @@
 
             <input class="quantity" placeholder="Quantità"
                 {{ if .Article.Quantity }} value="{{ .Article.Quantity }}" {{ end }}
-                type="number" name="quantity">
+                type="number" step="any" name="quantity">
         </div>
 
-        {{ if .Article.Prev }}
-            <button class="icon" hx-get="/storage/{{ .SID }}/{{ .Article.Prev }}"><i class="fas fa-chevron-left"></i></button>
-        {{ end }}
+        <button class="icon pre-swap" hx-get="/storage/{{ .SID }}/{{ .Article.Prev }}"
+            {{ if not .Article.Prev }} disabled> <i class="fas"></i>
+            {{ else }} > <i class="fas fa-chevron-left"></i> {{ end }}
+        </button>
 
-        <button class="icon-text" hx-post="/storage/{{ .SID }}/{{ .Article.AID }}/delete" hx-push-url="false">
+        <button class="icon-text pre-swap" hx-post="/storage/{{ .SID }}/{{ .Article.AID }}/delete" hx-push-url="false">
             <i class="fas fa-trash"></i> {{ t "STR_DELETE" . }}
         </button>
 
-        <button class="icon-text" hx-push-url="false">
+        <button class="icon-text post-swap hidden" hx-get="/storage/{{ .SID }}/{{ .Article.AID }}" hx-push-url="false">
+            <i class="fas fa-undo"></i> {{ t "STR_CANCEL" . }}
+        </button>
+
+        <button class="icon-text post-swap hidden" hx-push-url="false">
             <i class="fas fa-check"></i> {{ t "STR_SAVE" . }}
         </button>
 
-        {{ if .Article.Next }}
-            <button class="icon" hx-get="/storage/{{ .SID }}/{{ .Article.Next }}"><i class="fas fa-chevron-right"></i></button>
-        {{ end }}
+        <button class="icon pre-swap" hx-get="/storage/{{ .SID }}/{{ .Article.Next }}"
+            {{ if not .Article.Next }} disabled> <i class="fas"></i>
+            {{ else }} > <i class="fas fa-chevron-right"></i> {{ end }}
+        </button>
     </form>
 {{ end }}

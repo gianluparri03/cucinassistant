@@ -50,6 +50,10 @@ button:disabled:hover {
     color: var(--red);
 }
 
+.hidden {
+    display: none !important;
+}
+
 
 
 /* --- NAV, MAIN AND FOOTER ---------- */

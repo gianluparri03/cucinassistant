@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS articles (
     aid SERIAL NOT NULL,
 
     name VARCHAR(250) NOT NULL,
-    quantity INT,
+    quantity FLOAT,
     expiration DATE NOT NULL,
 
     PRIMARY KEY (aid),

@@ -46,7 +46,7 @@ function addItem(e) {
     $('.item').last().children().each(function (a, i) {
         i.name = i.attributes['nametemplate'].textContent.replace("ID", itemsCount);
     });
-    $('.item').last().removeAttr("hidden");
+    $('.item').last().removeClass("hidden");
 }
 
 // Removes the last item
@@ -61,8 +61,8 @@ function removeItem(e) {
 
 
 
-// Changes the shown message
-function swapButtons() {
-    $('#pre-delete').remove();
-    $('#post-delete').show();
+// Swaps two contents
+function swapContent() {
+    $('.pre-swap').remove();
+    $('.post-swap').removeClass("hidden");
 }
