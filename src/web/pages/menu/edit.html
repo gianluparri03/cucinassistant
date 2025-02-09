@@ -1,4 +1,4 @@
-{{ define "title" }}{{ t "STR_EDIT" . }} {{ .Menu.Name }}{{ end }}
+{{ define "title" }}{{ t "STR_EDIT_MENU" . }}{{ end }}
 {{ define "back_link" }}/menus/{{ .Menu.MID }}{{ end }}
 
 {{ define "content" }}
@@ -55,7 +55,17 @@
         <button class="icon-text"><i class="fas fa-check"></i> {{ t "STR_SAVE" . }}</button>
     </form>
 
-    <button class="icon-text" hx-post="/menus/{{ .Menu.MID }}/delete" hx-push-url="false">
-        <i class="fas fa-trash-alt"></i> {{ t "STR_DELETE" . }}
-    </button>
+    <br>
+
+    <b>{{ t "STR_DELETE_MENU" . }}</b>
+
+    <div class="pre-swap">
+        <button class="icon-text" onclick="swapContent();"><i class="fas fa-trash"></i> {{ t "STR_DELETE" . }}</button>
+    </div>
+    <div class="post-swap hidden">
+        {{ t "STR_DELETE_MENU_TEXT" . }} <br>
+        <button class="icon-text" hx-post="/menus/{{ .Menu.MID }}/delete" hx-push-url="false">
+            <i class="fas fa-check"></i> {{ t "STR_CONFIRM" . }}
+        </button>
+    </div>
 {{ end }}

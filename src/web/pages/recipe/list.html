@@ -1,0 +1,21 @@
+{{ define "title" }}{{ t "STR_RECIPES" . }}{{ end }}
+{{ define "back_link" }}/{{ end }}
+
+{{ define "content" }}
+    <button class="icon-text" hx-get="/recipes/new">
+        <i class="fas fa-plus"></i> {{ t "STR_NEW_RECIPE" . }}
+    </button>
+
+    <br>
+
+    {{ if .Recipes }}
+        <ol>
+            {{ range .Recipes }}
+                <li><a hx-get="/recipes/{{ .RID }}">{{ .Name }}</a></li>
+            {{ end }}
+        </ol>
+    {{ else }}
+        <br>
+        <span id="empty-label">{{ t "STR_RECIPES_EMPTY" . }}</span>
+    {{ end }}
+{{ end }}

@@ -198,6 +198,22 @@ other = "Ricerca corrente"
 hash = "sha1-f6fdbe48dc54dd86f63097a03bd24094dedd713a"
 other = "Elimina"
 
+[STR_DELETE_MENU]
+hash = "sha1-4ca031a8d710776b463f3b0dbf4c7c8aaf51f441"
+other = "Elimina menù"
+
+[STR_DELETE_MENU_TEXT]
+hash = "sha1-5e0d5f4c736c808f5cf162b3091e2ce2a7c9b80c"
+other = "Sei sicuro di voler cancellare questo menù?"
+
+[STR_DELETE_RECIPE]
+hash = "sha1-f76dc677ffc5b4cec2ee16fe2f3e004a97ac06ed"
+other = "Elimina ricetta"
+
+[STR_DELETE_RECIPE_TEXT]
+hash = "sha1-dd14503203fa59763115133c49ea9ff39a8df6f4"
+other = "Sei sicuro di voler eliminare questa ricetta?"
+
 [STR_DELETE_SECTION_TEXT]
 hash = "sha1-f84a6d3ec22389ab7b9393c4bbb20d60e651f351"
 other = "Sei sicuro? Tutti gli articoli in questa sezione verranno eliminati."
@@ -218,6 +234,10 @@ other = "Sei sicuro di voler eliminare il tuo account?"
 hash = "sha1-21323f3a7217636dead622b390e5d045d5d2f3c8"
 other = "Sei DAVVERO sicuro di voler eliminare il tuo account? Questa azione è irreversibile."
 
+[STR_DIRECTIONS]
+hash = "sha1-f814a9fb4687a03c782821e4d0970490c90daccd"
+other = "Procedimento"
+
 [STR_EDIT]
 hash = "sha1-5301648dcf6b53cefc9ed52999aaa92d4603cae0"
 other = "Modifica"
@@ -229,6 +249,14 @@ other = "Modifica articolo"
 [STR_EDIT_ENTRY]
 hash = "sha1-65440fe7aa25c746a5164314cefa99b603acfbc0"
 other = "Modifica elemento"
+
+[STR_EDIT_MENU]
+hash = "sha1-1d8623444e68ce2d3afac8c3f2add4f298725f43"
+other = "Modifica menù"
+
+[STR_EDIT_RECIPE]
+hash = "sha1-ca96d943628b1f74567d5c384a7b907943f9baa1"
+other = "Modifica ricetta"
 
 [STR_EDIT_SECTION]
 hash = "sha1-404c66f0e458388dbf332f8d3fc72d66ace5bbdc"
@@ -257,6 +285,10 @@ other = "Buongiorno {{ .Username }},"
 [STR_INFO]
 hash = "sha1-4c53eb52568a369776f7d6d6c6ab28215de64ed2"
 other = "Maggiori informazioni"
+
+[STR_INGREDIENTS]
+hash = "sha1-f9e84ee2ac4634a39452780983326a651e6d12d8"
+other = "Ingredienti"
 
 [STR_LANGUAGE]
 hash = "sha1-89b86ab0e66f527166d98df92ddbcf5416ed58f6"
@@ -290,6 +322,10 @@ other = "Nuovo menù"
 hash = "sha1-d850ee188c7c55b64bc3624534de5c5051a57dc6"
 other = "Nuova password"
 
+[STR_NEW_RECIPE]
+hash = "sha1-f53c48bf688fc1a859458e5092ce4be9bc831026"
+other = "Nuova ricetta"
+
 [STR_NEW_SECTION]
 hash = "sha1-f10051f6c4d1a10bab68cb30f84e1cf819be5513"
 other = "Nuova sezione"
@@ -301,6 +337,10 @@ other = "Nuovo nome utente"
 [STR_NOREPLY]
 hash = "sha1-751e4a1fb2325efec61ee3df177e1defe44ef5b6"
 other = "Questa email è stata generata automaticamente. Si prega di non rispondere."
+
+[STR_NOTES]
+hash = "sha1-70440046a3dc2e079f23ee1c57dfa76669b732aa"
+other = "Note"
 
 [STR_OK]
 hash = "sha1-b0a98216a32426b9e66a4ac1eb6df2e96e1b495c"
@@ -317,6 +357,14 @@ other = "Password"
 [STR_QUANTITY]
 hash = "sha1-44f6af6945544c0bab016a9160df6abb0cefcb60"
 other = "Quantità"
+
+[STR_RECIPES]
+hash = "sha1-9fb1092f32d4fcbf9e061ffd718d4ec689c6c95e"
+other = "Ricette"
+
+[STR_RECIPES_EMPTY]
+hash = "sha1-cb53bd7e15bcacb92ef7a0be4bce3032b792c2a2"
+other = "Nessuna ricetta trovata."
 
 [STR_REGARDS]
 hash = "sha1-f39492f77c8ada5234e54eb4bba72e79722912b5"
@@ -381,6 +429,10 @@ other = "Accedi"
 [STR_SIGNUP]
 hash = "sha1-0b81497c8589af2714a1ddbeb62b3a4be679c318"
 other = "Registrati"
+
+[STR_STARS]
+hash = "sha1-adb03812b4ef51b44dcb01437556b7f04f0cd155"
+other = "Stelle"
 
 [STR_STATS]
 hash = "sha1-2086b21f8f49274138c38d476bee317a84a8aecc"

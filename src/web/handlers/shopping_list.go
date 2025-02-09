@@ -8,7 +8,7 @@ import (
 )
 
 // getEID returns the EID written in the url
-func getEID(c *utils.Context) (EID int, err error) {
+func getEID(c *utils.Context) (int, error) {
 	return getID(c, "EID", database.ERR_ENTRY_NOT_FOUND)
 }
 

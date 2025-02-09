@@ -8,7 +8,7 @@ import (
 )
 
 // getMID returns the MID written in the url
-func getMID(c *utils.Context) (MID int, err error) {
+func getMID(c *utils.Context) (int, error) {
 	return getID(c, "MID", database.ERR_MENU_NOT_FOUND)
 }
 

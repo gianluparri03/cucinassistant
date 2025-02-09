@@ -1,0 +1,24 @@
+{{ define "title" }}{{ .Recipe.Name }}{{ end }}
+{{ define "back_link" }}/recipes{{ end }}
+
+{{ define "content" }}
+    <div id="stars">
+        {{ range .FullStars }}<i class="fas fa-star"></i>{{ end }}
+        {{- range .EmptyStars }}<i class="far fa-star"></i>{{ end }}
+    </div>
+
+    <h4>{{ t "STR_INGREDIENTS" . }}</h4>
+    <ul>
+        {{ range .Ingredients }}<li>{{ . }}</li>{{ end }}
+    </ul>
+
+    <h4>{{ t "STR_DIRECTIONS" . }}</h4>
+    <ol>
+        {{ range .Directions }}<li>{{ . }}</li>{{ end }}
+    </ol>
+
+    <h4>{{ t "STR_NOTES" . }}</h4>
+    <p>{{ .Recipe.Notes }}</p>
+
+    <button class="icon-text" hx-get="/recipes/{{ .Recipe.RID }}/edit"><i class="fas fa-edit"></i> {{ t "STR_EDIT" . }}</button>
+{{ end }}

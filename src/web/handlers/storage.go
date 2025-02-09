@@ -9,7 +9,7 @@ import (
 )
 
 // getSID returns the SID written in the url
-func getSID(c *utils.Context) (SID int, err error) {
+func getSID(c *utils.Context) (int, error) {
 	return getID(c, "SID", database.ERR_SECTION_NOT_FOUND)
 }
 

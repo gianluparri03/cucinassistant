@@ -25,7 +25,6 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 		Unprotected: true,
 		GetHandler:  handlers.GetStats,
 	},
-
 	{
 		Path:       "/menus",
 		GetHandler: handlers.GetMenus,
@@ -75,7 +74,6 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 		Path:        "/shopping_list/clear",
 		PostHandler: handlers.PostClearShoppingList,
 	},
-
 	{
 		Path:        "/user/signup",
 		Unprotected: true,
@@ -139,7 +137,6 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 		GetHandler:  handlers.GetDeleteUser2,
 		PostHandler: handlers.PostDeleteUser2,
 	},
-
 	{
 		Path:       "/storage",
 		GetHandler: handlers.GetSections,
@@ -184,5 +181,21 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 	{
 		Path:        "/storage/{SID}/{AID}/delete",
 		PostHandler: handlers.PostDeleteArticle,
+	},
+	{
+		Path:       "/recipes",
+		GetHandler: handlers.GetRecipes,
+	},
+	{
+		Path:       "/recipes/new",
+		GetHandler: handlers.GetNewRecipe,
+	},
+	{
+		Path:       "/recipes/{RID}",
+		GetHandler: handlers.GetRecipe,
+	},
+	{
+		Path:       "/recipes/{RID}/edit",
+		GetHandler: handlers.GetEditRecipe,
 	},
 }

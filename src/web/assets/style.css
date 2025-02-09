@@ -278,6 +278,8 @@ message button {
 
 textarea {
     resize: none;
+    field-sizing: content;
+    min-height: 70px;
 }
 
 @media(orientation: landscape) {
@@ -357,6 +359,13 @@ textarea {
     .article input+input, .article input+select {
         margin-left: 5px;
     }
+}
+
+
+
+/* --- PAGE SPECIFIC: Recipe ---- */
+#stars {
+    font-size: 1.5em;
 }
 
 
