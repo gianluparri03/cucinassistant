@@ -217,9 +217,9 @@ func GetEditArticle(c *utils.Context) (err error) {
 	var SID, AID int
 
 	if SID, AID, err = getAID(c); err == nil {
-		var article database.OrderedArticle
+		var article database.Article
 
-		if article, err = c.U.Storage().GetOrderedArticle(AID); err == nil {
+		if article, err = c.U.Storage().GetArticle(AID); err == nil {
 			utils.RenderPage(c, "storage/edit_article", map[string]any{
 				"SID":     SID,
 				"Article": article,
@@ -242,8 +242,13 @@ func PostEditArticle(c *utils.Context) (err error) {
 			Quantity:   c.R.PostFormValue("quantity"),
 		}
 
-		if err = c.U.Storage().EditArticle(AID, newData); err == nil {
-			utils.Redirect(c, "/storage/"+strconv.Itoa(SID)+"/"+strconv.Itoa(AID))
+		var changed bool
+		if err, changed = c.U.Storage().EditArticle(AID, newData); err == nil {
+			if !changed {
+				utils.Redirect(c, "/storage/"+strconv.Itoa(SID)+"/"+strconv.Itoa(AID))
+			} else {
+				utils.ShowAndRedirect(c, "MSG_ORDER_CHANGED", "/storage/"+strconv.Itoa(SID))
+			}
 		}
 	}
 

@@ -106,6 +106,10 @@ other = "Lingua cambiata correttamente"
 hash = "sha1-00c0b7923b6a5cdc03b2d69aff28304c7cb62dad"
 other = "Menù elimnato con successo"
 
+[MSG_ORDER_CHANGED]
+hash = "sha1-357c429649b168526e60822e3d5960c8f56eaeeb"
+other = "L'ordine degli articoli è cambiato"
+
 [MSG_PAGE_NOT_FOUND]
 hash = "sha1-bc3023b36063a7681db24681472b54fa11f0d4ec"
 other = "Pagina non trovata"
