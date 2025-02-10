@@ -10,7 +10,7 @@
 
         <div>
             <b>{{ t "STR_STARS" . }}</b> <br>
-            <input name="stars" type="number" min="0" max="5" step="1" value="{{ .Recipe.Stars }}">
+            <input name="stars" type="number" min="0" max="5" step="0.5" value="{{ .Stars }}">
         </div> <br>
 
         <div>
@@ -27,7 +27,11 @@
             <b>{{ t "STR_NOTES" . }}</b> <br>
             <textarea name="notes">{{ .Recipe.Notes }}</textarea>
         </div>
+
+        <button class="icon-text"><i class="fas fa-check"></i> {{ t "STR_SAVE" . }}</button>
     </form>
+
+    <br><br>
 
     <b>{{ t "STR_DELETE_RECIPE" . }}</b>
 

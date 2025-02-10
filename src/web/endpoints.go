@@ -51,7 +51,6 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 		Path:        "/menus/{MID}/delete",
 		PostHandler: handlers.PostDeleteMenu,
 	},
-
 	{
 		Path:       "/shopping_list",
 		GetHandler: handlers.GetShoppingList,
@@ -187,15 +186,21 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 		GetHandler: handlers.GetRecipes,
 	},
 	{
-		Path:       "/recipes/new",
-		GetHandler: handlers.GetNewRecipe,
+		Path:        "/recipes/new",
+		GetHandler:  handlers.GetNewRecipe,
+		PostHandler: handlers.PostNewRecipe,
 	},
 	{
 		Path:       "/recipes/{RID}",
 		GetHandler: handlers.GetRecipe,
 	},
 	{
-		Path:       "/recipes/{RID}/edit",
-		GetHandler: handlers.GetEditRecipe,
+		Path:        "/recipes/{RID}/edit",
+		GetHandler:  handlers.GetEditRecipe,
+		PostHandler: handlers.PostEditRecipe,
+	},
+	{
+		Path:        "/recipes/{RID}/delete",
+		PostHandler: handlers.PostDeleteRecipe,
 	},
 }

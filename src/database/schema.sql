@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS menus (
     FOREIGN KEY (uid) REFERENCES ca_users (uid) ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS menus_uid_name ON menus (uid, created_at);
+CREATE INDEX IF NOT EXISTS menus_uid_createdat ON menus (uid, created_at);
 
 
 CREATE TABLE IF NOT EXISTS sections (
@@ -72,3 +72,22 @@ CREATE TABLE IF NOT EXISTS entries (
 );
 
 CREATE INDEX IF NOT EXISTS entries_uid ON entries (uid);
+
+
+CREATE TABLE IF NOT EXISTS recipes (
+    uid INT NOT NULL,
+    rid SERIAL NOT NULL,
+
+    name VARCHAR(64) NOT NULL,
+    stars INT NOT NULL DEFAULT 0,
+
+    ingredients VARCHAR(4096) NOT NULL DEFAULT '',
+    directions VARCHAR(4096) NOT NULL DEFAULT '',
+    notes VARCHAR(4096) NOT NULL DEFAULT '',
+
+    PRIMARY KEY (rid),
+    FOREIGN KEY (uid) REFERENCES ca_users (uid) ON DELETE CASCADE,
+    UNIQUE (uid, name)
+);
+
+CREATE INDEX IF NOT EXISTS recipies_uid_name ON recipes (uid, name);

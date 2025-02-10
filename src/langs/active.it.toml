@@ -42,6 +42,14 @@ other = "Elemento non trovato"
 hash = "sha1-579b4ac2971a99642e1a0d4c1a18b7b4861b4978"
 other = "Menù non trovato"
 
+[ERR_RECIPE_DUPLICATED]
+hash = "sha1-746faa616eda8489b82a403e5bb09407155ab598"
+other = "Esiste già una ricetta con questo nome"
+
+[ERR_RECIPE_NOT_FOUND]
+hash = "sha1-757fdaa0794909e71486c2f16310ba919182d41c"
+other = "Ricetta non trovata"
+
 [ERR_SECTION_DUPLICATED]
 hash = "sha1-e14c2c241e36279458fa1336e4c0e5d443920564"
 other = "Esiste già una sezione con lo stesso nome"
@@ -117,6 +125,10 @@ other = "Pagina non trovata"
 [MSG_PASSWORD_CHANGED]
 hash = "sha1-e12081a4a6d4521224c6eba397f2db9b0f6fb798"
 other = "Password cambiata con successo"
+
+[MSG_RECIPE_DELETED]
+hash = "sha1-7d15237bdbbaf7fa062d4a64fe4417da586922b0"
+other = "Ricetta eliminata correttamente"
 
 [MSG_SECTION_DELETED]
 hash = "sha1-3ae5a8b2decbc0d9420a7cc293076c64426b76ef"

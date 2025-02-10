@@ -383,11 +383,13 @@ func TestResetPassword(t *testing.T) {
 func TestDeleteUser(t *testing.T) {
 	user, _ := getTestingUser(t)
 	token, _ := user.GenerateToken()
+
 	user.ShoppingList().Append("e")
 	user.Menus().New("m")
 	section, _ := user.Storage().NewSection("s")
 	user.Storage().AddArticles(StringArticle{Name: "article", Section: section.SID})
 	testingArticlesN++
+	user.Recipes().New("r")
 
 	otherUser, _ := getTestingUser(t)
 

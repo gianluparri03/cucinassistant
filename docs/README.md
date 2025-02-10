@@ -14,6 +14,7 @@
 - A `Menu` is a collection of 14 meals. It has a unique `MID`.
 - An `Article` is an item in storage, identified by a `AID`. A collection of `Article`s is called a `Section` (`SID`).
 - An `Entry` is an item of an user's `ShoppingList`. It has a unique `EID`.
+- A `Recipe` is identified by it's `RID`.
 
 ## HTMX and HTML status codes
 

@@ -2,23 +2,32 @@
 {{ define "back_link" }}/recipes{{ end }}
 
 {{ define "content" }}
-    <div id="stars">
-        {{ range .FullStars }}<i class="fas fa-star"></i>{{ end }}
-        {{- range .EmptyStars }}<i class="far fa-star"></i>{{ end }}
-    </div>
+    {{ if ne .Recipe.Stars 0 }}
+        <div id="stars">
+            {{ range .FullStars }}<i class="fas fa-star"></i>{{ end }}
+            {{- range .HalfStars }}<i class="fas fa-star-half-alt"></i>{{ end }}
+            {{- range .EmptyStars }}<i class="far fa-star"></i>{{ end }}
+        </div>
+    {{ end }}
 
-    <h4>{{ t "STR_INGREDIENTS" . }}</h4>
-    <ul>
-        {{ range .Ingredients }}<li>{{ . }}</li>{{ end }}
-    </ul>
+    {{ if .Recipe.Ingredients }}
+        <h4>{{ t "STR_INGREDIENTS" . }}</h4>
+        <ul>
+            {{ range .Ingredients }}<li>{{ . }}</li>{{ end }}
+        </ul>
+    {{ end }}
 
-    <h4>{{ t "STR_DIRECTIONS" . }}</h4>
-    <ol>
-        {{ range .Directions }}<li>{{ . }}</li>{{ end }}
-    </ol>
+    {{ if .Recipe.Directions }}
+        <h4>{{ t "STR_DIRECTIONS" . }}</h4>
+        <ol>
+            {{ range .Directions }}<li>{{ . }}</li>{{ end }}
+        </ol>
+    {{ end }}
 
-    <h4>{{ t "STR_NOTES" . }}</h4>
-    <p>{{ .Recipe.Notes }}</p>
+    {{ if .Recipe.Notes }}
+        <h4>{{ t "STR_NOTES" . }}</h4>
+        <p>{{ .Recipe.Notes }}</p>
+    {{ end }}
 
     <button class="icon-text" hx-get="/recipes/{{ .Recipe.RID }}/edit"><i class="fas fa-edit"></i> {{ t "STR_EDIT" . }}</button>
 {{ end }}

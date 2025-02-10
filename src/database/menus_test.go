@@ -98,20 +98,22 @@ func TestMenusNew(t *testing.T) {
 		User User
 		Name string
 
-		ExpectedErr error
-		ExpectedMN  int
+		ExpectedErr  error
+		ExpectedName string
 	}
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			if m, err := d.User.Menus().New("name"); err != d.ExpectedErr {
-				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
-			} else if err == nil && m.Name != "name" {
-				t.Errorf("%s: expected name <test>, got <%v>", msg, m.Name)
-			}
+			name := "testMenu"
 
-			if menus, _ := d.User.Menus().GetAll(); len(menus) != d.ExpectedMN {
-				t.Errorf("%v, wrong number of menus", msg)
+			if m, err := d.User.Menus().New(name); err != d.ExpectedErr {
+				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
+			} else if err == nil {
+				if m.Name != name {
+					t.Errorf("%s: expected name <%s>, got <%v>", msg, name, m.Name)
+				} else if _, err = d.User.Menus().GetOne(m.MID); err != nil {
+					t.Errorf("%s: menu not saved", msg)
+				}
 			}
 		},
 
@@ -122,11 +124,7 @@ func TestMenusNew(t *testing.T) {
 			},
 			{
 				"",
-				data{User: user, ExpectedMN: 1},
-			},
-			{
-				"",
-				data{User: user, ExpectedMN: 2},
+				data{User: user},
 			},
 		},
 	}.Run(t)
