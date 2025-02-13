@@ -34,7 +34,17 @@ The file `template.html` is the base template of all the emails.
 This package exports two functions: `Translate`, used to translate all the UI, using `i18n`,
 and `ExecuteTemplates`, which loads html template files and executes them, using the `Translate`
 function when specified.
-Inside the folder there are the `.toml` files for all the supported languages.
+
+Adding an early return into the `Translate` function will let you see the string tags instead of their translations,
+so it could help you for testing purposes.
+
+Inside this folder there are also the `.toml` files for all the supported languages. The process to add new strings to
+the list, you have to:
+
+1. Write it into `active.en.toml`
+2. Run `m lang_gen` (that generates the translate files for the missing strings)
+3. Write the translations into the `translate.*.toml`
+4. Run `m lang_save` (that merges the translate and active files)
 
 The IDs of the strings to be translated are always in uppercase and snake case; if they start with
 `ERR_` it means they come from the `database` package; if they start with `MSG_` they come from the

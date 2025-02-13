@@ -76,6 +76,7 @@ type Stats struct {
 	SectionsNumber int
 	ArticlesNumber int
 	EntriesNumber  int
+	RecipesNumber  int
 }
 
 // GetStats returns a Stats instance
@@ -86,5 +87,6 @@ func GetStats() (s Stats) {
 	db.QueryRow(`SELECT COUNT(*) FROM sections;`).Scan(&s.SectionsNumber)
 	db.QueryRow(`SELECT COUNT(*) FROM articles;`).Scan(&s.ArticlesNumber)
 	db.QueryRow(`SELECT COUNT(*) FROM entries;`).Scan(&s.EntriesNumber)
+	db.QueryRow(`SELECT COUNT(*) FROM recipes;`).Scan(&s.RecipesNumber)
 	return
 }

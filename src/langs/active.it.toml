@@ -163,8 +163,8 @@ hash = "sha1-c758f56f12fbb48c0b6d8e80b344d4dab6ad5cac"
 other = "Account eliminato con successo"
 
 [PAG_INFO]
-hash = "sha1-992dfedb89ddbed81ab477592acb4e12c19273f6"
-other = "<p>CucinAssistant è un progetto sviluppato da <a href=\"https://gianlucaparri.me\" target=\"_blank\">Gianluca Parri</a>, ideato nel 2023 in seguito alla sua nuova vita da fuorisede universitario.<br>Da quel momento è in continua evoluzione, anche se lentamente.<br>La versione corrente è la {{ .VersionCode }} ({{ .VersionName }}).</p><p> Al momento è disponibile sia come sito web (<a href=\"{{ .BaseURL }}\" target=\"_blank\">{{ .BaseURL }}</a>) sia come applicazione Android sul <a href=\"https://play.google.com/store/apps/details?id=me.gianlucaparri.ca.twa\" target=\"_blank\">Play Store</a>; gli utenti iOS possono installarla dal browser.<br>In ogni caso, le app e il sito sono la stessa identica cosa.</p><p>CucinAssistant è open source; il codice sorgente è disponibile su <a href=\"https://github.com/gianluparri03/cucinassistant/\" target=\"_blank\">GitHub</a>.</p><p>È disponibile una pagina di <a hx-get=\"/stats\">statistiche</a>.</p><p>Per ulteriori informazioni, potete scrivere una mail a <a href=\"mailto:cucinassistant@gmail.com\" target=\"_blank\">cucinassistant@gmail.com</a>.</p>"
+hash = "sha1-6e56637baa1d284d292824f3b5ed75af0562fd39"
+other = "<p>CucinAssistant è un progetto sviluppato da <a href=\"https://gianlucaparri.me\" target=\"_blank\">Gianluca Parri</a>, ideato nel 2023 in seguito alla sua nuova vita da fuorisede universitario.<br>Da quel momento è in continua evoluzione, anche se lentamente.<br>La versione corrente è la {{ .VersionCode }} ({{ .VersionName }}).</p><p> Al momento è disponibile sia come sito web (<a href=\"{{ .BaseURL }}\" target=\"_blank\">{{ .BaseURL }}</a>) sia come applicazione Android sul <a href=\"https://play.google.com/store/apps/details?id=me.gianlucaparri.ca.twa\" target=\"_blank\">Play Store</a>; gli utenti iOS possono installarla dal browser.<br>In ogni caso, le app e il sito sono la stessa identica cosa.</p><p>CucinAssistant è open source; il codice sorgente è disponibile su <a href=\"https://github.com/gianluparri03/cucinassistant/\" target=\"_blank\">GitHub</a>.</p><p>È disponibile una pagina di <a hx-get=\"/stats\">statistiche</a>.</p><p>Per ulteriori informazioni, potete scrivere una mail a <a href=\"mailto:info@cucinassistant.com\" target=\"_blank\">info@cucinassistant.com</a>.</p>"
 
 [STR_ADD]
 hash = "sha1-61cc55aa0453184734c3fa0b621eda6fa874bd83"
@@ -461,6 +461,10 @@ other = "{{ .Stats.EntriesNumber }} elementi nelle liste della spesa"
 [STR_STATS_MENUS]
 hash = "sha1-460363d4d02118c9657452c7129704b011dce68a"
 other = "{{ .Stats.MenusNumber }} menù"
+
+[STR_STATS_RECIPES]
+hash = "sha1-d5a283e888b2a239b9939e193fa29cbb13cb034a"
+other = "{{ .Stats.RecipesNumber }} ricette"
 
 [STR_STATS_USERS]
 hash = "sha1-9b8a0e7fd37e0a24aece9b5d1eebeff4e47459fd"

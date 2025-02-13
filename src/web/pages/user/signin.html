@@ -3,10 +3,10 @@
 {{ define "content" }}
     <form method="POST">
         <label for="username">{{ t "STR_USERNAME" . }}</label> <br>
-        <input type="text" name="username" required> <br>
+        <input type="text" name="username" id="username" required> <br>
 
         <label for="password">{{ t "STR_PASSWORD" . }}</label> <br>
-        <input type="password" name="password" required> <br>
+        <input type="password" name="password" id="password" required> <br>
 
         <button class="icon-text"><i class="fas fa-sign-in-alt"></i> {{ t "STR_SIGNIN" . }}</button> <br>
 

@@ -3,10 +3,10 @@
 {{ define "content" }}
     <form method="POST" onsubmit="comparePasswords('{{ t "MSG_UNMATCHING_PASSWORDS" . }}');">
         <label for="username">{{ t "STR_USERNAME" . }}</label> <br>
-        <input type="text" name="username" required> <br>
+        <input type="text" name="username" id="username" required> <br>
 
         <label for="email">{{ t "STR_EMAIL" . }}</label> <br>
-        <input type="email" name="email" required> <br>
+        <input type="email" name="email" id="email" required> <br>
 
         <label for="password-1">{{ t "STR_PASSWORD" . }}</label> <br>
         <input type="password" name="password" id="password-1" required> <br>

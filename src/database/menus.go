@@ -9,10 +9,6 @@ import (
 const (
 	// mealSeparator is used to separate meals when packed
 	mealSeparator = ";"
-
-	// duplicatedMenuSuffix is added at the end of the name when
-	// duplicating a menu
-	duplicatedMenuSuffix = " (copia)"
 )
 
 // packMeals packs the 14 meals in a string
@@ -174,6 +170,6 @@ func (m Menus) Duplicate(MID int) (Menu, error) {
 		return Menu{}, err
 		// Copies data from the srcMenu
 	} else {
-		return m.Replace(menu.MID, src.Name+duplicatedMenuSuffix, src.Meals)
+		return m.Replace(menu.MID, src.Name, src.Meals)
 	}
 }

@@ -27,6 +27,7 @@ func render(c *Context, pages []string, data map[string]any) {
 		data = make(map[string]any)
 	}
 	data["IsHx"] = c.h
+	data["Lang"] = c.L
 
 	// Executes the template
 	langs.ExecuteTemplates(c.W, c.L, pages, data)

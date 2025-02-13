@@ -6,6 +6,7 @@ after some experiments, I've decided to rewrite it completely in Go, with Postgr
 
 Here is a resume of all the versions available, with their major changes.
 
+- [6/Zucchina](https://github.com/gianluparri03/cucinassistant/releases/tag/v6): multi language UI, recipes
 - [5/Patata](https://github.com/gianluparri03/cucinassistant/releases/tag/v5): complete rewrite
 - [4/Fico](https://github.com/gianluparri03/cucinassistant/releases/tag/v4): improved UI
 - [3/Noce](https://github.com/gianluparri03/cucinassistant/releases/tag/v3): more security

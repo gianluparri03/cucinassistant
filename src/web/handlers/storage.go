@@ -127,6 +127,7 @@ func PostAddArticlesSection(c *utils.Context) (err error) {
 	var SID int
 	if SID, err = getSID(c); err == nil {
 		var articles []database.StringArticle
+		c.R.ParseForm()
 		prefix := "article-"
 
 		// Parse all the articles that have a name
