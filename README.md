@@ -1,9 +1,9 @@
 <img src="banner.png">
 
-<img src="https://up.gianlucaparri.me/api/badge/8/status" href="https://cucinassistant.com">
-<img src="https://img.shields.io/github/actions/workflow/status/gianluparri03/cucinassistant/push.yml" href="https://github.com/gianluparri03/cucinassistant/actions">
-<img src="https://img.shields.io/badge/Translations-2-green">
-<img src="https://img.shields.io/badge/Telegram-link-blue" href="https://t.me/cucinassistant">
+![production](https://up.gianlucaparri.me/api/badge/8/status)
+![actions](https://img.shields.io/github/actions/workflow/status/gianluparri03/cucinassistant/push.yml)
+![translations](https://img.shields.io/badge/Translations-2-green)
+[Telegram channel](https://t.me/cucinassistant)
 
 
 ## What is CucinAssistant
