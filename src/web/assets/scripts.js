@@ -42,11 +42,13 @@ function addItem(e) {
     if (e) { e.preventDefault(); } else { itemsCount = 0; }
     itemsCount++;
 
-    $('.item').first().clone().appendTo('#new-items');
-    $('.item').last().children().each(function (a, i) {
-        i.name = i.attributes['nametemplate'].textContent.replace("ID", itemsCount);
-    });
-    $('.item').last().removeClass("hidden");
+    $('.item.hidden')
+        .clone()
+        .prependTo('#new-items')
+        .removeClass("hidden")
+        .children().each((ind, inp) => {
+            inp.name = $(inp).attr('nametemplate').replace('ID', itemsCount);
+        });
 }
 
 // Removes the last item
