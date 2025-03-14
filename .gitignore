@@ -1,3 +1,4 @@
 ignored/
 src/configs/*.local
 src/langs/translate.*.toml
+src/database/caerror_string.go

@@ -27,7 +27,7 @@ type Email struct {
 
 var (
 	// Welcome is sent after the signup
-	Welcome = Email{Subject: "STR_SIGNUP_DONE"}
+	Welcome = Email{Subject: "STR_SIGNUP_DONE", Content: "EMA_WELCOME"}
 
 	// ResetPassword is used to send the user its token
 	ResetPassword = Email{Subject: "STR_RESET_PASSWORD", Content: "EMA_RESET_PASSWORD"}

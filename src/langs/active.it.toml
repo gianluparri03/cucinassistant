@@ -14,6 +14,10 @@ other = "la tua password è stata cambiata di recente."
 hash = "sha1-6b4964d72a86d6e7a26705909c576c103a657acd"
 other = "per resettare la tua password, <a href=\"{{ .ResetLink }}\">clicca qui</a>."
 
+[EMA_WELCOME]
+hash = "sha1-4d70a53086c4d9e22ae529a8dfd43c7214bd1f40"
+other = "Benvenuto/a su CucinAssistant, {{ .Username }}!"
+
 [ERR_ARTICLE_DUPLICATED]
 hash = "sha1-e8bd4ab43729660a5be8cabc9ff165dcd9a7224a"
 other = "Esiste già un articolo con stesso nome e scadenza"
@@ -442,6 +446,10 @@ other = "Accedi"
 hash = "sha1-0b81497c8589af2714a1ddbeb62b3a4be679c318"
 other = "Registrati"
 
+[STR_SIGNUP_DONE]
+hash = "sha1-87722ab591c44d84c2728a085aae563cb273254e"
+other = "Registrazione avvenuta"
+
 [STR_STARS]
 hash = "sha1-adb03812b4ef51b44dcb01437556b7f04f0cd155"
 other = "Stelle"
@@ -501,7 +509,3 @@ other = "Mercoledì"
 [STR_WELCOMEBACK]
 hash = "sha1-6ed09c2005d90b402bfdb7e04c8cf0a4d60239ca"
 other = "Bentornato/a, {{ .Username }}!"
-
-[STR_WELCOME_TO_CA]
-hash = "sha1-4d70a53086c4d9e22ae529a8dfd43c7214bd1f40"
-other = "Benvenuto su CucinAssistant, {{ .Username }}!"
