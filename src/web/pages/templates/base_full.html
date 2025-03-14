@@ -26,7 +26,7 @@
         <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" crossorigin="anonymous"></script>
         <script src="/assets/scripts.js" crossorigin="anonymous"></script>
 
-        <script> if (typeof navigator.serviceWorker !== 'undefined') { navigator.serviceWorker.register('/sw.js'); } </script>
+        <script> navigator.serviceWorker.getRegistrations().then(rs => { for (const r of rs) { r.unregister(); } }); </script>
     </head>
 
     <body

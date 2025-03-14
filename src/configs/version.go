@@ -1,4 +1,4 @@
 package configs
 
-const VersionCode = 6
-const VersionName = "Zucchina"
+const VersionCode = 7
+const VersionName = "?"

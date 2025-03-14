@@ -4,6 +4,7 @@ import (
 	"github.com/gorilla/mux"
 	"log/slog"
 	"net/http"
+	"strconv"
 
 	"cucinassistant/configs"
 	"cucinassistant/web/utils"
@@ -34,13 +35,8 @@ func Start() {
 // registerAssets adds all the assets to the router
 func registerAssets(router *mux.Router) {
 	// Registers the assets
-	fs := http.FileServer(http.Dir("web/assets"))
+	fs := cacheAssets(http.FileServer(http.Dir("web/assets")))
 	router.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", fs))
-
-	// Registers the service worker
-	router.HandleFunc("/sw.js", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "web/assets/service_worker.js")
-	})
 
 	// Registers the favicon
 	router.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
@@ -51,5 +47,22 @@ func registerAssets(router *mux.Router) {
 	router.NotFoundHandler = utils.Handler(func(c *utils.Context) error {
 		utils.ShowAndRedirect(c, "MSG_PAGE_NOT_FOUND", "/")
 		return nil
+	})
+}
+
+// cacheAssets adds the ETag to the resource. The ETag is set to the current
+// version.
+func cacheAssets(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		version := "\"" + strconv.Itoa(configs.VersionCode) + "\""
+
+		w.Header().Set("Cache-Control", "no-cache")
+		w.Header().Set("ETag", version)
+
+		if w.Header().Get("If-None-Match") == version {
+			w.WriteHeader(http.StatusNotModified)
+		} else {
+			h.ServeHTTP(w, r)
+		}
 	})
 }
