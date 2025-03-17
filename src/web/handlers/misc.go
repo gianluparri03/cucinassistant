@@ -7,6 +7,7 @@ import (
 	"cucinassistant/configs"
 	"cucinassistant/database"
 	"cucinassistant/langs"
+	"cucinassistant/web/pages"
 	"cucinassistant/web/utils"
 )
 
@@ -15,10 +16,7 @@ import (
 // language; otherwise, it shows the form
 func GetLang(c *utils.Context) error {
 	if tag := c.R.URL.Query().Get("tag"); tag == "" {
-		utils.RenderPage(c, "misc/lang", map[string]any{
-			"Langs":   langs.Available,
-			"Current": c.L,
-		})
+		utils.RenderPage(c, pages.MiscLang(langs.Available, c.L))
 	} else {
 		utils.SetLang(c, tag)
 	}
@@ -28,25 +26,23 @@ func GetLang(c *utils.Context) error {
 
 // GetIndex renders /
 func GetIndex(c *utils.Context) error {
-	utils.RenderPage(c, "misc/home", map[string]any{"Username": c.U.Username})
+	utils.RenderPage(c, pages.MiscHome(c.U.Username))
 	return nil
 }
 
 // GetInfo renders /info
 func GetInfo(c *utils.Context) error {
-	utils.RenderPage(c, "misc/info", map[string]any{
+	utils.RenderPage(c, pages.MiscInfo(map[string]any{
 		"BaseURL":     configs.BaseURL,
 		"VersionCode": configs.VersionCode,
 		"VersionName": configs.VersionName,
-	})
+	}))
 	return nil
 }
 
 // GetStats renders /stats
 func GetStats(c *utils.Context) error {
-	utils.RenderPage(c, "misc/stats", map[string]any{
-		"Stats": database.GetStats(),
-	})
+	utils.RenderPage(c, pages.MiscStats(database.GetStats()))
 	return nil
 }
 

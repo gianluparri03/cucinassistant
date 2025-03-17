@@ -1,0 +1,254 @@
+package pages
+
+import (
+	"strconv"
+
+	"cucinassistant/database"
+	"cucinassistant/langs"
+)
+
+templ StorageAddArticles(SID int, sections []database.Section) {
+	{{ baseurl := "/storage" }}
+	if SID > 0 {
+		{{ baseurl = baseurl + "/" + strconv.Itoa(SID) }}
+	}
+	@TemplateTitle(langs.Translate(ctx, "STR_ADD_ARTICLES", nil), baseurl)
+
+    <form method="POST">
+        <button class="icon" onclick="removeItem(event);">
+			<i class="fas fa-minus"></i>
+		</button>
+        <button class="icon" onclick="addItem(event);">
+			<i class="fas fa-plus"></i>
+		</button>
+        <button class="icon-text">
+			<i class="fas fa-check"></i> { langs.Translate(ctx, "STR_CONFIRM", nil) }
+		</button>
+
+        <div id="new-items">
+            <div class="item article hidden">
+                <input class="name" nametemplate="article-ID-name"
+					type="text" placeholder={ langs.Translate(ctx, "STR_NAME", nil) }>
+                <input class="expiration" nametemplate="article-ID-expiration"
+					type="date" placeholder={ langs.Translate(ctx, "STR_EXPIRATION", nil) }>
+                <input class="quantity" nametemplate="article-ID-quantity"
+					type="number" step="any" placeholder={ langs.Translate(ctx, "STR_QUANTITY", nil) }>
+
+				if SID <= 0 {
+                    <select class="section" nametemplate="article-ID-section">
+                        <option selected disabled>
+							{ langs.Translate(ctx, "STR_SECTION", nil) }
+						</option>
+
+						for _, section := range sections {
+							<option value={ strconv.Itoa(section.SID) }>
+								{ section.Name }
+							</option>
+						}
+                    </select>
+				}
+            </div>
+        </div>
+    </form>
+
+	@templ.JSFuncCall("addItem")
+}
+
+templ StorageDashboard(sections []database.Section) {
+    @TemplateTitle(langs.Translate(ctx, "STR_SECTIONS", nil), "/")
+
+    <div class="dashboard">
+		for _, section := range sections {
+			{{ baseurl := "/storage/" + strconv.Itoa(section.SID) }}
+			<button hx-get={ baseurl }>
+                <i class="fas fa-box"></i>
+				<span>{ section.Name }</span>
+            </button>
+		}
+
+        <button hx-get="/storage/new" class="transparent">
+            <i class="fas fa-plus"></i>
+            <span>{ langs.Translate(ctx, "STR_NEW_SECTION", nil) }</span>
+        </button>
+    </div>
+
+    <button class="icon-text" hx-get="/storage/add">
+		<i class="fas fa-plus"></i> { langs.Translate(ctx, "STR_ADD_ARTICLES", nil) }
+	</button>
+}
+
+templ StorageEditArticle(SID int, article database.Article) {
+	{{ baseurl := "/storage/" + strconv.Itoa(SID) }}
+    @TemplateTitle(langs.Translate(ctx, "STR_EDIT_ARTICLE", nil), baseurl)
+
+    <form method="POST">
+		{{ classes := "article" }}
+		if article.IsExpired() {
+			{{ classes += " expired" }}
+		}
+
+		<div class={ classes } onchange="swapContent();">
+			<input class="name" placeholder="Nome" value={ article.Name } name="name">
+
+            <input class="expiration" placeholder="Scadenza"
+				if article.Expiration != nil {
+					value={ article.FormatExpiration() }
+				}
+                type="date" name="expiration">
+
+            <input class="quantity" placeholder="Quantità"
+				if article.Quantity != nil {
+					value={ strconv.FormatFloat(float64(*article.Quantity), 'f', -1, 32) }
+				}
+                type="number" step="any" name="quantity">
+        </div>
+
+		if article.Prev != nil {
+			{{ prevurl := baseurl + "/" + strconv.Itoa(*article.Prev) }}
+			<button class="icon pre-swap" hx-get={ prevurl }>
+				<i class="fas fa-chevron-left"></i>
+			</button>
+		} else {
+			<button class="icon pre-swap" disabled>
+				<i class="fas"></i>
+			</button>
+		}
+
+		<span></span>
+
+		{{ deleteurl := baseurl + "/" + strconv.Itoa(article.AID) + "/delete" }}
+		<button class="icon-text pre-swap" hx-post={ deleteurl } hx-push-url="false">
+            <i class="fas fa-trash"></i> { langs.Translate(ctx, "STR_DELETE", nil) }
+        </button>
+
+		{{ cancelurl := baseurl + "/" + strconv.Itoa(article.AID) }}
+		<button class="icon-text post-swap hidden" hx-get={ cancelurl } hx-push-url="false">
+            <i class="fas fa-undo"></i> { langs.Translate(ctx, "STR_CANCEL", nil) }
+        </button>
+
+        <button class="icon-text post-swap hidden" hx-push-url="false">
+            <i class="fas fa-check"></i> { langs.Translate(ctx, "STR_SAVE", nil) }
+        </button>
+
+		if article.Next != nil {
+			{{ nexturl := baseurl + "/" + strconv.Itoa(*article.Next) }}
+			<button class="icon pre-swap" hx-get={ nexturl }>
+				<i class="fas fa-chevron-right"></i>
+			</button>
+		} else {
+			<button class="icon pre-swap" disabled>
+				<i class="fas"></i>
+			</button>
+		}
+    </form>
+}
+
+templ StorageEditSection(section database.Section) {
+	{{ baseurl := "/storage/" + strconv.Itoa(section.SID) }}
+    @TemplateTitle(langs.Translate(ctx, "STR_EDIT_SECTION", nil), baseurl)
+
+    <b>{ langs.Translate(ctx, "STR_NAME", nil) }</b>
+    <form method="POST">
+		<input type="text" name="name" value={ section.Name } required> <br>
+        <button class="icon-text">
+			<i class="fas fa-check"></i> { langs.Translate(ctx, "STR_SAVE", nil) }
+		</button>
+    </form>
+
+    <br>
+
+    <b>{ langs.Translate(ctx, "STR_DELETE", nil) }</b>
+    <div class="pre-swap">
+        <button class="icon-text" onclick="swapContent();">
+			<i class="fas fa-trash"></i> { langs.Translate(ctx, "STR_DELETE", nil) }
+		</button>
+    </div>
+    <div class="post-swap hidden">
+        { langs.Translate(ctx, "STR_DELETE_SECTION_TEXT", nil) } <br>
+		<button class="icon-text" hx-post={ baseurl + "/delete" } hx-push-url="false">
+            <i class="fas fa-check"></i> { langs.Translate(ctx, "STR_CONFIRM", nil) }
+        </button>
+    </div>
+}
+
+templ StorageNewSection() {
+    @TemplateTitle(langs.Translate(ctx, "STR_NEW_SECTION", nil), "/storage")
+
+    <form method="POST">
+        { langs.Translate(ctx, "STR_NAME", nil) } <br>
+		<input type="text" name="name" required> <br>
+
+        <button class="icon-text">
+			<i class="fas fa-check"></i> { langs.Translate(ctx, "STR_CONFIRM", nil) }
+		</button>
+    </form>
+}
+
+templ StorageSearchArticles(SID int) {
+	{{ baseurl := "/storage/" + strconv.Itoa(SID) }}
+    @TemplateTitle(langs.Translate(ctx, "STR_SEARCH_ARTICLES", nil), baseurl)
+
+    <form method="GET" action={ templ.SafeURL(baseurl) }>
+        { langs.Translate(ctx, "STR_NAME", nil) } <br>
+        <input name="search" required> <br>
+
+        <button class="icon">
+			<i class="fas fa-search"></i>
+		</button>
+    </form>
+}
+
+
+templ StorageViewArticles(section database.Section, search string) {
+	{{ baseurl := "/storage/" + strconv.Itoa(section.SID) }}
+	@TemplateTitle(section.Name, "/storage")
+
+    <div>
+		if search != "" {
+            <div>
+                { langs.Translate(ctx, "STR_CURRENT_SEARCH", nil) }: "<i>{ search }</i>".
+				<a hx-get={ baseurl }>{ langs.Translate(ctx, "STR_CANCEL", nil) }</a>
+            </div>
+		} else {
+			<button class="icon-text" hx-get={ baseurl + "/edit" }>
+				<i class="fas fa-edit"></i> { langs.Translate(ctx, "STR_EDIT_SECTION", nil) }
+			</button>
+            <br>
+			<button class="icon-text" hx-get={ baseurl + "/search" }>
+				<i class="fas fa-search"></i> { langs.Translate(ctx, "STR_SEARCH_ARTICLES", nil) }
+			</button>
+			<button class="icon-text" hx-get={ baseurl + "/add" }>
+				<i class="fas fa-plus"></i> { langs.Translate(ctx, "STR_ADD_ARTICLES", nil) }
+			</button>
+        }
+
+        <br>
+
+		for _, article := range section.Articles {
+			{{ classes := "article" }}
+			if article.IsExpired() {
+				{{ classes += " expired" }}
+			}
+
+			<div class={ classes } hx-get={ baseurl + "/" + strconv.Itoa(article.AID) }>
+				<input class="name" value={ article.Name } readonly>
+				if article.Expiration != nil {
+					<input class="expiration" type="date" readonly
+						value={ article.FormatExpiration() }>
+				}
+				if article.Quantity != nil {
+					<input class="quantity" type="number" readonly
+						value={ strconv.FormatFloat(float64(*article.Quantity), 'f', -1, 32) }>
+				}
+            </div>
+		}
+
+		if len(section.Articles) == 0 {
+			if search != "" {
+				<i>{ langs.Translate(ctx, "STR_SEARCH_EMPTY", nil) }</i>
+			} else {
+				<i>{ langs.Translate(ctx, "STR_SECTION_EMPTY", nil) }</i>
+			}
+		}
+    </div>
+}

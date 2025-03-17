@@ -1,0 +1,77 @@
+package pages
+
+import (
+	"strconv"
+
+	"cucinassistant/database"
+	"cucinassistant/langs"
+)
+
+templ ShoppingListAppend() {
+	@TemplateTitle(langs.Translate(ctx, "STR_APPEND_ENTRIES", nil), "/shopping_list")
+
+	<form method="POST">
+        <button class="icon" onclick="removeItem(event);">
+			<i class="fas fa-minus"></i>
+		</button>
+        <button class="icon" onclick="addItem(event);">
+			<i class="fas fa-plus"></i>
+		</button>
+		<button class="icon-text">
+			<i class="fas fa-check"></i> { langs.Translate(ctx, "STR_CONFIRM", nil) }
+		</button>
+
+        <div id="new-items">
+            <div class="item hidden">
+                <input class="name" type="text" nametemplate="entry-ID-name"
+					placeholder={ langs.Translate(ctx, "STR_NAME", nil) }>
+            </div>
+        </div>
+    </form>
+
+	@templ.JSFuncCall("addItem")
+}
+
+templ ShoppingListEdit(name string) {
+	@TemplateTitle(langs.Translate(ctx, "STR_EDIT_ENTRY", nil), "/shopping_list")
+
+    <form method="POST">
+		<input name="name" value={ name } required> <br>
+		<button class="icon-text">
+			<i class="fas fa-check"></i> { langs.Translate(ctx, "STR_CONFIRM", nil) }
+		</button>
+    </form>
+}
+
+templ ShoppingListView(list map[int]database.Entry) {
+	@TemplateTitle(langs.Translate(ctx, "STR_SHOPPINGLIST", nil), "/")
+
+    <div class="shopping-list">
+        <button class="icon-text" hx-get="/shopping_list/append">
+            <i class="fas fa-plus"></i> { langs.Translate(ctx, "STR_ADD", nil) }
+        </button>
+
+		if len(list) > 0 {
+            <button class="icon-text" hx-post="/shopping_list/clear" hx-push-url="false">
+                <i class="fas fa-trash"></i> { langs.Translate(ctx, "STR_DELETE_SELECTED", nil) }
+            </button>
+       	}
+
+		for _, entry := range list {
+            <div class="shopping-item">
+				{{ baseurl := "/shopping_list/" + strconv.Itoa(entry.EID) }}
+
+				<input type="checkbox" checked?={ entry.Marked } autocomplete="off"
+					hx-post={ baseurl + "/toggle" } hx-push-url="false" readonly>
+
+				<label hx-get={ baseurl + "/edit" }>{ entry.Name }</label>
+            </div>
+		}
+
+		if len(list) == 0 {
+			<span id="empty-label">
+				{ langs.Translate(ctx, "STR_SHOPPINGLIST_EMPTY", nil) }
+			</span>
+		}
+    </div>
+}

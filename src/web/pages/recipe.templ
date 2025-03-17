@@ -1,0 +1,145 @@
+package pages
+
+import (
+	"strconv"
+	"strings"
+
+	"cucinassistant/database"
+	"cucinassistant/langs"
+)
+
+templ RecipeEdit(recipe database.Recipe) {
+	{{ baseurl := "/recipes/" + strconv.Itoa(recipe.RID) }}
+	@TemplateTitle(langs.Translate(ctx, "STR_EDIT_RECIPE", nil), baseurl)
+
+    <form method="POST">
+        <div>
+            <b>{ langs.Translate(ctx, "STR_NAME", nil) }</b> <br>
+            <input name="name" value={ recipe.Name }>
+        </div> <br>
+
+        <div>
+            <b>{ langs.Translate(ctx, "STR_STARS", nil) }</b> <br>
+			{{ stars := strconv.FormatFloat(float64(recipe.Stars) / 2, 'f', -1, 32) }}
+            <input name="stars" type="number" min="0" max="5" step="0.5" value={ stars }>
+        </div> <br>
+
+        <div>
+            <b>{ langs.Translate(ctx, "STR_INGREDIENTS", nil) }</b> <br>
+            <textarea name="ingredients">{ recipe.Ingredients }</textarea>
+        </div>
+
+        <div>
+            <b>{ langs.Translate(ctx, "STR_DIRECTIONS", nil) }</b> <br>
+            <textarea name="directions">{ recipe.Directions }</textarea>
+        </div>
+
+        <div>
+            <b>{ langs.Translate(ctx, "STR_NOTES", nil) }</b> <br>
+            <textarea name="notes">{ recipe.Notes }</textarea>
+        </div>
+
+		<button class="icon-text">
+			<i class="fas fa-check"></i> { langs.Translate(ctx, "STR_CONFIRM", nil) }
+		</button>
+    </form>
+
+    <br><br>
+
+    <b>{ langs.Translate(ctx, "STR_DELETE_RECIPE", nil) }</b>
+
+    <div class="pre-swap">
+        <button class="icon-text" onclick="swapContent();">
+			<i class="fas fa-trash"></i> { langs.Translate(ctx, "STR_DELETE", nil) }
+		</button>
+    </div>
+    <div class="post-swap hidden">
+        { langs.Translate(ctx, "STR_DELETE_RECIPE_TEXT", nil) } <br>
+		<button class="icon-text" hx-post={ baseurl + "/delete" } hx-push-url="false">
+            <i class="fas fa-check"></i> { langs.Translate(ctx, "STR_CONFIRM", nil) }
+        </button>
+    </div>
+}
+
+templ RecipeList(recipes []database.Recipe) {
+    @TemplateTitle(langs.Translate(ctx, "STR_RECIPES", nil), "/")
+
+    <button class="icon-text" hx-get="/recipes/new">
+        <i class="fas fa-plus"></i> { langs.Translate(ctx, "STR_NEW_RECIPE", nil) }
+    </button>
+
+    <br>
+
+    if len(recipes) > 0 {
+        <ol>
+			for _, recipe := range recipes {
+				{{ baseurl := "/recipes/" + strconv.Itoa(recipe.RID) }}
+                <li><a hx-get={ baseurl }>{ recipe.Name }</a></li>
+            }
+        </ol>
+    } else {
+        <br>
+        <span id="empty-label">
+			{ langs.Translate(ctx, "STR_RECIPES_EMPTY", nil) }
+		</span>
+	}
+}
+
+templ RecipeNew() {
+	@TemplateTitle(langs.Translate(ctx, "STR_NEW_RECIPE", nil), "/recipes")
+
+    <form method="POST">
+        { langs.Translate(ctx, "STR_NAME", nil) } <br>
+		<input type="text" name="name" required> <br>
+
+        <button class="icon-text">
+			<i class="fas fa-check"></i> { langs.Translate(ctx, "STR_CONFIRM", nil) }
+		</button>
+    </form>
+}
+
+templ RecipeView(recipe database.Recipe) {
+	{{ baseurl := "/recipes/" + strconv.Itoa(recipe.RID) }}
+	@TemplateTitle(recipe.Name, "/recipes")
+
+	if recipe.Stars != 0 {
+        <div id="stars">
+			for n := 0; n < recipe.Stars / 2; n++ {
+				<i class="fas fa-star"></i> 
+			}
+			if recipe.Stars % 2 > 0 {
+				<i class="fas fa-star-half-alt"></i> 
+			}
+			for n := 0; n < (10 - recipe.Stars) / 2; n++ {
+				<i class="far fa-star"></i> 
+			}
+        </div>
+	}
+
+	if recipe.Ingredients != "" {
+        <h4>{ langs.Translate(ctx, "STR_INGREDIENTS", nil) }</h4>
+        <ul>
+			for _, i := range strings.Split(recipe.Ingredients, "\n") {
+				<li>{ i }</li>
+			}
+        </ul>
+	}
+
+	if recipe.Directions != "" {
+        <h4>{ langs.Translate(ctx, "STR_DIRECTIONS", nil) }</h4>
+        <ol>
+			for _, d := range strings.Split(recipe.Directions, "\n") {
+				<li>{ d }</li>
+			}
+        </ol>
+	}
+
+	if recipe.Notes != "" {
+        <h4>{ langs.Translate(ctx, "STR_NOTES", nil) }</h4>
+        <p>{ recipe.Notes }</p>
+	}
+
+	<button class="icon-text" hx-get={ baseurl + "/edit" }>
+		<i class="fas fa-edit"></i> { langs.Translate(ctx, "STR_EDIT", nil) }
+	</button>
+}

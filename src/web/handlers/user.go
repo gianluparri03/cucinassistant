@@ -7,12 +7,13 @@ import (
 	"cucinassistant/database"
 	"cucinassistant/email"
 	"cucinassistant/langs"
+	"cucinassistant/web/pages"
 	"cucinassistant/web/utils"
 )
 
 // GetSignUp renders /user/signup
 func GetSignUp(c *utils.Context) error {
-	utils.RenderPage(c, "user/signup", nil)
+	utils.RenderPage(c, pages.UserSignUp())
 	return nil
 }
 
@@ -41,7 +42,7 @@ func PostSignUp(c *utils.Context) (err error) {
 
 // GetSignIn renders /user/signin
 func GetSignIn(c *utils.Context) error {
-	utils.RenderPage(c, "user/signin", nil)
+	utils.RenderPage(c, pages.UserSignIn())
 	return nil
 }
 
@@ -69,7 +70,7 @@ func PostSignOut(c *utils.Context) error {
 
 // GetForgotPassword renders /user/forgot_password
 func GetForgotPassword(c *utils.Context) error {
-	utils.RenderPage(c, "user/forgot_password", nil)
+	utils.RenderPage(c, pages.UserForgotPassword())
 	return nil
 }
 
@@ -99,9 +100,7 @@ func PostForgotPassword(c *utils.Context) (err error) {
 
 // GetResetPassword renders /user/reset_password
 func GetResetPassword(c *utils.Context) error {
-	utils.RenderPage(c, "user/reset_password", map[string]any{
-		"Token": c.R.URL.Query().Get("token"),
-	})
+	utils.RenderPage(c, pages.UserResetPassword(c.R.URL.Query().Get("token")))
 	return nil
 }
 
@@ -131,13 +130,13 @@ func PostResetPassword(c *utils.Context) (err error) {
 
 // GetSettings renders /user/settings
 func GetSettings(c *utils.Context) error {
-	utils.RenderPage(c, "user/settings", nil)
+	utils.RenderPage(c, pages.UserSettings())
 	return nil
 }
 
 // GetChangeUsername renders /user/change_username
 func GetChangeUsername(c *utils.Context) error {
-	utils.RenderPage(c, "user/change_username", map[string]any{"Username": c.U.Username})
+	utils.RenderPage(c, pages.UserChangeUsername(c.U.Username))
 	return nil
 }
 
@@ -156,7 +155,7 @@ func PostChangeUsername(c *utils.Context) (err error) {
 
 // GetChangeEmail renders /user/change_email
 func GetChangeEmail(c *utils.Context) error {
-	utils.RenderPage(c, "user/change_email", map[string]any{"Email": c.U.Email})
+	utils.RenderPage(c, pages.UserChangeEmail(c.U.Email))
 	return nil
 }
 
@@ -175,7 +174,7 @@ func PostChangeEmail(c *utils.Context) (err error) {
 
 // GetChangePassword renders /user/change_password
 func GetChangePassword(c *utils.Context) error {
-	utils.RenderPage(c, "user/change_password", nil)
+	utils.RenderPage(c, pages.UserChangePassword())
 	return nil
 }
 
@@ -198,10 +197,7 @@ func PostChangePassword(c *utils.Context) (err error) {
 
 // GetSetEmailLang renders /user/set_email_lang
 func GetSetEmailLang(c *utils.Context) error {
-	utils.RenderPage(c, "user/set_email_lang", map[string]any{
-		"Langs":   langs.Available,
-		"Current": c.U.EmailLang,
-	})
+	utils.RenderPage(c, pages.UserSetEmailLang(langs.Available, c.U.EmailLang))
 	return nil
 }
 
@@ -220,7 +216,7 @@ func PostSetEmailLang(c *utils.Context) (err error) {
 
 // GetDeleteUser1 renders /user/delete_1
 func GetDeleteUser1(c *utils.Context) error {
-	utils.RenderPage(c, "user/delete", map[string]any{"Warning": true})
+	utils.RenderPage(c, pages.UserDelete(true, ""))
 	return nil
 }
 
@@ -242,7 +238,7 @@ func PostDeleteUser1(c *utils.Context) (err error) {
 
 // GetDeleteUser2 renders /user/delete_2
 func GetDeleteUser2(c *utils.Context) error {
-	utils.RenderPage(c, "user/delete", map[string]any{"Token": c.R.URL.Query().Get("token")})
+	utils.RenderPage(c, pages.UserDelete(false, c.R.URL.Query().Get("token")))
 	return nil
 }
 

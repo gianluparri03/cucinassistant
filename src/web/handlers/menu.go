@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"cucinassistant/database"
+	"cucinassistant/web/pages"
 	"cucinassistant/web/utils"
 )
 
@@ -16,7 +17,7 @@ func getMID(c *utils.Context) (int, error) {
 func GetMenus(c *utils.Context) (err error) {
 	var menus []database.Menu
 	if menus, err = c.U.Menus().GetAll(); err == nil {
-		utils.RenderPage(c, "menu/dashboard", map[string]any{"Menus": menus})
+		utils.RenderPage(c, pages.MenuDashboard(menus))
 	}
 
 	return
@@ -24,7 +25,7 @@ func GetMenus(c *utils.Context) (err error) {
 
 // GetNewMenu renders /menus/new
 func GetNewMenu(c *utils.Context) (err error) {
-	utils.RenderPage(c, "menu/new", nil)
+	utils.RenderPage(c, pages.MenuNew())
 	return
 }
 
@@ -46,7 +47,7 @@ func GetMenu(c *utils.Context) (err error) {
 		// Retrieves the menu
 		var menu database.Menu
 		if menu, err = c.U.Menus().GetOne(MID); err == nil {
-			utils.RenderPage(c, "menu/view", map[string]any{"Menu": menu})
+			utils.RenderPage(c, pages.MenuView(menu))
 		}
 	}
 
@@ -61,7 +62,7 @@ func GetEditMenu(c *utils.Context) (err error) {
 		// Retrieves the menu
 		var menu database.Menu
 		if menu, err = c.U.Menus().GetOne(MID); err == nil {
-			utils.RenderPage(c, "menu/edit", map[string]any{"Menu": menu})
+			utils.RenderPage(c, pages.MenuEdit(menu))
 		}
 	}
 

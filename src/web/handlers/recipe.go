@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"strconv"
-	"strings"
 
 	"cucinassistant/database"
+	"cucinassistant/web/pages"
 	"cucinassistant/web/utils"
 )
 
@@ -18,9 +18,7 @@ func GetRecipes(c *utils.Context) (err error) {
 	var recipes []database.Recipe
 
 	if recipes, err = c.U.Recipes().GetAll(); err == nil {
-		utils.RenderPage(c, "recipe/list", map[string]any{
-			"Recipes": recipes,
-		})
+		utils.RenderPage(c, pages.RecipeList(recipes))
 	}
 
 	return
@@ -28,7 +26,7 @@ func GetRecipes(c *utils.Context) (err error) {
 
 // GetNewRecipe renders /recipes/new
 func GetNewRecipe(c *utils.Context) (err error) {
-	utils.RenderPage(c, "recipe/new", nil)
+	utils.RenderPage(c, pages.RecipeNew())
 	return
 }
 
@@ -48,16 +46,8 @@ func GetRecipe(c *utils.Context) (err error) {
 
 	if RID, err = getRID(c); err == nil {
 		var recipe database.Recipe
-
 		if recipe, err = c.U.Recipes().GetOne(RID); err == nil {
-			utils.RenderPage(c, "recipe/view", map[string]any{
-				"Recipe":      recipe,
-				"FullStars":   make([]struct{}, recipe.Stars/2),
-				"HalfStars":   make([]struct{}, recipe.Stars%2),
-				"EmptyStars":  make([]struct{}, (10-recipe.Stars)/2),
-				"Ingredients": strings.Split(recipe.Ingredients, "\n"),
-				"Directions":  strings.Split(recipe.Directions, "\n"),
-			})
+			utils.RenderPage(c, pages.RecipeView(recipe))
 		}
 	}
 
@@ -71,10 +61,7 @@ func GetEditRecipe(c *utils.Context) (err error) {
 	if RID, err = getRID(c); err == nil {
 		var recipe database.Recipe
 		if recipe, err = c.U.Recipes().GetOne(RID); err == nil {
-			utils.RenderPage(c, "recipe/edit", map[string]any{
-				"Recipe": recipe,
-				"Stars":  float32(recipe.Stars) / 2,
-			})
+			utils.RenderPage(c, pages.RecipeEdit(recipe))
 		}
 	}
 

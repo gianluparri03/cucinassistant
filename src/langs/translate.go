@@ -1,15 +1,26 @@
 package langs
 
 import (
+	"context"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
-	"html/template"
-	"io"
 	"log/slog"
-	"path"
 )
 
-// Translate returns the string with that id in the given language
-func Translate(lang string, id string, data any) string {
+const contextKey string = "lang"
+
+// Lang returns a context in which is saved the lang
+func Lang(lang string) context.Context {
+	return context.WithValue(context.Background(), contextKey, lang)
+}
+
+// Translate returns the string with that id in the language specified in the
+// context
+func Translate(ctx context.Context, id string, data any) string {
+	lang, ok := ctx.Value(contextKey).(string)
+	if !ok {
+		lang = Default
+	}
+
 	// Gets the required localizer (or the default one)
 	l, found := localizers[lang]
 	if !found {
@@ -23,27 +34,4 @@ func Translate(lang string, id string, data any) string {
 	}
 
 	return str
-}
-
-// ExecuteTemplates parses the given templates and applies to them
-// the translations (function t) in the given language, then
-// writes them
-func ExecuteTemplates(w io.Writer, lang string, templates []string, data any) {
-	// Prepares the FuncMap
-	funcs := template.FuncMap{
-		"t": func(id string, data any) template.HTML {
-			return template.HTML(Translate(lang, id, data))
-		},
-	}
-
-	// Loads the templates
-	tmpl, err := template.New(path.Base(templates[0])).Funcs(funcs).ParseFiles(templates...)
-	if err != nil {
-		slog.Error("while fetching templates:", "err", err, "templates", templates)
-	}
-
-	// Executes it
-	if err = tmpl.Execute(w, data); err != nil {
-		slog.Error("while executing templates:", "err", err, "templates", templates)
-	}
 }

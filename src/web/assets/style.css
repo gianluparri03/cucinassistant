@@ -366,6 +366,7 @@ textarea {
 /* --- PAGE SPECIFIC: Recipe ---- */
 #stars {
     font-size: 1.5em;
+	word-spacing: -100%;
 }
 
 

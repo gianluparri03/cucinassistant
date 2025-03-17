@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"cucinassistant/database"
+	"cucinassistant/web/pages"
 	"cucinassistant/web/utils"
 )
 
@@ -27,7 +28,7 @@ func getAID(c *utils.Context) (SID int, AID int, err error) {
 func GetSections(c *utils.Context) (err error) {
 	var list []database.Section
 	if list, err = c.U.Storage().GetSections(); err == nil {
-		utils.RenderPage(c, "storage/dashboard", map[string]any{"List": list})
+		utils.RenderPage(c, pages.StorageDashboard(list))
 	}
 
 	return
@@ -35,7 +36,7 @@ func GetSections(c *utils.Context) (err error) {
 
 // GetNewSection renders /storage/new
 func GetNewSection(c *utils.Context) (err error) {
-	utils.RenderPage(c, "storage/new_section", nil)
+	utils.RenderPage(c, pages.StorageNewSection())
 	return
 }
 
@@ -57,10 +58,7 @@ func GetArticles(c *utils.Context) (err error) {
 
 		var section database.Section
 		if section, err = c.U.Storage().GetArticles(SID, search); err == nil {
-			utils.RenderPage(c, "storage/view_articles", map[string]any{
-				"Section": section,
-				"Search":  search,
-			})
+			utils.RenderPage(c, pages.StorageViewArticles(section, search))
 		}
 	}
 
@@ -74,7 +72,7 @@ func GetEditSection(c *utils.Context) (err error) {
 	if SID, err = getSID(c); err == nil {
 		var section database.Section
 		if section, err = c.U.Storage().GetSection(SID); err == nil {
-			utils.RenderPage(c, "storage/edit_section", map[string]any{"Section": section})
+			utils.RenderPage(c, pages.StorageEditSection(section))
 		}
 	}
 
@@ -110,11 +108,8 @@ func GetAddArticlesSection(c *utils.Context) (err error) {
 	var SID int
 	if SID, err = getSID(c); err == nil {
 		var section database.Section
-
 		if section, err = c.U.Storage().GetArticles(SID, ""); err == nil {
-			utils.RenderPage(c, "storage/add_articles", map[string]any{
-				"SID": section.SID,
-			})
+			utils.RenderPage(c, pages.StorageAddArticles(section.SID, []database.Section{}))
 		}
 	}
 
@@ -161,9 +156,7 @@ func GetAddArticlesCommon(c *utils.Context) (err error) {
 	var sections []database.Section
 
 	if sections, err = c.U.Storage().GetSections(); err == nil {
-		utils.RenderPage(c, "storage/add_articles", map[string]any{
-			"Sections": sections,
-		})
+		utils.RenderPage(c, pages.StorageAddArticles(0, sections))
 	}
 
 	return
@@ -205,9 +198,7 @@ func PostAddArticlesCommon(c *utils.Context) (err error) {
 func GetSearchArticles(c *utils.Context) (err error) {
 	var SID int
 	if SID, err = getSID(c); err == nil {
-		utils.RenderPage(c, "storage/search_articles", map[string]any{
-			"SID": SID,
-		})
+		utils.RenderPage(c, pages.StorageSearchArticles(SID))
 	}
 
 	return
@@ -219,12 +210,8 @@ func GetEditArticle(c *utils.Context) (err error) {
 
 	if SID, AID, err = getAID(c); err == nil {
 		var article database.Article
-
 		if article, err = c.U.Storage().GetArticle(AID); err == nil {
-			utils.RenderPage(c, "storage/edit_article", map[string]any{
-				"SID":     SID,
-				"Article": article,
-			})
+			utils.RenderPage(c, pages.StorageEditArticle(SID, article))
 		}
 	}
 

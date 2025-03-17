@@ -1,0 +1,90 @@
+package pages
+
+import (
+	"cucinassistant/langs"
+)
+
+templ MiscHome(username string) {
+    @TemplateTitle(langs.Translate(ctx, "STR_WELCOMEBACK", username), "")
+
+    <div class="dashboard">
+        <button hx-get="/menus">
+            <i class="fas fa-utensils"></i>
+            <span>{ langs.Translate(ctx, "STR_MENUS", nil) }</span>
+        </button>
+
+        <button hx-get="/storage">
+            <i class="fas fa-box"></i>
+            <span>{ langs.Translate(ctx, "STR_STORAGE", nil) }</span>
+        </button>
+
+        <button hx-get="/shopping_list">
+            <i class="fas fa-shopping-cart"></i>
+            <span>{ langs.Translate(ctx, "STR_SHOPPINGLIST", nil) }</span>
+        </button>
+
+        <button hx-get="/recipes">
+            <i class="fas fa-book"></i>
+            <span>{ langs.Translate(ctx, "STR_RECIPES", nil) }</span>
+        </button>
+
+        <button hx-get="/user/settings" class="transparent">
+            <i class="fas fa-cog"></i>
+            <span>{ langs.Translate(ctx, "STR_SETTINGS", nil) }</span>
+        </button>
+    </div>
+}
+
+templ MiscInfo(infoData any) {
+    @TemplateTitle(langs.Translate(ctx, "STR_INFO", nil), "")
+    @templ.Raw(langs.Translate(ctx, "PAG_INFO", infoData))
+}
+
+templ MiscLang(available map[string]string, current string) {
+    @TemplateTitle(langs.Translate(ctx, "STR_LANGUAGE", nil), "/")
+
+    <form method="GET" hx-disable>
+        <select name="tag" id="languages">
+            for tag, name := range available {
+                <option value={ tag } selected?={ tag == current }>
+					{ name }
+				</option>
+            }
+        </select> <br>
+
+		<button class="icon-text">
+			<i class="fas fa-check"></i> { langs.Translate(ctx, "STR_CONFIRM", nil) }
+		</button>
+    </form>
+}
+
+templ MiscStats(statsData any) {
+    @TemplateTitle(langs.Translate(ctx, "STR_STATS", nil), "/")
+
+    <div class="dashboard">
+        <button class="transparent" disabled>
+            <i class="fas fa-user"></i>
+            <span>{ langs.Translate(ctx, "STR_STATS_USERS", statsData) }</span>
+        </button>
+
+        <button class="transparent" disabled>
+            <i class="fas fa-utensils"></i>
+            <span>{ langs.Translate(ctx, "STR_STATS_MENUS", statsData) }</span>
+        </button>
+
+        <button class="transparent" disabled>
+            <i class="fas fa-box"></i>
+            <span>{ langs.Translate(ctx, "STR_STATS_ARTICLES", statsData) }</span>
+        </button>
+
+        <button class="transparent" disabled>
+            <i class="fas fa-shopping-cart"></i>
+            <span>{ langs.Translate(ctx, "STR_STATS_ENTRIES", statsData) }</span>
+        </button>
+
+        <button class="transparent" disabled>
+            <i class="fas fa-book"></i>
+            <span>{ langs.Translate(ctx, "STR_STATS_RECIPES", statsData) }</span>
+        </button>
+    </div>
+}

@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"cucinassistant/database"
+	"cucinassistant/web/pages"
 	"cucinassistant/web/utils"
 )
 
@@ -15,8 +16,9 @@ func getEID(c *utils.Context) (int, error) {
 // GetShoppingList renders /shopping_list
 func GetShoppingList(c *utils.Context) (err error) {
 	var list map[int]database.Entry
+
 	if list, err = c.U.ShoppingList().GetAll(); err == nil {
-		utils.RenderPage(c, "shopping_list/view", map[string]any{"List": list})
+		utils.RenderPage(c, pages.ShoppingListView(list))
 	}
 
 	return
@@ -24,7 +26,7 @@ func GetShoppingList(c *utils.Context) (err error) {
 
 // GetAppendEntries renders /shopping_list/append
 func GetAppendEntries(c *utils.Context) error {
-	utils.RenderPage(c, "shopping_list/append", nil)
+	utils.RenderPage(c, pages.ShoppingListAppend())
 	return nil
 }
 
@@ -83,7 +85,7 @@ func GetEditEntry(c *utils.Context) (err error) {
 		// Retrieves the entry's name and renders the page
 		var entry database.Entry
 		if entry, err = c.U.ShoppingList().GetOne(EID); err == nil {
-			utils.RenderPage(c, "shopping_list/edit", map[string]any{"Name": entry.Name})
+			utils.RenderPage(c, pages.ShoppingListEdit(entry.Name))
 		}
 	}
 

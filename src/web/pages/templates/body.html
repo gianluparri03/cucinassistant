@@ -1,8 +1,0 @@
-{{ define "body" }}
-    <h1>
-        <i id="back" class="fas fa-arrow-circle-left" hx-get="{{ block "back_link" . }}{{ end }}"></i>
-        {{ template "title" . }}
-    </h1>
-
-    {{ template "content" . }}
-{{ end }}

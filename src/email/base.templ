@@ -1,0 +1,31 @@
+package email
+
+import (
+	"cucinassistant/langs"
+)
+
+templ Base(subject string, content string, username string) {
+	<html>
+		<body>
+			<td style="font-size: 1.3em">
+				<main>
+					<h2>{ subject }</h2>
+
+					<p>
+						{ langs.Translate(ctx, "STR_GOOD_MORNING", username) }
+						<br><br>
+						@templ.Raw(content)
+						<br><br><br>
+						{ langs.Translate(ctx, "STR_REGARDS", nil) }
+					</p>
+				</main>
+
+				<hr width="700">
+
+				<small>
+					{ langs.Translate(ctx, "STR_NOREPLY", nil) }
+				</small>
+			</td>
+		</body>
+	</html>
+}

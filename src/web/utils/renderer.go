@@ -1,59 +1,43 @@
 package utils
 
 import (
+	"github.com/a-h/templ"
 	"net/http"
 
 	"cucinassistant/langs"
+	"cucinassistant/web/pages"
 )
 
-// render executes the given templates witth the given data.
-// It adds the base template in automatic, looking if it's a
-// normal request or a request made by htmx.
-func render(c *Context, pages []string, data map[string]any) {
-	// Adds the base template
-	if c.h {
-		pages = append([]string{"templates/base_hx"}, pages...)
-	} else {
-		pages = append([]string{"templates/base_full"}, pages...)
+// render renders the given page.
+// If it's an htmx request it will render only content; otherwise it will
+// render the complete structure, with the body and the message.
+func render(c *Context, body, message, content templ.Component) {
+	if !c.h {
+		content = pages.TemplateBase(c.L, body, message)
 	}
 
-	// Completes the pages names
-	for i, p := range pages {
-		pages[i] = "web/pages/" + p + ".html"
-	}
-
-	// Adds the isHx field to the data
-	if data == nil {
-		data = make(map[string]any)
-	}
-	data["IsHx"] = c.h
-	data["Lang"] = c.L
-
-	// Executes the template
-	langs.ExecuteTemplates(c.W, c.L, pages, data)
+	content.Render(langs.Lang(c.L), c.W)
 }
 
-// RenderPage renders a specific page, with some data.
-// PageName must contain the subfolder and the basename, like
-// "user/signup"
-func RenderPage(c *Context, pageName string, data map[string]any) {
-	render(c, []string{"templates/body", pageName}, data)
-}
-
-// Redirect redirects to a given path
-func Redirect(c *Context, path string) {
-	http.Redirect(c.W, c.R, path, http.StatusSeeOther)
+// RenderPage renders a page (a body)
+func RenderPage(c *Context, page templ.Component) {
+	render(c, page, pages.TemplateEmpty(), page)
 }
 
 // ShowAndRedirect shows a popup message to the user,
-// then redirects him away
+// then redirects it away
 func ShowAndRedirect(c *Context, msg string, path string) {
 	c.W.WriteHeader(http.StatusBadRequest)
-	tMsg := langs.Translate(c.L, msg, nil)
-	render(c, []string{"templates/error"}, map[string]any{"Message": tMsg, "Path": path})
+	page := pages.TemplateMessage(msg, path, c.h)
+	render(c, pages.TemplateEmpty(), page, page)
 }
 
 // Show shows a popup message to the user.
 func Show(c *Context, msg string) {
 	ShowAndRedirect(c, msg, "")
+}
+
+// Redirect redirects to a given path
+func Redirect(c *Context, path string) {
+	http.Redirect(c.W, c.R, path, http.StatusSeeOther)
 }

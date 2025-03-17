@@ -2,7 +2,7 @@ package email
 
 import (
 	"bytes"
-	"html/template"
+	"context"
 	"log/slog"
 	"net/smtp"
 
@@ -49,8 +49,9 @@ func (e Email) Write(user *database.User, data map[string]any) EmailBody {
 	subject := e.Subject
 	content := e.Content
 	if !e.Raw {
-		subject = langs.Translate(user.EmailLang, subject, nil)
-		content = langs.Translate(user.EmailLang, content, data)
+		lang := langs.Lang(user.EmailLang)
+		subject = langs.Translate(lang, subject, nil)
+		content = langs.Translate(lang, content, data)
 	}
 
 	// Prepares the headers of the body
@@ -66,10 +67,10 @@ func (e Email) Write(user *database.User, data map[string]any) EmailBody {
 	}
 	data["Username"] = user.Username
 	data["Subject"] = subject
-	data["Content"] = template.HTML(content)
+	data["Content"] = content
 
 	// Executes the templates
-	langs.ExecuteTemplates(&body, user.EmailLang, []string{"email/template.html"}, data)
+	Base(subject, content, user.Username).Render(context.Background(), &body)
 	return EmailBody{Body: &body, Recipient: user.Email}
 }
 

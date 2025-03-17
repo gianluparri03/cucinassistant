@@ -1,0 +1,113 @@
+package pages
+
+import (
+	"strconv"
+
+	"cucinassistant/database"
+	"cucinassistant/langs"
+)
+
+var days = [7]string{
+	"STR_MONDAY",
+	"STR_TUESDAY",
+	"STR_WEDNESDAY",
+	"STR_THURSDAY",
+	"STR_FRIDAY",
+	"STR_SATURDAY",
+	"STR_SUNDAY",
+}
+
+templ MenuDashboard(menus []database.Menu) {
+	@TemplateTitle(langs.Translate(ctx, "STR_MENUS", nil), "/")
+
+    <div class="dashboard">
+		for _, menu := range menus {
+			{{ baseurl := "/menus/" + strconv.Itoa(menu.MID) }}
+			<button hx-get={ baseurl }>
+                <i class="fas fa-utensils"></i>
+				<span>{ menu.Name }</span>
+            </button>
+		}
+
+        <button hx-get="/menus/new" class="transparent">
+            <i class="fas fa-plus"></i>
+            <span>{ langs.Translate(ctx, "STR_NEW_MENU", nil) }</span>
+        </button>
+    </div>
+}
+
+templ MenuEdit(menu database.Menu) {
+	{{ baseurl := "/menus/" + strconv.Itoa(menu.MID) }}
+	@TemplateTitle(langs.Translate(ctx, "STR_EDIT_MENU", nil), baseurl)
+
+    <form method="POST">
+        <div class="menu-day">
+            <b>{ langs.Translate(ctx, "STR_NAME", nil) }</b> <br>
+			<input name="name" value={ menu.Name }>
+        </div> <br>
+
+		for index, day := range days {
+			<div class="menu-day">
+				<b>{ langs.Translate(ctx, day, nil) }</b>
+
+				for i := 0; i < 2; i++ {
+					{{ name := "meal-" + strconv.Itoa(index*2+i) }}
+					<textarea name={ name }>
+						{ menu.Meals[index*2+i] }
+					</textarea>
+				}
+			</div>
+		}
+
+		<button class="icon-text">
+			<i class="fas fa-check"></i> { langs.Translate(ctx, "STR_CONFIRM", nil) }
+		</button>
+    </form> <br>
+
+    <b>{ langs.Translate(ctx, "STR_DELETE_MENU", nil) }</b>
+
+    <div class="pre-swap">
+		<button class="icon-text" onclick="swapContent()">
+			<i class="fas fa-trash"></i> { langs.Translate(ctx, "STR_DELETE", nil) }
+		</button>
+    </div>
+    <div class="post-swap hidden">
+        { langs.Translate(ctx, "STR_DELETE_MENU_TEXT", nil) } <br>
+		<button class="icon-text" hx-post={ baseurl + "/delete" } hx-push-url="false">
+            <i class="fas fa-check"></i> { langs.Translate(ctx, "STR_CONFIRM", nil) }
+        </button>
+    </div>
+}
+
+templ MenuNew() {
+	@TemplateTitle(langs.Translate(ctx, "STR_NEW_MENU", nil), "/menus")
+
+    <form method="POST">
+        { langs.Translate(ctx, "STR_NAME", nil) } <br>
+		<input type="text" name="name" required> <br>
+
+		<button class="icon-text">
+			<i class="fas fa-check"></i> { langs.Translate(ctx, "STR_CONFIRM", nil) }
+		</button>
+    </form>
+}
+
+templ MenuView(menu database.Menu) {
+	{{ baseurl := "/menus/" + strconv.Itoa(menu.MID) }}
+	@TemplateTitle(menu.Name, "/menus")
+
+	<button class="icon-text" hx-get={ baseurl + "/edit" }>
+		<i class="fas fa-edit"></i> { langs.Translate(ctx, "STR_EDIT", nil) }
+	</button>
+	<button class="icon-text" hx-post={ baseurl + "/duplicate" }>
+		<i class="fas fa-clone"></i> { langs.Translate(ctx, "STR_CLONE", nil) }
+	</button>
+
+	for index, day := range days {
+		<div class="menu-day">
+			<b>{ langs.Translate(ctx, day, nil) }</b>
+			<textarea readonly>{ menu.Meals[index*2+0] }</textarea>
+			<textarea readonly>{ menu.Meals[index*2+1] }</textarea>
+		</div>
+	}
+}

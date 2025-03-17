@@ -47,10 +47,14 @@ cover: create_test_db
 	@cd src; CA_ENV=testing go test -coverprofile=/tmp/cover.out -covermode atomic cucinassistant/database
 	@cd src; go tool cover -html=/tmp/cover.out
 
-# Runs go fmt and go generate
+# Runs go fmt
 fmt:
-	@cd src; go generate ./...
 	@cd src; go fmt ./...
+
+# Generates code
+gen:
+	@cd src; go generate ./...
+	@cd src; templ generate
 
 # Generates the translate.*.toml files
 lang_gen:
