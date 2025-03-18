@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"cucinassistant/database"
-	"cucinassistant/web/pages"
+	"cucinassistant/web/components"
 	"cucinassistant/web/utils"
 )
 
@@ -18,7 +18,7 @@ func GetShoppingList(c *utils.Context) (err error) {
 	var list map[int]database.Entry
 
 	if list, err = c.U.ShoppingList().GetAll(); err == nil {
-		utils.RenderPage(c, pages.ShoppingListView(list))
+		utils.RenderComponent(c, components.ShoppingListView(list))
 	}
 
 	return
@@ -26,7 +26,7 @@ func GetShoppingList(c *utils.Context) (err error) {
 
 // GetAppendEntries renders /shopping_list/append
 func GetAppendEntries(c *utils.Context) error {
-	utils.RenderPage(c, pages.ShoppingListAppend())
+	utils.RenderComponent(c, components.ShoppingListAppend())
 	return nil
 }
 
@@ -71,7 +71,7 @@ func PostToggleEntry(c *utils.Context) (err error) {
 func PostClearShoppingList(c *utils.Context) (err error) {
 	// Tries to clear the list
 	if err = c.U.ShoppingList().Clear(); err == nil {
-		utils.ShowAndRedirect(c, "MSG_SHOPPINGLIST_EMPTIED", "/shopping_list")
+		utils.ShowMessage(c, "MSG_SHOPPINGLIST_EMPTIED", "/shopping_list")
 	}
 
 	return
@@ -85,7 +85,7 @@ func GetEditEntry(c *utils.Context) (err error) {
 		// Retrieves the entry's name and renders the page
 		var entry database.Entry
 		if entry, err = c.U.ShoppingList().GetOne(EID); err == nil {
-			utils.RenderPage(c, pages.ShoppingListEdit(entry.Name))
+			utils.RenderComponent(c, components.ShoppingListEdit(entry.Name))
 		}
 	}
 

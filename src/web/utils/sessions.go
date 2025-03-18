@@ -51,7 +51,7 @@ func SaveUID(c *Context, UID int, msg string) {
 	}
 
 	if msg != "" {
-		ShowAndRedirect(c, msg, "/")
+		ShowMessage(c, msg, "/")
 	} else {
 		Redirect(c, "/")
 	}
@@ -66,7 +66,7 @@ func DropUID(c *Context, msg string) {
 	}
 
 	if msg != "" {
-		ShowAndRedirect(c, msg, "/user/signin")
+		ShowMessage(c, msg, "/user/signin")
 	} else {
 		Redirect(c, "/user/signin")
 	}
@@ -75,7 +75,7 @@ func DropUID(c *Context, msg string) {
 // SetLang sets the session language
 func SetLang(c *Context, lang string) {
 	if _, found := langs.Available[lang]; !found {
-		Show(c, "MSG_UNKNOWN_LANG")
+		ShowError(c, "MSG_UNKNOWN_LANG", "", http.StatusNotFound)
 		return
 	}
 
@@ -84,7 +84,7 @@ func SetLang(c *Context, lang string) {
 	c.s.Save(c.R, c.W)
 
 	if c.h {
-		ShowAndRedirect(c, "MSG_LANG_CHANGED", "/")
+		ShowMessage(c, "MSG_LANG_CHANGED", "/")
 	} else {
 		Redirect(c, "/")
 	}

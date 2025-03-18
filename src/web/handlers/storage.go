@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"cucinassistant/database"
-	"cucinassistant/web/pages"
+	"cucinassistant/web/components"
 	"cucinassistant/web/utils"
 )
 
@@ -28,7 +28,7 @@ func getAID(c *utils.Context) (SID int, AID int, err error) {
 func GetSections(c *utils.Context) (err error) {
 	var list []database.Section
 	if list, err = c.U.Storage().GetSections(); err == nil {
-		utils.RenderPage(c, pages.StorageDashboard(list))
+		utils.RenderComponent(c, components.StorageDashboard(list))
 	}
 
 	return
@@ -36,7 +36,7 @@ func GetSections(c *utils.Context) (err error) {
 
 // GetNewSection renders /storage/new
 func GetNewSection(c *utils.Context) (err error) {
-	utils.RenderPage(c, pages.StorageNewSection())
+	utils.RenderComponent(c, components.StorageNewSection())
 	return
 }
 
@@ -58,7 +58,7 @@ func GetArticles(c *utils.Context) (err error) {
 
 		var section database.Section
 		if section, err = c.U.Storage().GetArticles(SID, search); err == nil {
-			utils.RenderPage(c, pages.StorageViewArticles(section, search))
+			utils.RenderComponent(c, components.StorageViewArticles(section, search))
 		}
 	}
 
@@ -72,7 +72,7 @@ func GetEditSection(c *utils.Context) (err error) {
 	if SID, err = getSID(c); err == nil {
 		var section database.Section
 		if section, err = c.U.Storage().GetSection(SID); err == nil {
-			utils.RenderPage(c, pages.StorageEditSection(section))
+			utils.RenderComponent(c, components.StorageEditSection(section))
 		}
 	}
 
@@ -96,7 +96,7 @@ func PostDeleteSection(c *utils.Context) (err error) {
 	var SID int
 	if SID, err = getSID(c); err == nil {
 		if err = c.U.Storage().DeleteSection(SID); err == nil {
-			utils.ShowAndRedirect(c, "MSG_SECTION_DELETED", "/storage")
+			utils.ShowMessage(c, "MSG_SECTION_DELETED", "/storage")
 		}
 	}
 
@@ -109,7 +109,7 @@ func GetAddArticlesSection(c *utils.Context) (err error) {
 	if SID, err = getSID(c); err == nil {
 		var section database.Section
 		if section, err = c.U.Storage().GetArticles(SID, ""); err == nil {
-			utils.RenderPage(c, pages.StorageAddArticles(section.SID, []database.Section{}))
+			utils.RenderComponent(c, components.StorageAddArticles(section.SID, []database.Section{}))
 		}
 	}
 
@@ -156,7 +156,7 @@ func GetAddArticlesCommon(c *utils.Context) (err error) {
 	var sections []database.Section
 
 	if sections, err = c.U.Storage().GetSections(); err == nil {
-		utils.RenderPage(c, pages.StorageAddArticles(0, sections))
+		utils.RenderComponent(c, components.StorageAddArticles(0, sections))
 	}
 
 	return
@@ -188,7 +188,7 @@ func PostAddArticlesCommon(c *utils.Context) (err error) {
 
 	// Tries to add them
 	if err = c.U.Storage().AddArticles(articles...); err == nil {
-		utils.ShowAndRedirect(c, "MSG_ARTICLES_ADDED", "/storage")
+		utils.ShowMessage(c, "MSG_ARTICLES_ADDED", "/storage")
 	}
 
 	return
@@ -198,7 +198,7 @@ func PostAddArticlesCommon(c *utils.Context) (err error) {
 func GetSearchArticles(c *utils.Context) (err error) {
 	var SID int
 	if SID, err = getSID(c); err == nil {
-		utils.RenderPage(c, pages.StorageSearchArticles(SID))
+		utils.RenderComponent(c, components.StorageSearchArticles(SID))
 	}
 
 	return
@@ -211,7 +211,7 @@ func GetEditArticle(c *utils.Context) (err error) {
 	if SID, AID, err = getAID(c); err == nil {
 		var article database.Article
 		if article, err = c.U.Storage().GetArticle(AID); err == nil {
-			utils.RenderPage(c, pages.StorageEditArticle(SID, article))
+			utils.RenderComponent(c, components.StorageEditArticle(SID, article))
 		}
 	}
 
@@ -235,7 +235,7 @@ func PostEditArticle(c *utils.Context) (err error) {
 			if !changed {
 				utils.Redirect(c, "/storage/"+strconv.Itoa(SID)+"/"+strconv.Itoa(AID))
 			} else {
-				utils.ShowAndRedirect(c, "MSG_ORDER_CHANGED", "/storage/"+strconv.Itoa(SID))
+				utils.ShowMessage(c, "MSG_ORDER_CHANGED", "/storage/"+strconv.Itoa(SID))
 			}
 		}
 	}

@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"cucinassistant/langs"
-	"cucinassistant/web/pages"
+	"cucinassistant/web/components"
 )
 
 // render renders the given page.
@@ -13,28 +13,31 @@ import (
 // render the complete structure, with the body and the message.
 func render(c *Context, body, message, content templ.Component) {
 	if !c.h {
-		content = pages.TemplateBase(c.L, body, message)
+		content = components.TemplateBase(c.L, body, message)
 	}
 
 	content.Render(langs.Lang(c.L), c.W)
 }
 
-// RenderPage renders a page (a body)
-func RenderPage(c *Context, page templ.Component) {
-	render(c, page, pages.TemplateEmpty(), page)
+// RenderComponent renders a component
+func RenderComponent(c *Context, page templ.Component) {
+	render(c, page, components.TemplateEmpty(), page)
 }
 
-// ShowAndRedirect shows a popup message to the user,
-// then redirects it away
-func ShowAndRedirect(c *Context, msg string, path string) {
-	c.W.WriteHeader(http.StatusBadRequest)
-	page := pages.TemplateMessage(msg, path, c.h)
-	render(c, pages.TemplateEmpty(), page, page)
+// ShowError shows a popup error to the user, returning the
+// given http status code.
+// If path is set, it will redirects it to the given path
+func ShowError(c *Context, msg string, path string, code int) {
+	c.W.Header().Set("HX-Retarget", "#message-container")
+	c.W.WriteHeader(code)
+	page := components.TemplateMessage(msg, path, c.h)
+	render(c, components.TemplateEmpty(), page, page)
 }
 
-// Show shows a popup message to the user.
-func Show(c *Context, msg string) {
-	ShowAndRedirect(c, msg, "")
+// ShowMessage shows a popup message to the user.
+// If path is set, it will redirects it to the given path
+func ShowMessage(c *Context, msg string, path string) {
+	ShowError(c, msg, path, http.StatusOK)
 }
 
 // Redirect redirects to a given path

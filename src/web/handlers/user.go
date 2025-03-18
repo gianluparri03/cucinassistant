@@ -7,13 +7,13 @@ import (
 	"cucinassistant/database"
 	"cucinassistant/email"
 	"cucinassistant/langs"
-	"cucinassistant/web/pages"
+	"cucinassistant/web/components"
 	"cucinassistant/web/utils"
 )
 
 // GetSignUp renders /user/signup
 func GetSignUp(c *utils.Context) error {
-	utils.RenderPage(c, pages.UserSignUp())
+	utils.RenderComponent(c, components.UserSignUp())
 	return nil
 }
 
@@ -42,7 +42,7 @@ func PostSignUp(c *utils.Context) (err error) {
 
 // GetSignIn renders /user/signin
 func GetSignIn(c *utils.Context) error {
-	utils.RenderPage(c, pages.UserSignIn())
+	utils.RenderComponent(c, components.UserSignIn())
 	return nil
 }
 
@@ -70,7 +70,7 @@ func PostSignOut(c *utils.Context) error {
 
 // GetForgotPassword renders /user/forgot_password
 func GetForgotPassword(c *utils.Context) error {
-	utils.RenderPage(c, pages.UserForgotPassword())
+	utils.RenderComponent(c, components.UserForgotPassword())
 	return nil
 }
 
@@ -91,7 +91,7 @@ func PostForgotPassword(c *utils.Context) (err error) {
 			}).Send()
 
 			// Shows the popup
-			utils.Show(c, "MSG_EMAIL_SENT")
+			utils.ShowMessage(c, "MSG_EMAIL_SENT", "")
 		}
 	}
 
@@ -100,7 +100,7 @@ func PostForgotPassword(c *utils.Context) (err error) {
 
 // GetResetPassword renders /user/reset_password
 func GetResetPassword(c *utils.Context) error {
-	utils.RenderPage(c, pages.UserResetPassword(c.R.URL.Query().Get("token")))
+	utils.RenderComponent(c, components.UserResetPassword(c.R.URL.Query().Get("token")))
 	return nil
 }
 
@@ -130,13 +130,13 @@ func PostResetPassword(c *utils.Context) (err error) {
 
 // GetSettings renders /user/settings
 func GetSettings(c *utils.Context) error {
-	utils.RenderPage(c, pages.UserSettings())
+	utils.RenderComponent(c, components.UserSettings())
 	return nil
 }
 
 // GetChangeUsername renders /user/change_username
 func GetChangeUsername(c *utils.Context) error {
-	utils.RenderPage(c, pages.UserChangeUsername(c.U.Username))
+	utils.RenderComponent(c, components.UserChangeUsername(c.U.Username))
 	return nil
 }
 
@@ -147,7 +147,7 @@ func PostChangeUsername(c *utils.Context) (err error) {
 
 	// Tries to change it
 	if err = c.U.ChangeUsername(newUsername); err == nil {
-		utils.ShowAndRedirect(c, "MSG_USERNAME_CHANGED", "/user/settings")
+		utils.ShowMessage(c, "MSG_USERNAME_CHANGED", "/user/settings")
 	}
 
 	return
@@ -155,7 +155,7 @@ func PostChangeUsername(c *utils.Context) (err error) {
 
 // GetChangeEmail renders /user/change_email
 func GetChangeEmail(c *utils.Context) error {
-	utils.RenderPage(c, pages.UserChangeEmail(c.U.Email))
+	utils.RenderComponent(c, components.UserChangeEmail(c.U.Email))
 	return nil
 }
 
@@ -166,7 +166,7 @@ func PostChangeEmail(c *utils.Context) (err error) {
 
 	// Tries to change it
 	if err = c.U.ChangeEmail(newEmail); err == nil {
-		utils.ShowAndRedirect(c, "MSG_EMAIL_CHANGED", "/user/settings")
+		utils.ShowMessage(c, "MSG_EMAIL_CHANGED", "/user/settings")
 	}
 
 	return
@@ -174,7 +174,7 @@ func PostChangeEmail(c *utils.Context) (err error) {
 
 // GetChangePassword renders /user/change_password
 func GetChangePassword(c *utils.Context) error {
-	utils.RenderPage(c, pages.UserChangePassword())
+	utils.RenderComponent(c, components.UserChangePassword())
 	return nil
 }
 
@@ -189,7 +189,7 @@ func PostChangePassword(c *utils.Context) (err error) {
 		go email.PasswordChanged.Write(c.U, nil).Send()
 
 		// Shows the popup
-		utils.ShowAndRedirect(c, "MSG_PASSWORD_CHANGED", "/user/settings")
+		utils.ShowMessage(c, "MSG_PASSWORD_CHANGED", "/user/settings")
 	}
 
 	return
@@ -197,7 +197,7 @@ func PostChangePassword(c *utils.Context) (err error) {
 
 // GetSetEmailLang renders /user/set_email_lang
 func GetSetEmailLang(c *utils.Context) error {
-	utils.RenderPage(c, pages.UserSetEmailLang(langs.Available, c.U.EmailLang))
+	utils.RenderComponent(c, components.UserSetEmailLang(langs.Available, c.U.EmailLang))
 	return nil
 }
 
@@ -208,7 +208,7 @@ func PostSetEmailLang(c *utils.Context) (err error) {
 
 	// Tries to change it
 	if err = c.U.SetEmailLang(lang); err == nil {
-		utils.ShowAndRedirect(c, "MSG_LANG_CHANGED", "/user/settings")
+		utils.ShowMessage(c, "MSG_LANG_CHANGED", "/user/settings")
 	}
 
 	return
@@ -216,7 +216,7 @@ func PostSetEmailLang(c *utils.Context) (err error) {
 
 // GetDeleteUser1 renders /user/delete_1
 func GetDeleteUser1(c *utils.Context) error {
-	utils.RenderPage(c, pages.UserDelete(true, ""))
+	utils.RenderComponent(c, components.UserDelete(true, ""))
 	return nil
 }
 
@@ -230,7 +230,7 @@ func PostDeleteUser1(c *utils.Context) (err error) {
 			"DeleteLink": configs.BaseURL + "/user/delete_2?token=" + url.QueryEscape(token),
 		}).Send()
 
-		utils.Show(c, "MSG_EMAIL_SENT")
+		utils.ShowMessage(c, "MSG_EMAIL_SENT", "")
 	}
 
 	return
@@ -238,7 +238,7 @@ func PostDeleteUser1(c *utils.Context) (err error) {
 
 // GetDeleteUser2 renders /user/delete_2
 func GetDeleteUser2(c *utils.Context) error {
-	utils.RenderPage(c, pages.UserDelete(false, c.R.URL.Query().Get("token")))
+	utils.RenderComponent(c, components.UserDelete(false, c.R.URL.Query().Get("token")))
 	return nil
 }
 

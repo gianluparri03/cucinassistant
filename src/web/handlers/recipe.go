@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	"cucinassistant/database"
-	"cucinassistant/web/pages"
+	"cucinassistant/web/components"
 	"cucinassistant/web/utils"
 )
 
@@ -18,7 +18,7 @@ func GetRecipes(c *utils.Context) (err error) {
 	var recipes []database.Recipe
 
 	if recipes, err = c.U.Recipes().GetAll(); err == nil {
-		utils.RenderPage(c, pages.RecipeList(recipes))
+		utils.RenderComponent(c, components.RecipeList(recipes))
 	}
 
 	return
@@ -26,7 +26,7 @@ func GetRecipes(c *utils.Context) (err error) {
 
 // GetNewRecipe renders /recipes/new
 func GetNewRecipe(c *utils.Context) (err error) {
-	utils.RenderPage(c, pages.RecipeNew())
+	utils.RenderComponent(c, components.RecipeNew())
 	return
 }
 
@@ -47,7 +47,7 @@ func GetRecipe(c *utils.Context) (err error) {
 	if RID, err = getRID(c); err == nil {
 		var recipe database.Recipe
 		if recipe, err = c.U.Recipes().GetOne(RID); err == nil {
-			utils.RenderPage(c, pages.RecipeView(recipe))
+			utils.RenderComponent(c, components.RecipeView(recipe))
 		}
 	}
 
@@ -61,7 +61,7 @@ func GetEditRecipe(c *utils.Context) (err error) {
 	if RID, err = getRID(c); err == nil {
 		var recipe database.Recipe
 		if recipe, err = c.U.Recipes().GetOne(RID); err == nil {
-			utils.RenderPage(c, pages.RecipeEdit(recipe))
+			utils.RenderComponent(c, components.RecipeEdit(recipe))
 		}
 	}
 
@@ -97,7 +97,7 @@ func PostDeleteRecipe(c *utils.Context) (err error) {
 	var RID int
 	if RID, err = getRID(c); err == nil {
 		if err = c.U.Recipes().Delete(RID); err == nil {
-			utils.ShowAndRedirect(c, "MSG_RECIPE_DELETED", "/recipes")
+			utils.ShowMessage(c, "MSG_RECIPE_DELETED", "/recipes")
 		}
 	}
 

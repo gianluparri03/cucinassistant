@@ -81,7 +81,7 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	logRoute(c, "")
 
 	if err := h(c); err != nil {
-		Show(c, err.Error())
+		ShowError(c, err.Error(), "", http.StatusBadRequest)
 	}
 }
 
@@ -101,7 +101,7 @@ func (ph PHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				DropUID(c, "")
 			}
 
-			Show(c, err.Error())
+			ShowError(c, err.Error(), "", http.StatusBadRequest)
 		}
 	} else {
 		// If there isn't an UID, redirects to the signin

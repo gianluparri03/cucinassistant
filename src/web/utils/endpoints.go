@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"net/http"
 	"github.com/gorilla/mux"
 )
 
@@ -27,7 +28,7 @@ type Endpoint struct {
 func (e Endpoint) Register(router *mux.Router) {
 	// Returns an error message if the method is not allowed
 	unknownHandler := func(c *Context) error {
-		ShowAndRedirect(c, "MSG_UNKNOWN_REQUEST", "/")
+		ShowError(c, "MSG_UNKNOWN_REQUEST", "/", http.StatusMethodNotAllowed)
 		return nil
 	}
 

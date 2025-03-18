@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	"cucinassistant/database"
-	"cucinassistant/web/pages"
+	"cucinassistant/web/components"
 	"cucinassistant/web/utils"
 )
 
@@ -17,7 +17,7 @@ func getMID(c *utils.Context) (int, error) {
 func GetMenus(c *utils.Context) (err error) {
 	var menus []database.Menu
 	if menus, err = c.U.Menus().GetAll(); err == nil {
-		utils.RenderPage(c, pages.MenuDashboard(menus))
+		utils.RenderComponent(c, components.MenuDashboard(menus))
 	}
 
 	return
@@ -25,7 +25,7 @@ func GetMenus(c *utils.Context) (err error) {
 
 // GetNewMenu renders /menus/new
 func GetNewMenu(c *utils.Context) (err error) {
-	utils.RenderPage(c, pages.MenuNew())
+	utils.RenderComponent(c, components.MenuNew())
 	return
 }
 
@@ -47,7 +47,7 @@ func GetMenu(c *utils.Context) (err error) {
 		// Retrieves the menu
 		var menu database.Menu
 		if menu, err = c.U.Menus().GetOne(MID); err == nil {
-			utils.RenderPage(c, pages.MenuView(menu))
+			utils.RenderComponent(c, components.MenuView(menu))
 		}
 	}
 
@@ -62,7 +62,7 @@ func GetEditMenu(c *utils.Context) (err error) {
 		// Retrieves the menu
 		var menu database.Menu
 		if menu, err = c.U.Menus().GetOne(MID); err == nil {
-			utils.RenderPage(c, pages.MenuEdit(menu))
+			utils.RenderComponent(c, components.MenuEdit(menu))
 		}
 	}
 
@@ -111,7 +111,7 @@ func PostDeleteMenu(c *utils.Context) (err error) {
 	if MID, err = getMID(c); err == nil {
 		// Tries to delete the menu
 		if err = c.U.Menus().Delete(MID); err == nil {
-			utils.ShowAndRedirect(c, "MSG_MENU_DELETED", "/menus")
+			utils.ShowMessage(c, "MSG_MENU_DELETED", "/menus")
 		}
 	}
 

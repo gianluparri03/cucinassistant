@@ -1,4 +1,4 @@
-package pages
+package components
 
 import (
 	"cucinassistant/langs"
@@ -41,7 +41,6 @@ templ TemplateBase(lang string, body templ.Component, message templ.Component) {
             hx-push-url="true"
             hx-indicator="#loader-container"
             hx-target="#body-container"
-            hx-target-error="#message-container"
         >
             <nav>
                 <span><i id="home" class="fas fa-home" hx-get="/"></i></span>

@@ -45,7 +45,7 @@ func registerAssets(router *mux.Router) {
 
 	// Registers the 404 handler
 	router.NotFoundHandler = utils.Handler(func(c *utils.Context) error {
-		utils.ShowAndRedirect(c, "MSG_PAGE_NOT_FOUND", "/")
+		utils.ShowError(c, "MSG_PAGE_NOT_FOUND", "/", http.StatusNotFound)
 		return nil
 	})
 }
