@@ -55,11 +55,3 @@ fmt:
 gen:
 	@cd src; go generate ./...
 	@cd src; templ generate
-
-# Generates the translate.*.toml files
-lang_gen:
-	@cd src/langs; goi18n merge active.*.toml
-    
-# Merges the translate.*.toml into the active.*.toml
-lang_save:
-	@cd src/langs; goi18n merge active.*.toml translate.*.toml; rm translate.*.toml

@@ -1,90 +1,99 @@
 package components
 
 import (
+	"strconv"
+
+	"cucinassistant/database"
 	"cucinassistant/langs"
 )
 
 templ MiscHome(username string) {
-    @TemplateTitle(langs.Translate(ctx, "STR_WELCOMEBACK", username), "")
+    @TemplateTitle(langs.TranslateArg(ctx, langs.STR_WELCOMEBACK, username), "")
 
     <div class="dashboard">
         <button hx-get="/menus">
             <i class="fas fa-utensils"></i>
-            <span>{ langs.Translate(ctx, "STR_MENUS", nil) }</span>
+            <span>{ langs.Translate(ctx, langs.STR_MENUS) }</span>
         </button>
 
         <button hx-get="/storage">
             <i class="fas fa-box"></i>
-            <span>{ langs.Translate(ctx, "STR_STORAGE", nil) }</span>
+            <span>{ langs.Translate(ctx, langs.STR_STORAGE) }</span>
         </button>
 
         <button hx-get="/shopping_list">
             <i class="fas fa-shopping-cart"></i>
-            <span>{ langs.Translate(ctx, "STR_SHOPPINGLIST", nil) }</span>
+            <span>{ langs.Translate(ctx, langs.STR_SHOPPINGLIST) }</span>
         </button>
 
         <button hx-get="/recipes">
             <i class="fas fa-book"></i>
-            <span>{ langs.Translate(ctx, "STR_RECIPES", nil) }</span>
+            <span>{ langs.Translate(ctx, langs.STR_RECIPES) }</span>
         </button>
 
         <button hx-get="/user/settings" class="transparent">
             <i class="fas fa-cog"></i>
-            <span>{ langs.Translate(ctx, "STR_SETTINGS", nil) }</span>
+            <span>{ langs.Translate(ctx, langs.STR_SETTINGS) }</span>
         </button>
     </div>
 }
 
 templ MiscInfo(infoData any) {
-    @TemplateTitle(langs.Translate(ctx, "STR_INFO", nil), "")
-    @templ.Raw(langs.Translate(ctx, "PAG_INFO", infoData))
+    @TemplateTitle(langs.Translate(ctx, langs.STR_INFO), "")
+	TODO
+    <!--@templ.Raw(langs.TranslateArg(ctx, langs.PAG_INFO, infoData))-->
 }
 
-templ MiscLang(available map[string]string, current string) {
-    @TemplateTitle(langs.Translate(ctx, "STR_LANGUAGE", nil), "/")
+templ MiscLang(available map[string]*langs.Lang, current string) {
+    @TemplateTitle(langs.Translate(ctx, langs.STR_LANGUAGE), "/")
 
     <form method="GET" hx-disable>
         <select name="tag" id="languages">
-            for tag, name := range available {
-                <option value={ tag } selected?={ tag == current }>
-					{ name }
+            for _, lang := range available {
+                <option value={ lang.Tag } selected?={ lang.Tag == current }>
+					{ lang.Name }
 				</option>
             }
         </select> <br>
 
 		<button class="icon-text">
-			<i class="fas fa-check"></i> { langs.Translate(ctx, "STR_CONFIRM", nil) }
+			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
 		</button>
     </form>
 }
 
-templ MiscStats(statsData any) {
-    @TemplateTitle(langs.Translate(ctx, "STR_STATS", nil), "/")
+templ MiscStats(data database.Stats) {
+    @TemplateTitle(langs.Translate(ctx, langs.STR_STATS), "/")
 
     <div class="dashboard">
         <button class="transparent" disabled>
             <i class="fas fa-user"></i>
-            <span>{ langs.Translate(ctx, "STR_STATS_USERS", statsData) }</span>
+            <span>{ langs.TranslateArg(ctx, langs.STR_STATS_USERS, strconv.Itoa(data.UsersNumber)) }</span>
         </button>
 
         <button class="transparent" disabled>
             <i class="fas fa-utensils"></i>
-            <span>{ langs.Translate(ctx, "STR_STATS_MENUS", statsData) }</span>
+            <span>{ langs.TranslateArg(ctx, langs.STR_STATS_MENUS, strconv.Itoa(data.MenusNumber)) }</span>
         </button>
 
         <button class="transparent" disabled>
             <i class="fas fa-box"></i>
-            <span>{ langs.Translate(ctx, "STR_STATS_ARTICLES", statsData) }</span>
+            <span>{ langs.TranslateArg(ctx, langs.STR_STATS_SECTIONS, strconv.Itoa(data.SectionsNumber)) }</span>
+        </button>
+
+        <button class="transparent" disabled>
+            <i class="fas fa-box"></i>
+            <span>{ langs.TranslateArg(ctx, langs.STR_STATS_ARTICLES, strconv.Itoa(data.ArticlesNumber)) }</span>
         </button>
 
         <button class="transparent" disabled>
             <i class="fas fa-shopping-cart"></i>
-            <span>{ langs.Translate(ctx, "STR_STATS_ENTRIES", statsData) }</span>
+            <span>{ langs.TranslateArg(ctx, langs.STR_STATS_ENTRIES, strconv.Itoa(data.EntriesNumber)) }</span>
         </button>
 
         <button class="transparent" disabled>
             <i class="fas fa-book"></i>
-            <span>{ langs.Translate(ctx, "STR_STATS_RECIPES", statsData) }</span>
+            <span>{ langs.TranslateArg(ctx, langs.STR_STATS_RECIPES, strconv.Itoa(data.RecipesNumber)) }</span>
         </button>
     </div>
 }

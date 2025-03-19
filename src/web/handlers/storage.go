@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"cucinassistant/database"
+	"cucinassistant/langs"
 	"cucinassistant/web/components"
 	"cucinassistant/web/utils"
 )
@@ -96,7 +97,7 @@ func PostDeleteSection(c *utils.Context) (err error) {
 	var SID int
 	if SID, err = getSID(c); err == nil {
 		if err = c.U.Storage().DeleteSection(SID); err == nil {
-			utils.ShowMessage(c, "MSG_SECTION_DELETED", "/storage")
+			utils.ShowMessage(c, langs.STR_SECTION_DELETED, "/storage")
 		}
 	}
 
@@ -188,7 +189,7 @@ func PostAddArticlesCommon(c *utils.Context) (err error) {
 
 	// Tries to add them
 	if err = c.U.Storage().AddArticles(articles...); err == nil {
-		utils.ShowMessage(c, "MSG_ARTICLES_ADDED", "/storage")
+		utils.ShowMessage(c, langs.STR_ARTICLES_ADDED, "/storage")
 	}
 
 	return
@@ -235,7 +236,7 @@ func PostEditArticle(c *utils.Context) (err error) {
 			if !changed {
 				utils.Redirect(c, "/storage/"+strconv.Itoa(SID)+"/"+strconv.Itoa(AID))
 			} else {
-				utils.ShowMessage(c, "MSG_ORDER_CHANGED", "/storage/"+strconv.Itoa(SID))
+				utils.ShowMessage(c, langs.STR_ORDER_CHANGED, "/storage/"+strconv.Itoa(SID))
 			}
 		}
 	}

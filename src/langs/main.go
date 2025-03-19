@@ -1,43 +1,42 @@
 package langs
 
 import (
-	"github.com/BurntSushi/toml"
-	"github.com/nicksnyder/go-i18n/v2/i18n"
-	"golang.org/x/text/language"
-	"log/slog"
-	"os"
+	"cucinassistant/database"
 )
 
-// Available contains all the supported languages
-// in the form tag: Name (the name is in that language's language)
-var Available map[string]string = map[string]string{
-	"en": "English",
-	"it": "Italiano",
+// Available is a collection of all the available languages
+var Available map[string]*Lang = map[string]*Lang{
+	english.Tag: english,
+	italian.Tag: italian,
 }
 
 // Default is the default language
-var Default string = "en"
+var Default *Lang = english
 
-// localizers is a collection of localizers
-var localizers map[string]*i18n.Localizer
+// Lang is an available language
+type Lang struct {
+	// Tag is the language tag (es. "en")
+	Tag string
 
-// Load initializes the undle and loads the translations
-func Load() {
-	// Creates the bundle
-	bundle := i18n.NewBundle(language.English)
-	bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
+	// Name is the language name, in that language
+	Name string
 
-	// Initializes the localizers map
-	localizers = make(map[string]*i18n.Localizer)
+	// Strings contains the translations for the Strings
+	Strings map[String]string
+}
 
-	for lang, _ := range Available {
-		// Loads the files and the localizers
-		if _, err := bundle.LoadMessageFile("langs/active." + lang + ".toml"); err != nil {
-			slog.Error("cannot load language:", "lang", lang, "err", err)
-			os.Exit(1)
-		}
-
-		// Creates the localizers
-		localizers[lang] = i18n.NewLocalizer(bundle, lang)
+// Get returns the language with that tag.
+// If the language is not found, the default one is returned.
+func Get(tag string) *Lang {
+	l, ok := Available[tag]
+	if ok {
+		return l
+	} else {
+		return Default
 	}
+}
+
+// ParseError returns a String from a database.Error
+func ParseError(err error) String {
+	return String(err.(database.Error))
 }

@@ -10,62 +10,62 @@ import (
 
 templ RecipeEdit(recipe database.Recipe) {
 	{{ baseurl := "/recipes/" + strconv.Itoa(recipe.RID) }}
-	@TemplateTitle(langs.Translate(ctx, "STR_EDIT_RECIPE", nil), baseurl)
+	@TemplateTitle(langs.Translate(ctx, langs.STR_EDIT_RECIPE), baseurl)
 
     <form method="POST">
         <div>
-            <b>{ langs.Translate(ctx, "STR_NAME", nil) }</b> <br>
+            <b>{ langs.Translate(ctx, langs.STR_NAME) }</b> <br>
             <input name="name" value={ recipe.Name }>
         </div> <br>
 
         <div>
-            <b>{ langs.Translate(ctx, "STR_STARS", nil) }</b> <br>
+            <b>{ langs.Translate(ctx, langs.STR_STARS) }</b> <br>
 			{{ stars := strconv.FormatFloat(float64(recipe.Stars) / 2, 'f', -1, 32) }}
             <input name="stars" type="number" min="0" max="5" step="0.5" value={ stars }>
         </div> <br>
 
         <div>
-            <b>{ langs.Translate(ctx, "STR_INGREDIENTS", nil) }</b> <br>
+            <b>{ langs.Translate(ctx, langs.STR_INGREDIENTS) }</b> <br>
             <textarea name="ingredients">{ recipe.Ingredients }</textarea>
         </div>
 
         <div>
-            <b>{ langs.Translate(ctx, "STR_DIRECTIONS", nil) }</b> <br>
+            <b>{ langs.Translate(ctx, langs.STR_DIRECTIONS) }</b> <br>
             <textarea name="directions">{ recipe.Directions }</textarea>
         </div>
 
         <div>
-            <b>{ langs.Translate(ctx, "STR_NOTES", nil) }</b> <br>
+            <b>{ langs.Translate(ctx, langs.STR_NOTES) }</b> <br>
             <textarea name="notes">{ recipe.Notes }</textarea>
         </div>
 
 		<button class="icon-text">
-			<i class="fas fa-check"></i> { langs.Translate(ctx, "STR_CONFIRM", nil) }
+			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
 		</button>
     </form>
 
     <br><br>
 
-    <b>{ langs.Translate(ctx, "STR_DELETE_RECIPE", nil) }</b>
+    <b>{ langs.Translate(ctx, langs.STR_DELETE_RECIPE) }</b>
 
     <div class="pre-swap">
         <button class="icon-text" onclick="swapContent();">
-			<i class="fas fa-trash"></i> { langs.Translate(ctx, "STR_DELETE", nil) }
+			<i class="fas fa-trash"></i> { langs.Translate(ctx, langs.STR_DELETE) }
 		</button>
     </div>
     <div class="post-swap hidden">
-        { langs.Translate(ctx, "STR_DELETE_RECIPE_TEXT", nil) } <br>
+        { langs.Translate(ctx, langs.STR_DELETE_RECIPE_TEXT) } <br>
 		<button class="icon-text" hx-post={ baseurl + "/delete" } hx-push-url="false">
-            <i class="fas fa-check"></i> { langs.Translate(ctx, "STR_CONFIRM", nil) }
+            <i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
         </button>
     </div>
 }
 
 templ RecipeList(recipes []database.Recipe) {
-    @TemplateTitle(langs.Translate(ctx, "STR_RECIPES", nil), "/")
+    @TemplateTitle(langs.Translate(ctx, langs.STR_RECIPES), "/")
 
     <button class="icon-text" hx-get="/recipes/new">
-        <i class="fas fa-plus"></i> { langs.Translate(ctx, "STR_NEW_RECIPE", nil) }
+        <i class="fas fa-plus"></i> { langs.Translate(ctx, langs.STR_NEW_RECIPE) }
     </button>
 
     <br>
@@ -80,20 +80,20 @@ templ RecipeList(recipes []database.Recipe) {
     } else {
         <br>
         <span id="empty-label">
-			{ langs.Translate(ctx, "STR_RECIPES_EMPTY", nil) }
+			{ langs.Translate(ctx, langs.STR_RECIPES_EMPTY) }
 		</span>
 	}
 }
 
 templ RecipeNew() {
-	@TemplateTitle(langs.Translate(ctx, "STR_NEW_RECIPE", nil), "/recipes")
+	@TemplateTitle(langs.Translate(ctx, langs.STR_NEW_RECIPE), "/recipes")
 
     <form method="POST">
-        { langs.Translate(ctx, "STR_NAME", nil) } <br>
+        { langs.Translate(ctx, langs.STR_NAME) } <br>
 		<input type="text" name="name" required> <br>
 
         <button class="icon-text">
-			<i class="fas fa-check"></i> { langs.Translate(ctx, "STR_CONFIRM", nil) }
+			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
 		</button>
     </form>
 }
@@ -117,7 +117,7 @@ templ RecipeView(recipe database.Recipe) {
 	}
 
 	if recipe.Ingredients != "" {
-        <h4>{ langs.Translate(ctx, "STR_INGREDIENTS", nil) }</h4>
+        <h4>{ langs.Translate(ctx, langs.STR_INGREDIENTS) }</h4>
         <ul>
 			for _, i := range strings.Split(recipe.Ingredients, "\n") {
 				<li>{ i }</li>
@@ -126,7 +126,7 @@ templ RecipeView(recipe database.Recipe) {
 	}
 
 	if recipe.Directions != "" {
-        <h4>{ langs.Translate(ctx, "STR_DIRECTIONS", nil) }</h4>
+        <h4>{ langs.Translate(ctx, langs.STR_DIRECTIONS) }</h4>
         <ol>
 			for _, d := range strings.Split(recipe.Directions, "\n") {
 				<li>{ d }</li>
@@ -135,11 +135,11 @@ templ RecipeView(recipe database.Recipe) {
 	}
 
 	if recipe.Notes != "" {
-        <h4>{ langs.Translate(ctx, "STR_NOTES", nil) }</h4>
+        <h4>{ langs.Translate(ctx, langs.STR_NOTES) }</h4>
         <p>{ recipe.Notes }</p>
 	}
 
 	<button class="icon-text" hx-get={ baseurl + "/edit" }>
-		<i class="fas fa-edit"></i> { langs.Translate(ctx, "STR_EDIT", nil) }
+		<i class="fas fa-edit"></i> { langs.Translate(ctx, langs.STR_EDIT) }
 	</button>
 }

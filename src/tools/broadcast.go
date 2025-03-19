@@ -86,7 +86,7 @@ func readEmail(scanner *bufio.Scanner) email.Email {
 
 		// Repeat this process every time is needed
 		if confirm(scanner) {
-			return email.Email{Subject: subject, Content: content, Raw: true}
+			return email.RawEmail{Subject: subject, Content: content}
 		}
 	}
 

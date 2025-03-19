@@ -4,7 +4,7 @@ import (
 	"cucinassistant/langs"
 )
 
-templ Base(subject string, content string, username string) {
+templ Base(subject string, content string, username string, link string) {
 	<html>
 		<body>
 			<td style="font-size: 1.3em">
@@ -12,20 +12,33 @@ templ Base(subject string, content string, username string) {
 					<h2>{ subject }</h2>
 
 					<p>
-						{ langs.Translate(ctx, "STR_GOOD_MORNING", username) }
+						{ langs.TranslateArg(ctx, langs.STR_GOOD_MORNING, username) }
 						<br><br>
+
 						@templ.Raw(content)
+						if link != "" {
+							@Button(link)
+						}
+
 						<br><br><br>
-						{ langs.Translate(ctx, "STR_REGARDS", nil) }
+						{ langs.Translate(ctx, langs.STR_REGARDS) },
+						<br>
+						CucinAssistant
 					</p>
 				</main>
 
 				<hr width="700">
 
 				<small>
-					{ langs.Translate(ctx, "STR_NOREPLY", nil) }
+					{ langs.Translate(ctx, langs.STR_NOREPLY) }
 				</small>
 			</td>
 		</body>
 	</html>
+}
+
+templ Button(path string) {
+	<a href={ templ.SafeURL(path) }>
+		{ langs.Translate(ctx, langs.STR_CLICK_HERE) }
+	</a>.
 }

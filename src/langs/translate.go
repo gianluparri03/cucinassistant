@@ -2,36 +2,29 @@ package langs
 
 import (
 	"context"
-	"github.com/nicksnyder/go-i18n/v2/i18n"
-	"log/slog"
+	"strings"
 )
 
 const contextKey string = "lang"
+const placeholder string = "%%"
 
-// Lang returns a context in which is saved the lang
-func Lang(lang string) context.Context {
-	return context.WithValue(context.Background(), contextKey, lang)
+// GetCtx returns a context in which is saved the language tag
+func (l *Lang) Ctx() context.Context {
+	return context.WithValue(context.Background(), contextKey, l)
 }
 
-// Translate returns the string with that id in the language specified in the
-// context
-func Translate(ctx context.Context, id string, data any) string {
-	lang, ok := ctx.Value(contextKey).(string)
+// Translate translates a String
+func Translate(ctx context.Context, s String) string {
+	lang, ok := ctx.Value(contextKey).(*Lang)
 	if !ok {
 		lang = Default
 	}
 
-	// Gets the required localizer (or the default one)
-	l, found := localizers[lang]
-	if !found {
-		l = localizers[Default]
-	}
+	return lang.Strings[s]
+}
 
-	// Gets the string
-	str, err := l.Localize(&i18n.LocalizeConfig{MessageID: id, TemplateData: data})
-	if err != nil {
-		slog.Error("while translating:", "id", id, "lang", lang, "err", err)
-	}
-
-	return str
+// TranslateArg translates a String, then replaces the placeholder
+// with the given argument
+func TranslateArg(ctx context.Context, s String, a string) string {
+	return strings.ReplaceAll(Translate(ctx, s), placeholder, a)
 }

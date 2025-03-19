@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"cucinassistant/database"
+	"cucinassistant/langs"
 	"cucinassistant/web/components"
 	"cucinassistant/web/utils"
 )
@@ -97,7 +98,7 @@ func PostDeleteRecipe(c *utils.Context) (err error) {
 	var RID int
 	if RID, err = getRID(c); err == nil {
 		if err = c.U.Recipes().Delete(RID); err == nil {
-			utils.ShowMessage(c, "MSG_RECIPE_DELETED", "/recipes")
+			utils.ShowMessage(c, langs.STR_RECIPE_DELETED, "/recipes")
 		}
 	}
 

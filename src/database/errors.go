@@ -1,15 +1,15 @@
 package database
 
-//go:generate stringer -type=CAError
-type CAError int
+//go:generate stringer -type=Error
+type Error int
 
 // Errors returns the error name
-func (c CAError) Error() string {
+func (c Error) Error() string {
 	return c.String()
 }
 
 const (
-	ERR_UNKNOWN CAError = iota
+	ERR_UNKNOWN Error = iota + 1
 
 	ERR_USER_UNKNOWN
 	ERR_USER_NAME_TOO_SHORT
@@ -34,4 +34,6 @@ const (
 
 	ERR_RECIPE_NOT_FOUND
 	ERR_RECIPE_DUPLICATED
+
+	ErrorsNumber int = iota
 )

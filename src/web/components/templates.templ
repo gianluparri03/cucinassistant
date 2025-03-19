@@ -56,9 +56,9 @@ templ TemplateBase(lang string, body templ.Component, message templ.Component) {
 
             <footer>
                 CucinAssistant &copy; 2023-2025, Gianluca Parri <br>
-                <a hx-get="/info">{ langs.Translate(ctx, "STR_INFO", nil) }</a> &bullet;
+                <a hx-get="/info">{ langs.Translate(ctx, langs.STR_INFO) }</a> &bullet;
                 <a href={ templ.SafeURL("https://cucinassistant.com/tutorials/" + lang + ".pdf") } hx-disable>
-                    { langs.Translate(ctx, "STR_TUTORIAL", nil) }
+                    { langs.Translate(ctx, langs.STR_TUTORIAL) }
                 </a>
             </footer>
         </body>
@@ -75,10 +75,10 @@ templ TemplateTitle(title string, backLink string) {
     </h1>
 }
 
-templ TemplateMessage(msg string, backLink string, isHx bool) {
+templ TemplateMessage(msg langs.String, backLink string, isHx bool) {
     <message>
         <content>
-			<p>{ langs.Translate(ctx, msg, nil) }</p>
+			<p>{ langs.Translate(ctx, msg) }</p>
 
             <div>
                 <button class="icon-text"
@@ -91,7 +91,7 @@ templ TemplateMessage(msg string, backLink string, isHx bool) {
                     hx-push-url="true"
                     autofocus>
 
-                    <i class="fas fa-check"></i> { langs.Translate(ctx, "STR_OK", nil) }
+                    <i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_OK) }
                 </button>
             </div>
         </content>

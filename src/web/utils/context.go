@@ -51,7 +51,7 @@ func buildContext(w http.ResponseWriter, r *http.Request, protected bool) *Conte
 	if lang, found := c.s.Values["Lang"]; found {
 		c.L = lang.(string)
 	} else {
-		c.L = langs.Default
+		c.L = langs.Default.Tag
 	}
 
 	// Gets the user, if it's protected
@@ -81,7 +81,7 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	logRoute(c, "")
 
 	if err := h(c); err != nil {
-		ShowError(c, err.Error(), "", http.StatusBadRequest)
+		ShowError(c, langs.ParseError(err), "", http.StatusBadRequest)
 	}
 }
 
@@ -98,10 +98,10 @@ func (ph PHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if c.U != nil {
 		if err := ph(c); err != nil {
 			if err == database.ERR_USER_UNKNOWN {
-				DropUID(c, "")
+				DropUID(c, langs.STR_NONE)
 			}
 
-			ShowError(c, err.Error(), "", http.StatusBadRequest)
+			ShowError(c, langs.ParseError(err), "", http.StatusBadRequest)
 		}
 	} else {
 		// If there isn't an UID, redirects to the signin

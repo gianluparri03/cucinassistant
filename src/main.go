@@ -31,9 +31,9 @@ func main() {
 	slog.Warn("Checking schema...")
 	database.Bootstrap()
 
-	// Loads the languages
-	slog.Warn("Loading languages...")
-	langs.Load()
+	// Checks the languages
+	slog.Warn("Checking languages...")
+	langs.CheckAll()
 
 	// Adds a listener for shutting down the server if it's on debug mode
 	slog.Warn("Starting web server...")

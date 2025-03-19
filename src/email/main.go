@@ -14,63 +14,61 @@ import (
 // Email is the template of an email
 type Email struct {
 	// Subject is both the email subject and title
-	Subject string
+	Subject langs.String
 
 	// Content is the text sent with the email
-	Content string
-
-	// Raw indicates if Subject and Content are IDs
-	// that need to be translated (false) or are already
-	// translated (true)
-	Raw bool
+	Content langs.String
 }
 
 var (
 	// Welcome is sent after the signup
-	Welcome = Email{Subject: "STR_SIGNUP_DONE", Content: "EMA_WELCOME"}
+	Welcome = Email{Subject: langs.STR_SIGNUP_DONE, Content: langs.STR_WELCOME_EMAIL}
 
 	// ResetPassword is used to send the user its token
-	ResetPassword = Email{Subject: "STR_RESET_PASSWORD", Content: "EMA_RESET_PASSWORD"}
+	ResetPassword = Email{Subject: langs.STR_RESET_PASSWORD, Content: langs.STR_RESET_PASSWORD_EMAIL}
 
 	// PasswordChanged is sent every time the password is changed
-	PasswordChanged = Email{Subject: "STR_CHANGE_PASSWORD", Content: "EMA_PASSWORD_CHANGED"}
+	PasswordChanged = Email{Subject: langs.STR_CHANGE_PASSWORD, Content: langs.STR_PASSWORD_CHANGED_EMAIL}
 
 	// DeleteConfirm is used to send the user its token
-	DeleteConfirm = Email{Subject: "STR_DELETE_USER", Content: "EMA_DELETE_CONFIRM"}
+	DeleteConfirm = Email{Subject: langs.STR_DELETE_USER, Content: langs.STR_DELETE_CONFIRM_EMAIL}
 
 	// Goodbye is sent after an account has been deleted
-	Goodbye = Email{Subject: "STR_GOODBYE", Content: "EMA_GOODBYE"}
+	Goodbye = Email{Subject: langs.STR_GOODBYE, Content: langs.STR_GOODBYE_EMAIL}
 )
+
+// Write creates an EmailBody.
+// It reads from the user the username, the recipient and the language.
+func (e Email) Write(user *database.User, link string) EmailBody {
+	ctx := langs.Get(user.EmailLang).Ctx()
+
+	return RawEmail{
+		Subject: langs.Translate(ctx, e.Subject),
+		Content: langs.Translate(ctx, e.Content),
+	}.Write(user, link)
+}
+
+// RawEmail is an email that has already been translated
+type RawEmail struct {
+	// Subject is both the email subject and title
+	Subject string
+
+	// Content is the text sent with the email
+	Content string
+}
 
 // Write executes the email template with the given data.
 // It reads from the user the username, the recipient and the language.
-func (e Email) Write(user *database.User, data map[string]any) EmailBody {
-	// Translates subject and content if the email is not raw
-	subject := e.Subject
-	content := e.Content
-	if !e.Raw {
-		lang := langs.Lang(user.EmailLang)
-		subject = langs.Translate(lang, subject, nil)
-		content = langs.Translate(lang, content, data)
-	}
-
+func (e RawEmail) Write(user *database.User, link string) EmailBody {
 	// Prepares the headers of the body
 	var body bytes.Buffer
-	body.Write([]byte("Subject: " + subject + "\n"))
+	body.Write([]byte("Subject: " + e.Subject + "\n"))
 	body.Write([]byte("From: CucinAssistant <" + configs.EmailSender + ">\n"))
 	body.Write([]byte("To: " + user.Email + "\n"))
 	body.Write([]byte("MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n\n\n"))
 
-	// Adds the subject and the content of the email
-	if data == nil {
-		data = make(map[string]any)
-	}
-	data["Username"] = user.Username
-	data["Subject"] = subject
-	data["Content"] = content
-
 	// Executes the templates
-	Base(subject, content, user.Username).Render(context.Background(), &body)
+	Base(e.Subject, e.Content, user.Username, link).Render(context.Background(), &body)
 	return EmailBody{Body: &body, Recipient: user.Email}
 }
 

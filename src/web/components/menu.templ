@@ -7,18 +7,18 @@ import (
 	"cucinassistant/langs"
 )
 
-var days = [7]string{
-	"STR_MONDAY",
-	"STR_TUESDAY",
-	"STR_WEDNESDAY",
-	"STR_THURSDAY",
-	"STR_FRIDAY",
-	"STR_SATURDAY",
-	"STR_SUNDAY",
+var days = [7]langs.String{
+	langs.STR_MONDAY,
+	langs.STR_TUESDAY,
+	langs.STR_WEDNESDAY,
+	langs.STR_THURSDAY,
+	langs.STR_FRIDAY,
+	langs.STR_SATURDAY,
+	langs.STR_SUNDAY,
 }
 
 templ MenuDashboard(menus []database.Menu) {
-	@TemplateTitle(langs.Translate(ctx, "STR_MENUS", nil), "/")
+	@TemplateTitle(langs.Translate(ctx, langs.STR_MENUS), "/")
 
     <div class="dashboard">
 		for _, menu := range menus {
@@ -31,24 +31,24 @@ templ MenuDashboard(menus []database.Menu) {
 
         <button hx-get="/menus/new" class="transparent">
             <i class="fas fa-plus"></i>
-            <span>{ langs.Translate(ctx, "STR_NEW_MENU", nil) }</span>
+            <span>{ langs.Translate(ctx, langs.STR_NEW_MENU) }</span>
         </button>
     </div>
 }
 
 templ MenuEdit(menu database.Menu) {
 	{{ baseurl := "/menus/" + strconv.Itoa(menu.MID) }}
-	@TemplateTitle(langs.Translate(ctx, "STR_EDIT_MENU", nil), baseurl)
+	@TemplateTitle(langs.Translate(ctx, langs.STR_EDIT_MENU), baseurl)
 
     <form method="POST">
         <div class="menu-day">
-            <b>{ langs.Translate(ctx, "STR_NAME", nil) }</b> <br>
+            <b>{ langs.Translate(ctx, langs.STR_NAME) }</b> <br>
 			<input name="name" value={ menu.Name }>
         </div> <br>
 
 		for index, day := range days {
 			<div class="menu-day">
-				<b>{ langs.Translate(ctx, day, nil) }</b>
+				<b>{ langs.Translate(ctx, day) }</b>
 
 				for i := 0; i < 2; i++ {
 					{{ name := "meal-" + strconv.Itoa(index*2+i) }}
@@ -60,34 +60,34 @@ templ MenuEdit(menu database.Menu) {
 		}
 
 		<button class="icon-text">
-			<i class="fas fa-check"></i> { langs.Translate(ctx, "STR_CONFIRM", nil) }
+			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
 		</button>
     </form> <br>
 
-    <b>{ langs.Translate(ctx, "STR_DELETE_MENU", nil) }</b>
+    <b>{ langs.Translate(ctx, langs.STR_DELETE_MENU) }</b>
 
     <div class="pre-swap">
 		<button class="icon-text" onclick="swapContent()">
-			<i class="fas fa-trash"></i> { langs.Translate(ctx, "STR_DELETE", nil) }
+			<i class="fas fa-trash"></i> { langs.Translate(ctx, langs.STR_DELETE) }
 		</button>
     </div>
     <div class="post-swap hidden">
-        { langs.Translate(ctx, "STR_DELETE_MENU_TEXT", nil) } <br>
+        { langs.Translate(ctx, langs.STR_DELETE_MENU_TEXT) } <br>
 		<button class="icon-text" hx-post={ baseurl + "/delete" } hx-push-url="false">
-            <i class="fas fa-check"></i> { langs.Translate(ctx, "STR_CONFIRM", nil) }
+            <i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
         </button>
     </div>
 }
 
 templ MenuNew() {
-	@TemplateTitle(langs.Translate(ctx, "STR_NEW_MENU", nil), "/menus")
+	@TemplateTitle(langs.Translate(ctx, langs.STR_NEW_MENU), "/menus")
 
     <form method="POST">
-        { langs.Translate(ctx, "STR_NAME", nil) } <br>
+        { langs.Translate(ctx, langs.STR_NAME) } <br>
 		<input type="text" name="name" required> <br>
 
 		<button class="icon-text">
-			<i class="fas fa-check"></i> { langs.Translate(ctx, "STR_CONFIRM", nil) }
+			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
 		</button>
     </form>
 }
@@ -97,15 +97,15 @@ templ MenuView(menu database.Menu) {
 	@TemplateTitle(menu.Name, "/menus")
 
 	<button class="icon-text" hx-get={ baseurl + "/edit" }>
-		<i class="fas fa-edit"></i> { langs.Translate(ctx, "STR_EDIT", nil) }
+		<i class="fas fa-edit"></i> { langs.Translate(ctx, langs.STR_EDIT) }
 	</button>
 	<button class="icon-text" hx-post={ baseurl + "/duplicate" }>
-		<i class="fas fa-clone"></i> { langs.Translate(ctx, "STR_CLONE", nil) }
+		<i class="fas fa-clone"></i> { langs.Translate(ctx, langs.STR_CLONE) }
 	</button>
 
 	for index, day := range days {
 		<div class="menu-day">
-			<b>{ langs.Translate(ctx, day, nil) }</b>
+			<b>{ langs.Translate(ctx, day) }</b>
 			<textarea readonly>{ menu.Meals[index*2+0] }</textarea>
 			<textarea readonly>{ menu.Meals[index*2+1] }</textarea>
 		</div>

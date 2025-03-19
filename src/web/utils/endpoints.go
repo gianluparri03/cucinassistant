@@ -1,8 +1,10 @@
 package utils
 
 import (
-	"net/http"
 	"github.com/gorilla/mux"
+	"net/http"
+
+	"cucinassistant/langs"
 )
 
 // Endpoint contains all the info to register automatically
@@ -28,7 +30,7 @@ type Endpoint struct {
 func (e Endpoint) Register(router *mux.Router) {
 	// Returns an error message if the method is not allowed
 	unknownHandler := func(c *Context) error {
-		ShowError(c, "MSG_UNKNOWN_REQUEST", "/", http.StatusMethodNotAllowed)
+		ShowError(c, langs.STR_UNKNOWN_REQUEST, "/", http.StatusMethodNotAllowed)
 		return nil
 	}
 

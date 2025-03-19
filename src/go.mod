@@ -3,7 +3,6 @@ module cucinassistant
 go 1.23
 
 require (
-	github.com/BurntSushi/toml v1.4.0
 	github.com/a-h/templ v0.3.833
 	github.com/alexedwards/argon2id v1.0.0
 	github.com/antonlindstrom/pgstore v0.0.0-20220421113606-e3a6e3fed12a
@@ -11,8 +10,6 @@ require (
 	github.com/gorilla/sessions v1.3.0
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.10.9
-	github.com/nicksnyder/go-i18n/v2 v2.5.0
-	golang.org/x/text v0.21.0
 )
 
 require (

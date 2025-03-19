@@ -8,7 +8,7 @@ import (
 )
 
 templ ShoppingListAppend() {
-	@TemplateTitle(langs.Translate(ctx, "STR_APPEND_ENTRIES", nil), "/shopping_list")
+	@TemplateTitle(langs.Translate(ctx, langs.STR_APPEND_ENTRIES), "/shopping_list")
 
 	<form method="POST">
         <button class="icon" onclick="removeItem(event);">
@@ -18,13 +18,13 @@ templ ShoppingListAppend() {
 			<i class="fas fa-plus"></i>
 		</button>
 		<button class="icon-text">
-			<i class="fas fa-check"></i> { langs.Translate(ctx, "STR_CONFIRM", nil) }
+			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
 		</button>
 
         <div id="new-items">
             <div class="item hidden">
                 <input class="name" type="text" nametemplate="entry-ID-name"
-					placeholder={ langs.Translate(ctx, "STR_NAME", nil) }>
+					placeholder={ langs.Translate(ctx, langs.STR_NAME) }>
             </div>
         </div>
     </form>
@@ -33,27 +33,27 @@ templ ShoppingListAppend() {
 }
 
 templ ShoppingListEdit(name string) {
-	@TemplateTitle(langs.Translate(ctx, "STR_EDIT_ENTRY", nil), "/shopping_list")
+	@TemplateTitle(langs.Translate(ctx, langs.STR_EDIT_ENTRY), "/shopping_list")
 
     <form method="POST">
 		<input name="name" value={ name } required> <br>
 		<button class="icon-text">
-			<i class="fas fa-check"></i> { langs.Translate(ctx, "STR_CONFIRM", nil) }
+			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
 		</button>
     </form>
 }
 
 templ ShoppingListView(list map[int]database.Entry) {
-	@TemplateTitle(langs.Translate(ctx, "STR_SHOPPINGLIST", nil), "/")
+	@TemplateTitle(langs.Translate(ctx, langs.STR_SHOPPINGLIST), "/")
 
     <div class="shopping-list">
         <button class="icon-text" hx-get="/shopping_list/append">
-            <i class="fas fa-plus"></i> { langs.Translate(ctx, "STR_ADD", nil) }
+            <i class="fas fa-plus"></i> { langs.Translate(ctx, langs.STR_ADD) }
         </button>
 
 		if len(list) > 0 {
             <button class="icon-text" hx-post="/shopping_list/clear" hx-push-url="false">
-                <i class="fas fa-trash"></i> { langs.Translate(ctx, "STR_DELETE_SELECTED", nil) }
+                <i class="fas fa-trash"></i> { langs.Translate(ctx, langs.STR_DELETE_SELECTED) }
             </button>
        	}
 
@@ -70,7 +70,7 @@ templ ShoppingListView(list map[int]database.Entry) {
 
 		if len(list) == 0 {
 			<span id="empty-label">
-				{ langs.Translate(ctx, "STR_SHOPPINGLIST_EMPTY", nil) }
+				{ langs.Translate(ctx, langs.STR_SHOPPINGLIST_EMPTY) }
 			</span>
 		}
     </div>
