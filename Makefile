@@ -40,7 +40,7 @@ run: start_db
 
 # Runs the tests
 test: create_test_db
-	@-cd src; CA_ENV=testing go test -v cucinassistant/database
+	@-cd src; CA_ENV=testing go test cucinassistant/database cucinassistant/langs
 
 # Runs the tests and shows a coverage report
 cover: create_test_db

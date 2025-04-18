@@ -8,7 +8,6 @@ import (
 
 	"cucinassistant/configs"
 	"cucinassistant/database"
-	"cucinassistant/langs"
 	"cucinassistant/web"
 )
 
@@ -30,10 +29,6 @@ func main() {
 	// Checks the schema
 	slog.Warn("Checking schema...")
 	database.Bootstrap()
-
-	// Checks the languages
-	slog.Warn("Checking languages...")
-	langs.CheckAll()
 
 	// Adds a listener for shutting down the server if it's on debug mode
 	slog.Warn("Starting web server...")

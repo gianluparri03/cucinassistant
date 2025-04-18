@@ -1,3 +1,2 @@
 ignored/
 src/configs/*.local
-src/langs/translate.*.toml
