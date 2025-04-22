@@ -318,34 +318,75 @@ func (s Storage) GetArticle(AID int) (Article, error) {
 	return article, nil
 }
 
-// GetArticles returns a specific section, filled with
+// GetSectionArticles returns a specific section, filled with
 // its articles. It is possible to specify a filter,
 // that will filter the name.
 // The next and prev fields are not fetched.
-func (s Storage) GetArticles(SID int, filter string) (Section, error) {
+func (s Storage) GetSectionArticles(SID int, filter string) (Section, error) {
 	// Gets the empty section
 	section, err := s.GetSection(SID)
 	if err != nil {
 		return section, err
 	}
 
-	// Scans the articles
-	rows, err := db.Query(`SELECT sid, aid, name, expiration, quantity FROM articles
-						  WHERE sid=$1 AND name ILIKE CONCAT('%', $2::VARCHAR, '%') ORDER BY expiration, aid;`, SID, filter)
+	// Runs the query
+	rows, err := db.Query(`SELECT sid, aid, name, expiration, quantity
+						   FROM articles WHERE sid=$1 AND
+						   name ILIKE CONCAT('%', $2::VARCHAR, '%')
+						   ORDER BY expiration, aid;`, SID, filter)
 	defer rows.Close()
+
+	// Scans the articles
 	if err != nil {
-		slog.Error("while retrieving articles:", "err", err)
+		slog.Error("while retrieving section articles:", "err", err)
 		return section, ERR_UNKNOWN
 	} else {
 		for rows.Next() {
-			var article Article
-			rows.Scan(&article.SID, &article.AID, &article.Name, &article.Expiration, &article.Quantity)
-			article.fixExpiration()
-			section.Articles = append(section.Articles, article)
+			var a Article
+			rows.Scan(&a.SID, &a.AID, &a.Name, &a.Expiration, &a.Quantity)
+			a.fixExpiration()
+			section.Articles = append(section.Articles, a)
 		}
 	}
 
 	return section, nil
+}
+
+// GetAllArticles returns all the articles, filtered by their name.
+// The next and prev fields are not fetched.
+func (s Storage) GetAllArticles(filter string) ([]Article, error) {
+	var articles []Article
+
+	// Runs the query
+	rows, err := db.Query(`SELECT a.sid, a.aid, a.name, a.expiration, a.quantity
+						   FROM articles a
+						   INNER JOIN sections s ON a.sid = s.sid
+						   INNER JOIN ca_users u ON s.uid = u.uid
+						   WHERE u.uid=$1 AND
+						   a.name ILIKE CONCAT('%', $2::VARCHAR, '%')
+						   ORDER BY a.expiration, a.aid;`, s.uid, filter)
+	defer rows.Close()
+
+	// Scans the articles
+	if err != nil {
+		slog.Error("while retrieving all articles:", "err", err)
+		return articles, ERR_UNKNOWN
+	} else {
+		for rows.Next() {
+			var a Article
+			rows.Scan(&a.SID, &a.AID, &a.Name, &a.Expiration, &a.Quantity)
+			a.fixExpiration()
+			articles = append(articles, a)
+		}
+	}
+
+	// If no articles have been found, makes sure the user exists
+	if len(articles) == 0 {
+		_, err = GetUser("UID", s.uid)
+		return articles, err
+	}
+
+	return articles, nil
 }
 
 // EditArticle tries to replace the article's name, quantity and expiration.

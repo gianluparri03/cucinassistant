@@ -11,7 +11,9 @@ var italian *Lang = &Lang{
 	Strings: map[String]string{
 		STR_ADD:                                 "Aggiungi",
 		STR_ADD_ARTICLES:                        "Aggiungi articoli",
+		STR_ALL_ARTICLES:                        "Vedi tutti",
 		STR_APPEND_ENTRIES:                      "Aggiungi elementi",
+		STR_ARTICLES:                            "Articoli",
 		STR_ARTICLES_ADDED:                      "Articoli aggiunti correttamente.",
 		STR_CANCEL:                              "Annulla",
 		STR_CHANGE_EMAIL:                        "Cambio email",
@@ -105,6 +107,7 @@ var italian *Lang = &Lang{
 		STR_STATS_SECTIONS:                      placeholder + " sezioni",
 		STR_STATS_USERS:                         placeholder + " utenti",
 		STR_STORAGE:                             "Dispensa",
+		STR_STORAGE_EMPTY:                       "La dispensa è vuota",
 		STR_SUNDAY:                              "Domenica",
 		STR_THURSDAY:                            "Giovedì",
 		STR_TUESDAY:                             "Martedì",

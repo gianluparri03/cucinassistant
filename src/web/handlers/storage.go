@@ -51,16 +51,28 @@ func PostNewSection(c *utils.Context) (err error) {
 	return
 }
 
-// GetArticles renders /storage/{SID}
-func GetArticles(c *utils.Context) (err error) {
+// GetSectionArticles renders /storage/{SID}
+func GetSectionArticles(c *utils.Context) (err error) {
 	var SID int
 	if SID, err = getSID(c); err == nil {
 		search := c.R.URL.Query().Get("search")
 
 		var section database.Section
-		if section, err = c.U.Storage().GetArticles(SID, search); err == nil {
-			utils.RenderComponent(c, components.StorageViewArticles(section, search))
+		if section, err = c.U.Storage().GetSectionArticles(SID, search); err == nil {
+			utils.RenderComponent(c, components.StorageViewSectionArticles(section, search))
 		}
+	}
+
+	return
+}
+
+// GetAllArticles renders /storage/view
+func GetAllArticles(c *utils.Context) (err error) {
+	search := c.R.URL.Query().Get("search")
+
+	var articles []database.Article
+	if articles, err = c.U.Storage().GetAllArticles(search); err == nil {
+		utils.RenderComponent(c, components.StorageViewAllArticles(articles, search))
 	}
 
 	return
@@ -109,7 +121,7 @@ func GetAddArticlesSection(c *utils.Context) (err error) {
 	var SID int
 	if SID, err = getSID(c); err == nil {
 		var section database.Section
-		if section, err = c.U.Storage().GetArticles(SID, ""); err == nil {
+		if section, err = c.U.Storage().GetSectionArticles(SID, ""); err == nil {
 			utils.RenderComponent(c, components.StorageAddArticles(section.SID, []database.Section{}))
 		}
 	}
@@ -195,11 +207,18 @@ func PostAddArticlesCommon(c *utils.Context) (err error) {
 	return
 }
 
-// GetSearchArticles renders /storage/{SID}/search
-func GetSearchArticles(c *utils.Context) (err error) {
+// GetSearchAllArticles renders /storage/search
+func GetSearchAllArticles(c *utils.Context) (err error) {
+	utils.RenderComponent(c, components.StorageSearchArticles("/storage/view", "/storage"))
+	return
+}
+
+// GetSearchSectionArticles renders /storage/{SID}/search
+func GetSearchSectionArticles(c *utils.Context) (err error) {
 	var SID int
 	if SID, err = getSID(c); err == nil {
-		utils.RenderComponent(c, components.StorageSearchArticles(SID))
+		target := "/storage/" + strconv.Itoa(SID)
+		utils.RenderComponent(c, components.StorageSearchArticles(target, target))
 	}
 
 	return

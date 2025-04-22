@@ -151,8 +151,16 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 		PostHandler: handlers.PostAddArticlesCommon,
 	},
 	{
+		Path:       "/storage/search",
+		GetHandler: handlers.GetSearchAllArticles,
+	},
+	{
+		Path:       "/storage/view",
+		GetHandler: handlers.GetAllArticles,
+	},
+	{
 		Path:       "/storage/{SID}",
-		GetHandler: handlers.GetArticles,
+		GetHandler: handlers.GetSectionArticles,
 	},
 	{
 		Path:        "/storage/{SID}/edit",
@@ -170,7 +178,7 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 	},
 	{
 		Path:       "/storage/{SID}/search",
-		GetHandler: handlers.GetSearchArticles,
+		GetHandler: handlers.GetSearchSectionArticles,
 	},
 	{
 		Path:        "/storage/{SID}/{AID}",

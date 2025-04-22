@@ -57,6 +57,14 @@ templ StorageAddArticles(SID int, sections []database.Section) {
 templ StorageDashboard(sections []database.Section) {
     @TemplateTitle(langs.Translate(ctx, langs.STR_STORAGE), "/")
 
+    <button class="icon-text" hx-get="/storage/view">
+		<i class="fas fa-box"></i> { langs.Translate(ctx, langs.STR_ALL_ARTICLES) }
+	</button>
+
+    <button class="icon-text" hx-get="/storage/add">
+		<i class="fas fa-plus"></i> { langs.Translate(ctx, langs.STR_ADD_ARTICLES) }
+	</button>
+
     <div class="dashboard">
 		for _, section := range sections {
 			{{ baseurl := "/storage/" + strconv.Itoa(section.SID) }}
@@ -71,10 +79,6 @@ templ StorageDashboard(sections []database.Section) {
             <span>{ langs.Translate(ctx, langs.STR_NEW_SECTION) }</span>
         </button>
     </div>
-
-    <button class="icon-text" hx-get="/storage/add">
-		<i class="fas fa-plus"></i> { langs.Translate(ctx, langs.STR_ADD_ARTICLES) }
-	</button>
 }
 
 templ StorageEditArticle(SID int, article database.Article) {
@@ -184,11 +188,10 @@ templ StorageNewSection() {
     </form>
 }
 
-templ StorageSearchArticles(SID int) {
-	{{ baseurl := "/storage/" + strconv.Itoa(SID) }}
-    @TemplateTitle(langs.Translate(ctx, langs.STR_SEARCH_ARTICLES), baseurl)
+templ StorageSearchArticles(target string, back string) {
+    @TemplateTitle(langs.Translate(ctx, langs.STR_SEARCH_ARTICLES), back)
 
-    <form method="GET" action={ templ.SafeURL(baseurl) }>
+    <form method="GET" action={ templ.SafeURL(target) }>
         { langs.Translate(ctx, langs.STR_NAME) } <br>
         <input name="search" required> <br>
 
@@ -198,8 +201,28 @@ templ StorageSearchArticles(SID int) {
     </form>
 }
 
+templ viewArticles(articles []database.Article) {
+	for _, article := range articles {
+		{{ classes := "article" }}
+		if article.IsExpired() {
+			{{ classes += " expired" }}
+		}
 
-templ StorageViewArticles(section database.Section, search string) {
+		<div class={ classes } hx-get={ "/storage/" + strconv.Itoa(article.SID) + "/" + strconv.Itoa(article.AID) }>
+			<input class="name" value={ article.Name } readonly>
+			if article.Expiration != nil {
+				<input class="expiration" type="date" readonly
+					value={ article.FormatExpiration() }>
+			}
+			if article.Quantity != nil {
+				<input class="quantity" type="number" readonly
+					value={ strconv.FormatFloat(float64(*article.Quantity), 'f', -1, 32) }>
+			}
+		</div>
+	}
+}
+
+templ StorageViewSectionArticles(section database.Section, search string) {
 	{{ baseurl := "/storage/" + strconv.Itoa(section.SID) }}
 	@TemplateTitle(section.Name, "/storage")
 
@@ -223,31 +246,44 @@ templ StorageViewArticles(section database.Section, search string) {
         }
 
         <br>
-
-		for _, article := range section.Articles {
-			{{ classes := "article" }}
-			if article.IsExpired() {
-				{{ classes += " expired" }}
-			}
-
-			<div class={ classes } hx-get={ baseurl + "/" + strconv.Itoa(article.AID) }>
-				<input class="name" value={ article.Name } readonly>
-				if article.Expiration != nil {
-					<input class="expiration" type="date" readonly
-						value={ article.FormatExpiration() }>
-				}
-				if article.Quantity != nil {
-					<input class="quantity" type="number" readonly
-						value={ strconv.FormatFloat(float64(*article.Quantity), 'f', -1, 32) }>
-				}
-            </div>
-		}
+		@viewArticles(section.Articles)
 
 		if len(section.Articles) == 0 {
 			if search != "" {
 				<i>{ langs.Translate(ctx, langs.STR_SEARCH_EMPTY) }</i>
 			} else {
 				<i>{ langs.Translate(ctx, langs.STR_SECTION_EMPTY) }</i>
+			}
+		}
+    </div>
+}
+
+templ StorageViewAllArticles(articles []database.Article, search string) {
+	@TemplateTitle(langs.Translate(ctx, langs.STR_ALL_ARTICLES), "/storage")
+
+    <div>
+		if search != "" {
+            <div>
+                { langs.Translate(ctx, langs.STR_CURRENT_SEARCH) }: "<i>{ search }</i>".
+				<a hx-get="/storage/view">{ langs.Translate(ctx, langs.STR_CANCEL) }</a>
+            </div>
+		} else {
+			<button class="icon-text" hx-get="/storage/search">
+				<i class="fas fa-search"></i> { langs.Translate(ctx, langs.STR_SEARCH_ARTICLES) }
+			</button>
+			<button class="icon-text" hx-get="/storage/add">
+				<i class="fas fa-plus"></i> { langs.Translate(ctx, langs.STR_ADD_ARTICLES) }
+			</button>
+        }
+
+        <br>
+		@viewArticles(articles)
+
+		if len(articles) == 0 {
+			if search != "" {
+				<i>{ langs.Translate(ctx, langs.STR_SEARCH_EMPTY) }</i>
+			} else {
+				<i>{ langs.Translate(ctx, langs.STR_STORAGE_EMPTY) }</i>
 			}
 		}
     </div>

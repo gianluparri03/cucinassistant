@@ -11,7 +11,9 @@ var english *Lang = &Lang{
 	Strings: map[String]string{
 		STR_ADD:                                 "Add",
 		STR_ADD_ARTICLES:                        "Add articles",
+		STR_ALL_ARTICLES:                        "All articles",
 		STR_APPEND_ENTRIES:                      "Add entries",
+		STR_ARTICLES:                            "Articles",
 		STR_ARTICLES_ADDED:                      "Articles added succesfully",
 		STR_CANCEL:                              "Cancel",
 		STR_CHANGE_EMAIL:                        "Email change",
@@ -105,6 +107,7 @@ var english *Lang = &Lang{
 		STR_STATS_SECTIONS:                      placeholder + " sections",
 		STR_STATS_USERS:                         placeholder + " users",
 		STR_STORAGE:                             "Storage",
+		STR_STORAGE_EMPTY:                       "The storage is empty",
 		STR_SUNDAY:                              "Sunday",
 		STR_THURSDAY:                            "Thursday",
 		STR_TUESDAY:                             "Tuesday",

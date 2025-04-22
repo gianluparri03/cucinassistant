@@ -305,7 +305,7 @@ func TestStorageAddArticles(t *testing.T) {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
 			} else {
 				for sid, articles := range d.ExpectedArticles {
-					section, _ := d.User.Storage().GetArticles(sid, "")
+					section, _ := d.User.Storage().GetSectionArticles(sid, "")
 					if !reflect.DeepEqual(section.Articles, articles) {
 						t.Errorf("%s: expected list <%v>, got <%v>", msg, articles, section.Articles)
 					}
@@ -346,7 +346,7 @@ func TestStorageAddArticles(t *testing.T) {
 	}.Run(t)
 }
 
-func TestStorageGetArticles(t *testing.T) {
+func TestStorageGetSectionArticles(t *testing.T) {
 	user, _ := getTestingUser(t)
 
 	section, _ := user.Storage().NewSection("section")
@@ -387,7 +387,7 @@ func TestStorageGetArticles(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			section, err := d.User.Storage().GetArticles(d.SID, d.Filter)
+			section, err := d.User.Storage().GetSectionArticles(d.SID, d.Filter)
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
 			} else if !reflect.DeepEqual(section.Articles, d.ExpectedArticles) {
@@ -419,6 +419,59 @@ func TestStorageGetArticles(t *testing.T) {
 			{
 				"(empty)",
 				data{User: otherUser, SID: emptySection.SID},
+			},
+		},
+	}.Run(t)
+}
+
+func TestStorageGetAllArticles(t *testing.T) {
+	user, _ := getTestingUser(t)
+
+	section1, _ := user.Storage().NewSection("section1")
+	section2, _ := user.Storage().NewSection("section2")
+
+	s1 := StringArticle{Name: "First", Expiration: "2025-01-08", Quantity: "2", Section: section1.SID}
+	s2 := StringArticle{Name: "second", Expiration: "2025-01-06", Quantity: "15.31", Section: section2.SID}
+	user.Storage().AddArticles(s1, s2)
+
+	a1 := s1.getExpectedArticle()
+	a2 := s2.getExpectedArticle()
+
+	otherUser, _ := getTestingUser(t)
+	otherUserSection, _ := otherUser.Storage().NewSection("section")
+	otherUser.Storage().AddArticles(StringArticle{Name: "other", Section: otherUserSection.SID})
+	testingArticlesN++
+
+	type data struct {
+		User   User
+		Filter string
+
+		ExpectedErr      error
+		ExpectedArticles []Article
+	}
+
+	testSuite[data]{
+		Target: func(t *testing.T, msg string, d data) {
+			articles, err := d.User.Storage().GetAllArticles(d.Filter)
+			if err != d.ExpectedErr {
+				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
+			} else if !reflect.DeepEqual(articles, d.ExpectedArticles) {
+				t.Errorf("%s: expected list <%v>, got <%v>", msg, d.ExpectedArticles, articles)
+			}
+		},
+
+		Cases: []testCase[data]{
+			{
+				"got articles of unknown user",
+				data{User: unknownUser, ExpectedErr: ERR_USER_UNKNOWN},
+			},
+			{
+				"(unfiltered)",
+				data{User: user, ExpectedArticles: []Article{a2, a1}},
+			},
+			{
+				"(filtered)",
+				data{User: user, Filter: "F", ExpectedArticles: []Article{a1}},
 			},
 		},
 	}.Run(t)
