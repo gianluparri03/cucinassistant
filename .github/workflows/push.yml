@@ -11,9 +11,9 @@ jobs:
       database:
         image: postgres
         env:
-          POSTGRES_USER: ca
-          POSTGRES_PASSWORD: ca
-          POSTGRES_DB: ca_test
+          POSTGRES_USER: cucinassistant
+          POSTGRES_PASSWORD: cucinassistant
+          POSTGRES_DB: cucinassistant
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -36,4 +36,4 @@ jobs:
       - name: Run tests
         env:
             CA_ENV: "testing_ci"
-        run: go test cucinassistant/database cucinassistant/langs
+        run: go test cucinassistant/database

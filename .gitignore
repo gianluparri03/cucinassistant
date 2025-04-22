@@ -1,2 +1,6 @@
+.envrc
+
 ignored/
+
 src/configs/*.local
+src/cover.out
