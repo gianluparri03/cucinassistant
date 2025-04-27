@@ -222,7 +222,7 @@ templ StorageArticle(SID int, article database.Article, prev int, next int, sect
 				}
                 type="number" step="any" name="quantity">
 
-			<select class="section">
+			<select class="section" name="section">
 				<option selected disabled>
 					{ langs.Translate(ctx, langs.STR_SECTION) }
 				</option>

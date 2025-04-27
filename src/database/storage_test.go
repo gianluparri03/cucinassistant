@@ -2,6 +2,7 @@ package database
 
 import (
 	"reflect"
+	"strconv"
 	"testing"
 )
 
@@ -19,7 +20,7 @@ func (sa StringArticle) getExpectedArticle() Article {
 func TestStorageAddArticles(t *testing.T) {
 	user, _ := getTestingUser(t)
 	section, _ := user.Storage().NewSection("section")
-	sid := section.SID
+	sid := strconv.Itoa(section.SID)
 	otherSection, _ := user.Storage().NewSection("otherSection")
 
 	name := "article"
@@ -31,11 +32,11 @@ func TestStorageAddArticles(t *testing.T) {
 		{Name: "Full", Quantity: qty, Expiration: exp, Section: sid},
 		{Name: "Empty", Quantity: "", Expiration: "", Section: sid},
 		{Name: "NoExp", Quantity: qty, Expiration: "", Section: sid},
-		{Name: "otherSection", Quantity: qty, Expiration: exp, Section: otherSection.SID},
+		{Name: "otherSection", Quantity: qty, Expiration: exp, Section: strconv.Itoa(otherSection.SID)},
 	}
 
-	outSimple := make(map[int][]Article)
-	outDoubled := make(map[int][]Article)
+	outSimple := make(map[string][]Article)
+	outDoubled := make(map[string][]Article)
 	for _, sa := range inList {
 		simple := sa.getExpectedArticle()
 		outSimple[sa.Section] = append(outSimple[sa.Section], simple)
@@ -60,7 +61,7 @@ func TestStorageAddArticles(t *testing.T) {
 		Articles []StringArticle
 
 		ExpectedErr      error
-		ExpectedArticles map[int][]Article
+		ExpectedArticles map[string][]Article
 	}
 
 	testSuite[data]{
@@ -69,7 +70,8 @@ func TestStorageAddArticles(t *testing.T) {
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
 			} else {
-				for sid, articles := range d.ExpectedArticles {
+				for sidStr, articles := range d.ExpectedArticles {
+					sid, _ := strconv.Atoi(sidStr)
 					section, _ := d.User.Storage().GetArticles(sid, "")
 					if !reflect.DeepEqual(section.Articles, articles) {
 						t.Errorf("%s: expected list <%v>, got <%v>", msg, articles, section.Articles)
@@ -85,7 +87,7 @@ func TestStorageAddArticles(t *testing.T) {
 			},
 			{
 				"added articles to another user's section",
-				data{User: user, Articles: []StringArticle{{Name: name, Section: notMySection.SID}}, ExpectedErr: ERR_SECTION_NOT_FOUND},
+				data{User: user, Articles: []StringArticle{{Name: name, Section: strconv.Itoa(notMySection.SID)}}, ExpectedErr: ERR_SECTION_NOT_FOUND},
 			},
 			{
 				"other user added articles to section",
@@ -115,7 +117,7 @@ func TestStorageDeleteArticle(t *testing.T) {
 	user, _ := getTestingUser(t)
 
 	section, _ := user.Storage().NewSection("section")
-	sid := section.SID
+	sid := strconv.Itoa(section.SID)
 
 	sArticle := StringArticle{Name: "article", Expiration: "2024-12-18", Quantity: "5", Section: sid}
 	sNextArticle := StringArticle{Name: "next-article", Section: sid}
@@ -178,7 +180,8 @@ func TestStorageDeleteArticle(t *testing.T) {
 func TestStorageDeleteSection(t *testing.T) {
 	user, _ := getTestingUser(t)
 	section, _ := user.Storage().NewSection("s")
-	user.Storage().AddArticles(StringArticle{Name: "article", Section: section.SID})
+	sid := strconv.Itoa(section.SID)
+	user.Storage().AddArticles(StringArticle{Name: "article", Section: sid})
 	testingArticlesN++
 
 	otherUser, _ := getTestingUser(t)
@@ -226,29 +229,38 @@ func TestStorageEditArticle(t *testing.T) {
 	user, _ := getTestingUser(t)
 
 	section, _ := user.Storage().NewSection("section")
-	sid := section.SID
-
+	sid := strconv.Itoa(section.SID)
 	sArticle := StringArticle{Name: "article", Expiration: "2024-12-18", Quantity: "5", Section: sid}
-	sOtherArticle := StringArticle{Name: "otherArticle", Expiration: "2024-12-31", Quantity: "9", Section: sid}
-	user.Storage().AddArticles(sArticle, sOtherArticle)
-
+	user.Storage().AddArticles(sArticle)
 	article := sArticle.getExpectedArticle()
-	testingArticlesN++
 
-	newQty := StringArticle{Name: "article", Expiration: "2024-12-18"}
-	newAll := StringArticle{Name: "Article", Expiration: "2024-12-25", Quantity: "6"}
-	newAllWithChange := StringArticle{Name: "article", Expiration: "2025-01-02", Quantity: "9"}
+	otherSection, _ := user.Storage().NewSection("otherSection")
+	otherSID := strconv.Itoa(otherSection.SID)
+	sOtherArticle := StringArticle{Name: "otherArticle", Expiration: "2024-12-31", Quantity: "9", Section: otherSID}
+	user.Storage().AddArticles(sOtherArticle)
+	sOtherArticle.getExpectedArticle()
 
-	otherUser, _ := getTestingUser(t)
+	sDupArticle := sOtherArticle
+	sDupArticle.Section = sid
+	user.Storage().AddArticles(sDupArticle)
+	dupArticle := sDupArticle.getExpectedArticle()
+
+	notMyUser, _ := getTestingUser(t)
+	notMySection, _ := notMyUser.Storage().NewSection("section")
+	notMySID := strconv.Itoa(notMySection.SID)
+
+	newQty := StringArticle{Name: "article", Expiration: "2024-12-18", Section: sid}
+	newAll := StringArticle{Name: "Article", Expiration: "2024-12-25", Quantity: "6", Section: sid}
+	newAllWithChange := StringArticle{Name: "article", Expiration: "2025-01-02", Quantity: "9", Section: sid}
+	newSection := StringArticle{Section: otherSID}
 
 	type data struct {
 		User    User
 		AID     int
 		NewData StringArticle
 
-		ExpectedErr     error
-		ExpectedChanged bool
-		CheckEdits      bool
+		ExpectedErr error
+		CheckEdits  bool
 	}
 
 	testSuite[data]{
@@ -258,6 +270,7 @@ func TestStorageEditArticle(t *testing.T) {
 			} else if d.CheckEdits {
 				gotData, _ := user.Storage().GetArticle(d.AID)
 				expectedData, _ := d.NewData.Parse()
+				expectedData.fixExpiration()
 
 				if !reflect.DeepEqual(gotData.Name, expectedData.Name) {
 					t.Errorf("%s, name not saved", msg)
@@ -265,6 +278,8 @@ func TestStorageEditArticle(t *testing.T) {
 					t.Errorf("%s, expiration not saved", msg)
 				} else if !reflect.DeepEqual(gotData.Quantity, expectedData.Quantity) {
 					t.Errorf("%s, quantity not saved", msg)
+				} else if !reflect.DeepEqual(gotData.SID, expectedData.SID) {
+					t.Errorf("%s, section not saved", msg)
 				}
 			}
 		},
@@ -272,39 +287,51 @@ func TestStorageEditArticle(t *testing.T) {
 		Cases: []testCase[data]{
 			{
 				"other user edited article",
-				data{User: otherUser, AID: article.AID, NewData: newAll, ExpectedErr: ERR_ARTICLE_NOT_FOUND},
+				data{User: notMyUser, AID: article.AID, NewData: newAll, ExpectedErr: ERR_ARTICLE_NOT_FOUND},
 			},
 			{
 				"edited unknown article",
 				data{User: user, NewData: newAll, ExpectedErr: ERR_ARTICLE_NOT_FOUND},
 			},
 			{
+				"invalid section",
+				data{User: user, AID: article.AID, ExpectedErr: ERR_SECTION_NOT_FOUND},
+			},
+			{
 				"invalid quantity",
-				data{User: user, AID: article.AID, NewData: StringArticle{Quantity: "a few"}, ExpectedErr: ERR_ARTICLE_QUANTITY_INVALID},
+				data{User: user, AID: article.AID, NewData: StringArticle{Section: sid, Quantity: "a few"}, ExpectedErr: ERR_ARTICLE_QUANTITY_INVALID},
 			},
 			{
 				"invalid expiration",
-				data{User: user, AID: article.AID, NewData: StringArticle{Expiration: "next year"}, ExpectedErr: ERR_ARTICLE_EXPIRATION_INVALID},
+				data{User: user, AID: article.AID, NewData: StringArticle{Section: sid, Expiration: "next year"}, ExpectedErr: ERR_ARTICLE_EXPIRATION_INVALID},
 			},
 			{
 				"duplicated article",
 				data{User: user, AID: article.AID, NewData: sOtherArticle, ExpectedErr: ERR_ARTICLE_DUPLICATED},
 			},
 			{
+				"duplicated article in target section",
+				data{User: user, AID: dupArticle.AID, NewData: sOtherArticle, ExpectedErr: ERR_ARTICLE_DUPLICATED},
+			},
+			{
 				"(same)",
-				data{User: user, AID: article.AID, NewData: sArticle, ExpectedChanged: false, CheckEdits: true},
+				data{User: user, AID: article.AID, NewData: sArticle, CheckEdits: true},
 			},
 			{
 				"(only quantity)",
-				data{User: user, AID: article.AID, NewData: newQty, ExpectedChanged: false, CheckEdits: true},
+				data{User: user, AID: article.AID, NewData: newQty, CheckEdits: true},
 			},
 			{
-				"(all, changed=false)",
-				data{User: user, AID: article.AID, NewData: newAll, ExpectedChanged: false, CheckEdits: true},
+				"(expiration and quantity)",
+				data{User: user, AID: article.AID, NewData: newAllWithChange, CheckEdits: true},
 			},
 			{
-				"(all, changed=true)",
-				data{User: user, AID: article.AID, NewData: newAllWithChange, ExpectedChanged: true, CheckEdits: true},
+				"(section)",
+				data{User: user, AID: article.AID, NewData: newSection, CheckEdits: true},
+			},
+			{
+				"moved to other user's section",
+				data{User: user, AID: article.AID, NewData: StringArticle{Section: notMySID}, ExpectedErr: ERR_SECTION_NOT_FOUND},
 			},
 		},
 	}.Run(t)
@@ -372,14 +399,14 @@ func TestStorageGetArticle(t *testing.T) {
 	otherUser, _ := getTestingUser(t)
 
 	section, _ := user.Storage().NewSection("section")
-	sid := section.SID
+	sid := strconv.Itoa(section.SID)
 	s1 := StringArticle{Name: "first", Expiration: "2024-11-08", Quantity: "2", Section: sid}
 	s2 := StringArticle{Name: "second", Expiration: "2024-10-11", Section: sid}
 	s3 := StringArticle{Name: "third", Expiration: "", Quantity: "15", Section: sid}
 	user.Storage().AddArticles(s1, s2, s3)
 
 	otherSection, _ := user.Storage().NewSection("otherSection")
-	s4 := StringArticle{Name: "middle", Expiration: "2024-10-31", Section: otherSection.SID}
+	s4 := StringArticle{Name: "middle", Expiration: "2024-10-31", Section: strconv.Itoa(otherSection.SID)}
 	user.Storage().AddArticles(s4)
 
 	a1 := s1.getExpectedArticle()
@@ -446,8 +473,8 @@ func TestStorageGetArticlesGeneral(t *testing.T) {
 	section1, _ := user.Storage().NewSection("section1")
 	section2, _ := user.Storage().NewSection("section2")
 
-	s1 := StringArticle{Name: "First", Expiration: "2025-01-08", Quantity: "2", Section: section1.SID}
-	s2 := StringArticle{Name: "second", Expiration: "2025-01-06", Quantity: "15.31", Section: section2.SID}
+	s1 := StringArticle{Name: "First", Expiration: "2025-01-08", Quantity: "2", Section: strconv.Itoa(section1.SID)}
+	s2 := StringArticle{Name: "second", Expiration: "2025-01-06", Quantity: "15.31", Section: strconv.Itoa(section2.SID)}
 	user.Storage().AddArticles(s1, s2)
 
 	a1 := s1.getExpectedArticle()
@@ -455,7 +482,7 @@ func TestStorageGetArticlesGeneral(t *testing.T) {
 
 	otherUser, _ := getTestingUser(t)
 	otherUserSection, _ := otherUser.Storage().NewSection("section")
-	otherUser.Storage().AddArticles(StringArticle{Name: "other", Section: otherUserSection.SID})
+	otherUser.Storage().AddArticles(StringArticle{Name: "other", Section: strconv.Itoa(otherUserSection.SID)})
 	testingArticlesN++
 
 	type data struct {
@@ -497,7 +524,7 @@ func TestStorageGetArticlesSection(t *testing.T) {
 	user, _ := getTestingUser(t)
 
 	section, _ := user.Storage().NewSection("section")
-	sid := section.SID
+	sid := strconv.Itoa(section.SID)
 
 	s1 := StringArticle{Name: "first", Expiration: "2024-11-08", Quantity: "2", Section: sid}
 	s2 := StringArticle{Name: "second", Expiration: "2024-10-11", Section: sid}
@@ -509,7 +536,7 @@ func TestStorageGetArticlesSection(t *testing.T) {
 	a3 := s3.getExpectedArticle()
 
 	otherSection, _ := user.Storage().NewSection("otherSection")
-	s4 := StringArticle{Name: "fourth", Section: otherSection.SID}
+	s4 := StringArticle{Name: "fourth", Section: strconv.Itoa(otherSection.SID)}
 	user.Storage().AddArticles(s4)
 	testingArticlesN++
 
@@ -576,13 +603,14 @@ func TestStorageGetNeighbours(t *testing.T) {
 
 	section, _ := user.Storage().NewSection("section")
 	sid := section.SID
-	s1 := StringArticle{Expiration: "2024-11-08", Section: sid}
-	s2 := StringArticle{Expiration: "2024-10-11", Section: sid}
-	s3 := StringArticle{Expiration: "", Section: sid}
+	sidStr := strconv.Itoa(section.SID)
+	s1 := StringArticle{Expiration: "2024-11-08", Section: sidStr}
+	s2 := StringArticle{Expiration: "2024-10-11", Section: sidStr}
+	s3 := StringArticle{Expiration: "", Section: sidStr}
 	user.Storage().AddArticles(s1, s2, s3)
 
 	otherSection, _ := user.Storage().NewSection("otherSection")
-	s4 := StringArticle{Expiration: "2024-10-31", Section: otherSection.SID}
+	s4 := StringArticle{Expiration: "2024-10-31", Section: strconv.Itoa(otherSection.SID)}
 	user.Storage().AddArticles(s4)
 
 	a1 := s1.getExpectedArticle().AID

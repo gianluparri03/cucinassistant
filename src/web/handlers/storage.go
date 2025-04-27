@@ -103,7 +103,7 @@ func PostStorageSectionAdd(c *utils.Context) (err error) {
 				name := values[0]
 				exp := c.R.PostFormValue(prefix + id + "-expiration")
 				qty := c.R.PostFormValue(prefix + id + "-quantity")
-				sid, _ := strconv.Atoi(c.R.PostFormValue(prefix + id + "-section"))
+				sid := c.R.PostFormValue(prefix + id + "-section")
 
 				articles = append(articles, database.StringArticle{
 					Name: name, Expiration: exp, Quantity: qty, Section: sid,
@@ -189,6 +189,7 @@ func PostStorageArticle(c *utils.Context) (err error) {
 	if SID, AID, err = getAID(c); err == nil {
 		c.R.ParseForm()
 		newData := database.StringArticle{
+			Section:    c.R.PostFormValue("section"),
 			Name:       c.R.PostFormValue("name"),
 			Expiration: c.R.PostFormValue("expiration"),
 			Quantity:   c.R.PostFormValue("quantity"),

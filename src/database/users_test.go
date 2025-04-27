@@ -3,6 +3,7 @@ package database
 import (
 	"fmt"
 	"reflect"
+	"strconv"
 	"testing"
 )
 
@@ -195,7 +196,7 @@ func TestUserDeleteUser(t *testing.T) {
 	user.ShoppingList().Append("e")
 	user.Menus().New("m")
 	section, _ := user.Storage().NewSection("s")
-	user.Storage().AddArticles(StringArticle{Name: "article", Section: section.SID})
+	user.Storage().AddArticles(StringArticle{Name: "article", Section: strconv.Itoa(section.SID)})
 	testingArticlesN++
 	user.Recipes().New("r")
 

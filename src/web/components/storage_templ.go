@@ -995,7 +995,7 @@ func StorageArticle(SID int, article database.Article, prev int, next int, secti
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, " type=\"number\" step=\"any\" name=\"quantity\"> <select class=\"section\"><option selected disabled>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, " type=\"number\" step=\"any\" name=\"quantity\"> <select class=\"section\" name=\"section\"><option selected disabled>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

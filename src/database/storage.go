@@ -73,21 +73,26 @@ type Section struct {
 // StringArticle is a container for name, quantity,
 // expiration and section as strings, used for inputs
 type StringArticle struct {
-	Section    int
+	Section    string
 	Name       string
 	Quantity   string
 	Expiration string
 }
 
-// Parse reads the data contained in the StringArticle
-// and returns an Article.
+// Parse converts a StringArticle into an Article.
 // Dates must be formatted like 2004-02-05 (time.DateOnly).
 // If an empty date is given, the Article's expiration will
 // be set to defaultExpiration, in order to make correct inserts
 // in the database. When reading, instead, the Article.fixExpiration method
 // will convert a defaultExpiration in a nil.
 func (sa StringArticle) Parse() (Article, error) {
-	a := Article{SID: sa.Section}
+	var a Article
+
+	// Parses the SID
+	var err error
+	if a.SID, err = strconv.Atoi(sa.Section); err != nil {
+		return a, ERR_SECTION_NOT_FOUND
+	}
 
 	// Converts quantity to a float or nil
 	if sa.Quantity == "" {
@@ -196,8 +201,8 @@ func (s Storage) DeleteSection(SID int) error {
 	return nil
 }
 
-// EditArticle tries to replace the article's name, quantity and expiration.
-// The section field of newData is ignored.
+// EditArticle tries to replace the article's name, quantity and/or expiration.
+// It can also be used to move articles between sections.
 func (s Storage) EditArticle(AID int, newData StringArticle) error {
 	// Gets the current data
 	article, err := s.GetArticle(AID)
@@ -211,14 +216,21 @@ func (s Storage) EditArticle(AID int, newData StringArticle) error {
 	} else {
 		// If nothing has changed, don't do anything
 		if article.Name == parsed.Name &&
+			article.SID == parsed.SID &&
 			reflect.DeepEqual(article.Expiration, parsed.Expiration) &&
 			reflect.DeepEqual(article.Quantity, parsed.Quantity) {
 			return nil
 		} else {
+			article.SID = parsed.SID
 			article.Name = parsed.Name
 			article.Expiration = parsed.Expiration
 			article.Quantity = parsed.Quantity
 		}
+	}
+
+	// Checks if the section is owned by the user
+	if _, err := s.GetSection(article.SID); err != nil {
+		return err
 	}
 
 	// Checks if a similar article is already in storage
@@ -237,8 +249,8 @@ func (s Storage) EditArticle(AID int, newData StringArticle) error {
 	}
 
 	// Updates the article
-	_, err = db.Exec(`UPDATE articles SET name=$2, expiration=$3, quantity=$4 WHERE aid=$1;`,
-		AID, article.Name, article.Expiration, article.Quantity)
+	_, err = db.Exec(`UPDATE articles SET name=$3, expiration=$4, quantity=$5, sid=$2 WHERE aid=$1;`,
+		AID, article.SID, article.Name, article.Expiration, article.Quantity)
 	if err != nil {
 		return ERR_UNKNOWN
 	}
