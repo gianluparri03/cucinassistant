@@ -8,6 +8,89 @@ import (
 	"cucinassistant/langs"
 )
 
+templ Recipes(recipes []database.Recipe) {
+    @TemplateTitle(langs.Translate(ctx, langs.STR_RECIPES), "/")
+
+    <button class="icon-text" hx-get="/recipes/new">
+        <i class="fas fa-plus"></i> { langs.Translate(ctx, langs.STR_NEW_RECIPE) }
+    </button>
+
+    <br>
+
+    if len(recipes) > 0 {
+        <ol>
+			for _, recipe := range recipes {
+				{{ baseurl := "/recipes/" + strconv.Itoa(recipe.RID) }}
+                <li><a hx-get={ baseurl }>{ recipe.Name }</a></li>
+            }
+        </ol>
+    } else {
+        <br>
+        <span id="empty-label">
+			{ langs.Translate(ctx, langs.STR_RECIPES_EMPTY) }
+		</span>
+	}
+}
+
+templ RecipesNew() {
+	@TemplateTitle(langs.Translate(ctx, langs.STR_NEW_RECIPE), "/recipes")
+
+    <form method="POST">
+        { langs.Translate(ctx, langs.STR_NAME) } <br>
+		<input type="text" name="name" required> <br>
+
+        <button class="icon-text">
+			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
+		</button>
+    </form>
+}
+
+templ Recipe(recipe database.Recipe) {
+	{{ baseurl := "/recipes/" + strconv.Itoa(recipe.RID) }}
+	@TemplateTitle(recipe.Name, "/recipes")
+
+	if recipe.Stars != 0 {
+        <div id="stars">
+			for n := 0; n < recipe.Stars / 2; n++ {
+				<i class="fas fa-star"></i> 
+			}
+			if recipe.Stars % 2 > 0 {
+				<i class="fas fa-star-half-alt"></i> 
+			}
+			for n := 0; n < (10 - recipe.Stars) / 2; n++ {
+				<i class="far fa-star"></i> 
+			}
+        </div>
+	}
+
+	if recipe.Ingredients != "" {
+        <h4>{ langs.Translate(ctx, langs.STR_INGREDIENTS) }</h4>
+        <ul>
+			for _, i := range strings.Split(recipe.Ingredients, "\n") {
+				<li>{ i }</li>
+			}
+        </ul>
+	}
+
+	if recipe.Directions != "" {
+        <h4>{ langs.Translate(ctx, langs.STR_DIRECTIONS) }</h4>
+        <ol>
+			for _, d := range strings.Split(recipe.Directions, "\n") {
+				<li>{ d }</li>
+			}
+        </ol>
+	}
+
+	if recipe.Notes != "" {
+        <h4>{ langs.Translate(ctx, langs.STR_NOTES) }</h4>
+        <p>{ recipe.Notes }</p>
+	}
+
+	<button class="icon-text" hx-get={ baseurl + "/edit" }>
+		<i class="fas fa-edit"></i> { langs.Translate(ctx, langs.STR_EDIT) }
+	</button>
+}
+
 templ RecipeEdit(recipe database.Recipe) {
 	{{ baseurl := "/recipes/" + strconv.Itoa(recipe.RID) }}
 	@TemplateTitle(langs.Translate(ctx, langs.STR_EDIT_RECIPE), baseurl)
@@ -59,87 +142,4 @@ templ RecipeEdit(recipe database.Recipe) {
             <i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
         </button>
     </div>
-}
-
-templ RecipeList(recipes []database.Recipe) {
-    @TemplateTitle(langs.Translate(ctx, langs.STR_RECIPES), "/")
-
-    <button class="icon-text" hx-get="/recipes/new">
-        <i class="fas fa-plus"></i> { langs.Translate(ctx, langs.STR_NEW_RECIPE) }
-    </button>
-
-    <br>
-
-    if len(recipes) > 0 {
-        <ol>
-			for _, recipe := range recipes {
-				{{ baseurl := "/recipes/" + strconv.Itoa(recipe.RID) }}
-                <li><a hx-get={ baseurl }>{ recipe.Name }</a></li>
-            }
-        </ol>
-    } else {
-        <br>
-        <span id="empty-label">
-			{ langs.Translate(ctx, langs.STR_RECIPES_EMPTY) }
-		</span>
-	}
-}
-
-templ RecipeNew() {
-	@TemplateTitle(langs.Translate(ctx, langs.STR_NEW_RECIPE), "/recipes")
-
-    <form method="POST">
-        { langs.Translate(ctx, langs.STR_NAME) } <br>
-		<input type="text" name="name" required> <br>
-
-        <button class="icon-text">
-			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
-		</button>
-    </form>
-}
-
-templ RecipeView(recipe database.Recipe) {
-	{{ baseurl := "/recipes/" + strconv.Itoa(recipe.RID) }}
-	@TemplateTitle(recipe.Name, "/recipes")
-
-	if recipe.Stars != 0 {
-        <div id="stars">
-			for n := 0; n < recipe.Stars / 2; n++ {
-				<i class="fas fa-star"></i> 
-			}
-			if recipe.Stars % 2 > 0 {
-				<i class="fas fa-star-half-alt"></i> 
-			}
-			for n := 0; n < (10 - recipe.Stars) / 2; n++ {
-				<i class="far fa-star"></i> 
-			}
-        </div>
-	}
-
-	if recipe.Ingredients != "" {
-        <h4>{ langs.Translate(ctx, langs.STR_INGREDIENTS) }</h4>
-        <ul>
-			for _, i := range strings.Split(recipe.Ingredients, "\n") {
-				<li>{ i }</li>
-			}
-        </ul>
-	}
-
-	if recipe.Directions != "" {
-        <h4>{ langs.Translate(ctx, langs.STR_DIRECTIONS) }</h4>
-        <ol>
-			for _, d := range strings.Split(recipe.Directions, "\n") {
-				<li>{ d }</li>
-			}
-        </ol>
-	}
-
-	if recipe.Notes != "" {
-        <h4>{ langs.Translate(ctx, langs.STR_NOTES) }</h4>
-        <p>{ recipe.Notes }</p>
-	}
-
-	<button class="icon-text" hx-get={ baseurl + "/edit" }>
-		<i class="fas fa-edit"></i> { langs.Translate(ctx, langs.STR_EDIT) }
-	</button>
 }

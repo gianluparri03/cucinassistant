@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/gorilla/mux"
 	"strconv"
 	"strings"
 
@@ -10,40 +11,41 @@ import (
 	"cucinassistant/web/utils"
 )
 
-// getSID returns the SID written in the url
+func getAID(c *utils.Context) (int, int, error) {
+	SID, errS := getSID(c)
+	AID, errA := getID(c, "AID", database.ERR_ARTICLE_NOT_FOUND)
+
+	if errS != nil {
+		return SID, AID, errS
+	} else if errA != nil {
+		return SID, AID, errA
+	} else {
+		return SID, AID, nil
+	}
+}
+
 func getSID(c *utils.Context) (int, error) {
 	return getID(c, "SID", database.ERR_SECTION_NOT_FOUND)
 }
 
-// getAID returns the SID and the AID written in the url
-func getAID(c *utils.Context) (SID int, AID int, err error) {
-	SID, err = getSID(c)
-	if err == nil {
-		AID, err = getID(c, "AID", database.ERR_ARTICLE_NOT_FOUND)
-	}
-
-	return
-}
-
-// GetSections renders /storage
-func GetSections(c *utils.Context) (err error) {
+func GetStorage(c *utils.Context) (err error) {
 	var list []database.Section
+
 	if list, err = c.U.Storage().GetSections(); err == nil {
-		utils.RenderComponent(c, components.StorageDashboard(list))
+		utils.RenderComponent(c, components.Storage(list))
 	}
 
 	return
 }
 
-// GetNewSection renders /storage/new
-func GetNewSection(c *utils.Context) (err error) {
-	utils.RenderComponent(c, components.StorageNewSection())
+func GetStorageNew(c *utils.Context) (err error) {
+	utils.RenderComponent(c, components.StorageNew())
 	return
 }
 
-// PostNewSection tries to create a new section
-func PostNewSection(c *utils.Context) (err error) {
+func PostStorageNew(c *utils.Context) (err error) {
 	var s database.Section
+
 	if s, err = c.U.Storage().NewSection(c.R.FormValue("name")); err == nil {
 		utils.Redirect(c, "/storage/"+strconv.Itoa(s.SID))
 	}
@@ -51,137 +53,48 @@ func PostNewSection(c *utils.Context) (err error) {
 	return
 }
 
-// GetSectionArticles renders /storage/{SID}
-func GetSectionArticles(c *utils.Context) (err error) {
+func GetStorageSection(c *utils.Context) (err error) {
 	var SID int
+	var section database.Section
+	sn := make(map[int]string)
+
 	if SID, err = getSID(c); err == nil {
 		search := c.R.URL.Query().Get("search")
-
-		var section database.Section
-		if section, err = c.U.Storage().GetSectionArticles(SID, search); err == nil {
-			utils.RenderComponent(c, components.StorageViewSectionArticles(section, search))
-		}
-	}
-
-	return
-}
-
-// GetAllArticles renders /storage/view
-func GetAllArticles(c *utils.Context) (err error) {
-	search := c.R.URL.Query().Get("search")
-
-	var articles []database.Article
-	if articles, err = c.U.Storage().GetAllArticles(search); err == nil {
-		utils.RenderComponent(c, components.StorageViewAllArticles(articles, search))
-	}
-
-	return
-}
-
-// GetEditSection renders /storage/{SID}/edit
-func GetEditSection(c *utils.Context) (err error) {
-	// Retrieves the SID
-	var SID int
-	if SID, err = getSID(c); err == nil {
-		var section database.Section
-		if section, err = c.U.Storage().GetSection(SID); err == nil {
-			utils.RenderComponent(c, components.StorageEditSection(section))
-		}
-	}
-
-	return
-}
-
-// PostEditSection tries to change a section's name
-func PostEditSection(c *utils.Context) (err error) {
-	var SID int
-	if SID, err = getSID(c); err == nil {
-		if err = c.U.Storage().EditSection(SID, c.R.FormValue("name")); err == nil {
-			utils.Redirect(c, "/storage/"+strconv.Itoa(SID))
-		}
-	}
-
-	return
-}
-
-// PostDeleteSection tries to delete a section
-func PostDeleteSection(c *utils.Context) (err error) {
-	var SID int
-	if SID, err = getSID(c); err == nil {
-		if err = c.U.Storage().DeleteSection(SID); err == nil {
-			utils.ShowMessage(c, langs.STR_SECTION_DELETED, "/storage")
-		}
-	}
-
-	return
-}
-
-// GetAddArticlesSection renders /storage/{SID}/add
-func GetAddArticlesSection(c *utils.Context) (err error) {
-	var SID int
-	if SID, err = getSID(c); err == nil {
-		var section database.Section
-		if section, err = c.U.Storage().GetSectionArticles(SID, ""); err == nil {
-			utils.RenderComponent(c, components.StorageAddArticles(section.SID, []database.Section{}))
-		}
-	}
-
-	return
-}
-
-// PostAddArticlesSection tries to add articles to a section.
-func PostAddArticlesSection(c *utils.Context) (err error) {
-	// Gets the destination SID
-	var SID int
-	if SID, err = getSID(c); err == nil {
-		var articles []database.StringArticle
-		c.R.ParseForm()
-		prefix := "article-"
-
-		// Parse all the articles that have a name
-		for key, values := range c.R.PostForm {
-			if strings.HasPrefix(key, prefix) && strings.HasSuffix(key, "-name") {
-				if len(values) > 0 && values[0] != "" {
-					id := key[len(prefix) : len(key)-len("-name")]
-
-					name := values[0]
-					exp := c.R.PostFormValue(prefix + id + "-expiration")
-					qty := c.R.PostFormValue(prefix + id + "-quantity")
-
-					articles = append(articles, database.StringArticle{
-						Name: name, Expiration: exp, Quantity: qty, Section: SID,
-					})
+		if section, err = c.U.Storage().GetArticles(SID, search); err == nil {
+			if SID == 0 {
+				sections, _ := c.U.Storage().GetSections()
+				for _, s := range sections {
+					sn[s.SID] = s.Name
 				}
 			}
-		}
 
-		// Tries to add them
-		if err = c.U.Storage().AddArticles(articles...); err == nil {
-			utils.Redirect(c, "/storage/"+strconv.Itoa(SID))
+			utils.RenderComponent(c, components.StorageSection(section, search, sn))
 		}
 	}
 
 	return
 }
 
-// GetAddArticlesCommon renders /storage/add
-func GetAddArticlesCommon(c *utils.Context) (err error) {
+func GetStorageSectionAdd(c *utils.Context) (err error) {
+	var SID int
 	var sections []database.Section
 
-	if sections, err = c.U.Storage().GetSections(); err == nil {
-		utils.RenderComponent(c, components.StorageAddArticles(0, sections))
+	if SID, err = getSID(c); err == nil {
+		if SID == 0 {
+			sections, _ = c.U.Storage().GetSections()
+		}
+
+		utils.RenderComponent(c, components.StorageSectionAdd(SID, sections))
 	}
 
 	return
 }
 
-// PostAddArticlesCommon tries to add articles to multiple sections
-func PostAddArticlesCommon(c *utils.Context) (err error) {
+func PostStorageSectionAdd(c *utils.Context) (err error) {
 	var articles []database.StringArticle
 	c.R.ParseForm()
 	prefix := "article-"
 
-	// Parse all the articles that have a name
 	for key, values := range c.R.PostForm {
 		if strings.HasPrefix(key, prefix) && strings.HasSuffix(key, "-name") {
 			if len(values) > 0 && values[0] != "" {
@@ -199,47 +112,78 @@ func PostAddArticlesCommon(c *utils.Context) (err error) {
 		}
 	}
 
-	// Tries to add them
 	if err = c.U.Storage().AddArticles(articles...); err == nil {
-		utils.ShowMessage(c, langs.STR_ARTICLES_ADDED, "/storage")
+		sid, _ := mux.Vars(c.R)["SID"]
+		utils.ShowMessage(c, langs.STR_ARTICLES_ADDED, "/storage/"+sid)
 	}
 
 	return
 }
 
-// GetSearchAllArticles renders /storage/search
-func GetSearchAllArticles(c *utils.Context) (err error) {
-	utils.RenderComponent(c, components.StorageSearchArticles("/storage/view", "/storage"))
-	return
-}
-
-// GetSearchSectionArticles renders /storage/{SID}/search
-func GetSearchSectionArticles(c *utils.Context) (err error) {
+func PostStorageSectionDelete(c *utils.Context) (err error) {
 	var SID int
+
 	if SID, err = getSID(c); err == nil {
-		target := "/storage/" + strconv.Itoa(SID)
-		utils.RenderComponent(c, components.StorageSearchArticles(target, target))
-	}
-
-	return
-}
-
-// GetEditArticle renders /storage/{SID}/{AID}
-func GetEditArticle(c *utils.Context) (err error) {
-	var SID, AID int
-
-	if SID, AID, err = getAID(c); err == nil {
-		var article database.Article
-		if article, err = c.U.Storage().GetArticle(AID); err == nil {
-			utils.RenderComponent(c, components.StorageEditArticle(SID, article))
+		if err = c.U.Storage().DeleteSection(SID); err == nil {
+			utils.ShowMessage(c, langs.STR_SECTION_DELETED, "/storage")
 		}
 	}
 
 	return
 }
 
-// PostEditArticle tries to edit an article
-func PostEditArticle(c *utils.Context) (err error) {
+func GetStorageSectionEdit(c *utils.Context) (err error) {
+	var SID int
+	var section database.Section
+
+	if SID, err = getSID(c); err == nil {
+		if section, err = c.U.Storage().GetSection(SID); err == nil {
+			utils.RenderComponent(c, components.StorageSectionEdit(section))
+		}
+	}
+
+	return
+}
+
+func PostStorageSectionEdit(c *utils.Context) (err error) {
+	var SID int
+
+	if SID, err = getSID(c); err == nil {
+		if err = c.U.Storage().EditSection(SID, c.R.FormValue("name")); err == nil {
+			utils.Redirect(c, "/storage/"+strconv.Itoa(SID))
+		}
+	}
+
+	return
+}
+
+func GetStorageSectionSearch(c *utils.Context) (err error) {
+	var SID int
+
+	if SID, err = getSID(c); err == nil {
+		target := "/storage/" + strconv.Itoa(SID)
+		utils.RenderComponent(c, components.StorageSectionSearch(target))
+	}
+
+	return
+}
+
+func GetStorageArticle(c *utils.Context) (err error) {
+	var SID, AID int
+	var article database.Article
+
+	if SID, AID, err = getAID(c); err == nil {
+		if article, err = c.U.Storage().GetArticle(AID); err == nil {
+			prev, next := c.U.Storage().GetNeighbours(SID, AID)
+			sections, _ := c.U.Storage().GetSections()
+			utils.RenderComponent(c, components.StorageArticle(SID, article, prev, next, sections))
+		}
+	}
+
+	return
+}
+
+func PostStorageArticle(c *utils.Context) (err error) {
 	var SID, AID int
 
 	if SID, AID, err = getAID(c); err == nil {
@@ -250,9 +194,12 @@ func PostEditArticle(c *utils.Context) (err error) {
 			Quantity:   c.R.PostFormValue("quantity"),
 		}
 
-		var changed bool
-		if err, changed = c.U.Storage().EditArticle(AID, newData); err == nil {
-			if !changed {
+		prev1, next1 := c.U.Storage().GetNeighbours(SID, AID)
+
+		if err = c.U.Storage().EditArticle(AID, newData); err == nil {
+			prev2, next2 := c.U.Storage().GetNeighbours(SID, AID)
+
+			if prev1 == prev2 && next1 == next2 {
 				utils.Redirect(c, "/storage/"+strconv.Itoa(SID)+"/"+strconv.Itoa(AID))
 			} else {
 				utils.ShowMessage(c, langs.STR_ORDER_CHANGED, "/storage/"+strconv.Itoa(SID))
@@ -263,17 +210,16 @@ func PostEditArticle(c *utils.Context) (err error) {
 	return
 }
 
-// PostDeleteArticle tries to delete an article
-func PostDeleteArticle(c *utils.Context) (err error) {
+func PostStorageArticleDelete(c *utils.Context) (err error) {
 	var SID, AID int
 
 	if SID, AID, err = getAID(c); err == nil {
-		var next *int
+		_, next := c.U.Storage().GetNeighbours(SID, AID)
 
-		if err, next = c.U.Storage().DeleteArticle(AID); err == nil {
+		if err = c.U.Storage().DeleteArticle(AID); err == nil {
 			path := "/storage/" + strconv.Itoa(SID)
-			if next != nil {
-				path += "/" + strconv.Itoa(*next)
+			if next != 0 {
+				path += "/" + strconv.Itoa(next)
 			}
 
 			utils.Redirect(c, path)

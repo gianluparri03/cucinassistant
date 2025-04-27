@@ -51,11 +51,11 @@ function addItem(e) {
         });
 }
 
-// Removes the last item
+// Removes the first item (the last on added)
 function removeItem(e) {
     if (itemsCount > 1) {
         itemsCount--;
-        $('.item').last().remove();
+        $('.item').first().remove();
     }
 
     if (e) { e.preventDefault(); }

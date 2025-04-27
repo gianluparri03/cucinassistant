@@ -7,7 +7,7 @@ import (
 	"cucinassistant/langs"
 )
 
-templ MiscHome(username string) {
+templ Index(username string) {
     @TemplateTitle(langs.TranslateArg(ctx, langs.STR_WELCOMEBACK, username), "")
 
     <div class="dashboard">
@@ -38,13 +38,13 @@ templ MiscHome(username string) {
     </div>
 }
 
-templ MiscInfo(infoData any) {
+templ Info(infoData any) {
     @TemplateTitle(langs.Translate(ctx, langs.STR_INFO), "")
 	TODO
     <!--@templ.Raw(langs.TranslateArg(ctx, langs.PAG_INFO, infoData))-->
 }
 
-templ MiscLang(available map[string]*langs.Lang, current string) {
+templ Lang(available map[string]*langs.Lang, current string) {
     @TemplateTitle(langs.Translate(ctx, langs.STR_LANGUAGE), "/")
 
     <form method="GET" hx-disable>
@@ -62,7 +62,7 @@ templ MiscLang(available map[string]*langs.Lang, current string) {
     </form>
 }
 
-templ MiscStats(data database.Stats) {
+templ Stats(data database.Stats) {
     @TemplateTitle(langs.Translate(ctx, langs.STR_STATS), "/")
 
     <div class="dashboard">

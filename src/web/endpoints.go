@@ -7,11 +7,6 @@ import (
 
 var endpoints []utils.Endpoint = []utils.Endpoint{
 	{
-		Path:        "/lang",
-		Unprotected: true,
-		GetHandler:  handlers.GetLang,
-	},
-	{
 		Path:       "/",
 		GetHandler: handlers.GetIndex,
 	},
@@ -21,18 +16,24 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 		GetHandler:  handlers.GetInfo,
 	},
 	{
+		Path:        "/lang",
+		Unprotected: true,
+		GetHandler:  handlers.GetLang,
+	},
+	{
 		Path:        "/stats",
 		Unprotected: true,
 		GetHandler:  handlers.GetStats,
 	},
+
 	{
 		Path:       "/menus",
 		GetHandler: handlers.GetMenus,
 	},
 	{
 		Path:        "/menus/new",
-		GetHandler:  handlers.GetNewMenu,
-		PostHandler: handlers.PostNewMenu,
+		GetHandler:  handlers.GetMenusNew,
+		PostHandler: handlers.PostMenusNew,
 	},
 	{
 		Path:       "/menus/{MID}",
@@ -40,55 +41,134 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 	},
 	{
 		Path:        "/menus/{MID}/edit",
-		GetHandler:  handlers.GetEditMenu,
-		PostHandler: handlers.PostEditMenu,
-	},
-	{
-		Path:        "/menus/{MID}/duplicate",
-		PostHandler: handlers.PostDuplicateMenu,
+		GetHandler:  handlers.GetMenuEdit,
+		PostHandler: handlers.PostMenuEdit,
 	},
 	{
 		Path:        "/menus/{MID}/delete",
-		PostHandler: handlers.PostDeleteMenu,
+		PostHandler: handlers.PostMenuDelete,
 	},
+	{
+		Path:        "/menus/{MID}/duplicate",
+		PostHandler: handlers.PostMenuDuplicate,
+	},
+
+	{
+		Path:       "/recipes",
+		GetHandler: handlers.GetRecipes,
+	},
+	{
+		Path:        "/recipes/new",
+		GetHandler:  handlers.GetRecipesNew,
+		PostHandler: handlers.PostRecipesNew,
+	},
+	{
+		Path:       "/recipes/{RID}",
+		GetHandler: handlers.GetRecipe,
+	},
+	{
+		Path:        "/recipes/{RID}/edit",
+		GetHandler:  handlers.GetRecipeEdit,
+		PostHandler: handlers.PostRecipeEdit,
+	},
+	{
+		Path:        "/recipes/{RID}/delete",
+		PostHandler: handlers.PostRecipeDelete,
+	},
+
 	{
 		Path:       "/shopping_list",
 		GetHandler: handlers.GetShoppingList,
 	},
 	{
 		Path:        "/shopping_list/append",
-		GetHandler:  handlers.GetAppendEntries,
-		PostHandler: handlers.PostAppendEntries,
-	},
-	{
-		Path:        "/shopping_list/{EID}/toggle",
-		PostHandler: handlers.PostToggleEntry,
-	},
-	{
-		Path:        "/shopping_list/{EID}/edit",
-		GetHandler:  handlers.GetEditEntry,
-		PostHandler: handlers.PostEditEntry,
+		GetHandler:  handlers.GetShoppingListAppend,
+		PostHandler: handlers.PostShoppingListAppend,
 	},
 	{
 		Path:        "/shopping_list/clear",
-		PostHandler: handlers.PostClearShoppingList,
+		PostHandler: handlers.PostShoppingListClear,
 	},
 	{
-		Path:        "/user/signup",
-		Unprotected: true,
-		GetHandler:  handlers.GetSignUp,
-		PostHandler: handlers.PostSignUp,
+		Path:        "/shopping_list/{EID}/edit",
+		GetHandler:  handlers.GetEntryEdit,
+		PostHandler: handlers.PostEntryEdit,
 	},
 	{
-		Path:        "/user/signin",
-		Unprotected: true,
-		GetHandler:  handlers.GetSignIn,
-		PostHandler: handlers.PostSignIn,
+		Path:        "/shopping_list/{EID}/toggle",
+		PostHandler: handlers.PostEntryToggle,
+	},
+
+	{
+		Path:       "/storage",
+		GetHandler: handlers.GetStorage,
 	},
 	{
-		Path:        "/user/signout",
-		Unprotected: true,
-		PostHandler: handlers.PostSignOut,
+		Path:        "/storage/new",
+		GetHandler:  handlers.GetStorageNew,
+		PostHandler: handlers.PostStorageNew,
+	},
+	{
+		Path:       "/storage/{SID}",
+		GetHandler: handlers.GetStorageSection,
+	},
+	{
+		Path:        "/storage/{SID}/add",
+		GetHandler:  handlers.GetStorageSectionAdd,
+		PostHandler: handlers.PostStorageSectionAdd,
+	},
+	{
+		Path:        "/storage/{SID}/delete",
+		PostHandler: handlers.PostStorageSectionDelete,
+	},
+	{
+		Path:        "/storage/{SID}/edit",
+		GetHandler:  handlers.GetStorageSectionEdit,
+		PostHandler: handlers.PostStorageSectionEdit,
+	},
+	{
+		Path:       "/storage/{SID}/search",
+		GetHandler: handlers.GetStorageSectionSearch,
+	},
+	{
+		Path:        "/storage/{SID}/{AID}",
+		GetHandler:  handlers.GetStorageArticle,
+		PostHandler: handlers.PostStorageArticle,
+	},
+	{
+		Path:        "/storage/{SID}/{AID}/delete",
+		PostHandler: handlers.PostStorageArticleDelete,
+	},
+
+	{
+		Path:        "/user/change_email",
+		GetHandler:  handlers.GetUserChangeEmail,
+		PostHandler: handlers.PostUserChangeEmail,
+	},
+	{
+		Path:        "/user/change_email_lang",
+		GetHandler:  handlers.GetUserChangeEmailLang,
+		PostHandler: handlers.PostUserChangeEmailLang,
+	},
+	{
+		Path:        "/user/change_password",
+		GetHandler:  handlers.GetUserChangePassword,
+		PostHandler: handlers.PostUserChangePassword,
+	},
+	{
+		Path:        "/user/change_username",
+		GetHandler:  handlers.GetUserChangeUsername,
+		PostHandler: handlers.PostUserChangeUsername,
+	},
+	{
+		Path:        "/user/delete_1",
+		GetHandler:  handlers.GetUserDelete1,
+		PostHandler: handlers.PostUserDelete1,
+	},
+	{
+		Path:        "/user/delete_2",
+		GetHandler:  handlers.GetUserDelete2,
+		PostHandler: handlers.PostUserDelete2,
 	},
 	{
 		Path:        "/user/forgot_password",
@@ -104,111 +184,23 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 	},
 	{
 		Path:       "/user/settings",
-		GetHandler: handlers.GetSettings,
+		GetHandler: handlers.GetUserSettings,
 	},
 	{
-		Path:        "/user/change_username",
-		GetHandler:  handlers.GetChangeUsername,
-		PostHandler: handlers.PostChangeUsername,
+		Path:        "/user/signin",
+		Unprotected: true,
+		GetHandler:  handlers.GetUserSignIn,
+		PostHandler: handlers.PostUserSignIn,
 	},
 	{
-		Path:        "/user/change_email",
-		GetHandler:  handlers.GetChangeEmail,
-		PostHandler: handlers.PostChangeEmail,
+		Path:        "/user/signout",
+		Unprotected: true,
+		PostHandler: handlers.PostUserSignOut,
 	},
 	{
-		Path:        "/user/change_password",
-		GetHandler:  handlers.GetChangePassword,
-		PostHandler: handlers.PostChangePassword,
-	},
-	{
-		Path:        "/user/set_email_lang",
-		GetHandler:  handlers.GetSetEmailLang,
-		PostHandler: handlers.PostSetEmailLang,
-	},
-	{
-		Path:        "/user/delete_1",
-		GetHandler:  handlers.GetDeleteUser1,
-		PostHandler: handlers.PostDeleteUser1,
-	},
-	{
-		Path:        "/user/delete_2",
-		GetHandler:  handlers.GetDeleteUser2,
-		PostHandler: handlers.PostDeleteUser2,
-	},
-	{
-		Path:       "/storage",
-		GetHandler: handlers.GetSections,
-	},
-	{
-		Path:        "/storage/new",
-		GetHandler:  handlers.GetNewSection,
-		PostHandler: handlers.PostNewSection,
-	},
-	{
-		Path:        "/storage/add",
-		GetHandler:  handlers.GetAddArticlesCommon,
-		PostHandler: handlers.PostAddArticlesCommon,
-	},
-	{
-		Path:       "/storage/search",
-		GetHandler: handlers.GetSearchAllArticles,
-	},
-	{
-		Path:       "/storage/view",
-		GetHandler: handlers.GetAllArticles,
-	},
-	{
-		Path:       "/storage/{SID}",
-		GetHandler: handlers.GetSectionArticles,
-	},
-	{
-		Path:        "/storage/{SID}/edit",
-		GetHandler:  handlers.GetEditSection,
-		PostHandler: handlers.PostEditSection,
-	},
-	{
-		Path:        "/storage/{SID}/delete",
-		PostHandler: handlers.PostDeleteSection,
-	},
-	{
-		Path:        "/storage/{SID}/add",
-		GetHandler:  handlers.GetAddArticlesSection,
-		PostHandler: handlers.PostAddArticlesSection,
-	},
-	{
-		Path:       "/storage/{SID}/search",
-		GetHandler: handlers.GetSearchSectionArticles,
-	},
-	{
-		Path:        "/storage/{SID}/{AID}",
-		GetHandler:  handlers.GetEditArticle,
-		PostHandler: handlers.PostEditArticle,
-	},
-	{
-		Path:        "/storage/{SID}/{AID}/delete",
-		PostHandler: handlers.PostDeleteArticle,
-	},
-	{
-		Path:       "/recipes",
-		GetHandler: handlers.GetRecipes,
-	},
-	{
-		Path:        "/recipes/new",
-		GetHandler:  handlers.GetNewRecipe,
-		PostHandler: handlers.PostNewRecipe,
-	},
-	{
-		Path:       "/recipes/{RID}",
-		GetHandler: handlers.GetRecipe,
-	},
-	{
-		Path:        "/recipes/{RID}/edit",
-		GetHandler:  handlers.GetEditRecipe,
-		PostHandler: handlers.PostEditRecipe,
-	},
-	{
-		Path:        "/recipes/{RID}/delete",
-		PostHandler: handlers.PostDeleteRecipe,
+		Path:        "/user/signup",
+		Unprotected: true,
+		GetHandler:  handlers.GetUserSignUp,
+		PostHandler: handlers.PostUserSignUp,
 	},
 }

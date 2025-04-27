@@ -85,9 +85,11 @@ templ TemplateMessage(msg langs.String, backLink string, isHx bool) {
                     hx-on:click="$(this).parents('message').remove();"
                     if backLink != "" {
                         hx-get={ backLink }
-                    } else if isHx {
-                        hx-get="/"
-                    }
+                    } else {
+						if !isHx {
+							hx-get="/"
+						}
+					}
                     hx-push-url="true"
                     autofocus>
 

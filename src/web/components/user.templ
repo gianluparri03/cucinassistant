@@ -17,6 +17,24 @@ templ UserChangeEmail(current string) {
     </form>
 }
 
+templ UserChangeEmailLang(available map[string]*langs.Lang, current string) {
+    @TemplateTitle(langs.Translate(ctx, langs.STR_SET_EMAIL_LANG), "/user/settings")
+
+    <form method="POST">
+        <select name="lang" id="languages">
+            for _, lang := range available {
+                <option value={ lang.Tag } selected?={ lang.Tag == current }>
+					{ lang.Name }
+				</option>
+            }
+        </select>
+
+		<button class="icon-text">
+			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
+		</button>
+    </form>
+}
+
 templ UserChangePassword() {
     @TemplateTitle(langs.Translate(ctx, langs.STR_CHANGE_PASSWORD), "/user/settings")
 
@@ -111,24 +129,6 @@ templ UserResetPassword(token string) {
     </form>
 }
 
-templ UserSetEmailLang(available map[string]*langs.Lang, current string) {
-    @TemplateTitle(langs.Translate(ctx, langs.STR_SET_EMAIL_LANG), "/user/settings")
-
-    <form method="POST">
-        <select name="lang" id="languages">
-            for _, lang := range available {
-                <option value={ lang.Tag } selected?={ lang.Tag == current }>
-					{ lang.Name }
-				</option>
-            }
-        </select>
-
-		<button class="icon-text">
-			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
-		</button>
-    </form>
-}
-
 templ UserSettings() {
     @TemplateTitle(langs.Translate(ctx, langs.STR_SETTINGS), "/")
 
@@ -153,7 +153,7 @@ templ UserSettings() {
             <span>{ langs.Translate(ctx, langs.STR_CHANGE_PASSWORD) }</span>
         </button>
 
-        <button hx-get="/user/set_email_lang">
+        <button hx-get="/user/change_email_lang">
             <i class="fas fa-language"></i>
             <span>{ langs.Translate(ctx, langs.STR_SET_EMAIL_LANG) }</span>
         </button>

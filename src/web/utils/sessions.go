@@ -1,13 +1,14 @@
 package utils
 
 import (
-	"github.com/antonlindstrom/pgstore"
-	"github.com/gorilla/sessions"
 	"log/slog"
 	"net/http"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/antonlindstrom/pgstore"
+	"github.com/gorilla/sessions"
 
 	"cucinassistant/configs"
 	"cucinassistant/langs"
@@ -46,9 +47,7 @@ func InitSessionStore() {
 // It also redirects to /, with an optional message
 func SaveUID(c *Context, UID int, msg langs.String) {
 	c.s.Values["UID"] = UID
-	if err := c.s.Save(c.R, c.W); err != nil {
-		slog.Error("while saving session:", "err", err)
-	}
+	c.s.Save(c.R, c.W)
 
 	if msg != langs.STR_NONE {
 		ShowMessage(c, msg, "/")

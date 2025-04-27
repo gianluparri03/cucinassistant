@@ -3,15 +3,33 @@ package database
 import (
 	"database/sql"
 	"errors"
-	_ "github.com/lib/pq"
 	"log/slog"
 	"os"
 	"strings"
+
+	_ "github.com/lib/pq"
 
 	"cucinassistant/configs"
 )
 
 var db *sql.DB
+
+// handleNoRowsError is an utility function that does the following.
+// If err is sql.ErrNoRows, checks if it happened because the user (with given
+// UID) does not exist (and in this case it returns ERR_USER_UNKNOWN), or
+// just because there are no rows (and in this case it returns ifExists).
+// Otherwise returns ERR_UNKNOWN.
+func handleNoRowsError(err error, UID int, ifExist error) error {
+	if errors.Is(err, sql.ErrNoRows) {
+		if _, err = GetUser("UID", UID); err == nil {
+			return ifExist
+		} else {
+			return err
+		}
+	} else {
+		return ERR_UNKNOWN
+	}
+}
 
 // Connect creates a connection to the database.
 func Connect() {
@@ -47,25 +65,6 @@ func Bootstrap() {
 				os.Exit(1)
 			}
 		}
-	}
-}
-
-// handleNoRowsError is an utility function that does the following.
-// If err is sql.ErrNoRows, checks if it happened because the user (with given
-// UID) does not exist (and in this case it returns ERR_USER_UNKNOWN), or just because
-// there are no rows (and in this case it returns ifExists).
-// If err is not sql.ErrNoRows, it prints a log (with whileDoing) and returns
-// ERR_UNKNOWN
-func handleNoRowsError(err error, UID int, ifExist error, whileDoing string) error {
-	if errors.Is(err, sql.ErrNoRows) {
-		if _, err = GetUser("UID", UID); err == nil {
-			return ifExist
-		} else {
-			return err
-		}
-	} else {
-		slog.Error("while "+whileDoing+":", "err", err)
-		return ERR_UNKNOWN
 	}
 }
 

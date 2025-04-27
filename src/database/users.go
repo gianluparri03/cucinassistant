@@ -4,10 +4,10 @@ import (
 	"crypto/rand"
 	"database/sql"
 	"fmt"
-	"github.com/alexedwards/argon2id"
-	"log/slog"
 	"net/mail"
 	"strings"
+
+	"github.com/alexedwards/argon2id"
 )
 
 // checkUsername ensures an username is valid.
@@ -69,7 +69,6 @@ func createHash(plain string) (hash string, err error) {
 func compareHash(plain string, hash string, noMatch error) error {
 	match, err := argon2id.ComparePasswordAndHash(plain, hash)
 	if err != nil {
-		slog.Error("while hashing string", "err", err)
 		return ERR_UNKNOWN
 	} else if !match {
 		return noMatch
@@ -124,86 +123,6 @@ type User struct {
 	fetched bool
 }
 
-// GetUser returns the user with the given field.
-func GetUser(field string, value any) (User, error) {
-	// Makes sure the field is valid
-	if field != "UID" && field != "username" && field != "email" {
-		slog.Error("invalid user identifier", "field", field)
-		return User{}, ERR_UNKNOWN
-	}
-
-	// Prepares the user
-	user := User{fetched: true}
-	var token *string
-
-	// Queries the data
-	err := db.QueryRow(`SELECT uid, username, email, password, token, email_lang FROM ca_users WHERE `+field+`=$1;`, value).
-		Scan(&user.UID, &user.Username, &user.Email, &user.Password, &token, &user.EmailLang)
-	if err != nil {
-		// Checks the error
-		if !strings.HasSuffix(err.Error(), "no rows in result set") {
-			slog.Error("while retrieving user data:", "err", err)
-			return user, ERR_UNKNOWN
-		} else {
-			return user, ERR_USER_UNKNOWN
-		}
-	}
-
-	// Dereferences token (can be null)
-	if token == nil {
-		user.Token = ""
-	} else {
-		user.Token = *token
-	}
-
-	return user, nil
-}
-
-// SignUp tries to sign up an user.
-func SignUp(username string, email string, password string) (User, error) {
-	// Checks if data is valid
-	if err := checkUsername(username); err != nil {
-		return User{}, err
-	} else if err = checkEmail(email); err != nil {
-		return User{}, err
-	} else if err = checkPassword(password); err != nil {
-		return User{}, err
-	}
-
-	// Hashes the password
-	hash, err := createHash(password)
-	if err != nil {
-		return User{}, nil
-	}
-
-	// Tries to save it in the database
-	_, err = db.Exec(`INSERT INTO ca_users (username, email, password) VALUES ($1, $2, $3);`, username, email, hash)
-	if err != nil {
-		slog.Error("while signup:", "err", err)
-		return User{}, ERR_UNKNOWN
-	}
-
-	// Retrieves the UID
-	return GetUser("email", email)
-}
-
-// SignIn tries to sign in an user.
-func SignIn(username string, password string) (User, error) {
-	// Fetches the hash
-	user, err := GetUser("username", username)
-	if err != nil {
-		return User{}, ERR_USER_WRONG_CREDENTIALS
-	}
-
-	// Compare the passwords
-	err = compareHash(password, user.Password, ERR_USER_WRONG_CREDENTIALS)
-	if err != nil {
-		return User{}, err
-	}
-
-	return user, nil
-}
-
 // fetch checks if an user is builded
 // by hand or fetched form the database. In the
 // first case, it replaces it with a fetched one.
@@ -224,30 +143,52 @@ func (u *User) fetch() error {
 	return nil
 }
 
-// ChangeUsername changes the user's username with a new one.
-func (u *User) ChangeUsername(newUsername string) error {
-	// Ensures all data is present
-	if err := u.fetch(); err != nil {
-		return err
+// GetUser returns the user with the given field.
+func GetUser(field string, value any) (User, error) {
+	// Makes sure the field is valid
+	if field != "UID" && field != "username" && field != "email" {
+		return User{}, ERR_UNKNOWN
 	}
 
-	// Ensures the username is actually new, and that it's valid
-	if u.Username == newUsername {
-		return nil
-	} else if err := checkUsername(newUsername); err != nil {
-		return err
-	}
+	// Prepares the user
+	user := User{fetched: true}
+	var token *string
 
-	// Saves the new one
-	_, err := db.Exec(`UPDATE ca_users SET username=$2 WHERE uid=$1;`, u.UID, newUsername)
+	// Queries the data
+	err := db.QueryRow(`SELECT uid, username, email, password, token, email_lang FROM ca_users WHERE `+field+`=$1;`, value).
+		Scan(&user.UID, &user.Username, &user.Email, &user.Password, &token, &user.EmailLang)
 	if err != nil {
-		slog.Error("while changing user username:", "err", err)
-		return ERR_UNKNOWN
+		// Checks the error
+		if !strings.HasSuffix(err.Error(), "no rows in result set") {
+			return user, ERR_UNKNOWN
+		} else {
+			return user, ERR_USER_UNKNOWN
+		}
 	}
 
-	// Updates struct
-	u.Username = newUsername
-	return nil
+	// Dereferences token (can be null)
+	if token == nil {
+		user.Token = ""
+	} else {
+		user.Token = *token
+	}
+
+	return user, nil
+}
+
+// GetUsersForBroadcast returns the users, with only
+// their username, email and email_lang
+func GetUsersForBroadcast() (users []User) {
+	rows, _ := db.Query(`SELECT username, email, email_lang FROM ca_users;`)
+	defer rows.Close()
+
+	for rows.Next() {
+		var user User
+		rows.Scan(&user.Username, &user.Email, &user.EmailLang)
+		users = append(users, user)
+	}
+
+	return
 }
 
 // ChangeEmail changes the user's email with a new one.
@@ -267,7 +208,6 @@ func (u *User) ChangeEmail(newEmail string) error {
 	// Saves the new one
 	_, err := db.Exec(`UPDATE ca_users SET email=$2 WHERE uid=$1;`, u.UID, newEmail)
 	if err != nil {
-		slog.Error("while changing user email:", "err", err)
 		return ERR_UNKNOWN
 	}
 
@@ -303,12 +243,60 @@ func (u *User) ChangePassword(oldPassword string, newPassword string) error {
 	// Saves the new one
 	_, err = db.Exec(`UPDATE ca_users SET password=$2 WHERE uid=$1;`, u.UID, hashedPassword)
 	if err != nil {
-		slog.Error("while changing user password:", "err", err)
 		return ERR_UNKNOWN
 	}
 
 	// Updates struct
 	u.Password = hashedPassword
+	return nil
+}
+
+// ChangeUsername changes the user's username with a new one.
+func (u *User) ChangeUsername(newUsername string) error {
+	// Ensures all data is present
+	if err := u.fetch(); err != nil {
+		return err
+	}
+
+	// Ensures the username is actually new, and that it's valid
+	if u.Username == newUsername {
+		return nil
+	} else if err := checkUsername(newUsername); err != nil {
+		return err
+	}
+
+	// Saves the new one
+	_, err := db.Exec(`UPDATE ca_users SET username=$2 WHERE uid=$1;`, u.UID, newUsername)
+	if err != nil {
+		return ERR_UNKNOWN
+	}
+
+	// Updates struct
+	u.Username = newUsername
+	return nil
+}
+
+// Delete deletes the user and all of its content
+func (u *User) Delete(token string) error {
+	// Ensures all data is present and the token
+	// has been generated
+	if err := u.fetch(); err != nil {
+		return err
+	} else if u.Token == "" {
+		return ERR_USER_WRONG_TOKEN
+	}
+
+	// Compares the tokens
+	if err := compareHash(token, u.Token, ERR_USER_WRONG_TOKEN); err != nil {
+		return err
+	}
+
+	// Deletes the user
+	_, err := db.Exec(`DELETE FROM ca_users WHERE uid=$1;`, u.UID)
+	if err != nil {
+		return ERR_UNKNOWN
+	}
+
 	return nil
 }
 
@@ -323,7 +311,6 @@ func (u *User) GenerateToken() (string, error) {
 	var res sql.Result
 	res, err = db.Exec(`UPDATE ca_users SET token=$2 WHERE uid=$1;`, u.UID, hash)
 	if err != nil {
-		slog.Error("while saving token:", "err", err)
 		return "", ERR_UNKNOWN
 	} else if ra, _ := res.RowsAffected(); ra != 1 {
 		return "", ERR_USER_UNKNOWN
@@ -366,38 +353,12 @@ func (u *User) ResetPassword(token string, newPassword string) error {
 	// Saves the new password (and resets the token)
 	_, err = db.Exec(`UPDATE ca_users SET password=$2, token=NULL WHERE uid=$1;`, u.UID, hashedPassword)
 	if err != nil {
-		slog.Error("while resetting password:", "err", err)
 		return ERR_UNKNOWN
 	}
 
 	// Updates the struct
 	u.Token = ""
 	u.Password = hashedPassword
-	return nil
-}
-
-// Delete deletes the user and all of its content
-func (u *User) Delete(token string) error {
-	// Ensures all data is present and the token
-	// has been generated
-	if err := u.fetch(); err != nil {
-		return err
-	} else if u.Token == "" {
-		return ERR_USER_WRONG_TOKEN
-	}
-
-	// Compares the tokens
-	if err := compareHash(token, u.Token, ERR_USER_WRONG_TOKEN); err != nil {
-		return err
-	}
-
-	// Deletes the user
-	_, err := db.Exec(`DELETE FROM ca_users WHERE uid=$1;`, u.UID)
-	if err != nil {
-		slog.Error("while deleting user:", "err", err)
-		return ERR_UNKNOWN
-	}
-
 	return nil
 }
 
@@ -411,7 +372,6 @@ func (u *User) SetEmailLang(lang string) error {
 	// Saves the new value
 	_, err := db.Exec(`UPDATE ca_users SET email_lang=$2 WHERE uid=$1;`, u.UID, lang)
 	if err != nil {
-		slog.Error("while changing user email_lang:", "err", err)
 		return ERR_UNKNOWN
 	}
 
@@ -420,20 +380,46 @@ func (u *User) SetEmailLang(lang string) error {
 	return nil
 }
 
-// GetUsersForBroadcast returns the users, with only
-// their username, email and email_lang
-func GetUsersForBroadcast() (users []User) {
-	rows, err := db.Query(`SELECT username, email, email_lang FROM ca_users;`)
+// SignIn tries to sign in an user.
+func SignIn(username string, password string) (User, error) {
+	// Fetches the hash
+	user, err := GetUser("username", username)
 	if err != nil {
-		slog.Error("while selecting users for broadcast:", "err", err)
+		return User{}, ERR_USER_WRONG_CREDENTIALS
 	}
 
-	defer rows.Close()
-	for rows.Next() {
-		var user User
-		rows.Scan(&user.Username, &user.Email, &user.EmailLang)
-		users = append(users, user)
+	// Compare the passwords
+	err = compareHash(password, user.Password, ERR_USER_WRONG_CREDENTIALS)
+	if err != nil {
+		return User{}, err
 	}
 
-	return
+	return user, nil
+}
+
+// SignUp tries to sign up an user.
+func SignUp(username string, email string, password string) (User, error) {
+	// Checks if data is valid
+	if err := checkUsername(username); err != nil {
+		return User{}, err
+	} else if err = checkEmail(email); err != nil {
+		return User{}, err
+	} else if err = checkPassword(password); err != nil {
+		return User{}, err
+	}
+
+	// Hashes the password
+	hash, err := createHash(password)
+	if err != nil {
+		return User{}, nil
+	}
+
+	// Tries to save it in the database
+	_, err = db.Exec(`INSERT INTO ca_users (username, email, password) VALUES ($1, $2, $3);`, username, email, hash)
+	if err != nil {
+		return User{}, ERR_UNKNOWN
+	}
+
+	// Retrieves the UID
+	return GetUser("email", email)
 }

@@ -35,159 +35,7 @@ func getTestingUser(t *testing.T) (user User, password string) {
 
 var unknownUser User = User{}
 
-func TestSignup(t *testing.T) {
-	user := generateTestingUser()
-
-	type data struct {
-		Username string
-		Email    string
-		Password string
-
-		ExpectedErr error
-	}
-
-	testSuite[data]{
-		Target: func(t *testing.T, msg string, d data) {
-			preUN := GetStats().UsersNumber
-
-			_, err := SignUp(d.Username, d.Email, d.Password)
-			if err != d.ExpectedErr {
-				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
-			}
-
-			postUN := GetStats().UsersNumber
-
-			// UsersNumber should be incremented only if there are no errors
-			if (d.ExpectedErr != nil) != (preUN == postUN) {
-				t.Errorf("%s, wrong users number", msg)
-			}
-		},
-
-		Cases: []testCase[data]{
-			{
-				"username length not checked",
-				data{Username: "u", Email: user.Email, Password: user.Password, ExpectedErr: ERR_USER_NAME_TOO_SHORT},
-			},
-			{
-				"email not checked",
-				data{Username: user.Username, Email: "e", Password: user.Password, ExpectedErr: ERR_USER_MAIL_INVALID},
-			},
-			{
-				"password not checked",
-				data{Username: user.Username, Email: user.Email, Password: "p", ExpectedErr: ERR_USER_PASS_TOO_SHORT},
-			},
-			{
-				"",
-				data{Username: user.Username, Email: user.Email, Password: user.Password},
-			},
-			{
-				"signed up with duplicated username",
-				data{Username: user.Username, Email: user.Email + "e", Password: user.Password, ExpectedErr: ERR_USER_NAME_UNAVAIL},
-			},
-			{
-				"signed up with duplicated email",
-				data{Username: user.Username + "u", Email: user.Email, Password: user.Password, ExpectedErr: ERR_USER_MAIL_UNAVAIL},
-			},
-			{
-				"",
-				data{Username: user.Username + "u", Email: user.Email + "e", Password: user.Password},
-			},
-		},
-	}.Run(t)
-}
-
-func TestSignIn(t *testing.T) {
-	user, password := getTestingUser(t)
-
-	type data struct {
-		Username string
-		Password string
-
-		ExpectedErr error
-		ExpectedUID int
-	}
-
-	testSuite[data]{
-		Target: func(t *testing.T, msg string, d data) {
-			user, err := SignIn(d.Username, d.Password)
-			if err != d.ExpectedErr {
-				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
-			}
-
-			if (d.ExpectedErr == nil) && (user.UID != d.ExpectedUID) {
-				t.Errorf("%s, wrong uid", msg)
-			}
-		},
-
-		Cases: []testCase[data]{
-			{
-				"signed in unknown user",
-				data{Username: user.Username + "u", Password: password, ExpectedErr: ERR_USER_WRONG_CREDENTIALS},
-			},
-			{
-				"signed in with wrong password",
-				data{Username: user.Username, Password: password + "p", ExpectedErr: ERR_USER_WRONG_CREDENTIALS},
-			},
-			{
-				"",
-				data{Username: user.Username, Password: password, ExpectedUID: user.UID},
-			},
-		},
-	}.Run(t)
-}
-
-func TestChangeUsername(t *testing.T) {
-	user, _ := getTestingUser(t)
-	otherUser, _ := getTestingUser(t)
-
-	type data struct {
-		User        User
-		NewUsername string
-
-		ExpectedErr error
-	}
-
-	testSuite[data]{
-		Target: func(t *testing.T, msg string, d data) {
-			err := d.User.ChangeUsername(d.NewUsername)
-			if err != d.ExpectedErr {
-				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
-			}
-
-			if d.ExpectedErr == nil {
-				user, _ := GetUser("UID", user.UID)
-				if user.Username != d.NewUsername {
-					t.Errorf("%s, changes not saved", msg)
-				}
-			}
-		},
-
-		Cases: []testCase[data]{
-			{
-				"changed username of unknown user",
-				data{User: unknownUser, ExpectedErr: ERR_USER_UNKNOWN},
-			},
-			{
-				"username not checked",
-				data{User: user, NewUsername: "u", ExpectedErr: ERR_USER_NAME_TOO_SHORT},
-			},
-			{
-				"changed username with an unavailable one",
-				data{User: user, NewUsername: otherUser.Username, ExpectedErr: ERR_USER_NAME_UNAVAIL},
-			},
-			{
-				"(same)",
-				data{User: user, NewUsername: user.Username},
-			},
-			{
-				"(different)",
-				data{User: user, NewUsername: user.Username + "u"},
-			},
-		},
-	}.Run(t)
-}
-
-func TestChangeEmail(t *testing.T) {
+func TestUserChangeEmail(t *testing.T) {
 	user, _ := getTestingUser(t)
 	otherUser, _ := getTestingUser(t)
 
@@ -238,7 +86,7 @@ func TestChangeEmail(t *testing.T) {
 	}.Run(t)
 }
 
-func TestChangePassword(t *testing.T) {
+func TestUserChangePassword(t *testing.T) {
 	user, password := getTestingUser(t)
 
 	type data struct {
@@ -289,98 +137,58 @@ func TestChangePassword(t *testing.T) {
 	}.Run(t)
 }
 
-func TestGenerateToken(t *testing.T) {
+func TestUserChangeUsername(t *testing.T) {
 	user, _ := getTestingUser(t)
-
-	type data struct {
-		User        User
-		ExpectedErr error
-	}
-
-	testSuite[data]{
-		Target: func(t *testing.T, msg string, d data) {
-			token, err := d.User.GenerateToken()
-			if err != d.ExpectedErr {
-				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
-			}
-
-			if d.ExpectedErr == nil {
-				user, _ := GetUser("UID", d.User.UID)
-				if err := compareHash(token, user.Token, ERR_UNKNOWN); err != nil {
-					t.Errorf("%s, saved token does not match returned one", msg)
-				}
-			}
-		},
-
-		Cases: []testCase[data]{
-			{
-				"generated token of unknown user",
-				data{User: unknownUser, ExpectedErr: ERR_USER_UNKNOWN},
-			},
-			{
-				"",
-				data{User: user},
-			},
-		},
-	}.Run(t)
-}
-
-func TestResetPassword(t *testing.T) {
-	user, password := getTestingUser(t)
-	token, _ := user.GenerateToken()
 	otherUser, _ := getTestingUser(t)
 
 	type data struct {
 		User        User
-		Token       string
-		NewPassword string
+		NewUsername string
 
 		ExpectedErr error
 	}
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			err := d.User.ResetPassword(d.Token, d.NewPassword)
+			err := d.User.ChangeUsername(d.NewUsername)
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
 			}
 
 			if d.ExpectedErr == nil {
-				user, _ := GetUser("email", d.User.Email)
-				if user.Token != "" {
-					t.Errorf("%s, token wasn't dropped", msg)
-				} else if err := compareHash(d.NewPassword, user.Password, ERR_UNKNOWN); err != nil {
-					t.Errorf("%s, new password not saved", msg)
+				user, _ := GetUser("UID", user.UID)
+				if user.Username != d.NewUsername {
+					t.Errorf("%s, changes not saved", msg)
 				}
 			}
 		},
 
 		Cases: []testCase[data]{
 			{
-				"reset password of unknown user",
-				data{User: unknownUser, NewPassword: password, ExpectedErr: ERR_USER_UNKNOWN},
+				"changed username of unknown user",
+				data{User: unknownUser, ExpectedErr: ERR_USER_UNKNOWN},
 			},
 			{
-				"reset password of unknown user",
-				data{User: otherUser, NewPassword: password, ExpectedErr: ERR_USER_WRONG_TOKEN},
+				"username not checked",
+				data{User: user, NewUsername: "u", ExpectedErr: ERR_USER_NAME_TOO_SHORT},
 			},
 			{
-				"reset password with wrong token",
-				data{User: user, Token: token + "t", NewPassword: password, ExpectedErr: ERR_USER_WRONG_TOKEN},
+				"changed username with an unavailable one",
+				data{User: user, NewUsername: otherUser.Username, ExpectedErr: ERR_USER_NAME_UNAVAIL},
 			},
 			{
-				"reset password with an invalid one",
-				data{User: user, Token: token, NewPassword: "p", ExpectedErr: ERR_USER_PASS_TOO_SHORT},
+				"(same)",
+				data{User: user, NewUsername: user.Username},
 			},
 			{
-				"",
-				data{User: user, Token: token, NewPassword: password},
+				"(different)",
+				data{User: user, NewUsername: user.Username + "u"},
 			},
 		},
 	}.Run(t)
 }
 
-func TestDeleteUser(t *testing.T) {
+func TestUserDeleteUser(t *testing.T) {
 	user, _ := getTestingUser(t)
 	token, _ := user.GenerateToken()
 
@@ -436,7 +244,43 @@ func TestDeleteUser(t *testing.T) {
 	}.Run(t)
 }
 
-func TestGetUser(t *testing.T) {
+func TestUserGenerateToken(t *testing.T) {
+	user, _ := getTestingUser(t)
+
+	type data struct {
+		User        User
+		ExpectedErr error
+	}
+
+	testSuite[data]{
+		Target: func(t *testing.T, msg string, d data) {
+			token, err := d.User.GenerateToken()
+			if err != d.ExpectedErr {
+				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
+			}
+
+			if d.ExpectedErr == nil {
+				user, _ := GetUser("UID", d.User.UID)
+				if err := compareHash(token, user.Token, ERR_UNKNOWN); err != nil {
+					t.Errorf("%s, saved token does not match returned one", msg)
+				}
+			}
+		},
+
+		Cases: []testCase[data]{
+			{
+				"generated token of unknown user",
+				data{User: unknownUser, ExpectedErr: ERR_USER_UNKNOWN},
+			},
+			{
+				"",
+				data{User: user},
+			},
+		},
+	}.Run(t)
+}
+
+func TestUserGetUser(t *testing.T) {
 	user, _ := getTestingUser(t)
 
 	type data struct {
@@ -478,7 +322,62 @@ func TestGetUser(t *testing.T) {
 	}.Run(t)
 }
 
-func TestSetEmailLang(t *testing.T) {
+func TestUserResetPassword(t *testing.T) {
+	user, password := getTestingUser(t)
+	token, _ := user.GenerateToken()
+	otherUser, _ := getTestingUser(t)
+
+	type data struct {
+		User        User
+		Token       string
+		NewPassword string
+
+		ExpectedErr error
+	}
+
+	testSuite[data]{
+		Target: func(t *testing.T, msg string, d data) {
+			err := d.User.ResetPassword(d.Token, d.NewPassword)
+			if err != d.ExpectedErr {
+				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
+			}
+
+			if d.ExpectedErr == nil {
+				user, _ := GetUser("email", d.User.Email)
+				if user.Token != "" {
+					t.Errorf("%s, token wasn't dropped", msg)
+				} else if err := compareHash(d.NewPassword, user.Password, ERR_UNKNOWN); err != nil {
+					t.Errorf("%s, new password not saved", msg)
+				}
+			}
+		},
+
+		Cases: []testCase[data]{
+			{
+				"reset password of unknown user",
+				data{User: unknownUser, NewPassword: password, ExpectedErr: ERR_USER_UNKNOWN},
+			},
+			{
+				"reset password of unknown user",
+				data{User: otherUser, NewPassword: password, ExpectedErr: ERR_USER_WRONG_TOKEN},
+			},
+			{
+				"reset password with wrong token",
+				data{User: user, Token: token + "t", NewPassword: password, ExpectedErr: ERR_USER_WRONG_TOKEN},
+			},
+			{
+				"reset password with an invalid one",
+				data{User: user, Token: token, NewPassword: "p", ExpectedErr: ERR_USER_PASS_TOO_SHORT},
+			},
+			{
+				"",
+				data{User: user, Token: token, NewPassword: password},
+			},
+		},
+	}.Run(t)
+}
+
+func TestUserSetEmailLang(t *testing.T) {
 	user, _ := getTestingUser(t)
 
 	type data struct {
@@ -511,6 +410,107 @@ func TestSetEmailLang(t *testing.T) {
 			{
 				"",
 				data{User: user, NewLang: "it"},
+			},
+		},
+	}.Run(t)
+}
+
+func TestUserSignIn(t *testing.T) {
+	user, password := getTestingUser(t)
+
+	type data struct {
+		Username string
+		Password string
+
+		ExpectedErr error
+		ExpectedUID int
+	}
+
+	testSuite[data]{
+		Target: func(t *testing.T, msg string, d data) {
+			user, err := SignIn(d.Username, d.Password)
+			if err != d.ExpectedErr {
+				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
+			}
+
+			if (d.ExpectedErr == nil) && (user.UID != d.ExpectedUID) {
+				t.Errorf("%s, wrong uid", msg)
+			}
+		},
+
+		Cases: []testCase[data]{
+			{
+				"signed in unknown user",
+				data{Username: user.Username + "u", Password: password, ExpectedErr: ERR_USER_WRONG_CREDENTIALS},
+			},
+			{
+				"signed in with wrong password",
+				data{Username: user.Username, Password: password + "p", ExpectedErr: ERR_USER_WRONG_CREDENTIALS},
+			},
+			{
+				"",
+				data{Username: user.Username, Password: password, ExpectedUID: user.UID},
+			},
+		},
+	}.Run(t)
+}
+
+func TestUserSignup(t *testing.T) {
+	user := generateTestingUser()
+
+	type data struct {
+		Username string
+		Email    string
+		Password string
+
+		ExpectedErr error
+	}
+
+	testSuite[data]{
+		Target: func(t *testing.T, msg string, d data) {
+			preUN := GetStats().UsersNumber
+
+			_, err := SignUp(d.Username, d.Email, d.Password)
+			if err != d.ExpectedErr {
+				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
+			}
+
+			postUN := GetStats().UsersNumber
+
+			// UsersNumber should be incremented only if there are no errors
+			if (d.ExpectedErr != nil) != (preUN == postUN) {
+				t.Errorf("%s, wrong users number", msg)
+			}
+		},
+
+		Cases: []testCase[data]{
+			{
+				"username length not checked",
+				data{Username: "u", Email: user.Email, Password: user.Password, ExpectedErr: ERR_USER_NAME_TOO_SHORT},
+			},
+			{
+				"email not checked",
+				data{Username: user.Username, Email: "e", Password: user.Password, ExpectedErr: ERR_USER_MAIL_INVALID},
+			},
+			{
+				"password not checked",
+				data{Username: user.Username, Email: user.Email, Password: "p", ExpectedErr: ERR_USER_PASS_TOO_SHORT},
+			},
+			{
+				"",
+				data{Username: user.Username, Email: user.Email, Password: user.Password},
+			},
+			{
+				"signed up with duplicated username",
+				data{Username: user.Username, Email: user.Email + "e", Password: user.Password, ExpectedErr: ERR_USER_NAME_UNAVAIL},
+			},
+			{
+				"signed up with duplicated email",
+				data{Username: user.Username + "u", Email: user.Email, Password: user.Password, ExpectedErr: ERR_USER_MAIL_UNAVAIL},
+			},
+			{
+				"",
+				data{Username: user.Username + "u", Email: user.Email + "e", Password: user.Password},
 			},
 		},
 	}.Run(t)

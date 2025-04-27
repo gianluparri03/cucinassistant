@@ -5,6 +5,101 @@ import (
 	"testing"
 )
 
+func TestMenusDelete(t *testing.T) {
+	user, _ := getTestingUser(t)
+	menu, _ := user.Menus().New("")
+
+	otherUser, _ := getTestingUser(t)
+
+	type data struct {
+		User User
+		MID  int
+
+		ExpectedErr error
+		ShouldExist bool
+	}
+
+	testSuite[data]{
+		Target: func(t *testing.T, msg string, d data) {
+			if err := d.User.Menus().Delete(d.MID); err != d.ExpectedErr {
+				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
+			}
+
+			menu, _ = user.Menus().GetOne(d.MID)
+			if !d.ShouldExist && menu.MID != 0 {
+				t.Errorf("%s, menu wasn't deleted", msg)
+			} else if d.ShouldExist && menu.MID == 0 {
+				t.Errorf("%s, menu was deleted anyway", msg)
+			}
+		},
+
+		Cases: []testCase[data]{
+			{
+				"other user deleted menu",
+				data{User: otherUser, MID: menu.MID, ExpectedErr: ERR_MENU_NOT_FOUND, ShouldExist: true},
+			},
+			{
+				"deleted unknown menu",
+				data{User: user, ExpectedErr: ERR_MENU_NOT_FOUND},
+			},
+			{
+				"",
+				data{User: user, MID: menu.MID},
+			},
+		},
+	}.Run(t)
+}
+
+func TestMenusDuplicate(t *testing.T) {
+	user, _ := getTestingUser(t)
+	menu, _ := user.Menus().New("")
+	menu, _ = user.Menus().Replace(menu.MID, "name", [14]string{"a", "b", "c"})
+
+	otherUser, _ := getTestingUser(t)
+
+	type data struct {
+		User User
+		MID  int
+
+		ExpectedErr   error
+		ExpectedMenus []*Menu
+	}
+
+	testSuite[data]{
+		Target: func(t *testing.T, msg string, d data) {
+			got, err := d.User.Menus().Duplicate(d.MID)
+			if err != d.ExpectedErr {
+				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
+			}
+
+			if d.ExpectedErr == nil {
+				srcMenu, _ := d.User.Menus().GetOne(d.MID)
+				dstMenu, _ := d.User.Menus().GetOne(got.MID)
+				if srcMenu.Meals != dstMenu.Meals {
+					t.Errorf("%v, changes not saved", msg)
+				} else if !reflect.DeepEqual(dstMenu, got) {
+					t.Errorf("%v, wrong returned values", msg)
+				}
+			}
+		},
+
+		Cases: []testCase[data]{
+			{
+				"other user duplicated menu",
+				data{User: otherUser, MID: menu.MID, ExpectedErr: ERR_MENU_NOT_FOUND},
+			},
+			{
+				"duplicated unknown menu",
+				data{User: user, ExpectedErr: ERR_MENU_NOT_FOUND},
+			},
+			{
+				"",
+				data{User: user, MID: menu.MID},
+			},
+		},
+	}.Run(t)
+}
+
 func TestMenusGetAll(t *testing.T) {
 	user, _ := getTestingUser(t)
 	m1, _ := user.Menus().New("m1")
@@ -177,101 +272,6 @@ func TestMenusReplace(t *testing.T) {
 			{
 				"",
 				data{User: user, MID: menu.MID, NewName: newName, NewMeals: newMeals},
-			},
-		},
-	}.Run(t)
-}
-
-func TestMenusDelete(t *testing.T) {
-	user, _ := getTestingUser(t)
-	menu, _ := user.Menus().New("")
-
-	otherUser, _ := getTestingUser(t)
-
-	type data struct {
-		User User
-		MID  int
-
-		ExpectedErr error
-		ShouldExist bool
-	}
-
-	testSuite[data]{
-		Target: func(t *testing.T, msg string, d data) {
-			if err := d.User.Menus().Delete(d.MID); err != d.ExpectedErr {
-				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
-			}
-
-			menu, _ = user.Menus().GetOne(d.MID)
-			if !d.ShouldExist && menu.MID != 0 {
-				t.Errorf("%s, menu wasn't deleted", msg)
-			} else if d.ShouldExist && menu.MID == 0 {
-				t.Errorf("%s, menu was deleted anyway", msg)
-			}
-		},
-
-		Cases: []testCase[data]{
-			{
-				"other user deleted menu",
-				data{User: otherUser, MID: menu.MID, ExpectedErr: ERR_MENU_NOT_FOUND, ShouldExist: true},
-			},
-			{
-				"deleted unknown menu",
-				data{User: user, ExpectedErr: ERR_MENU_NOT_FOUND},
-			},
-			{
-				"",
-				data{User: user, MID: menu.MID},
-			},
-		},
-	}.Run(t)
-}
-
-func TestMenusDuplicate(t *testing.T) {
-	user, _ := getTestingUser(t)
-	menu, _ := user.Menus().New("")
-	menu, _ = user.Menus().Replace(menu.MID, "name", [14]string{"a", "b", "c"})
-
-	otherUser, _ := getTestingUser(t)
-
-	type data struct {
-		User User
-		MID  int
-
-		ExpectedErr   error
-		ExpectedMenus []*Menu
-	}
-
-	testSuite[data]{
-		Target: func(t *testing.T, msg string, d data) {
-			got, err := d.User.Menus().Duplicate(d.MID)
-			if err != d.ExpectedErr {
-				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
-			}
-
-			if d.ExpectedErr == nil {
-				srcMenu, _ := d.User.Menus().GetOne(d.MID)
-				dstMenu, _ := d.User.Menus().GetOne(got.MID)
-				if srcMenu.Meals != dstMenu.Meals {
-					t.Errorf("%v, changes not saved", msg)
-				} else if !reflect.DeepEqual(dstMenu, got) {
-					t.Errorf("%v, wrong returned values", msg)
-				}
-			}
-		},
-
-		Cases: []testCase[data]{
-			{
-				"other user duplicated menu",
-				data{User: otherUser, MID: menu.MID, ExpectedErr: ERR_MENU_NOT_FOUND},
-			},
-			{
-				"duplicated unknown menu",
-				data{User: user, ExpectedErr: ERR_MENU_NOT_FOUND},
-			},
-			{
-				"",
-				data{User: user, MID: menu.MID},
 			},
 		},
 	}.Run(t)

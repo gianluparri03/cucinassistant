@@ -17,7 +17,7 @@ var days = [7]langs.String{
 	langs.STR_SUNDAY,
 }
 
-templ MenuDashboard(menus []database.Menu) {
+templ Menus(menus []database.Menu) {
 	@TemplateTitle(langs.Translate(ctx, langs.STR_MENUS), "/")
 
     <div class="dashboard">
@@ -34,6 +34,39 @@ templ MenuDashboard(menus []database.Menu) {
             <span>{ langs.Translate(ctx, langs.STR_NEW_MENU) }</span>
         </button>
     </div>
+}
+
+templ MenusNew() {
+	@TemplateTitle(langs.Translate(ctx, langs.STR_NEW_MENU), "/menus")
+
+    <form method="POST">
+        { langs.Translate(ctx, langs.STR_NAME) } <br>
+		<input type="text" name="name" required> <br>
+
+		<button class="icon-text">
+			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
+		</button>
+    </form>
+}
+
+templ Menu(menu database.Menu) {
+	{{ baseurl := "/menus/" + strconv.Itoa(menu.MID) }}
+	@TemplateTitle(menu.Name, "/menus")
+
+	<button class="icon-text" hx-get={ baseurl + "/edit" }>
+		<i class="fas fa-edit"></i> { langs.Translate(ctx, langs.STR_EDIT) }
+	</button>
+	<button class="icon-text" hx-post={ baseurl + "/duplicate" }>
+		<i class="fas fa-clone"></i> { langs.Translate(ctx, langs.STR_CLONE) }
+	</button>
+
+	for index, day := range days {
+		<div class="menu-day">
+			<b>{ langs.Translate(ctx, day) }</b>
+			<textarea readonly>{ menu.Meals[index*2+0] }</textarea>
+			<textarea readonly>{ menu.Meals[index*2+1] }</textarea>
+		</div>
+	}
 }
 
 templ MenuEdit(menu database.Menu) {
@@ -77,37 +110,4 @@ templ MenuEdit(menu database.Menu) {
             <i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
         </button>
     </div>
-}
-
-templ MenuNew() {
-	@TemplateTitle(langs.Translate(ctx, langs.STR_NEW_MENU), "/menus")
-
-    <form method="POST">
-        { langs.Translate(ctx, langs.STR_NAME) } <br>
-		<input type="text" name="name" required> <br>
-
-		<button class="icon-text">
-			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
-		</button>
-    </form>
-}
-
-templ MenuView(menu database.Menu) {
-	{{ baseurl := "/menus/" + strconv.Itoa(menu.MID) }}
-	@TemplateTitle(menu.Name, "/menus")
-
-	<button class="icon-text" hx-get={ baseurl + "/edit" }>
-		<i class="fas fa-edit"></i> { langs.Translate(ctx, langs.STR_EDIT) }
-	</button>
-	<button class="icon-text" hx-post={ baseurl + "/duplicate" }>
-		<i class="fas fa-clone"></i> { langs.Translate(ctx, langs.STR_CLONE) }
-	</button>
-
-	for index, day := range days {
-		<div class="menu-day">
-			<b>{ langs.Translate(ctx, day) }</b>
-			<textarea readonly>{ menu.Meals[index*2+0] }</textarea>
-			<textarea readonly>{ menu.Meals[index*2+1] }</textarea>
-		</div>
-	}
 }
