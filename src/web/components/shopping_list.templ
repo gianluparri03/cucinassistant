@@ -21,6 +21,10 @@ templ ShoppingList(list map[int]database.Entry) {
             </button>
        	}
 
+        <button class="icon-text" onclick="window.print();">
+            <i class="fas fa-print"></i> { langs.Translate(ctx, langs.STR_PRINT) }
+        </button>
+
 		for _, entry := range list {
             <div class="shopping-item">
 				{{ baseurl := "/shopping_list/" + strconv.Itoa(entry.EID) }}

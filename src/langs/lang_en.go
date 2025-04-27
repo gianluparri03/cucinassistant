@@ -74,6 +74,7 @@ var english *Lang = &Lang{
 		STR_PASSWORD:                            "Password",
 		STR_PASSWORD_CHANGED:                    "Password changed successfully",
 		STR_PASSWORD_CHANGED_EMAIL:              "recently your password has been changed.",
+		STR_PRINT:                               "Print",
 		STR_QUANTITY:                            "Quantity",
 		STR_RECIPE_DELETED:                      "Recipe deleted succesfully",
 		STR_RECIPES:                             "Recipes",

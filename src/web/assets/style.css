@@ -410,3 +410,14 @@ textarea {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+
+
+/* --- PRINT -------------------- */
+@media print {
+	nav { display: none; }
+	main { margin: 0; }
+	body { background-color: white; }
+	footer div:nth-child(n+2) { display: none; }
+	#back, button { display: none !important; }
+}

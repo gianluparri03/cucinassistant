@@ -74,6 +74,7 @@ var italian *Lang = &Lang{
 		STR_PASSWORD:                            "Password",
 		STR_PASSWORD_CHANGED:                    "Password cambiata con successo",
 		STR_PASSWORD_CHANGED_EMAIL:              "la tua password è stata cambiata di recente.",
+		STR_PRINT:                               "Stampa",
 		STR_QUANTITY:                            "Quantità",
 		STR_RECIPE_DELETED:                      "Ricetta eliminata correttamente",
 		STR_RECIPES:                             "Ricette",

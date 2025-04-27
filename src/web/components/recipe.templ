@@ -89,6 +89,9 @@ templ Recipe(recipe database.Recipe) {
 	<button class="icon-text" hx-get={ baseurl + "/edit" }>
 		<i class="fas fa-edit"></i> { langs.Translate(ctx, langs.STR_EDIT) }
 	</button>
+	<button class="icon-text" onclick="window.print();">
+		<i class="fas fa-print"></i> { langs.Translate(ctx, langs.STR_PRINT) }
+	</button>
 }
 
 templ RecipeEdit(recipe database.Recipe) {

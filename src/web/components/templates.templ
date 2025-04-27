@@ -55,11 +55,15 @@ templ TemplateBase(lang string, body templ.Component, message templ.Component) {
             </main>
 
             <footer>
-                CucinAssistant &copy; 2023-2025, Gianluca Parri <br>
-                <a hx-get="/info">{ langs.Translate(ctx, langs.STR_INFO) }</a> &bullet;
-                <a href={ templ.SafeURL("https://cucinassistant.com/tutorials/" + lang + ".pdf") } hx-disable>
-                    { langs.Translate(ctx, langs.STR_TUTORIAL) }
-                </a>
+				<div>
+					CucinAssistant &copy; 2023-2025, Gianluca Parri
+				</div>
+				<div>
+					<a hx-get="/info">{ langs.Translate(ctx, langs.STR_INFO) }</a> &bullet;
+					<a href={ templ.SafeURL("https://cucinassistant.com/tutorials/" + lang + ".pdf") } hx-disable>
+						{ langs.Translate(ctx, langs.STR_TUTORIAL) }
+					</a>
+				</div>
             </footer>
         </body>
     </html>
