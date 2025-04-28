@@ -87,6 +87,47 @@ func TestUserChangeEmail(t *testing.T) {
 	}.Run(t)
 }
 
+func TestUserChangeEmailSettings(t *testing.T) {
+	user, _ := getTestingUser(t)
+
+	type data struct {
+		User          User
+		NewLang       string
+		NewNewsletter bool
+
+		ExpectedErr error
+	}
+
+	testSuite[data]{
+		Target: func(t *testing.T, msg string, d data) {
+			err := d.User.ChangeEmailSettings(d.NewLang, d.NewNewsletter)
+			if err != d.ExpectedErr {
+				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
+			}
+
+			if d.ExpectedErr == nil {
+				user, _ := GetUser("UID", user.UID)
+				if user.EmailLang != d.NewLang {
+					t.Errorf("%s, lang not saved", msg)
+				} else if user.Newsletter != d.NewNewsletter {
+					t.Errorf("%s, newsletter not saved", msg)
+				}
+			}
+		},
+
+		Cases: []testCase[data]{
+			{
+				"changed email_lang of unknown user",
+				data{User: unknownUser, ExpectedErr: ERR_USER_UNKNOWN},
+			},
+			{
+				"",
+				data{User: user, NewLang: "it", NewNewsletter: false},
+			},
+		},
+	}.Run(t)
+}
+
 func TestUserChangePassword(t *testing.T) {
 	user, password := getTestingUser(t)
 
@@ -373,44 +414,6 @@ func TestUserResetPassword(t *testing.T) {
 			{
 				"",
 				data{User: user, Token: token, NewPassword: password},
-			},
-		},
-	}.Run(t)
-}
-
-func TestUserSetEmailLang(t *testing.T) {
-	user, _ := getTestingUser(t)
-
-	type data struct {
-		User    User
-		NewLang string
-
-		ExpectedErr error
-	}
-
-	testSuite[data]{
-		Target: func(t *testing.T, msg string, d data) {
-			err := d.User.SetEmailLang(d.NewLang)
-			if err != d.ExpectedErr {
-				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
-			}
-
-			if d.ExpectedErr == nil {
-				user, _ := GetUser("UID", user.UID)
-				if user.EmailLang != d.NewLang {
-					t.Errorf("%s, changes not saved", msg)
-				}
-			}
-		},
-
-		Cases: []testCase[data]{
-			{
-				"changed email_lang of unknown user",
-				data{User: unknownUser, ExpectedErr: ERR_USER_UNKNOWN},
-			},
-			{
-				"",
-				data{User: user, NewLang: "it"},
 			},
 		},
 	}.Run(t)

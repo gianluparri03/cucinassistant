@@ -24,16 +24,17 @@ func PostUserChangeEmail(c *utils.Context) (err error) {
 	return
 }
 
-func GetUserChangeEmailLang(c *utils.Context) (err error) {
-	utils.RenderComponent(c, components.UserChangeEmailLang(langs.Available, c.U.EmailLang))
+func GetUserChangeEmailSettings(c *utils.Context) (err error) {
+	utils.RenderComponent(c, components.UserChangeEmailSettings(c.U, langs.Available))
 	return
 }
 
-func PostUserChangeEmailLang(c *utils.Context) (err error) {
+func PostUserChangeEmailSettings(c *utils.Context) (err error) {
 	lang := c.R.FormValue("lang")
+	newsletter := c.R.FormValue("newsletter") == "on"
 
-	if err = c.U.SetEmailLang(lang); err == nil {
-		utils.ShowMessage(c, langs.STR_LANG_CHANGED, "/user/settings")
+	if err = c.U.ChangeEmailSettings(lang, newsletter); err == nil {
+		utils.ShowMessage(c, langs.STR_SETTINGS_SAVED, "/user/settings")
 	}
 
 	return
@@ -191,7 +192,7 @@ func PostUserSignUp(c *utils.Context) (err error) {
 	password := c.R.FormValue("password")
 
 	if user, err = database.SignUp(username, email_, password); err == nil {
-		user.SetEmailLang(c.L)
+		user.ChangeEmailSettings(c.L, true)
 		go email.Welcome.Write(&user, "").Send()
 		utils.SaveUID(c, user.UID, langs.STR_USER_CREATED)
 	}

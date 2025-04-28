@@ -113,6 +113,10 @@ type User struct {
 	// the users wishes to receive emails
 	EmailLang string
 
+	// Newsletter indicates if the user wants
+	// to receive the newsletter
+	Newsletter bool
+
 	// Token is an optional string, that
 	// can be generated to delete an user
 	// or to reset its password
@@ -155,8 +159,9 @@ func GetUser(field string, value any) (User, error) {
 	var token *string
 
 	// Queries the data
-	err := db.QueryRow(`SELECT uid, username, email, password, token, email_lang FROM ca_users WHERE `+field+`=$1;`, value).
-		Scan(&user.UID, &user.Username, &user.Email, &user.Password, &token, &user.EmailLang)
+	err := db.QueryRow(`SELECT uid, username, email, password, token, email_lang,
+		newsletter FROM ca_users WHERE `+field+`=$1;`, value).
+		Scan(&user.UID, &user.Username, &user.Email, &user.Password, &token, &user.EmailLang, &user.Newsletter)
 	if err != nil {
 		// Checks the error
 		if !strings.HasSuffix(err.Error(), "no rows in result set") {
@@ -178,8 +183,15 @@ func GetUser(field string, value any) (User, error) {
 
 // GetUsersForBroadcast returns the users, with only
 // their username, email and email_lang
-func GetUsersForBroadcast() (users []User) {
-	rows, _ := db.Query(`SELECT username, email, email_lang FROM ca_users;`)
+// If newsletter=false, all the users will be returned,
+// otherwise all of them
+func GetUsersForBroadcast(newsletter bool) (users []User) {
+	var filter string
+	if newsletter {
+		filter = " WHERE newsletter "
+	}
+
+	rows, _ := db.Query(`SELECT username, email, email_lang FROM ca_users` + filter + `;`)
 	defer rows.Close()
 
 	for rows.Next() {
@@ -213,6 +225,26 @@ func (u *User) ChangeEmail(newEmail string) error {
 
 	// Updates struct
 	u.Email = newEmail
+	return nil
+}
+
+// ChangeEmailSettings sets the EmailLang and Newsletter fields
+func (u *User) ChangeEmailSettings(lang string, newsletter bool) error {
+	// Ensures all data is present
+	if err := u.fetch(); err != nil {
+		return err
+	}
+
+	// Saves the new value
+	_, err := db.Exec(`UPDATE ca_users SET email_lang=$2, newsletter=$3 WHERE uid=$1;`,
+		u.UID, lang, newsletter)
+	if err != nil {
+		return ERR_UNKNOWN
+	}
+
+	// Updates struct
+	u.EmailLang = lang
+	u.Newsletter = newsletter
 	return nil
 }
 
@@ -359,24 +391,6 @@ func (u *User) ResetPassword(token string, newPassword string) error {
 	// Updates the struct
 	u.Token = ""
 	u.Password = hashedPassword
-	return nil
-}
-
-// SetEmailLang sets the EmailLang field
-func (u *User) SetEmailLang(lang string) error {
-	// Ensures all data is present
-	if err := u.fetch(); err != nil {
-		return err
-	}
-
-	// Saves the new value
-	_, err := db.Exec(`UPDATE ca_users SET email_lang=$2 WHERE uid=$1;`, u.UID, lang)
-	if err != nil {
-		return ERR_UNKNOWN
-	}
-
-	// Updates struct
-	u.EmailLang = lang
 	return nil
 }
 

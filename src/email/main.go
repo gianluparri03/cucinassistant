@@ -2,7 +2,6 @@ package email
 
 import (
 	"bytes"
-	"context"
 	"log/slog"
 	"net/smtp"
 
@@ -55,6 +54,9 @@ type RawEmail struct {
 
 	// Content is the text sent with the email
 	Content string
+
+	// Newsletter indicates whether to put the unsubscribe link at the bottom
+	Newsletter bool
 }
 
 // Write executes the email template with the given data.
@@ -68,7 +70,8 @@ func (e RawEmail) Write(user *database.User, link string) EmailBody {
 	body.Write([]byte("MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n\n\n"))
 
 	// Executes the templates
-	Base(e.Subject, e.Content, user.Username, link).Render(context.Background(), &body)
+	Base(e.Subject, e.Content, user.Username, link, e.Newsletter).
+		Render(langs.Get(user.EmailLang).Ctx(), &body)
 	return EmailBody{Body: &body, Recipient: user.Email}
 }
 

@@ -1,6 +1,7 @@
 package components
 
 import (
+	"cucinassistant/database"
 	"cucinassistant/langs"
 )
 
@@ -17,20 +18,28 @@ templ UserChangeEmail(current string) {
     </form>
 }
 
-templ UserChangeEmailLang(available map[string]*langs.Lang, current string) {
-    @TemplateTitle(langs.Translate(ctx, langs.STR_SET_EMAIL_LANG), "/user/settings")
+templ UserChangeEmailSettings(user *database.User, available map[string]*langs.Lang) {
+    @TemplateTitle(langs.Translate(ctx, langs.STR_EMAIL_SETTINGS), "/user/settings")
 
     <form method="POST">
+		{ langs.Translate(ctx, langs.STR_EMAIL_LANG) }
         <select name="lang" id="languages">
             for _, lang := range available {
-                <option value={ lang.Tag } selected?={ lang.Tag == current }>
+			<option value={ lang.Tag } selected?={ lang.Tag == user.EmailLang }>
 					{ lang.Name }
 				</option>
             }
         </select>
 
+		<br>
+
+		<input type="checkbox" id="newsletter" name="newsletter" checked?={ user.Newsletter }>
+		<label for="newsletter">{ langs.Translate(ctx, langs.STR_WANT_NEWSLETTER)  }</label>
+
+		<br> <br>
+
 		<button class="icon-text">
-			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
+			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
 		</button>
     </form>
 }
@@ -153,9 +162,9 @@ templ UserSettings() {
             <span>{ langs.Translate(ctx, langs.STR_CHANGE_PASSWORD) }</span>
         </button>
 
-        <button hx-get="/user/change_email_lang">
-            <i class="fas fa-language"></i>
-            <span>{ langs.Translate(ctx, langs.STR_SET_EMAIL_LANG) }</span>
+        <button hx-get="/user/change_email_settings">
+            <i class="fas fa-mail-bulk"></i>
+            <span>{ langs.Translate(ctx, langs.STR_EMAIL_SETTINGS) }</span>
         </button>
 
         <button hx-get="/user/delete_1">

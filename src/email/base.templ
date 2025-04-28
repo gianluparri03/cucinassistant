@@ -1,10 +1,11 @@
 package email
 
 import (
+	"cucinassistant/configs"
 	"cucinassistant/langs"
 )
 
-templ Base(subject string, content string, username string, link string) {
+templ Base(subject string, content string, username string, link string, newsletter bool) {
 	<html>
 		<body>
 			<td style="font-size: 1.3em">
@@ -31,6 +32,12 @@ templ Base(subject string, content string, username string, link string) {
 
 				<small>
 					{ langs.Translate(ctx, langs.STR_NOREPLY) }
+
+					if newsletter {
+						{{ url := configs.BaseURL + "/user/change_email_settings" }}
+						{ langs.Translate(ctx, langs.STR_UNSUBSCRIBE) }
+						&nbsp;<a href={ templ.SafeURL(url) }>{ url }</a>.
+					}
 				</small>
 			</td>
 		</body>

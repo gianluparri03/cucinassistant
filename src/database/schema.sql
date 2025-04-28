@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS ca_users (
     token VARCHAR(250),
 
     email_lang CHAR(2) NOT NULL DEFAULT '',
+	newsletter BOOL NOT NULL DEFAULT TRUE,
 
     PRIMARY KEY (uid),
     UNIQUE (username),
