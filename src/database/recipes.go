@@ -1,7 +1,9 @@
 package database
 
 import (
+	"crypto/rand"
 	"database/sql"
+	"fmt"
 	"reflect"
 
 	"github.com/lib/pq"
@@ -28,6 +30,9 @@ type Recipe struct {
 
 	// Notes are additional notes to the recipe
 	Notes string
+
+	// Code is a random code used by the user to share the recipe
+	Code *string
 }
 
 // Recipes is used to manage all the recipes
@@ -73,13 +78,14 @@ func (r Recipes) Edit(RID int, updated Recipe) (Recipe, error) {
 
 	// Checks if something has actually changed
 	updated.RID = RID
+	updated.Code = original.Code
 	if reflect.DeepEqual(original, updated) {
 		return original, nil
 	}
 
 	// Executes the query
-	_, err = db.Exec(`UPDATE recipes SET name=$3, stars=$4, ingredients=$5, directions=$6, notes=$7 WHERE uid=$1 AND rid=$2;`,
-		r.uid, RID, updated.Name, updated.Stars, updated.Ingredients, updated.Directions, updated.Notes)
+	_, err = db.Exec(`UPDATE recipes SET name=$2, stars=$3, ingredients=$4, directions=$5, notes=$6 WHERE rid=$1;`,
+		RID, updated.Name, updated.Stars, updated.Ingredients, updated.Directions, updated.Notes)
 	if err != nil {
 		if pqe, ok := err.(*pq.Error); ok && pqe.Code == "23505" {
 			return Recipe{}, ERR_RECIPE_DUPLICATED
@@ -125,10 +131,24 @@ func (r Recipes) GetOne(RID int) (Recipe, error) {
 	var recipe Recipe
 
 	// Scans the recipe
-	err := db.QueryRow(`SELECT rid, name, stars, ingredients, directions, notes FROM recipes WHERE uid=$1 AND rid=$2;`, r.uid, RID).
-		Scan(&recipe.RID, &recipe.Name, &recipe.Stars, &recipe.Ingredients, &recipe.Directions, &recipe.Notes)
+	err := db.QueryRow(`SELECT rid, name, stars, ingredients, directions, notes, code FROM recipes WHERE uid=$1 AND rid=$2;`, r.uid, RID).
+		Scan(&recipe.RID, &recipe.Name, &recipe.Stars, &recipe.Ingredients, &recipe.Directions, &recipe.Notes, &recipe.Code)
 	if err != nil {
 		return recipe, handleNoRowsError(err, r.uid, ERR_RECIPE_NOT_FOUND)
+	}
+
+	return recipe, nil
+}
+
+// GetPublicRecipe returns a public recipe
+func GetPublicRecipe(code string) (Recipe, error) {
+	var recipe Recipe
+
+	// Scans the recipe
+	err := db.QueryRow(`SELECT name, stars, ingredients, directions, notes, code FROM recipes WHERE code=$1;`, code).
+		Scan(&recipe.Name, &recipe.Stars, &recipe.Ingredients, &recipe.Directions, &recipe.Notes, &recipe.Code)
+	if err != nil {
+		return recipe, ERR_RECIPE_NOT_FOUND
 	}
 
 	return recipe, nil
@@ -153,4 +173,67 @@ func (r Recipes) New(name string) (Recipe, error) {
 	}
 
 	return recipe, nil
+}
+
+// Save creates a copy of a public recipe
+func (r Recipes) Save(code string) (Recipe, error) {
+	// Gets the original
+	original, err := GetPublicRecipe(code)
+	if err != nil {
+		return Recipe{}, err
+	}
+
+	// Creates a new one
+	copied, err := r.New(original.Name)
+	if err != nil {
+		return copied, err
+	}
+
+	// Saves the content
+	return r.Edit(copied.RID, original)
+}
+
+// Share creates a code for a recipe
+func (r Recipes) Share(RID int) (string, error) {
+	// Ensures the recipe (and the user) exist
+	if _, err := r.GetOne(RID); err != nil {
+		return "", err
+	}
+
+	for true {
+		// Generates the code
+		buffer := make([]byte, 4)
+		rand.Read(buffer)
+		code := fmt.Sprintf("%x", buffer)
+
+		// Saves it
+		_, err := db.Exec(`UPDATE recipes SET code=$2 WHERE rid=$1;`, RID, code)
+		if err != nil {
+			if pqe, ok := err.(*pq.Error); ok && pqe.Code == "23505" {
+				continue
+			} else {
+				return "", ERR_UNKNOWN
+			}
+		} else {
+			return code, nil
+		}
+	}
+
+	return "", nil
+}
+
+// Unshare deletes a recipe's code
+func (r Recipes) Unshare(RID int) error {
+	// Ensures the recipe (and the user) exist
+	if _, err := r.GetOne(RID); err != nil {
+		return err
+	}
+
+	// Saves it
+	_, err := db.Exec(`UPDATE recipes SET code=NULL WHERE rid=$1;`, RID)
+	if err != nil {
+		return ERR_UNKNOWN
+	}
+
+	return nil
 }

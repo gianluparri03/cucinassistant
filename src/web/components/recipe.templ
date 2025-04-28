@@ -45,9 +45,14 @@ templ RecipesNew() {
     </form>
 }
 
-templ Recipe(recipe database.Recipe) {
+templ Recipe(recipe database.Recipe, ca_baseurl string) {
 	{{ baseurl := "/recipes/" + strconv.Itoa(recipe.RID) }}
-	@TemplateTitle(recipe.Name, "/recipes")
+
+	if recipe.RID != 0 {
+		@TemplateTitle(recipe.Name, "/recipes")
+	} else {
+		<h1>{ recipe.Name }</h1>
+	}
 
 	if recipe.Stars != 0 {
         <div id="stars">
@@ -86,12 +91,22 @@ templ Recipe(recipe database.Recipe) {
         <p>{ recipe.Notes }</p>
 	}
 
-	<button class="icon-text" hx-get={ baseurl + "/edit" }>
-		<i class="fas fa-edit"></i> { langs.Translate(ctx, langs.STR_EDIT) }
-	</button>
-	<button class="icon-text" onclick="window.print();">
-		<i class="fas fa-print"></i> { langs.Translate(ctx, langs.STR_PRINT) }
-	</button>
+	if recipe.RID != 0 {
+		<button class="icon-text" hx-get={ baseurl + "/edit" }>
+			<i class="fas fa-edit"></i> { langs.Translate(ctx, langs.STR_EDIT) }
+		</button>
+		<button class="icon-text" hx-get={ baseurl + "/share" }>
+			<i class="fas fa-share-alt"></i> { langs.Translate(ctx, langs.STR_SHARE) }
+		</button>
+	} else {
+		{{ link := ca_baseurl + "/public_recipes/" + *recipe.Code + "/save"}}
+		<button class="icon-text" hx-post={ link } hx-push-url="false">
+			<i class="fas fa-save"></i> { langs.Translate(ctx, langs.STR_SAVE) }
+		</button>
+        <button class="icon-text" onclick="window.print();">
+            <i class="fas fa-print"></i> { langs.Translate(ctx, langs.STR_PRINT) }
+        </button>
+	}
 }
 
 templ RecipeEdit(recipe database.Recipe) {
@@ -145,4 +160,32 @@ templ RecipeEdit(recipe database.Recipe) {
             <i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
         </button>
     </div>
+}
+
+templ RecipeShare(recipe database.Recipe, ca_baseurl string) {
+	{{ base_url := "/recipes/"+strconv.Itoa(recipe.RID) }}
+	@TemplateTitle(langs.Translate(ctx, langs.STR_SHARE), base_url)
+
+	<button class="icon-text" onclick="printRecipe()">
+		<i class="fas fa-print"></i> { langs.Translate(ctx, langs.STR_PRINT) }
+	</button>
+
+	<br><br>
+
+	if recipe.Code != nil {
+		{ langs.Translate(ctx, langs.STR_RECIPE_IS_SHARED) } <br>
+		{{ link := ca_baseurl + "/public_recipes/" + *recipe.Code }}
+		<a href={ templ.SafeURL(link) }>{ link }</a> <br>
+		<button class="icon-text" hx-post={ base_url + "/share" } hx-push-url="false">
+			<i class="fas fa-link"></i> { langs.Translate(ctx, langs.STR_REGENERATE_LINK) }
+		</button>
+		<button class="icon-text" hx-post={ base_url + "/unshare" } hx-push-url="false">
+			<i class="fas fa-unlink"></i> { langs.Translate(ctx, langs.STR_DELETE_LINK) }
+		</button>
+	} else {
+		{ langs.Translate(ctx, langs.STR_RECIPE_IS_UNSHARED) } <br>
+		<button class="icon-text" hx-post={ base_url + "/share" } hx-push-url="false">
+			<i class="fas fa-link"></i> { langs.Translate(ctx, langs.STR_GENERATE_LINK) }
+		</button>
+	}
 }

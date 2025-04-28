@@ -420,4 +420,5 @@ textarea {
 	body { background-color: white; }
 	footer div:nth-child(n+2) { display: none; }
 	#back, button { display: none !important; }
+	#loader-container { display: none !important; }
 }

@@ -86,9 +86,13 @@ CREATE TABLE IF NOT EXISTS recipes (
     directions VARCHAR(4096) NOT NULL DEFAULT '',
     notes VARCHAR(4096) NOT NULL DEFAULT '',
 
+	code CHAR(8),
+
     PRIMARY KEY (rid),
     FOREIGN KEY (uid) REFERENCES ca_users (uid) ON DELETE CASCADE,
-    UNIQUE (uid, name)
+    UNIQUE (uid, name),
+	UNIQUE (code)
 );
 
-CREATE INDEX IF NOT EXISTS recipies_uid_name ON recipes (uid, name);
+CREATE INDEX IF NOT EXISTS recipes_uid_name ON recipes (uid, name);
+CREATE INDEX IF NOT EXISTS recipes_code ON recipes (code);

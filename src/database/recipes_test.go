@@ -203,6 +203,46 @@ func TestRecipesGetOne(t *testing.T) {
 	}.Run(t)
 }
 
+func TestRecipesGetPublic(t *testing.T) {
+	user, _ := getTestingUser(t)
+	recipe, _ := user.Recipes().New("r")
+	user.Recipes().Edit(recipe.RID, Recipe{
+		Name: "newName", Stars: 4, Ingredients: "flour", Directions: "Mix", Notes: "-",
+	})
+	code, _ := user.Recipes().Share(recipe.RID)
+	recipe, _ = user.Recipes().GetOne(recipe.RID)
+
+	type data struct {
+		Code string
+
+		ExpectedErr    error
+		ExpectedRecipe Recipe
+	}
+
+	testSuite[data]{
+		Target: func(t *testing.T, msg string, d data) {
+			d.ExpectedRecipe.RID = 0
+			recipe, err := GetPublicRecipe(d.Code)
+			if err != d.ExpectedErr {
+				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
+			} else if !reflect.DeepEqual(recipe, d.ExpectedRecipe) {
+				t.Errorf("%s: expected recipe <%v>, got <%v>", msg, d.ExpectedRecipe, recipe)
+			}
+		},
+
+		Cases: []testCase[data]{
+			{
+				"got data of unknown recipe",
+				data{ExpectedErr: ERR_RECIPE_NOT_FOUND},
+			},
+			{
+				"",
+				data{Code: code, ExpectedRecipe: recipe},
+			},
+		},
+	}.Run(t)
+}
+
 func TestRecipesNew(t *testing.T) {
 	user, _ := getTestingUser(t)
 	otherUser, _ := getTestingUser(t)
@@ -246,6 +286,155 @@ func TestRecipesNew(t *testing.T) {
 			{
 				"",
 				data{User: otherUser},
+			},
+		},
+	}.Run(t)
+}
+
+func TestRecipesSave(t *testing.T) {
+	owner, _ := getTestingUser(t)
+	recipe, _ := owner.Recipes().New("recipe")
+	code, _ := owner.Recipes().Share(recipe.RID)
+
+	user, _ := getTestingUser(t)
+	userDup, _ := getTestingUser(t)
+	userDup.Recipes().New(recipe.Name)
+
+	type data struct {
+		User User
+		Code string
+
+		ExpectedRecipe Recipe
+		ExpectedErr    error
+	}
+
+	testSuite[data]{
+		Target: func(t *testing.T, msg string, d data) {
+			recipe, err := d.User.Recipes().Save(d.Code)
+			if err != d.ExpectedErr {
+				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
+			}
+
+			if d.ExpectedErr == nil {
+				r, _ := d.User.Recipes().GetOne(recipe.RID)
+				d.ExpectedRecipe.RID = r.RID
+				d.ExpectedRecipe.Code = nil
+				if !reflect.DeepEqual(r, d.ExpectedRecipe) {
+					t.Errorf("%v, saved recipe not the same", msg)
+				}
+			}
+		},
+
+		Cases: []testCase[data]{
+			{
+				"unknown user saved recipe",
+				data{Code: code, ExpectedErr: ERR_USER_UNKNOWN},
+			},
+			{
+				"saved unknown recipe",
+				data{User: user, ExpectedErr: ERR_RECIPE_NOT_FOUND},
+			},
+			{
+				"duplicated recipe (owner)",
+				data{User: owner, Code: code, ExpectedErr: ERR_RECIPE_DUPLICATED},
+			},
+			{
+				"duplicated recipe (other user)",
+				data{User: userDup, Code: code, ExpectedErr: ERR_RECIPE_DUPLICATED},
+			},
+			{
+				"",
+				data{User: user, Code: code, ExpectedRecipe: recipe},
+			},
+		},
+	}.Run(t)
+}
+
+func TestRecipesShare(t *testing.T) {
+	user, _ := getTestingUser(t)
+	recipe, _ := user.Recipes().New("recipe")
+
+	otherUser, _ := getTestingUser(t)
+
+	type data struct {
+		User User
+		RID  int
+
+		ExpectedErr error
+	}
+
+	testSuite[data]{
+		Target: func(t *testing.T, msg string, d data) {
+			code, err := d.User.Recipes().Share(d.RID)
+			if err != d.ExpectedErr {
+				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
+			}
+
+			if d.ExpectedErr == nil {
+				if r, _ := d.User.Recipes().GetOne(d.RID); *r.Code != code {
+					t.Errorf("%v, code not saved", msg)
+				}
+			}
+		},
+
+		Cases: []testCase[data]{
+			{
+				"other user shared recipe",
+				data{User: otherUser, RID: recipe.RID, ExpectedErr: ERR_RECIPE_NOT_FOUND},
+			},
+			{
+				"(new)",
+				data{User: user, RID: recipe.RID},
+			},
+			{
+				"(replace)",
+				data{User: user, RID: recipe.RID},
+			},
+		},
+	}.Run(t)
+}
+
+func TestRecipesUnshare(t *testing.T) {
+	user, _ := getTestingUser(t)
+	recipe, _ := user.Recipes().New("recipe")
+	user.Recipes().Share(recipe.RID)
+
+	otherUser, _ := getTestingUser(t)
+	otherRecipe, _ := otherUser.Recipes().New("otherRecipe")
+
+	type data struct {
+		User User
+		RID  int
+
+		ExpectedErr error
+	}
+
+	testSuite[data]{
+		Target: func(t *testing.T, msg string, d data) {
+			err := d.User.Recipes().Unshare(d.RID)
+			if err != d.ExpectedErr {
+				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
+			}
+
+			if d.ExpectedErr == nil {
+				if r, _ := d.User.Recipes().GetOne(d.RID); r.Code != nil {
+					t.Errorf("%v, code not saved", msg)
+				}
+			}
+		},
+
+		Cases: []testCase[data]{
+			{
+				"other user unshared recipe",
+				data{User: otherUser, RID: recipe.RID, ExpectedErr: ERR_RECIPE_NOT_FOUND},
+			},
+			{
+				"(with code)",
+				data{User: user, RID: recipe.RID},
+			},
+			{
+				"(without code)",
+				data{User: otherUser, RID: otherRecipe.RID},
 			},
 		},
 	}.Run(t)

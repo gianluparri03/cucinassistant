@@ -54,6 +54,15 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 	},
 
 	{
+		Path:        "/public_recipes/{code}",
+		Unprotected: true,
+		GetHandler:  handlers.GetPublicRecipe,
+	},
+	{
+		Path:        "/public_recipes/{code}/save",
+		PostHandler: handlers.PostPublicRecipeSave,
+	},
+	{
 		Path:       "/recipes",
 		GetHandler: handlers.GetRecipes,
 	},
@@ -74,6 +83,15 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 	{
 		Path:        "/recipes/{RID}/delete",
 		PostHandler: handlers.PostRecipeDelete,
+	},
+	{
+		Path:        "/recipes/{RID}/share",
+		GetHandler:  handlers.GetRecipeShare,
+		PostHandler: handlers.PostRecipeShare,
+	},
+	{
+		Path:        "/recipes/{RID}/unshare",
+		PostHandler: handlers.PostRecipeUnshare,
 	},
 
 	{

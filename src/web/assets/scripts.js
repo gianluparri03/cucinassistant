@@ -68,3 +68,15 @@ function swapContent() {
     $('.pre-swap').remove();
     $('.post-swap').removeClass("hidden");
 }
+
+
+// Prints a recipe from the share page
+function printRecipe() {
+	function inner() {
+		window.print();
+		document.removeEventListener('htmx:afterSwap', inner);
+	}
+
+	document.addEventListener('htmx:afterSwap', inner);
+	$("#back").click();
+}
