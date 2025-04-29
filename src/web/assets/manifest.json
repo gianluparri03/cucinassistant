@@ -1,7 +1,6 @@
 {
     "name": "CucinAssistant",
     "short_name": "CucinAssistant",
-    "description": "Un aiutante per la cucina",
 
     "start_url": "/",
     "id": "?homescreen=1",

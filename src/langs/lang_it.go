@@ -119,6 +119,7 @@ var italian *Lang = &Lang{
 		STR_STORAGE:                             "Dispensa",
 		STR_STORAGE_EMPTY:                       "La dispensa è vuota",
 		STR_SUNDAY:                              "Domenica",
+		STR_SUPPORT:                             "Supporto",
 		STR_THURSDAY:                            "Giovedì",
 		STR_TUESDAY:                             "Martedì",
 		STR_TUTORIAL:                            "Guida",

@@ -4,7 +4,6 @@ import (
 	"github.com/gorilla/mux"
 	"strconv"
 
-	"cucinassistant/configs"
 	"cucinassistant/database"
 	"cucinassistant/langs"
 	"cucinassistant/web/components"
@@ -26,21 +25,14 @@ func GetIndex(c *utils.Context) (err error) {
 }
 
 func GetInfo(c *utils.Context) (err error) {
-	utils.RenderComponent(c, components.Info(map[string]any{
-		"BaseURL":     configs.BaseURL,
-		"VersionCode": configs.VersionCode,
-		"VersionName": configs.VersionName,
-	}))
 	return
 }
 
 func GetLang(c *utils.Context) (err error) {
-	// If it has the 'tag' query param, it sets the current
-	// language; otherwise, it shows the form
 	if tag := c.R.URL.Query().Get("tag"); tag == "" {
 		utils.RenderComponent(c, components.Lang(langs.Available, c.L))
 	} else {
-		utils.SetLang(c, tag)
+		utils.SetLang(c, tag, c.R.URL.Query().Has("silent"))
 	}
 
 	return

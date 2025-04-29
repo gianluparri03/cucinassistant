@@ -153,7 +153,7 @@ func PostResetPassword(c *utils.Context) (err error) {
 }
 
 func GetUserSettings(c *utils.Context) (err error) {
-	utils.RenderComponent(c, components.UserSettings())
+	utils.RenderComponent(c, components.UserSettings(configs.SupportEmail))
 	return
 }
 

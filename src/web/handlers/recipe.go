@@ -30,7 +30,7 @@ func PostPublicRecipeSave(c *utils.Context) (err error) {
 	var recipe database.Recipe
 
 	if recipe, err = c.U.Recipes().Save(mux.Vars(c.R)["code"]); err == nil {
-		utils.ShowMessage(c, langs.STR_RECIPE_COPIED, "/recipes/"+strconv.Itoa(recipe.RID))
+		utils.ShowMessage(c, langs.STR_RECIPE_SAVED, "/recipes/"+strconv.Itoa(recipe.RID))
 	}
 
 	return

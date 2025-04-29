@@ -1,9 +1,11 @@
 package utils
 
 import (
+	"fmt"
 	"github.com/a-h/templ"
 	"net/http"
 
+	"cucinassistant/configs"
 	"cucinassistant/langs"
 	"cucinassistant/web/components"
 )
@@ -13,7 +15,8 @@ import (
 // render the complete structure, with the body and the message.
 func render(c *Context, body, message, content templ.Component) {
 	if !c.h {
-		content = components.TemplateBase(c.L, body, message)
+		tutorial := fmt.Sprintf("%s/%d_%s.pdf", configs.TutorialsURL, configs.VersionCode, c.L)
+		content = components.TemplateBase(c.L, body, message, tutorial)
 	}
 
 	content.Render(langs.Get(c.L).Ctx(), c.W)

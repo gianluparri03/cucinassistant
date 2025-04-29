@@ -119,6 +119,7 @@ var english *Lang = &Lang{
 		STR_STORAGE:                             "Storage",
 		STR_STORAGE_EMPTY:                       "The storage is empty",
 		STR_SUNDAY:                              "Sunday",
+		STR_SUPPORT:                             "Support",
 		STR_THURSDAY:                            "Thursday",
 		STR_TUESDAY:                             "Tuesday",
 		STR_TUTORIAL:                            "Tutorial",

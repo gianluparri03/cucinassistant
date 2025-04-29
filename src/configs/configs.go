@@ -11,8 +11,7 @@ var Test bool
 // Default: false.
 var Debug bool
 
-// BaseURL (env `CA_BASEURL`) is the URL from which the server will be accessible,
-// like https://cucinassistant.com or http://localhost:8080.
+// BaseURL (env `CA_BASEURL`) is the URL from which the server will be accessible.
 // Does not need the trailing slash.
 var BaseURL string
 
@@ -43,3 +42,10 @@ var EmailLogin string
 
 // EmailPassword (env `CA_EMAIL_PASSWORD`) is used to login to the mail server.
 var EmailPassword string
+
+// SupportEmail (env `CA_SUPPORT_EMAIL`) is the email at which the users can ask support.
+var SupportEmail string
+
+// TutorialsURL (env `CA_TUTORIALS_URL`) is the url at which the tutorials are found.
+// Does not need the trailing slash.
+var TutorialsURL string

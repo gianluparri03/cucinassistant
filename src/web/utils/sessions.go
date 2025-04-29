@@ -72,7 +72,7 @@ func DropUID(c *Context, msg langs.String) {
 }
 
 // SetLang sets the session language
-func SetLang(c *Context, lang string) {
+func SetLang(c *Context, lang string, silent bool) {
 	if _, found := langs.Available[lang]; !found {
 		ShowError(c, langs.STR_UNKNOWN_LANG, "", http.StatusBadRequest)
 		return

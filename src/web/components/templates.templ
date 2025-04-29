@@ -4,7 +4,7 @@ import (
 	"cucinassistant/langs"
 )
 
-templ TemplateBase(lang string, body templ.Component, message templ.Component) {
+templ TemplateBase(lang string, body templ.Component, message templ.Component, tutorial string) {
     <!DOCTYPE html>
 
     <html>
@@ -60,7 +60,7 @@ templ TemplateBase(lang string, body templ.Component, message templ.Component) {
 				</div>
 				<div>
 					<a hx-get="/info">{ langs.Translate(ctx, langs.STR_INFO) }</a> &bullet;
-					<a href={ templ.SafeURL("https://cucinassistant.com/tutorials/" + lang + ".pdf") } hx-disable>
+					<a href={ templ.SafeURL(tutorial) } hx-disable>
 						{ langs.Translate(ctx, langs.STR_TUTORIAL) }
 					</a>
 				</div>
@@ -71,9 +71,7 @@ templ TemplateBase(lang string, body templ.Component, message templ.Component) {
 
 templ TemplateTitle(title string, backLink string) {
     <h1>
-        if backLink != "" {
-            <i id="back" class="fas fa-arrow-circle-left" hx-get={ backLink }></i>
-        }
+		<i id="back" class="fas fa-arrow-circle-left" hx-get={ backLink }></i>
 
         { title }
     </h1>

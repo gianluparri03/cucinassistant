@@ -138,7 +138,7 @@ templ UserResetPassword(token string) {
     </form>
 }
 
-templ UserSettings() {
+templ UserSettings(supportEmail string) {
     @TemplateTitle(langs.Translate(ctx, langs.STR_SETTINGS), "/")
 
     <div class="dashboard">
@@ -157,20 +157,27 @@ templ UserSettings() {
             <span>{ langs.Translate(ctx, langs.STR_CHANGE_EMAIL) }</span>
         </button>
 
-        <button hx-get="/user/change_password">
-            <i class="fas fa-key"></i>
-            <span>{ langs.Translate(ctx, langs.STR_CHANGE_PASSWORD) }</span>
-        </button>
-
         <button hx-get="/user/change_email_settings">
             <i class="fas fa-mail-bulk"></i>
             <span>{ langs.Translate(ctx, langs.STR_EMAIL_SETTINGS) }</span>
+        </button>
+
+        <button hx-get="/user/change_password">
+            <i class="fas fa-key"></i>
+            <span>{ langs.Translate(ctx, langs.STR_CHANGE_PASSWORD) }</span>
         </button>
 
         <button hx-get="/user/delete_1">
             <i class="fas fa-trash"></i>
             <span>{ langs.Translate(ctx, langs.STR_DELETE_USER) }</span>
         </button>
+
+		if supportEmail != "" {
+			<button onclick={ templ.JSFuncCall("window.open", "mailto:" + supportEmail) } class="transparent">
+				<i class="fas fa-question-circle"></i>
+				<span>{ langs.Translate(ctx, langs.STR_SUPPORT) }</span>
+			</button>
+		}
     </div>
 }
 
