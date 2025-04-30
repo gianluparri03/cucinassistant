@@ -118,7 +118,7 @@ templ UserForgotPassword() {
 }
 
 templ UserResetPassword(token string) {
-    @TemplateTitle(langs.Translate(ctx, langs.STR_RESET_PASSWORD), "")
+	<h1>{ langs.Translate(ctx, langs.STR_RESET_PASSWORD) }</h1>
 
 	<form method="POST" onsubmit={ templ.JSFuncCall("comparePasswords", langs.Translate(ctx, langs.STR_UNMATCHING_PASSWORDS)) }>
 		<input value={ token } name="token" hidden>
@@ -182,7 +182,7 @@ templ UserSettings(supportEmail string) {
 }
 
 templ UserSignIn() {
-    @TemplateTitle(langs.Translate(ctx, langs.STR_SIGNIN), "")
+	<h1>{ langs.Translate(ctx, langs.STR_SIGNIN) }</h1>
 
     <form method="POST">
         <label for="username">{ langs.Translate(ctx, langs.STR_USERNAME) }</label> <br>
@@ -205,7 +205,7 @@ templ UserSignIn() {
 }
 
 templ UserSignUp() {
-    @TemplateTitle(langs.Translate(ctx, langs.STR_SIGNUP), "")
+	<h1>{ langs.Translate(ctx, langs.STR_SIGNUP) }</h1>
 
 	<form method="POST" onsubmit={ templ.JSFuncCall("comparePasswords", langs.Translate(ctx, langs.STR_UNMATCHING_PASSWORDS)) }>
         <label for="username">{ langs.Translate(ctx, langs.STR_USERNAME) }</label> <br>

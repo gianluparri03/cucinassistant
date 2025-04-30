@@ -59,7 +59,7 @@ var english *Lang = &Lang{
 		STR_INFO:                                "Further informations",
 		STR_INFO_CODE:                           "CucinAssistant is completely open source; you can see the source on <a href='" + placeholder + "'>Github</a>.",
 		STR_INFO_HISTORY:                        "CucinAssistant is a project by Gianluca Parri, ideated in 2023 after its new life as <i>fuorisede</i>.<br>Since then, it's continuosly evolving, even if slowly.",
-		STR_INFO_INTRO:                          "<b>CucinAssistant</b> is a simple website, with which you can easily manage <b>menues</b>, <b>recipes</b>, <b>articles</b> in storage (with quantities and expirations) and a <b>shopping list</b>.",
+		STR_INFO_INTRO:                          "<b>CucinAssistant</b> is a simple website, with which you (and your roommates) can easily manage <b>menues</b>, <b>recipes</b>, <b>articles</b> in storage (with quantities and expirations) and a <b>shopping list</b>.",
 		STR_INFO_STATS:                          "<p>See the <a href='" + placeholder + "'>this page</a>.",
 		STR_INFO_SUPPORT:                        "For doubts, questions or suggestions, you can write an email at <a href='mailto:" + placeholder + "'>" + placeholder + "</a>.",
 		STR_INFO_TUTORIAL:                       "There is a <a href='" + placeholder + "'>tutorial</a>, updated to the last version.",

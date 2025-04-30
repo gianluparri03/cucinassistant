@@ -59,7 +59,7 @@ var italian *Lang = &Lang{
 		STR_INFO:                                "Maggiori informazioni",
 		STR_INFO_CODE:                           "CucinAssistant è completamente open source; il codice sorgente è disponibile su <a href='" + placeholder + "'>Github</a>.",
 		STR_INFO_HISTORY:                        "CucinAssistant è un progetto sviluppato da Gianluca Parri, nato nel 2023 in seguito alla sua nuova vita da fuorisede universitario.<br>Da quel momento è in continua evoluzione, anche se lentamente.",
-		STR_INFO_INTRO:                          "<b>CucinAssistant</b> è un semplice sito web con il quale è possibile gestire più agevolmente <b>menù</b>, <b>ricette</b>, <b>articoli</b> in dispensa (con quantità e scadenze) e una <b>lista della spesa</b>.",
+		STR_INFO_INTRO:                          "<b>CucinAssistant</b> è un semplice sito web con il quale è possibile gestire più agevolmente (anche in più persone) <b>menù</b>, <b>ricette</b>, <b>articoli</b> in dispensa (con quantità e scadenze) e una <b>lista della spesa</b>.",
 		STR_INFO_STATS:                          "<p>Vedere la <a href='" + placeholder + "'>pagina apposita</a>.",
 		STR_INFO_SUPPORT:                        "Per ulteriori dubbi, domande o suggerimenti, potete scrivere una mail a <a href=mailto:'" + placeholder + "'>" + placeholder + "</a>.",
 		STR_INFO_TUTORIAL:                       "È disponibile una <a href='" + placeholder + "'>guida all'utilizzo</a> aggiornata all'ultima versione.",
