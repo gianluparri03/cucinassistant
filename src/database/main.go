@@ -6,13 +6,16 @@ import (
 	"log/slog"
 	"os"
 	"strings"
-
 	_ "github.com/lib/pq"
+	_ "embed"
 
 	"cucinassistant/configs"
 )
 
 var db *sql.DB
+
+//go:embed schema.sql
+var schema string
 
 // handleNoRowsError is an utility function that does the following.
 // If err is sql.ErrNoRows, checks if it happened because the user (with given
@@ -50,13 +53,6 @@ func Connect() {
 
 // Bootstrap makes sure that the database schema is ready
 func Bootstrap() {
-	// Loads the schema
-	schema, err := os.ReadFile("database/schema.sql")
-	if err != nil {
-		slog.Error("while reading the schema:", "err", err)
-		os.Exit(1)
-	}
-
 	// Splits it and executes it
 	for _, query := range strings.Split(string(schema), ";") {
 		if strings.TrimSpace(query) != "" {

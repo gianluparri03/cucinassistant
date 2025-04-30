@@ -20,9 +20,10 @@ func LoadAndParse() {
 }
 
 // load loads the configs from
-// * /configs/.env.E.local
-// * /configs/.env.E
-// * /configs/.env
+// - /configs/.env.E.local
+// - /configs/.env.E
+// - /configs/.env
+// - .env
 // where E is read from CA_ENV (should be 'development', 'testing' or 'production').
 // The former has the most priority.
 func load() {
@@ -30,6 +31,7 @@ func load() {
 	godotenv.Load("configs/.env." + env + ".local")
 	godotenv.Load("configs/.env." + env)
 	godotenv.Load("configs/.env")
+	godotenv.Load(".env")
 
 	slog.Warn("Environment", "type", env)
 }
