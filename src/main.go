@@ -14,7 +14,7 @@ import (
 // main runs everything
 func main() {
 	// Prints a welcome text
-	title := fmt.Sprintf("CucinAssistant [v%d (%s)]", configs.VersionCode, configs.VersionName)
+	title := fmt.Sprintf("CucinAssistant [v%s]", configs.Version)
 	slog.Warn(title)
 	slog.Warn(strings.Repeat("=", len(title)))
 

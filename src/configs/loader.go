@@ -50,6 +50,7 @@ func parse() {
 	EmailPassword = parseString("CA_EMAIL_PASSWORD", EmailEnabled)
 	SupportEmail = parseString("CA_SUPPORT_EMAIL", false)
 	TutorialsURL = parseString("CA_TUTORIALS_URL", false)
+	SourceURL = parseString("CA_SOURCE_URL", false)
 }
 
 // parseString reads a string from the environment variables, and

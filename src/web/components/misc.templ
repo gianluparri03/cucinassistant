@@ -38,10 +38,26 @@ templ Index(username string) {
     </div>
 }
 
-templ Info(infoData any) {
-    @TemplateTitle(langs.Translate(ctx, langs.STR_INFO), "")
-	TODO
-    <!--@templ.Raw(langs.TranslateArg(ctx, langs.PAG_INFO, infoData))-->
+templ Info(data map[string]string) {
+	<p>@templ.Raw(langs.Translate(ctx, langs.STR_INFO_INTRO))</p>
+	
+	<h4><i class="fas fa-history"></i> { langs.Translate(ctx, langs.STR_HISTORY) }</h4>
+	<p>@templ.Raw(langs.Translate(ctx, langs.STR_INFO_HISTORY))</p>
+
+	<h4><i class="fas fa-code"></i> { langs.Translate(ctx, langs.STR_CODE) }</h4>
+	<p>@templ.Raw(langs.TranslateArg(ctx, langs.STR_INFO_CODE, data["code"]))</p>
+
+	<h4><i class="fas fa-code-branch"></i> { langs.Translate(ctx, langs.STR_VERSION) }</h4>
+	<p>@templ.Raw(langs.TranslateArg(ctx, langs.STR_INFO_VERSION, data["version"]))</p>
+
+	<h4><i class="fas fa-chart-bar"></i> { langs.Translate(ctx, langs.STR_STATS) }</h4>
+	<p>@templ.Raw(langs.TranslateArg(ctx, langs.STR_INFO_STATS, "/stats"))</p>
+
+	<h4><i class="fas fa-book"></i> { langs.Translate(ctx, langs.STR_TUTORIAL) }</h4>
+	<p>@templ.Raw(langs.TranslateArg(ctx, langs.STR_INFO_TUTORIAL, data["tutorial"]))</p>
+
+	<h4><i class="fas fa-question-circle"></i> { langs.Translate(ctx, langs.STR_SUPPORT) }</h4>
+	<p>@templ.Raw(langs.TranslateArg(ctx, langs.STR_INFO_SUPPORT, data["support"]))</p>
 }
 
 templ Lang(available map[string]*langs.Lang, current string) {
@@ -63,7 +79,7 @@ templ Lang(available map[string]*langs.Lang, current string) {
 }
 
 templ Stats(data database.Stats) {
-    @TemplateTitle(langs.Translate(ctx, langs.STR_STATS), "/")
+    @TemplateTitle(langs.Translate(ctx, langs.STR_STATS), "/info")
 
     <div class="dashboard">
         <button class="transparent" disabled>

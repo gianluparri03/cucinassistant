@@ -16,6 +16,11 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 		GetHandler:  handlers.GetInfo,
 	},
 	{
+		Path:        "/info/{lang}",
+		Unprotected: true,
+		GetHandler:  handlers.GetInfo,
+	},
+	{
 		Path:        "/lang",
 		Unprotected: true,
 		GetHandler:  handlers.GetLang,

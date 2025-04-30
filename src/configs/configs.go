@@ -49,3 +49,6 @@ var SupportEmail string
 // TutorialsURL (env `CA_TUTORIALS_URL`) is the url at which the tutorials are found.
 // Does not need the trailing slash.
 var TutorialsURL string
+
+// SourceURL (env `CA_SOURCE_URL`) is the url of the source repository.
+var SourceURL string

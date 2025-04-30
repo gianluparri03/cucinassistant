@@ -1,9 +1,12 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/gorilla/mux"
+	"net/http"
 	"strconv"
 
+	"cucinassistant/configs"
 	"cucinassistant/database"
 	"cucinassistant/langs"
 	"cucinassistant/web/components"
@@ -25,6 +28,21 @@ func GetIndex(c *utils.Context) (err error) {
 }
 
 func GetInfo(c *utils.Context) (err error) {
+	if lang := mux.Vars(c.R)["lang"]; lang != "" {
+		if _, found := langs.Available[lang]; found {
+			c.L = lang
+		} else {
+			utils.ShowError(c, langs.STR_UNKNOWN_LANG, "", http.StatusNotFound)
+			return
+		}
+	}
+
+	utils.RenderComponent(c, components.Info(map[string]string{
+		"code":     configs.SourceURL,
+		"version":  configs.Version,
+		"tutorial": fmt.Sprintf("%s/%d_%s.pdf", configs.TutorialsURL, configs.VersionCode, c.L),
+		"support":  configs.SupportEmail,
+	}))
 	return
 }
 
