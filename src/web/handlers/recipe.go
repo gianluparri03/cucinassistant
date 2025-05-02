@@ -6,7 +6,6 @@ import (
 
 	"cucinassistant/configs"
 	"cucinassistant/database"
-	"cucinassistant/langs"
 	"cucinassistant/web/components"
 	"cucinassistant/web/utils"
 )
@@ -30,7 +29,7 @@ func PostPublicRecipeSave(c *utils.Context) (err error) {
 	var recipe database.Recipe
 
 	if recipe, err = c.U.Recipes().Save(mux.Vars(c.R)["code"]); err == nil {
-		utils.ShowMessage(c, langs.STR_RECIPE_SAVED, "/recipes/"+strconv.Itoa(recipe.RID))
+		utils.Redirect(c, "/recipes/"+strconv.Itoa(recipe.RID))
 	}
 
 	return
@@ -113,7 +112,7 @@ func PostRecipeDelete(c *utils.Context) (err error) {
 
 	if RID, err = getRID(c); err == nil {
 		if err = c.U.Recipes().Delete(RID); err == nil {
-			utils.ShowMessage(c, langs.STR_RECIPE_DELETED, "/recipes")
+			utils.Redirect(c, "/recipes")
 		}
 	}
 

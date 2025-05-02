@@ -58,6 +58,8 @@ templ Info(data map[string]string) {
 
 	<h4><i class="fas fa-question-circle"></i> { langs.Translate(ctx, langs.STR_SUPPORT) }</h4>
 	<p>@templ.Raw(langs.TranslateArg(ctx, langs.STR_INFO_SUPPORT, data["support"]))</p>
+
+	<style> #footer-links { display: none; } </style>
 }
 
 templ Lang(available map[string]*langs.Lang, current string) {

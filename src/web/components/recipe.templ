@@ -54,6 +54,23 @@ templ Recipe(recipe database.Recipe, ca_baseurl string) {
 		<h1>{ recipe.Name }</h1>
 	}
 
+	if recipe.RID != 0 {
+		<button class="icon-text" hx-get={ baseurl + "/edit" }>
+			<i class="fas fa-edit"></i> { langs.Translate(ctx, langs.STR_EDIT) }
+		</button>
+		<button class="icon-text" hx-get={ baseurl + "/share" }>
+			<i class="fas fa-share-alt"></i> { langs.Translate(ctx, langs.STR_SHARE) }
+		</button>
+	} else {
+		{{ link := ca_baseurl + "/public_recipes/" + *recipe.Code + "/save"}}
+		<button class="icon-text" hx-post={ link } hx-push-url="false">
+			<i class="fas fa-clone"></i> { langs.Translate(ctx, langs.STR_SAVE) }
+		</button>
+        <button class="icon-text" onclick="window.print();">
+            <i class="fas fa-print"></i> { langs.Translate(ctx, langs.STR_PRINT) }
+        </button>
+	}
+
 	if recipe.Stars != 0 {
         <div id="stars">
 			for n := 0; n < recipe.Stars / 2; n++ {
@@ -90,23 +107,6 @@ templ Recipe(recipe database.Recipe, ca_baseurl string) {
         <h4>{ langs.Translate(ctx, langs.STR_NOTES) }</h4>
         <p>{ recipe.Notes }</p>
 	}
-
-	if recipe.RID != 0 {
-		<button class="icon-text" hx-get={ baseurl + "/edit" }>
-			<i class="fas fa-edit"></i> { langs.Translate(ctx, langs.STR_EDIT) }
-		</button>
-		<button class="icon-text" hx-get={ baseurl + "/share" }>
-			<i class="fas fa-share-alt"></i> { langs.Translate(ctx, langs.STR_SHARE) }
-		</button>
-	} else {
-		{{ link := ca_baseurl + "/public_recipes/" + *recipe.Code + "/save"}}
-		<button class="icon-text" hx-post={ link } hx-push-url="false">
-			<i class="fas fa-save"></i> { langs.Translate(ctx, langs.STR_SAVE) }
-		</button>
-        <button class="icon-text" onclick="window.print();">
-            <i class="fas fa-print"></i> { langs.Translate(ctx, langs.STR_PRINT) }
-        </button>
-	}
 }
 
 templ RecipeEdit(recipe database.Recipe) {
@@ -141,7 +141,7 @@ templ RecipeEdit(recipe database.Recipe) {
         </div>
 
 		<button class="icon-text">
-			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
+			<i class="fas fa-confirm"></i> { langs.Translate(ctx, langs.STR_SAVE) }
 		</button>
     </form>
 

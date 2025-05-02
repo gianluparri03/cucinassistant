@@ -1,9 +1,9 @@
 package web
 
 import (
+	"embed"
 	"github.com/gorilla/mux"
 	"net/http"
-	"embed"
 	"strconv"
 
 	"cucinassistant/configs"

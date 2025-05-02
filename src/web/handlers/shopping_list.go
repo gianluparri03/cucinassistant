@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"cucinassistant/database"
-	"cucinassistant/langs"
 	"cucinassistant/web/components"
 	"cucinassistant/web/utils"
 )
@@ -49,7 +48,7 @@ func PostShoppingListAppend(c *utils.Context) (err error) {
 
 func PostShoppingListClear(c *utils.Context) (err error) {
 	if err = c.U.ShoppingList().Clear(); err == nil {
-		utils.ShowMessage(c, langs.STR_SHOPPINGLIST_EMPTIED, "/shopping_list")
+		utils.Redirect(c, "/shopping_list")
 	}
 
 	return

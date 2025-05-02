@@ -254,10 +254,6 @@ message button {
 
 
 /* --- PAGE SPECIFIC: Shopping -- */
-.shopping-list > * {
-    display: block;
-}
-
 .shopping-list *:not(#empty-label):hover {
     cursor: pointer;
 }
@@ -367,6 +363,7 @@ textarea {
 #stars {
     font-size: 1.5em;
 	word-spacing: -100%;
+	margin-top: 1rem;
 }
 
 
@@ -418,7 +415,7 @@ textarea {
 	nav { display: none; }
 	main { margin: 0; }
 	body { background-color: white; }
-	footer div:nth-child(n+2) { display: none; }
+	#footer-links { display: none; }
 	#back, button { display: none !important; }
 	#loader-container { display: none !important; }
 }

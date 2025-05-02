@@ -13,7 +13,7 @@ templ UserChangeEmail(current string) {
         <input type="email" name="email-new" value={ current } required> <br>
 
 		<button class="icon-text">
-			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
+			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
 		</button>
     </form>
 }
@@ -58,7 +58,7 @@ templ UserChangePassword() {
         <input type="password" id="password-2" required> <br>
 
 		<button class="icon-text">
-			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
+			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
 		</button>
     </form>
 }
@@ -71,7 +71,7 @@ templ UserChangeUsername(current string) {
         <input name="username-new" value={ current } required> <br>
 
 		<button class="icon-text">
-			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
+			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
 		</button>
     </form>
 }
@@ -133,7 +133,7 @@ templ UserResetPassword(token string) {
         <input type="password" id="password-2" required> <br>
 
 		<button class="icon-text">
-			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
+			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
 		</button>
     </form>
 }

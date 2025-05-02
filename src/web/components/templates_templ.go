@@ -62,7 +62,7 @@ func TemplateBase(lang string, body templ.Component, message templ.Component, tu
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div><div id=\"loader-container\"><span id=\"loader\"></span></div></main><footer><div>CucinAssistant &copy; 2023-2025, Gianluca Parri</div><div><a hx-get=\"/info\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div><div id=\"loader-container\"><span id=\"loader\"></span></div></main><footer><div>CucinAssistant &copy; 2023-2025, Gianluca Parri</div><div id=\"footer-links\"><a hx-get=\"/info\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

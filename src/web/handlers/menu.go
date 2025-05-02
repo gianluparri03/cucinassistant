@@ -4,7 +4,6 @@ import (
 	"strconv"
 
 	"cucinassistant/database"
-	"cucinassistant/langs"
 	"cucinassistant/web/components"
 	"cucinassistant/web/utils"
 )
@@ -86,7 +85,7 @@ func PostMenuDelete(c *utils.Context) (err error) {
 
 	if MID, err = getMID(c); err == nil {
 		if err = c.U.Menus().Delete(MID); err == nil {
-			utils.ShowMessage(c, langs.STR_MENU_DELETED, "/menus")
+			utils.Redirect(c, "/menus")
 		}
 	}
 

@@ -21,8 +21,8 @@ templ ShoppingList(list map[int]database.Entry) {
             </button>
        	}
 
-        <button class="icon-text" onclick="window.print();">
-            <i class="fas fa-print"></i> { langs.Translate(ctx, langs.STR_PRINT) }
+        <button class="icon" onclick="window.print();">
+            <i class="fas fa-print"></i>
         </button>
 
 		for _, entry := range list {
@@ -55,7 +55,7 @@ templ ShoppingListAppend() {
 			<i class="fas fa-plus"></i>
 		</button>
 		<button class="icon-text">
-			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
+			<i class="fas fa-confirm"></i> { langs.Translate(ctx, langs.STR_SAVE) }
 		</button>
 
         <div id="new-items">
@@ -75,7 +75,7 @@ templ EntryEdit(name string) {
     <form method="POST">
 		<input name="name" value={ name } required> <br>
 		<button class="icon-text">
-			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
+			<i class="fas fa-confirm"></i> { langs.Translate(ctx, langs.STR_SAVE) }
 		</button>
     </form>
 }

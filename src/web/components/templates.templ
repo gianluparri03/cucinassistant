@@ -58,7 +58,7 @@ templ TemplateBase(lang string, body templ.Component, message templ.Component, t
 				<div>
 					CucinAssistant &copy; 2023-2025, Gianluca Parri
 				</div>
-				<div>
+				<div id="footer-links">
 					<a hx-get="/info">{ langs.Translate(ctx, langs.STR_INFO) }</a> &bullet;
 					<a href={ templ.SafeURL(tutorial) } hx-disable>
 						{ langs.Translate(ctx, langs.STR_TUTORIAL) }

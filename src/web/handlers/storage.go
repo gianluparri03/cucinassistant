@@ -114,7 +114,7 @@ func PostStorageSectionAdd(c *utils.Context) (err error) {
 
 	if err = c.U.Storage().AddArticles(articles...); err == nil {
 		sid, _ := mux.Vars(c.R)["SID"]
-		utils.ShowMessage(c, langs.STR_ARTICLES_ADDED, "/storage/"+sid)
+		utils.Redirect(c, "/storage/"+sid)
 	}
 
 	return
@@ -125,7 +125,7 @@ func PostStorageSectionDelete(c *utils.Context) (err error) {
 
 	if SID, err = getSID(c); err == nil {
 		if err = c.U.Storage().DeleteSection(SID); err == nil {
-			utils.ShowMessage(c, langs.STR_SECTION_DELETED, "/storage")
+			utils.Redirect(c, "/storage")
 		}
 	}
 

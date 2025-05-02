@@ -2,12 +2,12 @@ package database
 
 import (
 	"database/sql"
+	_ "embed"
 	"errors"
+	_ "github.com/lib/pq"
 	"log/slog"
 	"os"
 	"strings"
-	_ "github.com/lib/pq"
-	_ "embed"
 
 	"cucinassistant/configs"
 )

@@ -32,7 +32,7 @@ func main() {
 
 	// Adds a listener for shutting down the server if it's on debug mode
 	slog.Warn("Starting web server...")
-	if debug := os.Getenv("CA_DEBUG"); debug == "1" || debug == "true" {
+	if configs.Debug {
 		go func() {
 			fmt.Scanln()
 			os.Exit(0)
@@ -42,6 +42,6 @@ func main() {
 	}
 
 	// Starts the server
-	slog.Warn("Running on http://localhost:" + os.Getenv("CA_PORT") + "/")
+	slog.Warn("Running on " + configs.BaseURL)
 	web.Start()
 }
