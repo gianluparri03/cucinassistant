@@ -58,8 +58,8 @@ templ Recipe(recipe database.Recipe, ca_baseurl string) {
 		<button class="icon-text" hx-get={ baseurl + "/edit" }>
 			<i class="fas fa-edit"></i> { langs.Translate(ctx, langs.STR_EDIT) }
 		</button>
-		<button class="icon-text" hx-get={ baseurl + "/share" }>
-			<i class="fas fa-share-alt"></i> { langs.Translate(ctx, langs.STR_SHARE) }
+		<button class="icon" hx-get={ baseurl + "/share" }>
+			<i class="fas fa-share-alt"></i>
 		</button>
 	} else {
 		{{ link := ca_baseurl + "/public_recipes/" + *recipe.Code + "/save"}}
@@ -141,7 +141,7 @@ templ RecipeEdit(recipe database.Recipe) {
         </div>
 
 		<button class="icon-text">
-			<i class="fas fa-confirm"></i> { langs.Translate(ctx, langs.STR_SAVE) }
+			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
 		</button>
     </form>
 
