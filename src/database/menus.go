@@ -96,7 +96,7 @@ func (m Menus) GetAll() ([]Menu, error) {
 
 	// Queries the entries
 	var rows *sql.Rows
-	rows, err := db.Query(`SELECT mid, name FROM menus WHERE uid=$1 ORDER BY created_at;`, m.uid)
+	rows, err := db.Query(`SELECT mid, name FROM menus WHERE uid=$1 ORDER BY mid;`, m.uid)
 	if err != nil {
 		return menus, ERR_UNKNOWN
 	}

@@ -22,13 +22,11 @@ CREATE TABLE IF NOT EXISTS menus (
     name VARCHAR(64) NOT NULL,
     meals VARCHAR(4096),
 
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
     PRIMARY KEY (mid),
     FOREIGN KEY (uid) REFERENCES ca_users (uid) ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS menus_uid_createdat ON menus (uid, created_at);
+CREATE INDEX IF NOT EXISTS menus_uid_mid ON menus (uid, mid);
 
 
 CREATE TABLE IF NOT EXISTS sections (
@@ -72,7 +70,7 @@ CREATE TABLE IF NOT EXISTS entries (
     UNIQUE (uid, name)
 );
 
-CREATE INDEX IF NOT EXISTS entries_uid ON entries (uid);
+CREATE INDEX IF NOT EXISTS entries_uid_name ON entries (uid, name);
 
 
 CREATE TABLE IF NOT EXISTS recipes (

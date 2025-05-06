@@ -10,21 +10,13 @@ var testingEntriesN int = 0
 
 func (sl ShoppingList) generate() (entry Entry) {
 	testingEntriesN++
-	name := "entry-" + strconv.Itoa(testingEntriesN)
-	sl.Append(name)
 
-	// Find its id
-	list, _ := sl.GetAll()
-	var EID int
-	for EID, entry = range list {
-		if entry.Name == name {
-			break
-		}
-	}
+	entry.EID = testingEntriesN
+	entry.Name = "entry-" + strconv.Itoa(testingEntriesN)
+	sl.Append(entry.Name)
 
-	// Marks only the odd ones
 	if testingEntriesN%2 > 0 {
-		sl.Toggle(EID)
+		sl.Toggle(testingEntriesN)
 		entry.Marked = true
 	}
 
@@ -33,20 +25,20 @@ func (sl ShoppingList) generate() (entry Entry) {
 
 func TestShoppingListAppend(t *testing.T) {
 	user, _ := getTestingUser(t)
-	entry1 := user.ShoppingList().generate()
-	entry2 := Entry{EID: testingEntriesN + 1, Name: "appended-2"}
-	entry3 := Entry{EID: testingEntriesN + 2, Name: "appended-3"}
-	testingEntriesN += 2
+	entry1 := Entry{EID: testingEntriesN + 1, Name: "appended-1"}
+	entry2 := Entry{EID: testingEntriesN + 2, Name: "appended-2"}
+	entry3 := Entry{EID: testingEntriesN + 3, Name: "appended-3"}
+	testingEntriesN += 4
 
-	names := []string{entry2.Name, entry3.Name, entry1.Name, entry2.Name}
-	list := map[int]Entry{entry1.EID: entry1, entry2.EID: entry2, entry3.EID: entry3}
+	names := []string{entry1.Name, entry2.Name, entry3.Name, entry2.Name}
+	list := []Entry{entry1, entry2, entry3}
 
 	type data struct {
 		User  User
 		Names []string
 
 		ExpectedErr  error
-		ExpectedList map[int]Entry
+		ExpectedList []Entry
 	}
 
 	testSuite[data]{
@@ -65,7 +57,7 @@ func TestShoppingListAppend(t *testing.T) {
 		Cases: []testCase[data]{
 			{
 				"unknown user appended entries",
-				data{User: unknownUser, Names: names, ExpectedErr: ERR_USER_UNKNOWN, ExpectedList: map[int]Entry{}},
+				data{User: unknownUser, Names: names, ExpectedErr: ERR_USER_UNKNOWN},
 			},
 			{
 				"",
@@ -81,10 +73,10 @@ func TestShoppingListClear(t *testing.T) {
 	e2 := user.ShoppingList().generate()
 	e3 := user.ShoppingList().generate()
 
-	list := map[int]Entry{}
+	var list []Entry
 	for _, e := range []Entry{e1, e2, e3} {
 		if !e.Marked {
-			list[e.EID] = e
+			list = append(list, e)
 		}
 	}
 
@@ -95,7 +87,7 @@ func TestShoppingListClear(t *testing.T) {
 		User User
 
 		ExpectedErr  error
-		ExpectedList map[int]Entry
+		ExpectedList []Entry
 	}
 
 	testSuite[data]{
@@ -123,8 +115,8 @@ func TestShoppingListClear(t *testing.T) {
 	}.Run(t)
 
 	list, _ = otherUser.ShoppingList().GetAll()
-	if !reflect.DeepEqual(list, map[int]Entry{otherEntry.EID: otherEntry}) {
-		t.Errorf("cleared shopping list of everyone")
+	if !reflect.DeepEqual(list, []Entry{otherEntry}) {
+		t.Errorf("cleared shopping list of everyone %v", list)
 	}
 }
 
@@ -186,7 +178,7 @@ func TestShoppingListGetAll(t *testing.T) {
 	entry1 := user.ShoppingList().generate()
 	entry2 := user.ShoppingList().generate()
 	entry3 := user.ShoppingList().generate()
-	list := map[int]Entry{entry1.EID: entry1, entry2.EID: entry2, entry3.EID: entry3}
+	list := []Entry{entry1, entry2, entry3}
 
 	otherUser, _ := getTestingUser(t)
 
@@ -197,7 +189,7 @@ func TestShoppingListGetAll(t *testing.T) {
 		User User
 
 		ExpectedErr  error
-		ExpectedList map[int]Entry
+		ExpectedList []Entry
 	}
 
 	testSuite[data]{
@@ -213,11 +205,11 @@ func TestShoppingListGetAll(t *testing.T) {
 		Cases: []testCase[data]{
 			{
 				"got entries of unknown user",
-				data{User: unknownUser, ExpectedErr: ERR_USER_UNKNOWN, ExpectedList: map[int]Entry{}},
+				data{User: unknownUser, ExpectedErr: ERR_USER_UNKNOWN},
 			},
 			{
 				"(empty)",
-				data{User: otherUser, ExpectedList: map[int]Entry{}},
+				data{User: otherUser},
 			},
 			{
 				"(filled)",
@@ -276,6 +268,7 @@ func TestShoppingListGetOne(t *testing.T) {
 func TestShoppingListToggle(t *testing.T) {
 	user, _ := getTestingUser(t)
 	entry := user.ShoppingList().generate()
+	before := entry.Marked
 
 	otherUser, _ := getTestingUser(t)
 
@@ -310,12 +303,12 @@ func TestShoppingListToggle(t *testing.T) {
 				data{User: user, ExpectedErr: ERR_ENTRY_NOT_FOUND},
 			},
 			{
-				"(marking)",
-				data{User: user, EID: entry.EID, ExpectedStatus: true},
+				"(first time)",
+				data{User: user, EID: entry.EID, ExpectedStatus: !before},
 			},
 			{
-				"(unmarking)",
-				data{User: user, EID: entry.EID, ExpectedStatus: false},
+				"(second time)",
+				data{User: user, EID: entry.EID, ExpectedStatus: before},
 			},
 		},
 	}.Run(t)

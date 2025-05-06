@@ -96,12 +96,12 @@ func (sl ShoppingList) Edit(EID int, newName string) error {
 }
 
 // GetShoppingList returns an user's shopping list
-func (sl ShoppingList) GetAll() (map[int]Entry, error) {
-	entries := map[int]Entry{}
+func (sl ShoppingList) GetAll() ([]Entry, error) {
+	var entries []Entry
 
 	// Queries the entries
 	var rows *sql.Rows
-	rows, err := db.Query(`SELECT eid, name, marked FROM entries WHERE uid=$1;`, sl.uid)
+	rows, err := db.Query(`SELECT eid, name, marked FROM entries WHERE uid=$1 ORDER BY name;`, sl.uid)
 	if err != nil {
 		return entries, ERR_UNKNOWN
 	}
@@ -111,7 +111,7 @@ func (sl ShoppingList) GetAll() (map[int]Entry, error) {
 	for rows.Next() {
 		var e Entry
 		rows.Scan(&e.EID, &e.Name, &e.Marked)
-		entries[e.EID] = e
+		entries = append(entries, e)
 	}
 
 	// If no entries have been found, makes sure the user exists

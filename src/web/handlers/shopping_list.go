@@ -13,7 +13,7 @@ func getEID(c *utils.Context) (int, error) {
 }
 
 func GetShoppingList(c *utils.Context) (err error) {
-	var list map[int]database.Entry
+	var list []database.Entry
 
 	if list, err = c.U.ShoppingList().GetAll(); err == nil {
 		utils.RenderComponent(c, components.ShoppingList(list))

@@ -7,7 +7,7 @@ import (
 	"cucinassistant/langs"
 )
 
-templ ShoppingList(list map[int]database.Entry) {
+templ ShoppingList(list []database.Entry) {
 	@TemplateTitle(langs.Translate(ctx, langs.STR_SHOPPINGLIST), "/")
 
     <div class="shopping-list">
