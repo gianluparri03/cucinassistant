@@ -62,6 +62,6 @@ CucinAssistant uses:
 - [FontAwesome](https://fontawesome.com/) (icons)
 - [HTMX](https://htmx.org/) (web rendering)
 - [Inclusive Sans](https://fonts.google.com/specimen/Inclusive+Sans) (font)
-- [Sakura CSS](https://github.com/oxalorg/sakura) (sttylesheet)
+- [Sakura CSS](https://github.com/oxalorg/sakura) (stylesheets)
 - [Satisfy](https://fonts.google.com/specimen/Satisfy?query=satisfy) (font)
 - [Templ](https://templ.guide/) (html templating)
