@@ -78,10 +78,9 @@ templ MenuEdit(menu database.Menu) {
 	@TemplateTitle(langs.Translate(ctx, langs.STR_EDIT_MENU), baseurl)
 
     <form method="POST">
-        <div class="menu-day">
-            <b>{ langs.Translate(ctx, langs.STR_NAME) }</b> <br>
-			<input name="name" value={ menu.Name }>
-        </div> <br>
+        <b>{ langs.Translate(ctx, langs.STR_NAME) }</b>
+        <br>
+        <input name="name" value={ menu.Name }>
 
 		for index, day := range days {
 			<div class="menu-day">

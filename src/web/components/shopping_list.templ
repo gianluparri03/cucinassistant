@@ -21,8 +21,8 @@ templ ShoppingList(list []database.Entry) {
             </button>
        	}
 
-        <button class="icon" onclick="window.print();">
-            <i class="fas fa-print"></i>
+        <button class="icon-text" onclick="window.print();">
+			<i class="fas fa-print"></i> { langs.Translate(ctx, langs.STR_PRINT) }
         </button>
 
 		for _, entry := range list {

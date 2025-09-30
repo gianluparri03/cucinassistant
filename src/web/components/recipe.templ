@@ -54,23 +54,6 @@ templ Recipe(recipe database.Recipe, ca_baseurl string) {
 		<h1>{ recipe.Name }</h1>
 	}
 
-	if recipe.RID != 0 {
-		<button class="icon-text" hx-get={ baseurl + "/edit" }>
-			<i class="fas fa-edit"></i> { langs.Translate(ctx, langs.STR_EDIT) }
-		</button>
-		<button class="icon" hx-get={ baseurl + "/share" }>
-			<i class="fas fa-share-alt"></i>
-		</button>
-	} else {
-		{{ link := ca_baseurl + "/public_recipes/" + *recipe.Code + "/save"}}
-		<button class="icon-text" hx-post={ link } hx-push-url="false">
-			<i class="fas fa-clone"></i> { langs.Translate(ctx, langs.STR_SAVE) }
-		</button>
-        <button class="icon-text" onclick="window.print();">
-            <i class="fas fa-print"></i> { langs.Translate(ctx, langs.STR_PRINT) }
-        </button>
-	}
-
 	if recipe.Stars != 0 {
         <div id="stars">
 			for n := 0; n < recipe.Stars / 2; n++ {
@@ -84,6 +67,24 @@ templ Recipe(recipe database.Recipe, ca_baseurl string) {
 			}
         </div>
 	}
+
+	if recipe.RID != 0 {
+		<button class="icon-text" hx-get={ baseurl + "/edit" }>
+			<i class="fas fa-edit"></i> { langs.Translate(ctx, langs.STR_EDIT) }
+		</button>
+		<button class="icon-text" hx-get={ baseurl + "/share" }>
+			<i class="fas fa-share-alt"></i> { langs.Translate(ctx, langs.STR_SHARE) }
+		</button>
+	} else {
+		{{ link := ca_baseurl + "/public_recipes/" + *recipe.Code + "/save"}}
+		<button class="icon-text" hx-post={ link } hx-push-url="false">
+			<i class="fas fa-clone"></i> { langs.Translate(ctx, langs.STR_SAVE) }
+		</button>
+        <button class="icon-text" onclick="window.print();">
+            <i class="fas fa-print"></i> { langs.Translate(ctx, langs.STR_PRINT) }
+        </button>
+	}
+
 
 	if recipe.Ingredients != "" {
         <h4>{ langs.Translate(ctx, langs.STR_INGREDIENTS) }</h4>
@@ -127,18 +128,18 @@ templ RecipeEdit(recipe database.Recipe) {
 
         <div>
             <b>{ langs.Translate(ctx, langs.STR_INGREDIENTS) }</b> <br>
-            <textarea name="ingredients">{ recipe.Ingredients }</textarea>
-        </div>
+            <textarea class="big-text" name="ingredients">{ recipe.Ingredients }</textarea>
+        </div> <br>
 
         <div>
             <b>{ langs.Translate(ctx, langs.STR_DIRECTIONS) }</b> <br>
-            <textarea name="directions">{ recipe.Directions }</textarea>
-        </div>
+            <textarea class="big-text" name="directions">{ recipe.Directions }</textarea>
+        </div> <br>
 
         <div>
             <b>{ langs.Translate(ctx, langs.STR_NOTES) }</b> <br>
-            <textarea name="notes">{ recipe.Notes }</textarea>
-        </div>
+            <textarea class="big-text" name="notes">{ recipe.Notes }</textarea>
+        </div> <br>
 
 		<button class="icon-text">
 			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }

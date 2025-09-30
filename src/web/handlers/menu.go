@@ -94,11 +94,10 @@ func PostMenuDelete(c *utils.Context) (err error) {
 
 func PostMenuDuplicate(c *utils.Context) (err error) {
 	var MID int
-	var menu database.Menu
 
 	if MID, err = getMID(c); err == nil {
-		if menu, err = c.U.Menus().Duplicate(MID); err == nil {
-			utils.Redirect(c, "/menus/"+strconv.Itoa(menu.MID)+"/edit")
+		if _, err = c.U.Menus().Duplicate(MID); err == nil {
+			utils.Redirect(c, "/menus")
 		}
 	}
 

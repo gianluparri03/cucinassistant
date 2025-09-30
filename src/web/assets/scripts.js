@@ -80,3 +80,22 @@ function printRecipe() {
 	document.addEventListener('htmx:afterSwap', inner);
 	$("#back").click();
 }
+
+// Converts the expiration input to an actual date input
+function activateExpirationInput(i) {
+    i.type = 'date';
+    i.showPicker();
+} 
+
+// Converts the quantity input to an actual number input
+function activateQuantityInput(i) {
+    i.type = 'number';
+} 
+
+// Converts the section input to an actual selection input
+function activateSectionInput(i) {
+    var s = i.nextElementSibling;
+    i.remove();
+    s.classList.remove('hidden');
+    s.showPicker();
+}

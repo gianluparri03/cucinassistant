@@ -78,13 +78,13 @@ templ TemplateTitle(title string, backLink string) {
 }
 
 templ TemplateMessage(msg langs.String, backLink string, isHx bool) {
-    <message>
-        <content>
+    <div class="message">
+        <div class="content">
 			<p>{ langs.Translate(ctx, msg) }</p>
 
             <div>
                 <button class="icon-text"
-                    hx-on:click="$(this).parents('message').remove();"
+                    hx-on:click="$(this).parents('.message').remove();"
                     if backLink != "" {
                         hx-get={ backLink }
                     } else {
@@ -98,8 +98,8 @@ templ TemplateMessage(msg langs.String, backLink string, isHx bool) {
                     <i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_OK) }
                 </button>
             </div>
-        </content>
-    </message>
+        </div>
+    </div>
 }
 
 templ TemplateEmpty() {

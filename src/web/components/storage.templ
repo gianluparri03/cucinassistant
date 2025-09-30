@@ -132,15 +132,31 @@ templ StorageSectionAdd(SID int, sections []database.Section) {
 
         <div id="new-items">
             <div class="item article hidden">
-                <input class="name" nametemplate="article-ID-name"
-					type="text" placeholder={ langs.Translate(ctx, langs.STR_NAME) }>
-                <input class="expiration" nametemplate="article-ID-expiration"
-					type="date" placeholder={ langs.Translate(ctx, langs.STR_EXPIRATION) }>
-                <input class="quantity" nametemplate="article-ID-quantity"
-					type="number" step="any" placeholder={ langs.Translate(ctx, langs.STR_QUANTITY) }>
+                <input class="name"
+                    type="text"
+                    placeholder={ langs.Translate(ctx, langs.STR_NAME) }
+                    nametemplate="article-ID-name"
+                >
+
+                <input class="expiration"
+                    onfocus="activateExpirationInput(this);"
+                    placeholder={ langs.Translate(ctx, langs.STR_EXPIRATION) }
+                    nametemplate="article-ID-expiration"
+                >
+
+                <input class="quantity"
+                    onfocus="activateQuantityInput(this);"
+					placeholder={ langs.Translate(ctx, langs.STR_QUANTITY) }
+                    nametemplate="article-ID-quantity"
+                >
 
 				if SID == 0 {
-                	<select class="section" nametemplate="article-ID-section">
+                    <input class="section"
+                        onfocus="activateSectionInput(this);"
+                        placeholder={ langs.Translate(ctx, langs.STR_SECTION) }
+                    >
+
+                	<select class="section hidden" nametemplate="article-ID-section">
                         <option selected disabled>
 							{ langs.Translate(ctx, langs.STR_SECTION) }
 						</option>
@@ -152,9 +168,10 @@ templ StorageSectionAdd(SID int, sections []database.Section) {
 						}
                     </select>
 				} else {
-                    <select class="section" nametemplate="article-ID-section" hidden>
-						<option value={ strconv.Itoa(SID) } selected></option>
-					</select>
+                    <input class="section hidden"
+						value={ strconv.Itoa(SID) }
+                        nametemplate="article-ID-section"
+                    >
 				}
             </div>
         </div>

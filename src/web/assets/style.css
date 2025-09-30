@@ -12,7 +12,7 @@
 
 
 
-/* --- GENERAL ELEMENTS -------------- */
+/* --- GENERAL RULES ----------------- */
 * {
     font-family: var(--sansserif);
 }
@@ -46,6 +46,43 @@ button:disabled:hover {
     cursor: default;
 }
 
+label {
+    display: inline;
+    font-weight: normal;
+}
+
+input, select {
+    margin: 5px 0;
+}
+
+button.icon {
+    width: 50px;
+    height: 50px;
+    color: white;
+}
+
+button.icon-text {
+    height: 50px;
+    color: white;
+}
+
+textarea {
+    resize: none;
+    margin-bottom: 0;
+    field-sizing: content;
+    min-height: 70px;
+}
+
+textarea.big-text {
+    min-height: 130px;
+}
+
+@media(orientation: landscape) {
+    textarea {
+        width: 48%;
+    }
+}
+
 #unmatching_passwords {
     color: var(--red);
 }
@@ -55,8 +92,14 @@ button:disabled:hover {
 }
 
 
+#languages {
+    display: block;
+    width: 30vmax;
+}
 
-/* --- NAV, MAIN AND FOOTER ---------- */
+
+
+/* --- NAV --------------------------- */
 nav {
     position: absolute;
     top: 0;
@@ -94,6 +137,9 @@ nav {
     text-shadow: var(--orange) 2px 3px 2px;
 }
 
+
+
+/* --- MAIN and TITLE ---------------- */
 main {
     margin: 130px auto;
 }
@@ -113,6 +159,9 @@ h1 {
     opacity: 1;
 }
 
+
+
+/* --- FOOTER ------------------------ */
 footer {
     position: fixed;
     bottom: 0;
@@ -134,35 +183,8 @@ footer a:hover {
 
 
 
-/* --- FORM -------------------------- */
-label {
-    display: inline;
-}
-
-input, select {
-    margin: 5px 0;
-}
-
-#languages {
-    display: block;
-    width: 30vmax;
-}
-
-button.icon {
-    width: 50px;
-    height: 50px;
-    color: white;
-}
-
-button.icon-text {
-    height: 50px;
-    color: white;
-}
-
-
-
 /* --- MESSAGES ----------------- */
-message {
+.message {
     width: 100%;
     height: 100%;
     position: fixed;
@@ -173,7 +195,7 @@ message {
     overflow: hidden;
 }
 
-message > content {
+.message > .content {
     width: 60%;
     position: absolute;
     top: 30%;
@@ -184,16 +206,12 @@ message > content {
     box-sizing: border-box;
 }
 
-message > content > p {
+.message > .content > p {
     margin-bottom: 30px;
 }
 
-message button {
+.message button {
     margin: 5px;
-}
-
-#cookie-notice {
-    display: none;
 }
 
 
@@ -253,6 +271,60 @@ message button {
 
 
 
+/* --- LOADER ------------------- */
+#loader-container {
+    width: 100%;
+    height: 100%;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+
+    background-color: rgba(0, 0, 0, 0.6);
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.htmx-request#loader-container {
+    display: flex;
+}
+
+#loader {
+    width: 50px;
+    height: 50px;
+
+    display: inline-block;
+
+    border: 5px solid var(--orange);
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    box-sizing: border-box;
+
+    animation: loader .7s linear infinite;
+}
+
+@keyframes loader {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
+
+/* --- PRINTING ----------------- */
+@media print {
+	nav { display: none; }
+	main { margin: 0; }
+	body { background-color: white; }
+	#footer-links { display: none; }
+	#back, button { display: none !important; }
+	#loader-container { display: none !important; }
+}
+
+
+
 /* --- PAGE SPECIFIC: Shopping -- */
 .shopping-list *:not(#empty-label):hover {
     cursor: pointer;
@@ -268,38 +340,17 @@ message button {
 /* --- PAGE SPECIFIC: Menu ------ */
 .menu-day {
     border-left: 3px solid var(--orange);
-    padding-left: 10px;
-    margin: 10px auto;
+    margin: 15px auto;
+    padding: 5px 0 10px 10px;
+
+    display: flex;
+    flex-flow: row wrap;
+    gap: 5px;
 }
 
-textarea {
-    resize: none;
-    field-sizing: content;
-    min-height: 70px;
-}
-
-@media(orientation: landscape) {
-    .menu-day {
-        display: flex;
-        flex-flow: row wrap;
-    }
-
-    .menu-day b {
-        width: 100%;
-        display: block;
-    }
-
-    .menu-day b+textarea {
-        margin-right: 5px;
-    }
-
-    .menu-day textarea {
-        width: 48%;
-    }
-
-    .menu-day textarea+textarea {
-        margin-left: 5px;
-    }
+.menu-day b {
+    width: 100%;
+    display: block;
 }
 
 
@@ -359,63 +410,8 @@ textarea {
 
 
 
-/* --- PAGE SPECIFIC: Recipe ---- */
+/* --- PAGE SPECIFIC: Recipes --- */
 #stars {
     font-size: 1.5em;
 	word-spacing: -100%;
-	margin-top: 1rem;
-}
-
-
-
-/* --- LOADER ------------------- */
-#loader-container {
-    width: 100%;
-    height: 100%;
-
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 2;
-
-    background-color: rgba(0, 0, 0, 0.6);
-
-    display: none;
-    align-items: center;
-    justify-content: center;
-}
-
-.htmx-request#loader-container {
-    display: flex;
-}
-
-#loader {
-    width: 50px;
-    height: 50px;
-
-    display: inline-block;
-
-    border: 5px solid var(--orange);
-    border-bottom-color: transparent;
-    border-radius: 50%;
-    box-sizing: border-box;
-
-    animation: loader .7s linear infinite;
-}
-
-@keyframes loader {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-
-
-/* --- PRINT -------------------- */
-@media print {
-	nav { display: none; }
-	main { margin: 0; }
-	body { background-color: white; }
-	#footer-links { display: none; }
-	#back, button { display: none !important; }
-	#loader-container { display: none !important; }
 }
