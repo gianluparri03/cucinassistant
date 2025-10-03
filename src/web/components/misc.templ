@@ -9,109 +9,104 @@ import (
 
 templ Index(username string) {
 	<h1>{ langs.TranslateArg(ctx, langs.STR_WELCOMEBACK, username) }</h1>
-
-    <div class="dashboard">
-        <button hx-get="/menus">
-            <i class="ph ph-fork-knife"></i>
-            <span>{ langs.Translate(ctx, langs.STR_MENUS) }</span>
-        </button>
-
-        <button hx-get="/storage">
-            <i class="ph ph-package"></i>
-            <span>{ langs.Translate(ctx, langs.STR_STORAGE) }</span>
-        </button>
-
-        <button hx-get="/shopping_list">
-            <i class="ph ph-basket"></i>
-            <span>{ langs.Translate(ctx, langs.STR_SHOPPINGLIST) }</span>
-        </button>
-
-        <button hx-get="/recipes">
-            <i class="ph ph-notebook"></i>
-            <span>{ langs.Translate(ctx, langs.STR_RECIPES) }</span>
-        </button>
-
-        <button hx-get="/user/settings" class="transparent">
-            <i class="ph ph-gear"></i>
-            <span>{ langs.Translate(ctx, langs.STR_SETTINGS) }</span>
-        </button>
-    </div>
+	<div class="dashboard">
+		<button hx-get="/menus">
+			<i class="ph ph-fork-knife"></i>
+			<span>{ langs.Translate(ctx, langs.STR_MENUS) }</span>
+		</button>
+		<button hx-get="/storage">
+			<i class="ph ph-package"></i>
+			<span>{ langs.Translate(ctx, langs.STR_STORAGE) }</span>
+		</button>
+		<button hx-get="/shopping_list">
+			<i class="ph ph-basket"></i>
+			<span>{ langs.Translate(ctx, langs.STR_SHOPPINGLIST) }</span>
+		</button>
+		<button hx-get="/recipes">
+			<i class="ph ph-notebook"></i>
+			<span>{ langs.Translate(ctx, langs.STR_RECIPES) }</span>
+		</button>
+		<button hx-get="/user/settings" class="transparent">
+			<i class="ph ph-gear"></i>
+			<span>{ langs.Translate(ctx, langs.STR_SETTINGS) }</span>
+		</button>
+	</div>
 }
 
 templ Info(data map[string]string) {
-	<p>@templ.Raw(langs.Translate(ctx, langs.STR_INFO_INTRO))</p>
-	
+	<p>
+		@templ.Raw(langs.Translate(ctx, langs.STR_INFO_INTRO))
+	</p>
 	<h4><i class="ph ph-clock-counter-clockwise"></i> { langs.Translate(ctx, langs.STR_HISTORY) }</h4>
-	<p>@templ.Raw(langs.Translate(ctx, langs.STR_INFO_HISTORY))</p>
-
+	<p>
+		@templ.Raw(langs.Translate(ctx, langs.STR_INFO_HISTORY))
+	</p>
 	<h4><i class="ph ph-code"></i> { langs.Translate(ctx, langs.STR_CODE) }</h4>
-	<p>@templ.Raw(langs.TranslateArg(ctx, langs.STR_INFO_CODE, data["code"]))</p>
-
+	<p>
+		@templ.Raw(langs.TranslateArg(ctx, langs.STR_INFO_CODE, data["code"]))
+	</p>
 	<h4><i class="ph ph-git-branch"></i> { langs.Translate(ctx, langs.STR_VERSION) }</h4>
-	<p>@templ.Raw(langs.TranslateArg(ctx, langs.STR_INFO_VERSION, data["version"]))</p>
-
+	<p>
+		@templ.Raw(langs.TranslateArg(ctx, langs.STR_INFO_VERSION, data["version"]))
+	</p>
 	<h4><i class="ph ph-chart-bar-horizontal"></i> { langs.Translate(ctx, langs.STR_STATS) }</h4>
-	<p>@templ.Raw(langs.TranslateArg(ctx, langs.STR_INFO_STATS, "/stats"))</p>
-
+	<p>
+		@templ.Raw(langs.TranslateArg(ctx, langs.STR_INFO_STATS, "/stats"))
+	</p>
 	<h4><i class="ph ph-info"></i> { langs.Translate(ctx, langs.STR_TUTORIAL) }</h4>
-	<p>@templ.Raw(langs.TranslateArg(ctx, langs.STR_INFO_TUTORIAL, data["tutorial"]))</p>
-
+	<p>
+		@templ.Raw(langs.TranslateArg(ctx, langs.STR_INFO_TUTORIAL, data["tutorial"]))
+	</p>
 	<h4><i class="ph ph-lifebuoy"></i> { langs.Translate(ctx, langs.STR_SUPPORT) }</h4>
-	<p>@templ.Raw(langs.TranslateArg(ctx, langs.STR_INFO_SUPPORT, data["support"]))</p>
-
+	<p>
+		@templ.Raw(langs.TranslateArg(ctx, langs.STR_INFO_SUPPORT, data["support"]))
+	</p>
 	<style> #footer-links { display: none; } </style>
 }
 
 templ Lang(available map[string]*langs.Lang, current string) {
-    @TemplateTitle(langs.Translate(ctx, langs.STR_LANGUAGE), "/")
-
-    <form method="GET" hx-disable>
-        <select name="tag" id="languages">
-            for _, lang := range available {
-                <option value={ lang.Tag } selected?={ lang.Tag == current }>
+	@TemplateTitle(langs.Translate(ctx, langs.STR_LANGUAGE), "/")
+	<form method="GET" hx-disable>
+		<select name="tag" id="languages">
+			for _, lang := range available {
+				<option value={ lang.Tag } selected?={ lang.Tag == current }>
 					{ lang.Name }
 				</option>
-            }
-        </select> <br>
-
+			}
+		</select>
+		<br/>
 		<button class="icon-text">
 			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
 		</button>
-    </form>
+	</form>
 }
 
 templ Stats(data database.Stats) {
-    @TemplateTitle(langs.Translate(ctx, langs.STR_STATS), "/info")
-
-    <div class="dashboard">
-        <button class="transparent" disabled>
-            <i class="ph ph-users"></i>
-            <span>{ langs.TranslateArg(ctx, langs.STR_STATS_USERS, strconv.Itoa(data.UsersNumber)) }</span>
-        </button>
-
-        <button class="transparent" disabled>
-            <i class="ph ph-fork-knife"></i>
-            <span>{ langs.TranslateArg(ctx, langs.STR_STATS_MENUS, strconv.Itoa(data.MenusNumber)) }</span>
-        </button>
-
-        <button class="transparent" disabled>
-            <i class="ph ph-package"></i>
-            <span>{ langs.TranslateArg(ctx, langs.STR_STATS_SECTIONS, strconv.Itoa(data.SectionsNumber)) }</span>
-        </button>
-
-        <button class="transparent" disabled>
-            <i class="ph ph-package"></i>
-            <span>{ langs.TranslateArg(ctx, langs.STR_STATS_ARTICLES, strconv.Itoa(data.ArticlesNumber)) }</span>
-        </button>
-
-        <button class="transparent" disabled>
-            <i class="ph ph-basket"></i>
-            <span>{ langs.TranslateArg(ctx, langs.STR_STATS_ENTRIES, strconv.Itoa(data.EntriesNumber)) }</span>
-        </button>
-
-        <button class="transparent" disabled>
-            <i class="ph ph-notebook"></i>
-            <span>{ langs.TranslateArg(ctx, langs.STR_STATS_RECIPES, strconv.Itoa(data.RecipesNumber)) }</span>
-        </button>
-    </div>
+	@TemplateTitle(langs.Translate(ctx, langs.STR_STATS), "/info")
+	<div class="dashboard">
+		<button class="transparent" disabled>
+			<i class="ph ph-users"></i>
+			<span>{ langs.TranslateArg(ctx, langs.STR_STATS_USERS, strconv.Itoa(data.UsersNumber)) }</span>
+		</button>
+		<button class="transparent" disabled>
+			<i class="ph ph-fork-knife"></i>
+			<span>{ langs.TranslateArg(ctx, langs.STR_STATS_MENUS, strconv.Itoa(data.MenusNumber)) }</span>
+		</button>
+		<button class="transparent" disabled>
+			<i class="ph ph-package"></i>
+			<span>{ langs.TranslateArg(ctx, langs.STR_STATS_SECTIONS, strconv.Itoa(data.SectionsNumber)) }</span>
+		</button>
+		<button class="transparent" disabled>
+			<i class="ph ph-package"></i>
+			<span>{ langs.TranslateArg(ctx, langs.STR_STATS_ARTICLES, strconv.Itoa(data.ArticlesNumber)) }</span>
+		</button>
+		<button class="transparent" disabled>
+			<i class="ph ph-basket"></i>
+			<span>{ langs.TranslateArg(ctx, langs.STR_STATS_ENTRIES, strconv.Itoa(data.EntriesNumber)) }</span>
+		</button>
+		<button class="transparent" disabled>
+			<i class="ph ph-notebook"></i>
+			<span>{ langs.TranslateArg(ctx, langs.STR_STATS_RECIPES, strconv.Itoa(data.RecipesNumber)) }</span>
+		</button>
+	</div>
 }

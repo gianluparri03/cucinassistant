@@ -10,6 +10,7 @@ cover:
 
 fmt:
 	go fmt ./...
+	templ fmt .
 
 gen:
 	go generate ./...

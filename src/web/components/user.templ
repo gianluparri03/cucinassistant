@@ -6,226 +6,227 @@ import (
 )
 
 templ UserChangeEmail(current string) {
-    @TemplateTitle(langs.Translate(ctx, langs.STR_CHANGE_EMAIL), "/user/settings")
-
-    <form method="POST">
-        { langs.Translate(ctx, langs.STR_NEW_EMAIL) } <br>
-        <input type="email" name="email-new" value={ current } required> <br>
-
+	@TemplateTitle(langs.Translate(ctx, langs.STR_CHANGE_EMAIL), "/user/settings")
+	<form method="POST">
+		{ langs.Translate(ctx, langs.STR_NEW_EMAIL) }
+		<br/>
+		<input type="email" name="email-new" value={ current } required/>
+		<br/>
 		<button class="icon-text">
 			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
 		</button>
-    </form>
+	</form>
 }
 
 templ UserChangeEmailSettings(user *database.User, available map[string]*langs.Lang) {
-    @TemplateTitle(langs.Translate(ctx, langs.STR_EMAIL_SETTINGS), "/user/settings")
-
-    <form method="POST">
+	@TemplateTitle(langs.Translate(ctx, langs.STR_EMAIL_SETTINGS), "/user/settings")
+	<form method="POST">
 		{ langs.Translate(ctx, langs.STR_EMAIL_LANG) }
-        <select name="lang" id="languages">
-            for _, lang := range available {
-			<option value={ lang.Tag } selected?={ lang.Tag == user.EmailLang }>
+		<select name="lang" id="languages">
+			for _, lang := range available {
+				<option value={ lang.Tag } selected?={ lang.Tag == user.EmailLang }>
 					{ lang.Name }
 				</option>
-            }
-        </select>
-
-		<br>
-
-		<input type="checkbox" id="newsletter" name="newsletter" checked?={ user.Newsletter }>
-		<label for="newsletter">{ langs.Translate(ctx, langs.STR_WANT_NEWSLETTER)  }</label>
-
-		<br> <br>
-
+			}
+		</select>
+		<br/>
+		<input type="checkbox" id="newsletter" name="newsletter" checked?={ user.Newsletter }/>
+		<label for="newsletter">{ langs.Translate(ctx, langs.STR_WANT_NEWSLETTER) }</label>
+		<br/>
+		<br/>
 		<button class="icon-text">
 			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
 		</button>
-    </form>
+	</form>
 }
 
 templ UserChangePassword() {
-    @TemplateTitle(langs.Translate(ctx, langs.STR_CHANGE_PASSWORD), "/user/settings")
-
-    <form method="POST" onsubmit={ templ.JSFuncCall("comparePasswords", langs.Translate(ctx, langs.STR_UNMATCHING_PASSWORDS)) }>
-        <label for="password-old">{ langs.Translate(ctx, langs.STR_OLD_PASSWORD) }</label> <br>
-        <input type="password" name="old-password" id="password-old" required> <br>
-
-        <label for="password-1">{ langs.Translate(ctx, langs.STR_NEW_PASSWORD) }</label> <br>
-        <input type="password" name="new-password" id="password-1" required> <br>
-
-        <label for="password-2">{ langs.Translate(ctx, langs.STR_REPEAT_PASSWORD) }</label> <br>
-        <input type="password" id="password-2" required> <br>
-
+	@TemplateTitle(langs.Translate(ctx, langs.STR_CHANGE_PASSWORD), "/user/settings")
+	<form method="POST" onsubmit={ templ.JSFuncCall("comparePasswords", langs.Translate(ctx, langs.STR_UNMATCHING_PASSWORDS)) }>
+		<label for="password-old">{ langs.Translate(ctx, langs.STR_OLD_PASSWORD) }</label>
+		<br/>
+		<input type="password" name="old-password" id="password-old" required/>
+		<br/>
+		<label for="password-1">{ langs.Translate(ctx, langs.STR_NEW_PASSWORD) }</label>
+		<br/>
+		<input type="password" name="new-password" id="password-1" required/>
+		<br/>
+		<label for="password-2">{ langs.Translate(ctx, langs.STR_REPEAT_PASSWORD) }</label>
+		<br/>
+		<input type="password" id="password-2" required/>
+		<br/>
 		<button class="icon-text">
 			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
 		</button>
-    </form>
+	</form>
 }
 
 templ UserChangeUsername(current string) {
-    @TemplateTitle(langs.Translate(ctx, langs.STR_CHANGE_USERNAME), "/user/settings")
-
-    <form method="POST">
-        { langs.Translate(ctx, langs.STR_NEW_USERNAME) }<br>
-        <input name="username-new" value={ current } required> <br>
-
+	@TemplateTitle(langs.Translate(ctx, langs.STR_CHANGE_USERNAME), "/user/settings")
+	<form method="POST">
+		{ langs.Translate(ctx, langs.STR_NEW_USERNAME) }
+		<br/>
+		<input name="username-new" value={ current } required/>
+		<br/>
 		<button class="icon-text">
 			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
 		</button>
-    </form>
+	</form>
 }
 
 templ UserDelete(isWarning bool, token string) {
-    @TemplateTitle(langs.Translate(ctx, langs.STR_DELETE_USER), "/user/settings")
-
-    if isWarning {
-        <form method="POST">
-            { langs.Translate(ctx, langs.STR_DELETE_USER_TEXT1) } <br><br>
+	@TemplateTitle(langs.Translate(ctx, langs.STR_DELETE_USER), "/user/settings")
+	if isWarning {
+		<form method="POST">
+			{ langs.Translate(ctx, langs.STR_DELETE_USER_TEXT1) }
+			<br/>
+			<br/>
 			<button class="icon-text">
 				<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
 			</button>
-        </form>
-    } else { 
-        <div class="pre-swap">
-            { langs.Translate(ctx, langs.STR_DELETE_USER_TEXT1) } <br><br>
-            <button class="icon-text" onclick="swapContent()">
-                <i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
-            </button>
-        </div>
-
-        <form method="POST" class="post-swap hidden">
-            { langs.Translate(ctx, langs.STR_DELETE_USER_TEXT2) } <br><br>
-            <input name="token" value={ token } hidden>
+		</form>
+	} else {
+		<div class="pre-swap">
+			{ langs.Translate(ctx, langs.STR_DELETE_USER_TEXT1) }
+			<br/>
+			<br/>
+			<button class="icon-text" onclick="swapContent()">
+				<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
+			</button>
+		</div>
+		<form method="POST" class="post-swap hidden">
+			{ langs.Translate(ctx, langs.STR_DELETE_USER_TEXT2) }
+			<br/>
+			<br/>
+			<input name="token" value={ token } hidden/>
 			<button class="icon-text">
 				<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
 			</button>
-        </form>
-    }
+		</form>
+	}
 }
 
 templ UserForgotPassword() {
-    @TemplateTitle(langs.Translate(ctx, langs.STR_FORGOT_PASSWORD), "/user/signin")
-
-    <form method="POST">
-        { langs.Translate(ctx, langs.STR_EMAIL) } <br>
-        <input type="email" name="email" required> <br>
-
+	@TemplateTitle(langs.Translate(ctx, langs.STR_FORGOT_PASSWORD), "/user/signin")
+	<form method="POST">
+		{ langs.Translate(ctx, langs.STR_EMAIL) }
+		<br/>
+		<input type="email" name="email" required/>
+		<br/>
 		<button class="icon-text">
 			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
 		</button>
-    </form>
+	</form>
 }
 
 templ UserResetPassword(token string) {
 	<h1>{ langs.Translate(ctx, langs.STR_RESET_PASSWORD) }</h1>
-
 	<form method="POST" onsubmit={ templ.JSFuncCall("comparePasswords", langs.Translate(ctx, langs.STR_UNMATCHING_PASSWORDS)) }>
-		<input value={ token } name="token" hidden>
-
-        <label for="email">{ langs.Translate(ctx, langs.STR_EMAIL) }</label> <br>
-        <input type="email" name="email" id="email" required> <br>
-
-        <label for="password-1">{ langs.Translate(ctx, langs.STR_NEW_PASSWORD) }</label> <br>
-        <input type="password" name="new-password" id="password-1" required> <br>
-
-        <label for="password-2">{ langs.Translate(ctx, langs.STR_REPEAT_PASSWORD) }</label> <br>
-        <input type="password" id="password-2" required> <br>
-
+		<input value={ token } name="token" hidden/>
+		<label for="email">{ langs.Translate(ctx, langs.STR_EMAIL) }</label>
+		<br/>
+		<input type="email" name="email" id="email" required/>
+		<br/>
+		<label for="password-1">{ langs.Translate(ctx, langs.STR_NEW_PASSWORD) }</label>
+		<br/>
+		<input type="password" name="new-password" id="password-1" required/>
+		<br/>
+		<label for="password-2">{ langs.Translate(ctx, langs.STR_REPEAT_PASSWORD) }</label>
+		<br/>
+		<input type="password" id="password-2" required/>
+		<br/>
 		<button class="icon-text">
 			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
 		</button>
-    </form>
+	</form>
 }
 
 templ UserSettings(supportEmail string) {
-    @TemplateTitle(langs.Translate(ctx, langs.STR_SETTINGS), "/")
-
-    <div class="dashboard">
-        <button hx-post="/user/signout">
-            <i class="ph ph-sign-out"></i>
-            <span>{ langs.Translate(ctx, langs.STR_LOGOUT) }</span>
-        </button>
-
-        <button hx-get="/user/change_username">
-            <i class="ph ph-user"></i>
-            <span>{ langs.Translate(ctx, langs.STR_CHANGE_USERNAME) }</span>
-        </button>
-
-        <button hx-get="/user/change_email">
-            <i class="ph ph-envelope"></i>
-            <span>{ langs.Translate(ctx, langs.STR_CHANGE_EMAIL) }</span>
-        </button>
-
-        <button hx-get="/user/change_email_settings">
-            <i class="ph ph-newspaper"></i>
-            <span>{ langs.Translate(ctx, langs.STR_EMAIL_SETTINGS) }</span>
-        </button>
-
-        <button hx-get="/user/change_password">
-            <i class="ph ph-key"></i>
-            <span>{ langs.Translate(ctx, langs.STR_CHANGE_PASSWORD) }</span>
-        </button>
-
-        <button hx-get="/user/delete_1">
-            <i class="ph ph-trash"></i>
-            <span>{ langs.Translate(ctx, langs.STR_DELETE_USER) }</span>
-        </button>
-
+	@TemplateTitle(langs.Translate(ctx, langs.STR_SETTINGS), "/")
+	<div class="dashboard">
+		<button hx-post="/user/signout">
+			<i class="ph ph-sign-out"></i>
+			<span>{ langs.Translate(ctx, langs.STR_LOGOUT) }</span>
+		</button>
+		<button hx-get="/user/change_username">
+			<i class="ph ph-user"></i>
+			<span>{ langs.Translate(ctx, langs.STR_CHANGE_USERNAME) }</span>
+		</button>
+		<button hx-get="/user/change_email">
+			<i class="ph ph-envelope"></i>
+			<span>{ langs.Translate(ctx, langs.STR_CHANGE_EMAIL) }</span>
+		</button>
+		<button hx-get="/user/change_email_settings">
+			<i class="ph ph-newspaper"></i>
+			<span>{ langs.Translate(ctx, langs.STR_EMAIL_SETTINGS) }</span>
+		</button>
+		<button hx-get="/user/change_password">
+			<i class="ph ph-key"></i>
+			<span>{ langs.Translate(ctx, langs.STR_CHANGE_PASSWORD) }</span>
+		</button>
+		<button hx-get="/user/delete_1">
+			<i class="ph ph-trash"></i>
+			<span>{ langs.Translate(ctx, langs.STR_DELETE_USER) }</span>
+		</button>
 		if supportEmail != "" {
-			<button onclick={ templ.JSFuncCall("window.open", "mailto:" + supportEmail) } class="transparent">
+			<button onclick={ templ.JSFuncCall("window.open", "mailto:"+supportEmail) } class="transparent">
 				<i class="ph ph-lifebuoy"></i>
 				<span>{ langs.Translate(ctx, langs.STR_SUPPORT) }</span>
 			</button>
 		}
-    </div>
+	</div>
 }
 
 templ UserSignIn() {
 	<h1>{ langs.Translate(ctx, langs.STR_SIGNIN) }</h1>
-
-    <form method="POST">
-        <label for="username">{ langs.Translate(ctx, langs.STR_USERNAME) }</label> <br>
-        <input type="text" name="username" id="username" required> <br>
-
-        <label for="password">{ langs.Translate(ctx, langs.STR_PASSWORD) }</label> <br>
-        <input type="password" name="password" id="password" required> <br>
-
-        <button class="icon-text">
+	<form method="POST">
+		<label for="username">{ langs.Translate(ctx, langs.STR_USERNAME) }</label>
+		<br/>
+		<input type="text" name="username" id="username" required/>
+		<br/>
+		<label for="password">{ langs.Translate(ctx, langs.STR_PASSWORD) }</label>
+		<br/>
+		<input type="password" name="password" id="password" required/>
+		<br/>
+		<button class="icon-text">
 			<i class="ph ph-sign-in"></i> { langs.Translate(ctx, langs.STR_SIGNIN) }
-		</button> <br>
-
-        <a hx-get="/user/forgot_password">
+		</button>
+		<br/>
+		<a hx-get="/user/forgot_password">
 			{ langs.Translate(ctx, langs.STR_FORGOT_PASSWORD) }
-		</a> <br>
-        <a hx-get="/user/signup">
+		</a>
+		<br/>
+		<a hx-get="/user/signup">
 			{ langs.Translate(ctx, langs.STR_SIGNUP) }
 		</a>
-    </form>
+	</form>
 }
 
 templ UserSignUp() {
 	<h1>{ langs.Translate(ctx, langs.STR_SIGNUP) }</h1>
-
 	<form method="POST" onsubmit={ templ.JSFuncCall("comparePasswords", langs.Translate(ctx, langs.STR_UNMATCHING_PASSWORDS)) }>
-        <label for="username">{ langs.Translate(ctx, langs.STR_USERNAME) }</label> <br>
-        <input type="text" name="username" id="username" required> <br>
-
-        <label for="email">{ langs.Translate(ctx, langs.STR_EMAIL) }</label> <br>
-        <input type="email" name="email" id="email" required> <br>
-
-        <label for="password-1">{ langs.Translate(ctx, langs.STR_PASSWORD) }</label> <br>
-        <input type="password" name="password" id="password-1" required> <br>
-
-        <label for="password-2">{ langs.Translate(ctx, langs.STR_REPEAT_PASSWORD) }</label> <br>
-        <input type="password" id="password-2" required> <br>
-
-        <button class="icon-text">
+		<label for="username">{ langs.Translate(ctx, langs.STR_USERNAME) }</label>
+		<br/>
+		<input type="text" name="username" id="username" required/>
+		<br/>
+		<label for="email">{ langs.Translate(ctx, langs.STR_EMAIL) }</label>
+		<br/>
+		<input type="email" name="email" id="email" required/>
+		<br/>
+		<label for="password-1">{ langs.Translate(ctx, langs.STR_PASSWORD) }</label>
+		<br/>
+		<input type="password" name="password" id="password-1" required/>
+		<br/>
+		<label for="password-2">{ langs.Translate(ctx, langs.STR_REPEAT_PASSWORD) }</label>
+		<br/>
+		<input type="password" id="password-2" required/>
+		<br/>
+		<button class="icon-text">
 			<i class="ph ph-user-plus"></i> { langs.Translate(ctx, langs.STR_SIGNUP) }
-		</button> <br>
-
-        <a hx-get="/user/signin">
+		</button>
+		<br/>
+		<a hx-get="/user/signin">
 			{ langs.Translate(ctx, langs.STR_SIGNIN) }
 		</a>
-    </form>
+	</form>
 }

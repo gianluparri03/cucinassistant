@@ -1,58 +1,51 @@
 package components
 
-import (
-	"cucinassistant/langs"
-)
+import "cucinassistant/langs"
 
 templ TemplateBase(lang string, body templ.Component, message templ.Component, tutorial string) {
-    <!DOCTYPE html>
-
-    <html>
-        <head>
-            <meta charset="utf-8">
-
-            <title>CucinAssistant</title>
-
-            <meta http-equiv="content-type" content="text/html">
-            <meta name="lang" content={ lang }>
-            <meta name="author" content="Gianluca Parri">
-            <meta name="owner" content="Gianluca Parri">
-            <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-            <link rel="manifest" href="/assets/manifest.json">
-
-            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inclusive+Sans&family=Satisfy&display=swap">
-            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.css">
-            <link rel="stylesheet" href="/assets/phosphor.css">
-            <link rel="stylesheet" href="/assets/sakura.css">
-            <link rel="stylesheet" href="/assets/style.css">
-
-            <script src="https://unpkg.com/htmx.org@2.0.0"></script>
-            <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/response-targets.js"></script>
-            <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"></script>
-            <script src="/assets/scripts.js"></script>
-        </head>
-
-        <body
-            hx-ext="response-targets"
-            hx-boost="true"
-            hx-push-url="true"
-            hx-indicator="#loader-container"
-            hx-target="#body-container"
-        >
-            <nav>
-                <span><i id="home" class="ph ph-house" hx-get="/"></i></span>
-                <span id="logo">CucinAssistant</span>
-                <span><i id="lang" class="ph ph-translate" hx-get="/lang"></i></span>
-            </nav>
-
-            <main>
-                <div id="body-container">@body</div>
-                <div id="message-container">@message</div>
-                <div id="loader-container"><span id="loader"></span></div>
-            </main>
-
-            <footer>
+	<!DOCTYPE html>
+	<html>
+		<head>
+			<meta charset="utf-8"/>
+			<title>CucinAssistant</title>
+			<meta http-equiv="content-type" content="text/html"/>
+			<meta name="lang" content={ lang }/>
+			<meta name="author" content="Gianluca Parri"/>
+			<meta name="owner" content="Gianluca Parri"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+			<link rel="manifest" href="/assets/manifest.json"/>
+			<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inclusive+Sans&family=Satisfy&display=swap"/>
+			<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.css"/>
+			<link rel="stylesheet" href="/assets/phosphor.css"/>
+			<link rel="stylesheet" href="/assets/sakura.css"/>
+			<link rel="stylesheet" href="/assets/style.css"/>
+			<script src="https://unpkg.com/htmx.org@2.0.0"></script>
+			<script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/response-targets.js"></script>
+			<script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"></script>
+			<script src="/assets/scripts.js"></script>
+		</head>
+		<body
+			hx-ext="response-targets"
+			hx-boost="true"
+			hx-push-url="true"
+			hx-indicator="#loader-container"
+			hx-target="#body-container"
+		>
+			<nav>
+				<span><i id="home" class="ph ph-house" hx-get="/"></i></span>
+				<span id="logo">CucinAssistant</span>
+				<span><i id="lang" class="ph ph-translate" hx-get="/lang"></i></span>
+			</nav>
+			<main>
+				<div id="body-container">
+					@body
+				</div>
+				<div id="message-container">
+					@message
+				</div>
+				<div id="loader-container"><span id="loader"></span></div>
+			</main>
+			<footer>
 				<div>
 					CucinAssistant &copy; 2023-2025, Gianluca Parri
 				</div>
@@ -62,42 +55,41 @@ templ TemplateBase(lang string, body templ.Component, message templ.Component, t
 						{ langs.Translate(ctx, langs.STR_TUTORIAL) }
 					</a>
 				</div>
-            </footer>
-        </body>
-    </html>
+			</footer>
+		</body>
+	</html>
 }
 
 templ TemplateTitle(title string, backLink string) {
-    <h1>
+	<h1>
 		<i id="back" class="ph-fill ph-arrow-circle-left" hx-get={ backLink }></i>
-
-        { title }
-    </h1>
+		{ title }
+	</h1>
 }
 
 templ TemplateMessage(msg langs.String, backLink string, isHx bool) {
-    <div class="message">
-        <div class="content">
+	<div class="message">
+		<div class="content">
 			<p>{ langs.Translate(ctx, msg) }</p>
-
-            <div>
-                <button class="icon-text"
-                    hx-on:click="$(this).parents('.message').remove();"
-                    if backLink != "" {
-                        hx-get={ backLink }
-                    } else {
+			<div>
+				<button
+					class="icon-text"
+					hx-on:click="$(this).parents('.message').remove();"
+					if backLink != "" {
+						hx-get={ backLink }
+					} else {
 						if !isHx {
 							hx-get="/"
 						}
 					}
-                    hx-push-url="true"
-                    autofocus>
-
-                    <i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_OK) }
-                </button>
-            </div>
-        </div>
-    </div>
+					hx-push-url="true"
+					autofocus
+				>
+					<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_OK) }
+				</button>
+			</div>
+		</div>
+	</div>
 }
 
 templ TemplateEmpty() {

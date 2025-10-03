@@ -19,40 +19,37 @@ var days = [7]langs.String{
 
 templ Menus(menus []database.Menu) {
 	@TemplateTitle(langs.Translate(ctx, langs.STR_MENUS), "/")
-
-    <div class="dashboard">
+	<div class="dashboard">
 		for _, menu := range menus {
 			{{ baseurl := "/menus/" + strconv.Itoa(menu.MID) }}
 			<button hx-get={ baseurl }>
-                <i class="ph ph-fork-knife"></i>
+				<i class="ph ph-fork-knife"></i>
 				<span>{ menu.Name }</span>
-            </button>
+			</button>
 		}
-
-        <button hx-get="/menus/new" class="transparent">
-            <i class="ph ph-plus"></i>
-            <span>{ langs.Translate(ctx, langs.STR_NEW_MENU) }</span>
-        </button>
-    </div>
+		<button hx-get="/menus/new" class="transparent">
+			<i class="ph ph-plus"></i>
+			<span>{ langs.Translate(ctx, langs.STR_NEW_MENU) }</span>
+		</button>
+	</div>
 }
 
 templ MenusNew() {
 	@TemplateTitle(langs.Translate(ctx, langs.STR_NEW_MENU), "/menus")
-
-    <form method="POST">
-        { langs.Translate(ctx, langs.STR_NAME) } <br>
-		<input type="text" name="name" required> <br>
-
+	<form method="POST">
+		{ langs.Translate(ctx, langs.STR_NAME) }
+		<br/>
+		<input type="text" name="name" required/>
+		<br/>
 		<button class="icon-text">
 			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
 		</button>
-    </form>
+	</form>
 }
 
 templ Menu(menu database.Menu) {
 	{{ baseurl := "/menus/" + strconv.Itoa(menu.MID) }}
 	@TemplateTitle(menu.Name, "/menus")
-
 	<button class="icon-text" hx-get={ baseurl + "/edit" }>
 		<i class="ph ph-note-pencil"></i> { langs.Translate(ctx, langs.STR_EDIT) }
 	</button>
@@ -62,8 +59,6 @@ templ Menu(menu database.Menu) {
 	<button class="icon-text" onclick="window.print();">
 		<i class="ph ph-printer"></i> { langs.Translate(ctx, langs.STR_PRINT) }
 	</button>
-
-
 	for index, day := range days {
 		<div class="menu-day">
 			<b>{ langs.Translate(ctx, day) }</b>
@@ -76,16 +71,13 @@ templ Menu(menu database.Menu) {
 templ MenuEdit(menu database.Menu) {
 	{{ baseurl := "/menus/" + strconv.Itoa(menu.MID) }}
 	@TemplateTitle(langs.Translate(ctx, langs.STR_EDIT_MENU), baseurl)
-
-    <form method="POST">
-        <b>{ langs.Translate(ctx, langs.STR_NAME) }</b>
-        <br>
-        <input name="name" value={ menu.Name }>
-
+	<form method="POST">
+		<b>{ langs.Translate(ctx, langs.STR_NAME) }</b>
+		<br/>
+		<input name="name" value={ menu.Name }/>
 		for index, day := range days {
 			<div class="menu-day">
 				<b>{ langs.Translate(ctx, day) }</b>
-
 				for i := 0; i < 2; i++ {
 					{{ name := "meal-" + strconv.Itoa(index*2+i) }}
 					<textarea name={ name }>
@@ -94,23 +86,22 @@ templ MenuEdit(menu database.Menu) {
 				}
 			</div>
 		}
-
 		<button class="icon-text">
 			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
 		</button>
-    </form> <br>
-
-    <b>{ langs.Translate(ctx, langs.STR_DELETE_MENU) }</b>
-
-    <div class="pre-swap">
+	</form>
+	<br/>
+	<b>{ langs.Translate(ctx, langs.STR_DELETE_MENU) }</b>
+	<div class="pre-swap">
 		<button class="icon-text" onclick="swapContent()">
 			<i class="ph ph-trash"></i> { langs.Translate(ctx, langs.STR_DELETE) }
 		</button>
-    </div>
-    <div class="post-swap hidden">
-        { langs.Translate(ctx, langs.STR_DELETE_MENU_TEXT) } <br>
+	</div>
+	<div class="post-swap hidden">
+		{ langs.Translate(ctx, langs.STR_DELETE_MENU_TEXT) }
+		<br/>
 		<button class="icon-text" hx-post={ baseurl + "/delete" } hx-push-url="false">
-            <i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
-        </button>
-    </div>
+			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
+		</button>
+	</div>
 }

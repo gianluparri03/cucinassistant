@@ -9,73 +9,73 @@ import (
 
 templ ShoppingList(list []database.Entry) {
 	@TemplateTitle(langs.Translate(ctx, langs.STR_SHOPPINGLIST), "/")
-
-    <div class="shopping-list">
-        <button class="icon-text" hx-get="/shopping_list/append">
-            <i class="ph ph-plus"></i> { langs.Translate(ctx, langs.STR_ADD) }
-        </button>
-
+	<div class="shopping-list">
+		<button class="icon-text" hx-get="/shopping_list/append">
+			<i class="ph ph-plus"></i> { langs.Translate(ctx, langs.STR_ADD) }
+		</button>
 		if len(list) > 0 {
-            <button class="icon-text" hx-post="/shopping_list/clear" hx-push-url="false">
-                <i class="ph ph-trash"></i> { langs.Translate(ctx, langs.STR_DELETE_SELECTED) }
-            </button>
-       	}
-
-        <button class="icon-text" onclick="window.print();">
-			<i class="ph ph-printer"></i> { langs.Translate(ctx, langs.STR_PRINT) }
-        </button>
-
-		for _, entry := range list {
-            <div class="shopping-item">
-				{{ baseurl := "/shopping_list/" + strconv.Itoa(entry.EID) }}
-
-				<input type="checkbox" checked?={ entry.Marked } autocomplete="off"
-					hx-post={ baseurl + "/toggle" } hx-push-url="false" readonly>
-
-				<label hx-get={ baseurl + "/edit" }>{ entry.Name }</label>
-            </div>
+			<button class="icon-text" hx-post="/shopping_list/clear" hx-push-url="false">
+				<i class="ph ph-trash"></i> { langs.Translate(ctx, langs.STR_DELETE_SELECTED) }
+			</button>
 		}
-
+		<button class="icon-text" onclick="window.print();">
+			<i class="ph ph-printer"></i> { langs.Translate(ctx, langs.STR_PRINT) }
+		</button>
+		for _, entry := range list {
+			<div class="shopping-item">
+				{{ baseurl := "/shopping_list/" + strconv.Itoa(entry.EID) }}
+				<input
+					type="checkbox"
+					checked?={ entry.Marked }
+					autocomplete="off"
+					hx-post={ baseurl + "/toggle" }
+					hx-push-url="false"
+					readonly
+				/>
+				<label hx-get={ baseurl + "/edit" }>{ entry.Name }</label>
+			</div>
+		}
 		if len(list) == 0 {
 			<div id="empty-label">
 				{ langs.Translate(ctx, langs.STR_SHOPPINGLIST_EMPTY) }
 			</div>
 		}
-    </div>
+	</div>
 }
 
 templ ShoppingListAppend() {
 	@TemplateTitle(langs.Translate(ctx, langs.STR_APPEND_ENTRIES), "/shopping_list")
-
 	<form method="POST">
-        <button class="icon" onclick="removeItem(event);">
+		<button class="icon" onclick="removeItem(event);">
 			<i class="ph ph-minus"></i>
 		</button>
-        <button class="icon" onclick="addItem(event);">
+		<button class="icon" onclick="addItem(event);">
 			<i class="ph ph-plus"></i>
 		</button>
 		<button class="icon-text">
 			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
 		</button>
-
-        <div id="new-items">
-            <div class="item hidden">
-                <input class="name" type="text" nametemplate="entry-ID-name"
-					placeholder={ langs.Translate(ctx, langs.STR_NAME) }>
-            </div>
-        </div>
-    </form>
-
+		<div id="new-items">
+			<div class="item hidden">
+				<input
+					class="name"
+					type="text"
+					nametemplate="entry-ID-name"
+					placeholder={ langs.Translate(ctx, langs.STR_NAME) }
+				/>
+			</div>
+		</div>
+	</form>
 	@templ.JSFuncCall("addItem")
 }
 
 templ EntryEdit(name string) {
 	@TemplateTitle(langs.Translate(ctx, langs.STR_EDIT_ENTRY), "/shopping_list")
-
-    <form method="POST">
-		<input name="name" value={ name } required> <br>
+	<form method="POST">
+		<input name="name" value={ name } required/>
+		<br/>
 		<button class="icon-text">
 			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
 		</button>
-    </form>
+	</form>
 }

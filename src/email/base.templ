@@ -11,28 +11,25 @@ templ Base(subject string, content string, username string, link string, newslet
 			<td style="font-size: 1.3em">
 				<main>
 					<h2>{ subject }</h2>
-
 					<p>
 						{ langs.TranslateArg(ctx, langs.STR_GOOD_MORNING, username) }
-						<br><br>
-
+						<br/>
+						<br/>
 						@templ.Raw(content)
 						if link != "" {
 							@Button(link)
 						}
-
-						<br><br><br>
+						<br/>
+						<br/>
+						<br/>
 						{ langs.Translate(ctx, langs.STR_REGARDS) },
-						<br>
+						<br/>
 						CucinAssistant
 					</p>
 				</main>
-
-				<hr width="700">
-
+				<hr width="700"/>
 				<small>
 					{ langs.Translate(ctx, langs.STR_NOREPLY) }
-
 					if newsletter {
 						{{ url := configs.BaseURL + "/user/change_email_settings" }}
 						{ langs.Translate(ctx, langs.STR_UNSUBSCRIBE) }
