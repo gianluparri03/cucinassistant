@@ -24,13 +24,13 @@ templ Menus(menus []database.Menu) {
 		for _, menu := range menus {
 			{{ baseurl := "/menus/" + strconv.Itoa(menu.MID) }}
 			<button hx-get={ baseurl }>
-                <i class="fas fa-utensils"></i>
+                <i class="ph ph-fork-knife"></i>
 				<span>{ menu.Name }</span>
             </button>
 		}
 
         <button hx-get="/menus/new" class="transparent">
-            <i class="fas fa-plus"></i>
+            <i class="ph ph-plus"></i>
             <span>{ langs.Translate(ctx, langs.STR_NEW_MENU) }</span>
         </button>
     </div>
@@ -44,7 +44,7 @@ templ MenusNew() {
 		<input type="text" name="name" required> <br>
 
 		<button class="icon-text">
-			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
+			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
 		</button>
     </form>
 }
@@ -54,13 +54,13 @@ templ Menu(menu database.Menu) {
 	@TemplateTitle(menu.Name, "/menus")
 
 	<button class="icon-text" hx-get={ baseurl + "/edit" }>
-		<i class="fas fa-edit"></i> { langs.Translate(ctx, langs.STR_EDIT) }
+		<i class="ph ph-note-pencil"></i> { langs.Translate(ctx, langs.STR_EDIT) }
 	</button>
 	<button class="icon-text" hx-post={ baseurl + "/duplicate" }>
-		<i class="fas fa-clone"></i> { langs.Translate(ctx, langs.STR_CLONE) }
+		<i class="ph ph-copy"></i> { langs.Translate(ctx, langs.STR_CLONE) }
 	</button>
 	<button class="icon-text" onclick="window.print();">
-		<i class="fas fa-print"></i> { langs.Translate(ctx, langs.STR_PRINT) }
+		<i class="ph ph-printer"></i> { langs.Translate(ctx, langs.STR_PRINT) }
 	</button>
 
 
@@ -96,7 +96,7 @@ templ MenuEdit(menu database.Menu) {
 		}
 
 		<button class="icon-text">
-			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
+			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
 		</button>
     </form> <br>
 
@@ -104,13 +104,13 @@ templ MenuEdit(menu database.Menu) {
 
     <div class="pre-swap">
 		<button class="icon-text" onclick="swapContent()">
-			<i class="fas fa-trash"></i> { langs.Translate(ctx, langs.STR_DELETE) }
+			<i class="ph ph-trash"></i> { langs.Translate(ctx, langs.STR_DELETE) }
 		</button>
     </div>
     <div class="post-swap hidden">
         { langs.Translate(ctx, langs.STR_DELETE_MENU_TEXT) } <br>
 		<button class="icon-text" hx-post={ baseurl + "/delete" } hx-push-url="false">
-            <i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
+            <i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
         </button>
     </div>
 }

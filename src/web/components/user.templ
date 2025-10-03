@@ -13,7 +13,7 @@ templ UserChangeEmail(current string) {
         <input type="email" name="email-new" value={ current } required> <br>
 
 		<button class="icon-text">
-			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
+			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
 		</button>
     </form>
 }
@@ -39,7 +39,7 @@ templ UserChangeEmailSettings(user *database.User, available map[string]*langs.L
 		<br> <br>
 
 		<button class="icon-text">
-			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
+			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
 		</button>
     </form>
 }
@@ -58,7 +58,7 @@ templ UserChangePassword() {
         <input type="password" id="password-2" required> <br>
 
 		<button class="icon-text">
-			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
+			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
 		</button>
     </form>
 }
@@ -71,7 +71,7 @@ templ UserChangeUsername(current string) {
         <input name="username-new" value={ current } required> <br>
 
 		<button class="icon-text">
-			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
+			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
 		</button>
     </form>
 }
@@ -83,14 +83,14 @@ templ UserDelete(isWarning bool, token string) {
         <form method="POST">
             { langs.Translate(ctx, langs.STR_DELETE_USER_TEXT1) } <br><br>
 			<button class="icon-text">
-				<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
+				<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
 			</button>
         </form>
     } else { 
         <div class="pre-swap">
             { langs.Translate(ctx, langs.STR_DELETE_USER_TEXT1) } <br><br>
             <button class="icon-text" onclick="swapContent()">
-                <i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
+                <i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
             </button>
         </div>
 
@@ -98,7 +98,7 @@ templ UserDelete(isWarning bool, token string) {
             { langs.Translate(ctx, langs.STR_DELETE_USER_TEXT2) } <br><br>
             <input name="token" value={ token } hidden>
 			<button class="icon-text">
-				<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
+				<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
 			</button>
         </form>
     }
@@ -112,7 +112,7 @@ templ UserForgotPassword() {
         <input type="email" name="email" required> <br>
 
 		<button class="icon-text">
-			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
+			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
 		</button>
     </form>
 }
@@ -133,7 +133,7 @@ templ UserResetPassword(token string) {
         <input type="password" id="password-2" required> <br>
 
 		<button class="icon-text">
-			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
+			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
 		</button>
     </form>
 }
@@ -143,38 +143,38 @@ templ UserSettings(supportEmail string) {
 
     <div class="dashboard">
         <button hx-post="/user/signout">
-            <i class="fas fa-sign-out-alt"></i>
+            <i class="ph ph-sign-out"></i>
             <span>{ langs.Translate(ctx, langs.STR_LOGOUT) }</span>
         </button>
 
         <button hx-get="/user/change_username">
-            <i class="fas fa-user"></i>
+            <i class="ph ph-user"></i>
             <span>{ langs.Translate(ctx, langs.STR_CHANGE_USERNAME) }</span>
         </button>
 
         <button hx-get="/user/change_email">
-            <i class="fas fa-envelope"></i>
+            <i class="ph ph-envelope"></i>
             <span>{ langs.Translate(ctx, langs.STR_CHANGE_EMAIL) }</span>
         </button>
 
         <button hx-get="/user/change_email_settings">
-            <i class="fas fa-mail-bulk"></i>
+            <i class="ph ph-newspaper"></i>
             <span>{ langs.Translate(ctx, langs.STR_EMAIL_SETTINGS) }</span>
         </button>
 
         <button hx-get="/user/change_password">
-            <i class="fas fa-key"></i>
+            <i class="ph ph-key"></i>
             <span>{ langs.Translate(ctx, langs.STR_CHANGE_PASSWORD) }</span>
         </button>
 
         <button hx-get="/user/delete_1">
-            <i class="fas fa-trash"></i>
+            <i class="ph ph-trash"></i>
             <span>{ langs.Translate(ctx, langs.STR_DELETE_USER) }</span>
         </button>
 
 		if supportEmail != "" {
 			<button onclick={ templ.JSFuncCall("window.open", "mailto:" + supportEmail) } class="transparent">
-				<i class="fas fa-question-circle"></i>
+				<i class="ph ph-lifebuoy"></i>
 				<span>{ langs.Translate(ctx, langs.STR_SUPPORT) }</span>
 			</button>
 		}
@@ -192,7 +192,7 @@ templ UserSignIn() {
         <input type="password" name="password" id="password" required> <br>
 
         <button class="icon-text">
-			<i class="fas fa-sign-in-alt"></i> { langs.Translate(ctx, langs.STR_SIGNIN) }
+			<i class="ph ph-sign-in"></i> { langs.Translate(ctx, langs.STR_SIGNIN) }
 		</button> <br>
 
         <a hx-get="/user/forgot_password">
@@ -221,7 +221,7 @@ templ UserSignUp() {
         <input type="password" id="password-2" required> <br>
 
         <button class="icon-text">
-			<i class="fas fa-user-plus"></i> { langs.Translate(ctx, langs.STR_SIGNUP) }
+			<i class="ph ph-user-plus"></i> { langs.Translate(ctx, langs.STR_SIGNUP) }
 		</button> <br>
 
         <a hx-get="/user/signin">

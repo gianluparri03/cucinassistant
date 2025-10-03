@@ -21,18 +21,16 @@ templ TemplateBase(lang string, body templ.Component, message templ.Component, t
 
             <link rel="manifest" href="/assets/manifest.json">
 
-            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inclusive+Sans&family=Satisfy&display=swap" crossorigin="anonymous">
-            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.css" crossorigin="anonymous">
+            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inclusive+Sans&family=Satisfy&display=swap">
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.css">
+            <link rel="stylesheet" href="/assets/phosphor.css">
             <link rel="stylesheet" href="/assets/sakura.css">
             <link rel="stylesheet" href="/assets/style.css">
 
-            <script src="https://unpkg.com/htmx.org@2.0.0" crossorigin="anonymous"></script>
-            <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/response-targets.js" crossorigin="anonymous"></script>
-            <script src="https://kit.fontawesome.com/ca194095ec.js" crossorigin="anonymous"></script>
-            <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" crossorigin="anonymous"></script>
-            <script src="/assets/scripts.js" crossorigin="anonymous"></script>
-
-            <script> navigator.serviceWorker.getRegistrations().then(rs => { for (const r of rs) { r.unregister(); } }); </script>
+            <script src="https://unpkg.com/htmx.org@2.0.0"></script>
+            <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/response-targets.js"></script>
+            <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"></script>
+            <script src="/assets/scripts.js"></script>
         </head>
 
         <body
@@ -43,9 +41,9 @@ templ TemplateBase(lang string, body templ.Component, message templ.Component, t
             hx-target="#body-container"
         >
             <nav>
-                <span><i id="home" class="fas fa-home" hx-get="/"></i></span>
+                <span><i id="home" class="ph ph-house" hx-get="/"></i></span>
                 <span id="logo">CucinAssistant</span>
-                <span><i id="lang" class="fas fa-language" hx-get="/lang"></i></span>
+                <span><i id="lang" class="ph ph-translate" hx-get="/lang"></i></span>
             </nav>
 
             <main>
@@ -71,7 +69,7 @@ templ TemplateBase(lang string, body templ.Component, message templ.Component, t
 
 templ TemplateTitle(title string, backLink string) {
     <h1>
-		<i id="back" class="fas fa-arrow-circle-left" hx-get={ backLink }></i>
+		<i id="back" class="ph-fill ph-arrow-circle-left" hx-get={ backLink }></i>
 
         { title }
     </h1>
@@ -95,7 +93,7 @@ templ TemplateMessage(msg langs.String, backLink string, isHx bool) {
                     hx-push-url="true"
                     autofocus>
 
-                    <i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_OK) }
+                    <i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_OK) }
                 </button>
             </div>
         </div>

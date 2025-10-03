@@ -11,23 +11,23 @@ templ Storage(sections []database.Section) {
     @TemplateTitle(langs.Translate(ctx, langs.STR_STORAGE), "/")
 
     <button class="icon-text" hx-get="/storage/0">
-		<i class="fas fa-box"></i> { langs.Translate(ctx, langs.STR_ALL_ARTICLES) }
+		<i class="ph ph-package"></i> { langs.Translate(ctx, langs.STR_ALL_ARTICLES) }
 	</button>
 
 	<button class="icon-text" hx-get="/storage/0/add">
-		<i class="fas fa-plus"></i> { langs.Translate(ctx, langs.STR_ADD_ARTICLES) }
+		<i class="ph ph-plus"></i> { langs.Translate(ctx, langs.STR_ADD_ARTICLES) }
 	</button>
 
     <div class="dashboard">
 		for _, section := range sections {
 			<button hx-get={ "/storage/" + strconv.Itoa(section.SID) }>
-                <i class="fas fa-box"></i>
+                <i class="ph ph-package"></i>
 				<span>{ section.Name }</span>
             </button>
 		}
 
         <button hx-get="/storage/new" class="transparent">
-            <i class="fas fa-plus"></i>
+            <i class="ph ph-plus"></i>
             <span>{ langs.Translate(ctx, langs.STR_NEW_SECTION) }</span>
         </button>
     </div>
@@ -41,7 +41,7 @@ templ StorageNew() {
 		<input type="text" name="name" required> <br>
 
         <button class="icon-text">
-			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
+			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
 		</button>
     </form>
 }
@@ -64,15 +64,15 @@ templ StorageSection(section database.Section, search string, secNames map[int]s
 		} else {
 			if section.SID != 0 {
 				<button class="icon-text" hx-get={ baseurl + "/edit" }>
-					<i class="fas fa-edit"></i> { langs.Translate(ctx, langs.STR_EDIT_SECTION) }
+					<i class="ph ph-note-pencil"></i> { langs.Translate(ctx, langs.STR_EDIT_SECTION) }
 				</button>
 				<br>
 				<button class="icon-text" hx-get={ baseurl + "/add" }>
-					<i class="fas fa-plus"></i> { langs.Translate(ctx, langs.STR_ADD_ARTICLES) }
+					<i class="ph ph-plus"></i> { langs.Translate(ctx, langs.STR_ADD_ARTICLES) }
 				</button>
 			}
 			<button class="icon-text" hx-get={ baseurl + "/search" }>
-				<i class="fas fa-search"></i> { langs.Translate(ctx, langs.STR_SEARCH_ARTICLES) }
+				<i class="ph ph-magnifying-glass"></i> { langs.Translate(ctx, langs.STR_SEARCH_ARTICLES) }
 			</button>
         }
 
@@ -121,13 +121,13 @@ templ StorageSectionAdd(SID int, sections []database.Section) {
 
     <form method="POST">
         <button class="icon" onclick="removeItem(event);">
-			<i class="fas fa-minus"></i>
+			<i class="ph ph-minus"></i>
 		</button>
         <button class="icon" onclick="addItem(event);">
-			<i class="fas fa-plus"></i>
+			<i class="ph ph-plus"></i>
 		</button>
         <button class="icon-text">
-			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
+			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
 		</button>
 
         <div id="new-items">
@@ -188,7 +188,7 @@ templ StorageSectionEdit(section database.Section) {
     <form method="POST">
 		<input type="text" name="name" value={ section.Name } required> <br>
         <button class="icon-text">
-			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
+			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
 		</button>
     </form>
 
@@ -197,13 +197,13 @@ templ StorageSectionEdit(section database.Section) {
     <b>{ langs.Translate(ctx, langs.STR_DELETE) }</b>
     <div class="pre-swap">
         <button class="icon-text" onclick="swapContent();">
-			<i class="fas fa-trash"></i> { langs.Translate(ctx, langs.STR_DELETE) }
+			<i class="ph ph-trash"></i> { langs.Translate(ctx, langs.STR_DELETE) }
 		</button>
     </div>
     <div class="post-swap hidden">
         { langs.Translate(ctx, langs.STR_DELETE_SECTION_TEXT) } <br>
 		<button class="icon-text" hx-post={ baseurl + "/delete" } hx-push-url="false">
-            <i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
+            <i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
         </button>
     </div>
 }
@@ -215,7 +215,7 @@ templ StorageSectionSearch(target string) {
         <input name="search" required> <br>
 
         <button class="icon">
-			<i class="fas fa-search"></i>
+			<i class="ph ph-magnifying-glass"></i>
 		</button>
     </form>
 }
@@ -261,35 +261,35 @@ templ StorageArticle(SID int, article database.Article, prev int, next int, sect
 
 		if prev != 0 {
 			<button class="icon pre-swap" hx-get={ sec_url + "/" + strconv.Itoa(prev) }>
-				<i class="fas fa-chevron-left"></i>
+				<i class="ph ph-arrow-left"></i>
 			</button>
 		} else {
 			<button class="icon pre-swap" disabled>
-				<i class="fas"></i>
+				<i class="ph ph-arrow-left transparent"></i>
 			</button>
 		}
 
 		<span></span>
 
 		<button class="icon-text pre-swap" hx-post={ art_url + "/delete" } hx-push-url="false">
-            <i class="fas fa-trash"></i> { langs.Translate(ctx, langs.STR_DELETE) }
+            <i class="ph ph-trash"></i> { langs.Translate(ctx, langs.STR_DELETE) }
         </button>
 
 		<button class="icon-text post-swap hidden" hx-get={ art_url } hx-push-url="false">
-            <i class="fas fa-undo"></i> { langs.Translate(ctx, langs.STR_CANCEL) }
+            <i class="ph ph-arrow-counter-clockwise"></i> { langs.Translate(ctx, langs.STR_CANCEL) }
         </button>
 
         <button class="icon-text post-swap hidden" hx-push-url="false">
-            <i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
+            <i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
         </button>
 
 		if next != 0 {
 			<button class="icon pre-swap" hx-get={ sec_url + "/" + strconv.Itoa(next) }>
-				<i class="fas fa-chevron-right"></i>
+				<i class="ph ph-arrow-right"></i>
 			</button>
 		} else {
 			<button class="icon pre-swap" disabled>
-				<i class="fas"></i>
+				<i class="ph ph-arrow-right transparent"></i>
 			</button>
 		}
     </form>

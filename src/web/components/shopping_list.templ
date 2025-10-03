@@ -12,17 +12,17 @@ templ ShoppingList(list []database.Entry) {
 
     <div class="shopping-list">
         <button class="icon-text" hx-get="/shopping_list/append">
-            <i class="fas fa-plus"></i> { langs.Translate(ctx, langs.STR_ADD) }
+            <i class="ph ph-plus"></i> { langs.Translate(ctx, langs.STR_ADD) }
         </button>
 
 		if len(list) > 0 {
             <button class="icon-text" hx-post="/shopping_list/clear" hx-push-url="false">
-                <i class="fas fa-trash"></i> { langs.Translate(ctx, langs.STR_DELETE_SELECTED) }
+                <i class="ph ph-trash"></i> { langs.Translate(ctx, langs.STR_DELETE_SELECTED) }
             </button>
        	}
 
         <button class="icon-text" onclick="window.print();">
-			<i class="fas fa-print"></i> { langs.Translate(ctx, langs.STR_PRINT) }
+			<i class="ph ph-printer"></i> { langs.Translate(ctx, langs.STR_PRINT) }
         </button>
 
 		for _, entry := range list {
@@ -49,13 +49,13 @@ templ ShoppingListAppend() {
 
 	<form method="POST">
         <button class="icon" onclick="removeItem(event);">
-			<i class="fas fa-minus"></i>
+			<i class="ph ph-minus"></i>
 		</button>
         <button class="icon" onclick="addItem(event);">
-			<i class="fas fa-plus"></i>
+			<i class="ph ph-plus"></i>
 		</button>
 		<button class="icon-text">
-			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
+			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
 		</button>
 
         <div id="new-items">
@@ -75,7 +75,7 @@ templ EntryEdit(name string) {
     <form method="POST">
 		<input name="name" value={ name } required> <br>
 		<button class="icon-text">
-			<i class="fas fa-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
+			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
 		</button>
     </form>
 }
