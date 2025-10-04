@@ -147,12 +147,7 @@ templ StorageSectionAdd(SID int, sections []database.Section) {
 					nametemplate="article-ID-quantity"
 				/>
 				if SID == 0 {
-					<input
-						class="section"
-						onfocus="activateSectionInput(this);"
-						placeholder={ langs.Translate(ctx, langs.STR_SECTION) }
-					/>
-					<select class="section hidden" nametemplate="article-ID-section">
+					<select class="section" nametemplate="article-ID-section">
 						<option selected disabled>
 							{ langs.Translate(ctx, langs.STR_SECTION) }
 						</option>
@@ -223,25 +218,33 @@ templ StorageArticle(SID int, article database.Article, prev int, next int, sect
 			{{ classes += " expired" }}
 		}
 		<div class={ classes } onchange="swapContent();">
-			<input class="name" placeholder="Nome" value={ article.Name } name="name"/>
 			<input
+				name="name"
+				class="name"
+				placeholder={ langs.Translate(ctx, langs.STR_NAME) }
+				value={ article.Name }
+			/>
+			<input
+				name="expiration"
 				class="expiration"
-				placeholder="Scadenza"
+				placeholder={ langs.Translate(ctx, langs.STR_EXPIRATION) }
 				if article.Expiration != nil {
 					value={ article.FormatExpiration() }
+					type="date"
+				} else {
+					onfocus="activateExpirationInput(this);"
 				}
-				type="date"
-				name="expiration"
 			/>
 			<input
 				class="quantity"
-				placeholder="Quantità"
+				name="quantity"
+				placeholder={ langs.Translate(ctx, langs.STR_QUANTITY) }
 				if article.Quantity != nil {
 					value={ strconv.FormatFloat(float64(*article.Quantity), 'f', -1, 32) }
+					type="number"
+				} else {
+					onfocus="activateQuantityInput(this);"
 				}
-				type="number"
-				step="any"
-				name="quantity"
 			/>
 			<select class="section" name="section">
 				<option selected disabled>
@@ -260,7 +263,7 @@ templ StorageArticle(SID int, article database.Article, prev int, next int, sect
 			</button>
 		} else {
 			<button class="icon pre-swap" disabled>
-				<i class="ph ph-arrow-left transparent"></i>
+				<i class="ph ph-arrow-left empty-icon"></i>
 			</button>
 		}
 		<span></span>
@@ -279,7 +282,7 @@ templ StorageArticle(SID int, article database.Article, prev int, next int, sect
 			</button>
 		} else {
 			<button class="icon pre-swap" disabled>
-				<i class="ph ph-arrow-right transparent"></i>
+				<i class="ph ph-arrow-right empty-icon"></i>
 			</button>
 		}
 	</form>

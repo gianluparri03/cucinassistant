@@ -61,6 +61,7 @@ templ TemplateBase(lang string, body templ.Component, message templ.Component, t
 }
 
 templ TemplateTitle(title string, backLink string) {
+	<title>{ title }</title>
 	<h1>
 		<i id="back" class="ph-fill ph-arrow-circle-left" hx-get={ backLink }></i>
 		{ title }

@@ -91,11 +91,3 @@ function activateExpirationInput(i) {
 function activateQuantityInput(i) {
     i.type = 'number';
 } 
-
-// Converts the section input to an actual selection input
-function activateSectionInput(i) {
-    var s = i.nextElementSibling;
-    i.remove();
-    s.classList.remove('hidden');
-    s.showPicker();
-}

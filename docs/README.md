@@ -7,6 +7,7 @@
   with docker compose.
 - [history.md](history.md) contains a brief history of the project and a list
   of all the released versions.
+- [icons.md](icons.md) contains more informations about the icons.
 
 ## Additional notes
 

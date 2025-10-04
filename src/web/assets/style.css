@@ -91,7 +91,7 @@ textarea.big-text {
     display: none !important;
 }
 
-.transparent {
+.empty-icon {
     opacity: 0;
 }
 
@@ -341,6 +341,15 @@ footer a:hover {
     height: 20px;
 }
 
+.shopping-list label {
+    margin-bottom: 0px;
+    margin-left: 8px;
+}
+
+.shopping-item {
+    display: flex;
+}
+
 
 
 /* --- PAGE SPECIFIC: Menu ------ */
@@ -419,5 +428,6 @@ footer a:hover {
 /* --- PAGE SPECIFIC: Recipes --- */
 #stars {
     font-size: 1.5em;
-    letter-spacing: -50%;
+    display: flex;
+    margin-bottom: 10px;
 }

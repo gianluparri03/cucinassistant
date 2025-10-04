@@ -8,6 +8,7 @@ import (
 )
 
 templ Index(username string) {
+	<title>CucinAssistant</title>
 	<h1>{ langs.TranslateArg(ctx, langs.STR_WELCOMEBACK, username) }</h1>
 	<div class="dashboard">
 		<button hx-get="/menus">
