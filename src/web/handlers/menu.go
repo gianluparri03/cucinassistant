@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"strconv"
+	"strings"
 
 	"cucinassistant/database"
 	"cucinassistant/web/components"
@@ -30,7 +31,11 @@ func GetMenusNew(c *utils.Context) (err error) {
 func PostMenusNew(c *utils.Context) (err error) {
 	var menu database.Menu
 
-	if menu, err = c.U.Menus().New(c.R.FormValue("name")); err == nil {
+	name := c.R.FormValue("name")
+	meals, _ := strconv.Atoi(c.R.FormValue("meals"))
+	days := strings.Split(c.R.FormValue("days"), "\n")
+
+	if menu, err = c.U.Menus().New(name, days, meals); err == nil {
 		utils.Redirect(c, "/menus/"+strconv.Itoa(menu.MID)+"/edit")
 	}
 
@@ -64,18 +69,18 @@ func GetMenuEdit(c *utils.Context) (err error) {
 }
 
 func PostMenuEdit(c *utils.Context) (err error) {
-	var MID int
-	var meals [14]string
+	// var MID int
+	// var meals [14]string
 
-	if MID, err = getMID(c); err == nil {
-		for i := 0; i < 14; i++ {
-			meals[i] = c.R.FormValue("meal-" + strconv.Itoa(i))
-		}
+	// if MID, err = getMID(c); err == nil {
+	// 	for i := 0; i < 14; i++ {
+	// 		meals[i] = c.R.FormValue("meal-" + strconv.Itoa(i))
+	// 	}
 
-		if _, err = c.U.Menus().Replace(MID, c.R.FormValue("name"), meals); err == nil {
-			utils.Redirect(c, "/menus/"+strconv.Itoa(MID))
-		}
-	}
+	// 	if _, err = c.U.Menus().Replace(MID, c.R.FormValue("name"), meals); err == nil {
+	// 		utils.Redirect(c, "/menus/"+strconv.Itoa(MID))
+	// 	}
+	// }
 
 	return
 }
@@ -93,13 +98,13 @@ func PostMenuDelete(c *utils.Context) (err error) {
 }
 
 func PostMenuDuplicate(c *utils.Context) (err error) {
-	var MID int
+	// var MID int
 
-	if MID, err = getMID(c); err == nil {
-		if _, err = c.U.Menus().Duplicate(MID); err == nil {
-			utils.Redirect(c, "/menus")
-		}
-	}
+	// if MID, err = getMID(c); err == nil {
+	// 	if _, err = c.U.Menus().Duplicate(MID); err == nil {
+	// 		utils.Redirect(c, "/menus")
+	// 	}
+	// }
 
 	return
 }

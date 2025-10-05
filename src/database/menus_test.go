@@ -7,7 +7,7 @@ import (
 
 func TestMenusDelete(t *testing.T) {
 	user, _ := getTestingUser(t)
-	menu, _ := user.Menus().New("")
+	menu, _ := user.Menus().New("menu", []string{"a", "b", "c"}, 1)
 
 	otherUser, _ := getTestingUser(t)
 
@@ -50,65 +50,15 @@ func TestMenusDelete(t *testing.T) {
 	}.Run(t)
 }
 
-func TestMenusDuplicate(t *testing.T) {
-	user, _ := getTestingUser(t)
-	menu, _ := user.Menus().New("")
-	menu, _ = user.Menus().Replace(menu.MID, "name", [14]string{"a", "b", "c"})
-
-	otherUser, _ := getTestingUser(t)
-
-	type data struct {
-		User User
-		MID  int
-
-		ExpectedErr   error
-		ExpectedMenus []*Menu
-	}
-
-	testSuite[data]{
-		Target: func(t *testing.T, msg string, d data) {
-			got, err := d.User.Menus().Duplicate(d.MID)
-			if err != d.ExpectedErr {
-				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
-			}
-
-			if d.ExpectedErr == nil {
-				srcMenu, _ := d.User.Menus().GetOne(d.MID)
-				dstMenu, _ := d.User.Menus().GetOne(got.MID)
-				if srcMenu.Meals != dstMenu.Meals {
-					t.Errorf("%v, changes not saved", msg)
-				} else if !reflect.DeepEqual(dstMenu, got) {
-					t.Errorf("%v, wrong returned values", msg)
-				}
-			}
-		},
-
-		Cases: []testCase[data]{
-			{
-				"other user duplicated menu",
-				data{User: otherUser, MID: menu.MID, ExpectedErr: ERR_MENU_NOT_FOUND},
-			},
-			{
-				"duplicated unknown menu",
-				data{User: user, ExpectedErr: ERR_MENU_NOT_FOUND},
-			},
-			{
-				"",
-				data{User: user, MID: menu.MID},
-			},
-		},
-	}.Run(t)
-}
-
 func TestMenusGetAll(t *testing.T) {
 	user, _ := getTestingUser(t)
-	m1, _ := user.Menus().New("m1")
-	m2, _ := user.Menus().New("m2")
+	m1, _ := user.Menus().New("m1", []string{"d10", "d11", "d12"}, 3)
+	m2, _ := user.Menus().New("m2", []string{"d20", "d21", "d22"}, 2)
 
 	otherUser, _ := getTestingUser(t)
 
 	otherOtherUser, _ := getTestingUser(t)
-	otherOtherUser.Menus().New("m0")
+	otherOtherUser.Menus().New("m0", []string{"d02"}, 5)
 
 	type data struct {
 		User User
@@ -120,6 +70,12 @@ func TestMenusGetAll(t *testing.T) {
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
 			menus, err := d.User.Menus().GetAll()
+
+			expected := d.ExpectedMenus
+			for i, _ := range expected {
+				expected[i].Days = nil
+			}
+
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
 			} else if !reflect.DeepEqual(menus, d.ExpectedMenus) {
@@ -146,8 +102,19 @@ func TestMenusGetAll(t *testing.T) {
 
 func TestMenusGetOne(t *testing.T) {
 	user, _ := getTestingUser(t)
-	menu, _ := user.Menus().New("m")
-	menu, _ = user.Menus().Replace(menu.MID, "m", [14]string{"a", "b", "c"})
+	menu, _ := user.Menus().New("m", []string{"d0", "d1", "d2"}, 3)
+
+	meals0 := []string{"", "meal-0-1"}
+	meals1 := []string{"", "", "", "meal-1-3"}
+	meals2 := []string{"meal-2-0", ""}
+
+	user.Menus().SetMeal(menu.MID, 1, meals1)
+	user.Menus().SetMeal(menu.MID, 2, meals2)
+	user.Menus().SetMeal(menu.MID, 0, meals0)
+
+	menu.Days[1].Meals = meals1
+	menu.Days[2].Meals = meals2
+	menu.Days[0].Meals = meals0
 
 	otherUser, _ := getTestingUser(t)
 
@@ -191,23 +158,35 @@ func TestMenusNew(t *testing.T) {
 
 	type data struct {
 		User User
-		Name string
 
-		ExpectedErr  error
-		ExpectedName string
+		ExpectedErr error
 	}
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
 			name := "testMenu"
+			daysNames := []string{"day1", "day2", "day3"}
+			mealsN := 1
 
-			if m, err := d.User.Menus().New(name); err != d.ExpectedErr {
+			if m, err := d.User.Menus().New(name, daysNames, mealsN); err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
 			} else if err == nil {
-				if m.Name != name {
-					t.Errorf("%s: expected name <%s>, got <%v>", msg, name, m.Name)
-				} else if _, err = d.User.Menus().GetOne(m.MID); err != nil {
-					t.Errorf("%s: menu not saved", msg)
+				menu := Menu{
+					MID:  m.MID,
+					Name: name,
+					Days: []Day{
+						Day{Name: "day1", Position: 0, Meals: make([]string, mealsN)},
+						Day{Name: "day2", Position: 1, Meals: make([]string, mealsN)},
+						Day{Name: "day3", Position: 2, Meals: make([]string, mealsN)},
+					},
+				}
+
+				if !reflect.DeepEqual(m, menu) {
+					t.Errorf("%s: expected menu <%v>, got <%v>", msg, menu, m)
+				} else if m2, err := d.User.Menus().GetOne(m.MID); err != nil {
+					t.Errorf("%s: menu not saved (error)", msg)
+				} else if !reflect.DeepEqual(m2, menu) {
+					t.Errorf("%s: menu not saved (differ): expected <%v> got <%v>", msg, menu, m2)
 				}
 			}
 		},
@@ -225,53 +204,58 @@ func TestMenusNew(t *testing.T) {
 	}.Run(t)
 }
 
-func TestMenusReplace(t *testing.T) {
+func TestMenuSetMeal(t *testing.T) {
 	user, _ := getTestingUser(t)
-	menu, _ := user.Menus().New("oldName")
-	newName := "newName"
-	newMeals := [14]string{"a", "b", "c"}
-
-	otherUser, _ := getTestingUser(t)
+	menu, _ := user.Menus().New("test", []string{"d0", "d1", "d2"}, 3)
 
 	type data struct {
-		User     User
-		MID      int
-		NewName  string
-		NewMeals [14]string
+		User  User
+		MID   int
+		Day   int
+		Meals []string
 
 		ExpectedErr error
 	}
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			got, err := d.User.Menus().Replace(d.MID, d.NewName, d.NewMeals)
-			if err != d.ExpectedErr {
-				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
-			}
+			before, _ := d.User.Menus().GetOne(d.MID)
 
-			if d.ExpectedErr == nil {
-				menu, _ := d.User.Menus().GetOne(d.MID)
-				expected := Menu{MID: d.MID, Name: d.NewName, Meals: d.NewMeals}
-				if !reflect.DeepEqual(menu, expected) {
-					t.Errorf("%v, changes not saved", msg)
-				} else if !reflect.DeepEqual(menu, got) {
-					t.Errorf("%v, new menu badly returned", msg)
+			if err := d.User.Menus().SetMeal(d.MID, d.Day, d.Meals); err != d.ExpectedErr {
+				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
+			} else if err == nil {
+				before.Days[d.Day].Meals = d.Meals
+				got, _ := d.User.Menus().GetOne(d.MID)
+				if !reflect.DeepEqual(before, got) {
+					t.Errorf("%s: meals not saved: expected <%v> got <%v>", msg, before, got)
 				}
 			}
 		},
 
 		Cases: []testCase[data]{
 			{
-				"other user replaced menu",
-				data{User: otherUser, MID: menu.MID, NewName: newName, NewMeals: newMeals, ExpectedErr: ERR_MENU_NOT_FOUND},
+				"unknown user set meal",
+				data{User: unknownUser, ExpectedErr: ERR_USER_UNKNOWN},
 			},
 			{
-				"replaced unknown menu",
-				data{User: user, NewName: newName, NewMeals: newMeals, ExpectedErr: ERR_MENU_NOT_FOUND},
+				"set meal of unknown menu",
+				data{User: user, ExpectedErr: ERR_MENU_NOT_FOUND},
 			},
 			{
-				"",
-				data{User: user, MID: menu.MID, NewName: newName, NewMeals: newMeals},
+				"set meal of unknown day",
+				data{User: user, MID: menu.MID, Day: -1, ExpectedErr: ERR_MENU_DAY_NOT_FOUND},
+			},
+			{
+				"(mealsN=)",
+				data{User: user, MID: menu.MID, Day: 1, Meals: []string{"meal0", "meal1", "meal2"}},
+			},
+			{
+				"(mealsN<)",
+				data{User: user, MID: menu.MID, Day: 2, Meals: []string{}},
+			},
+			{
+				"(mealsN>)",
+				data{User: user, MID: menu.MID, Day: 0, Meals: []string{"meal0", "meal1", "meal2", "meal3"}},
 			},
 		},
 	}.Run(t)

@@ -7,16 +7,6 @@ import (
 	"cucinassistant/langs"
 )
 
-var days = [7]langs.String{
-	langs.STR_MONDAY,
-	langs.STR_TUESDAY,
-	langs.STR_WEDNESDAY,
-	langs.STR_THURSDAY,
-	langs.STR_FRIDAY,
-	langs.STR_SATURDAY,
-	langs.STR_SUNDAY,
-}
-
 templ Menus(menus []database.Menu) {
 	@TemplateTitle(langs.Translate(ctx, langs.STR_MENUS), "/")
 	<div class="dashboard">
@@ -37,9 +27,25 @@ templ Menus(menus []database.Menu) {
 templ MenusNew() {
 	@TemplateTitle(langs.Translate(ctx, langs.STR_NEW_MENU), "/menus")
 	<form method="POST">
-		{ langs.Translate(ctx, langs.STR_NAME) }
+		<label>{ langs.Translate(ctx, langs.STR_NAME) }</label>
 		<br/>
 		<input type="text" name="name" required/>
+		<br/>
+		<label>{ langs.Translate(ctx, langs.STR_MEALS_NUMBER) }</label>
+		<br/>
+		<input type="number" name="meals" step="1" min="0" value="2" required/>
+		<br/>
+		<label>{ langs.Translate(ctx, langs.STR_DAYS) }</label>
+		<br/>
+		<textarea name="days">
+			{ langs.Translate(ctx, langs.STR_MONDAY) }
+			{ "\n" + langs.Translate(ctx, langs.STR_TUESDAY) }
+			{ "\n" + langs.Translate(ctx, langs.STR_WEDNESDAY) }
+			{ "\n" + langs.Translate(ctx, langs.STR_THURSDAY) }
+			{ "\n" + langs.Translate(ctx, langs.STR_FRIDAY) }
+			{ "\n" + langs.Translate(ctx, langs.STR_SATURDAY) }
+			{ "\n" + langs.Translate(ctx, langs.STR_SUNDAY) }
+		</textarea>
 		<br/>
 		<button class="icon-text">
 			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
@@ -53,17 +59,18 @@ templ Menu(menu database.Menu) {
 	<button class="icon-text" hx-get={ baseurl + "/edit" }>
 		<i class="ph ph-note-pencil"></i> { langs.Translate(ctx, langs.STR_EDIT) }
 	</button>
-	<button class="icon-text" hx-post={ baseurl + "/duplicate" }>
+    <button class="icon-text" hx-post={ baseurl + "/duplicate" }>
 		<i class="ph ph-copy"></i> { langs.Translate(ctx, langs.STR_CLONE) }
 	</button>
 	<button class="icon-text" onclick="window.print();">
 		<i class="ph ph-printer"></i> { langs.Translate(ctx, langs.STR_PRINT) }
 	</button>
-	for index, day := range days {
+	for _, day := range menu.Days {
 		<div class="menu-day">
-			<b>{ langs.Translate(ctx, day) }</b>
-			<textarea readonly>{ menu.Meals[index*2+0] }</textarea>
-			<textarea readonly>{ menu.Meals[index*2+1] }</textarea>
+			<b>{ day.Name }</b>
+			for _, meal := range day.Meals {
+				<textarea readonly>{ meal }</textarea>
+			}
 		</div>
 	}
 }
@@ -75,26 +82,26 @@ templ MenuEdit(menu database.Menu) {
 		<b>{ langs.Translate(ctx, langs.STR_NAME) }</b>
 		<br/>
 		<input name="name" value={ menu.Name }/>
-		for index, day := range days {
-			<div class="menu-day">
-				<b>{ langs.Translate(ctx, day) }</b>
-				for i := 0; i < 2; i++ {
-					{{ name := "meal-" + strconv.Itoa(index*2+i) }}
-					<textarea name={ name }>
-						{ menu.Meals[index*2+i] }
-					</textarea>
-				}
-			</div>
-		}
+		<br/>
 		<button class="icon-text">
 			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
 		</button>
 	</form>
 	<br/>
-	<b>{ langs.Translate(ctx, langs.STR_DELETE_MENU) }</b>
+	<b>{ langs.Translate(ctx, langs.STR_DAYS) }</b>
+	for _, day := range menu.Days {
+		<div>
+			<button class="icon" hx-get={ baseurl + "/edit/" + strconv.Itoa(day.Position) }>
+				<i class="ph ph-note-pencil"></i>
+			</button>
+			<span>{ day.Name }</span>
+		</div>
+	}
+	<br/>
+	<b>{ langs.Translate(ctx, langs.STR_DELETE) }</b>
 	<div class="pre-swap">
 		<button class="icon-text" onclick="swapContent()">
-			<i class="ph ph-trash"></i> { langs.Translate(ctx, langs.STR_DELETE) }
+			<i class="ph ph-trash"></i> { langs.Translate(ctx, langs.STR_DELETE_MENU) }
 		</button>
 	</div>
 	<div class="post-swap hidden">

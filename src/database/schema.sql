@@ -20,13 +20,23 @@ CREATE TABLE IF NOT EXISTS menus (
     mid SERIAL NOT NULL,
 
     name VARCHAR(64) NOT NULL,
-    meals VARCHAR(4096),
 
     PRIMARY KEY (mid),
     FOREIGN KEY (uid) REFERENCES ca_users (uid) ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS menus_uid_mid ON menus (uid, mid);
+
+CREATE TABLE IF NOT EXISTS days (
+    mid INT NOT NULL,
+    position INT NOT NULL,
+
+    name VARCHAR(64) NOT NULL,
+    meals VARCHAR(512)[] NOT NULL,
+
+    PRIMARY KEY (mid, position),
+    FOREIGN KEY (mid) REFERENCES menus (mid) ON DELETE CASCADE
+);
 
 
 CREATE TABLE IF NOT EXISTS sections (

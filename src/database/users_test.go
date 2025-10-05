@@ -235,7 +235,7 @@ func TestUserDeleteUser(t *testing.T) {
 	token, _ := user.GenerateToken()
 
 	user.ShoppingList().Append("e")
-	user.Menus().New("m")
+	user.Menus().New("m", []string{"d1"}, 4)
 	section, _ := user.Storage().NewSection("s")
 	user.Storage().AddArticles(StringArticle{Name: "article", Section: strconv.Itoa(section.SID)})
 	testingArticlesN++

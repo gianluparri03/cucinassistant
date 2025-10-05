@@ -2,43 +2,10 @@ package database
 
 import (
 	"database/sql"
-	"strings"
+	"github.com/lib/pq"
 )
 
-const (
-	// mealSeparator is used to separate meals when packed
-	mealSeparator = ";"
-)
-
-// packMeals packs the 14 meals in a string
-func packMeals(meals [14]string) string {
-	var sb strings.Builder
-
-	for index, meal := range meals {
-		sb.WriteString(meal)
-
-		if index < 13 {
-			sb.WriteString(mealSeparator)
-		}
-	}
-
-	return sb.String()
-}
-
-// unpackMeals unpacks a string in an array of meals
-func unpackMeals(meals string) (out [14]string) {
-	for index, meal := range strings.Split(meals, mealSeparator) {
-		if index == 14 {
-			break
-		}
-
-		out[index] = meal
-	}
-
-	return
-}
-
-// Menu is a collection of 14 meals, from monday lunch (0) to sunday dinner (13)
+// Menu is a collection of meals, divided into days
 type Menu struct {
 	// MID is the Menu ID
 	MID int
@@ -46,8 +13,20 @@ type Menu struct {
 	// Name is the name of the menu
 	Name string
 
-	// Meals contains all the 14 meals
-	Meals [14]string
+	// Days is the list of days of which the menu is composed
+	Days []Day
+}
+
+// Day is a component of a menu, and contains a name and a list of meals
+type Day struct {
+	// Name is the day's name
+	Name string
+
+	// Position is used to identify the day
+	Position int
+
+	// Meals contains the meals of the day
+	Meals []string
 }
 
 // Menus is used to manage all the menus
@@ -75,22 +54,7 @@ func (m Menus) Delete(MID int) error {
 	return nil
 }
 
-// Duplicate creates a copy of a menu
-func (m Menus) Duplicate(MID int) (Menu, error) {
-	// Gets the source menu
-	if src, err := m.GetOne(MID); err != nil {
-		return Menu{}, err
-		// Creates a new one
-	} else if menu, err := m.New(src.Name); err != nil {
-		return Menu{}, err
-		// Copies data from the srcMenu
-	} else {
-		return m.Replace(menu.MID, src.Name, src.Meals)
-	}
-}
-
-// GetAll returns a list of menus (meals not included)
-// ordered by creation date
+// GetAll returns a list of menus (days not included) ordered by creation date
 func (m Menus) GetAll() ([]Menu, error) {
 	var menus []Menu
 
@@ -118,53 +82,98 @@ func (m Menus) GetAll() ([]Menu, error) {
 	return menus, nil
 }
 
-// GetOne returns a specific menu, with the meals
+// GetOne returns a specific menu, with days and meals
 func (m Menus) GetOne(MID int) (Menu, error) {
 	var menu Menu
-	var meals string
+	var day Day
 
 	// Scans the menu
-	err := db.QueryRow(`SELECT mid, name, meals FROM menus WHERE uid=$1 AND mid=$2;`, m.uid, MID).Scan(&menu.MID, &menu.Name, &meals)
+	err := db.QueryRow(`SELECT mid, name FROM menus WHERE uid=$1 AND mid=$2;`, m.uid, MID).Scan(&menu.MID, &menu.Name)
 	if err != nil {
 		return menu, handleNoRowsError(err, m.uid, ERR_MENU_NOT_FOUND)
 	}
 
-	// Unpacks the meals
-	menu.Meals = unpackMeals(meals)
+	// Queries the days
+	var rows *sql.Rows
+	rows, err = db.Query(`SELECT name, position, meals FROM days WHERE mid=$1 ORDER BY position;`, menu.MID)
+	if err != nil {
+		return menu, ERR_UNKNOWN
+	}
+	defer rows.Close()
+
+	// Appends the days and the meals to the menu
+	for rows.Next() {
+		err := rows.Scan(&day.Name, &day.Position, pq.Array(&day.Meals))
+		if err != nil {
+			return menu, ERR_UNKNOWN
+		}
+		menu.Days = append(menu.Days, day)
+	}
+
 	return menu, nil
 }
 
+// SetMeals is used to set a day's meals
+func (m Menus) SetMeal(MID int, day int, meals []string) error {
+	// Gets the menu
+	menu, err := m.GetOne(MID)
+	if err != nil {
+		return err
+	}
+
+	// Searches the right day
+	for _, d := range menu.Days {
+		if d.Position == day {
+			// Saves the new meals
+			_, err := db.Exec(`UPDATE days SET meals=$3 WHERE mid=$1 AND position=$2`, MID, day, pq.Array(meals))
+			if err != nil {
+				return ERR_UNKNOWN
+			}
+
+			return nil
+
+		}
+	}
+
+	return ERR_DAY_NOT_FOUND
+}
+
 // New creates a new menu
-func (m Menus) New(name string) (Menu, error) {
+func (m Menus) New(name string, daysNames []string, mealsN int) (Menu, error) {
 	// Ensures the user exists
 	if _, err := GetUser("UID", m.uid); err != nil {
 		return Menu{}, err
 	}
 
-	// Adds the new menu
+	// Ensures the number of meals is valid
+	if mealsN < 0 {
+		return Menu{}, ERR_MEALS_NEGATIVE
+	}
+
+	// Prepares the statement for the days
+	stmt, err := db.Prepare(`INSERT INTO days (mid, position, name, meals) VALUES ($1, $2, $3, $4);`)
+	if err != nil {
+		return Menu{}, ERR_UNKNOWN
+	}
+	defer stmt.Close()
+
+	// Adds the menu
 	menu := Menu{Name: name}
-	err := db.QueryRow(`INSERT INTO menus (uid, name, meals) VALUES ($1, $2, $3) RETURNING mid;`, m.uid, menu.Name, packMeals(menu.Meals)).Scan(&menu.MID)
+	err = db.QueryRow(`INSERT INTO menus (uid, name) VALUES ($1, $2) RETURNING mid;`, m.uid, name).Scan(&menu.MID)
 	if err != nil {
 		return Menu{}, ERR_UNKNOWN
 	}
 
+	// Adds the days
+	for p, n := range daysNames {
+		meals := make([]string, mealsN)
+		_, err := stmt.Exec(menu.MID, p, n, pq.Array(meals))
+		if err != nil {
+			return menu, ERR_UNKNOWN
+		}
+
+		menu.Days = append(menu.Days, Day{Name: n, Position: p, Meals: meals})
+	}
+
 	return menu, nil
-}
-
-// Replace replaces the menu's name and all of its meals
-func (m Menus) Replace(MID int, newName string, newMeals [14]string) (Menu, error) {
-	// Ensures the menu (and the user) exist
-	if _, err := m.GetOne(MID); err != nil {
-		return Menu{}, err
-	}
-
-	// Executes the query
-	_, err := db.Exec(`UPDATE menus SET name=$3, meals=$4 WHERE uid=$1 AND mid=$2;`, m.uid, MID, newName, packMeals(newMeals))
-	if err != nil {
-		err = ERR_UNKNOWN
-		return Menu{}, err
-	}
-
-	// Returns the new menu
-	return m.GetOne(MID)
 }

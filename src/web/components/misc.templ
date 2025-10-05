@@ -35,6 +35,7 @@ templ Index(username string) {
 }
 
 templ Info(data map[string]string) {
+	<title>{ langs.Translate(ctx, langs.STR_INFO) }</title>
 	<p>
 		@templ.Raw(langs.Translate(ctx, langs.STR_INFO_INTRO))
 	</p>
@@ -75,7 +76,6 @@ templ Lang(available map[string]*langs.Lang, current string) {
 				</option>
 			}
 		</select>
-		<br/>
 		<button class="icon-text">
 			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
 		</button>
