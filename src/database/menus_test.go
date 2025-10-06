@@ -100,6 +100,54 @@ func TestMenusGetAll(t *testing.T) {
 	}.Run(t)
 }
 
+func TestMenusGetDay(t *testing.T) {
+	user, _ := getTestingUser(t)
+	menu, _ := user.Menus().New("m", []string{"d0", "d1", "d2"}, 3)
+
+	meals := []string{"meal-2-0", ""}
+	user.Menus().SetDayMeals(menu.MID, 2, meals)
+	user.Menus().SetDayName(menu.MID, 2, "d2")
+	day := menu.Days[2]
+	day.Meals = meals
+
+	otherUser, _ := getTestingUser(t)
+
+	type data struct {
+		User User
+		MID  int
+		DPos int
+
+		ExpectedErr error
+		ExpectedDay Day
+	}
+
+	testSuite[data]{
+		Target: func(t *testing.T, msg string, d data) {
+			day, err := d.User.Menus().GetDay(d.MID, d.DPos)
+			if err != d.ExpectedErr {
+				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
+			} else if !reflect.DeepEqual(day, d.ExpectedDay) {
+				t.Errorf("%s: expected day <%v>, got <%v>", msg, d.ExpectedDay, day)
+			}
+		},
+
+		Cases: []testCase[data]{
+			{
+				"got data of unknown day",
+				data{User: user, ExpectedErr: ERR_MENU_NOT_FOUND},
+			},
+			{
+				"other user retrieved day",
+				data{User: otherUser, MID: menu.MID, ExpectedErr: ERR_MENU_NOT_FOUND},
+			},
+			{
+				"",
+				data{User: user, MID: menu.MID, DPos: 2, ExpectedDay: day},
+			},
+		},
+	}.Run(t)
+}
+
 func TestMenusGetOne(t *testing.T) {
 	user, _ := getTestingUser(t)
 	menu, _ := user.Menus().New("m", []string{"d0", "d1", "d2"}, 3)
@@ -108,9 +156,9 @@ func TestMenusGetOne(t *testing.T) {
 	meals1 := []string{"", "", "", "meal-1-3"}
 	meals2 := []string{"meal-2-0", ""}
 
-	user.Menus().SetMeal(menu.MID, 1, meals1)
-	user.Menus().SetMeal(menu.MID, 2, meals2)
-	user.Menus().SetMeal(menu.MID, 0, meals0)
+	user.Menus().SetDayMeals(menu.MID, 1, meals1)
+	user.Menus().SetDayMeals(menu.MID, 2, meals2)
+	user.Menus().SetDayMeals(menu.MID, 0, meals0)
 
 	menu.Days[1].Meals = meals1
 	menu.Days[2].Meals = meals2
@@ -175,9 +223,9 @@ func TestMenusNew(t *testing.T) {
 					MID:  m.MID,
 					Name: name,
 					Days: []Day{
-						Day{Name: "day1", Position: 0, Meals: make([]string, mealsN)},
-						Day{Name: "day2", Position: 1, Meals: make([]string, mealsN)},
-						Day{Name: "day3", Position: 2, Meals: make([]string, mealsN)},
+						Day{MID: m.MID, Name: "day1", Position: 0, Meals: make([]string, mealsN)},
+						Day{MID: m.MID, Name: "day2", Position: 1, Meals: make([]string, mealsN)},
+						Day{MID: m.MID, Name: "day3", Position: 2, Meals: make([]string, mealsN)},
 					},
 				}
 
@@ -204,7 +252,7 @@ func TestMenusNew(t *testing.T) {
 	}.Run(t)
 }
 
-func TestMenuSetMeal(t *testing.T) {
+func TestMenuSetDayMeals(t *testing.T) {
 	user, _ := getTestingUser(t)
 	menu, _ := user.Menus().New("test", []string{"d0", "d1", "d2"}, 3)
 
@@ -221,7 +269,7 @@ func TestMenuSetMeal(t *testing.T) {
 		Target: func(t *testing.T, msg string, d data) {
 			before, _ := d.User.Menus().GetOne(d.MID)
 
-			if err := d.User.Menus().SetMeal(d.MID, d.Day, d.Meals); err != d.ExpectedErr {
+			if err := d.User.Menus().SetDayMeals(d.MID, d.Day, d.Meals); err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
 			} else if err == nil {
 				before.Days[d.Day].Meals = d.Meals
@@ -243,7 +291,7 @@ func TestMenuSetMeal(t *testing.T) {
 			},
 			{
 				"set meal of unknown day",
-				data{User: user, MID: menu.MID, Day: -1, ExpectedErr: ERR_MENU_DAY_NOT_FOUND},
+				data{User: user, MID: menu.MID, Day: -1, ExpectedErr: ERR_DAY_NOT_FOUND},
 			},
 			{
 				"(mealsN=)",
@@ -256,6 +304,99 @@ func TestMenuSetMeal(t *testing.T) {
 			{
 				"(mealsN>)",
 				data{User: user, MID: menu.MID, Day: 0, Meals: []string{"meal0", "meal1", "meal2", "meal3"}},
+			},
+		},
+	}.Run(t)
+}
+
+func TestMenuSetDayName(t *testing.T) {
+	user, _ := getTestingUser(t)
+	menu, _ := user.Menus().New("test", []string{"d0", "d1", "d2"}, 3)
+
+	type data struct {
+		User User
+		MID  int
+		Day  int
+		Name string
+
+		ExpectedErr error
+	}
+
+	testSuite[data]{
+		Target: func(t *testing.T, msg string, d data) {
+			before, _ := d.User.Menus().GetOne(d.MID)
+
+			if err := d.User.Menus().SetDayName(d.MID, d.Day, d.Name); err != d.ExpectedErr {
+				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
+			} else if err == nil {
+				before.Days[d.Day].Name = d.Name
+				got, _ := d.User.Menus().GetOne(d.MID)
+				if !reflect.DeepEqual(before, got) {
+					t.Errorf("%s: name not saved: expected <%v> got <%v>", msg, before, got)
+				}
+			}
+		},
+
+		Cases: []testCase[data]{
+			{
+				"unknown user set day name",
+				data{User: unknownUser, ExpectedErr: ERR_USER_UNKNOWN},
+			},
+			{
+				"set day name of unknown menu",
+				data{User: user, ExpectedErr: ERR_MENU_NOT_FOUND},
+			},
+			{
+				"set name of unknown day",
+				data{User: user, MID: menu.MID, Day: -1, ExpectedErr: ERR_DAY_NOT_FOUND},
+			},
+			{
+				"",
+				data{User: user, MID: menu.MID, Day: 0, Name: "c"},
+			},
+		},
+	}.Run(t)
+}
+
+func TestMenuSetName(t *testing.T) {
+	user, _ := getTestingUser(t)
+	menu, _ := user.Menus().New("test", []string{"d0", "d1", "d2"}, 3)
+
+	type data struct {
+		User User
+		MID  int
+
+		ExpectedErr error
+	}
+
+	testSuite[data]{
+		Target: func(t *testing.T, msg string, d data) {
+			newName := "newName"
+			before, _ := d.User.Menus().GetOne(d.MID)
+
+			if err := d.User.Menus().SetName(d.MID, newName); err != d.ExpectedErr {
+				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
+			} else if err == nil {
+				before.Name = newName
+				got, _ := d.User.Menus().GetOne(d.MID)
+				if !reflect.DeepEqual(before, got) {
+					t.Errorf("%s: name not saved: expected <%v> got <%v>", msg, before, got)
+				}
+			}
+		},
+
+		Cases: []testCase[data]{
+			{
+				"unknown user set menu name",
+				data{User: unknownUser, ExpectedErr: ERR_USER_UNKNOWN},
+			},
+			{
+				"set name of unknown menu",
+				data{User: user, ExpectedErr: ERR_MENU_NOT_FOUND},
+			},
+			{
+				"",
+				data{User: user, MID: menu.MID},
 			},
 		},
 	}.Run(t)

@@ -167,6 +167,7 @@ templ StorageSectionAdd(SID int, sections []database.Section) {
 			</div>
 		</div>
 	</form>
+	@templ.JSFuncCall("setItemsCount", 0)
 	@templ.JSFuncCall("addItem")
 }
 

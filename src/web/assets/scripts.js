@@ -1,11 +1,3 @@
-// Hides the back and the home button
-function disableNavigation() {
-    $("#back").remove();
-    $("#home").css("opacity", "0");
-}
-
-
-
 // Makes sure the fields password-1 and password-2 match,
 // otherwise shows an error.
 function comparePasswords(text) {
@@ -37,27 +29,45 @@ function comparePasswords(text) {
 
 let itemsCount;
 
-// Adds the inputs for a new item
-function addItem(e) {
-    if (e) { e.preventDefault(); } else { itemsCount = 0; }
-    itemsCount++;
-
-    $('.item.hidden')
-        .clone()
-        .prependTo('#new-items')
-        .removeClass("hidden")
-        .children().each((ind, inp) => {
-            inp.name = $(inp).attr('nametemplate').replace('ID', itemsCount);
-        });
+// Sets the new value for itemsCount
+function setItemsCount(n) {
+    itemsCount = n;
 }
 
-// Removes the first item (the last on added)
+// Adds the inputs for a new item
+function addItem(e, last=false) {
+    if (e) { e.preventDefault(); }
+    itemsCount++;
+
+    var i = $('.item.hidden').clone();
+
+    if (last) {
+        i.appendTo('#new-items');
+    } else {
+        i.prependTo('#new-items');
+    }
+    
+    i.removeClass("hidden").children().each((ind, inp) => {
+        if ((tmpl = $(inp).attr('nametemplate'))) {
+            inp.name = tmpl.replace('ID', itemsCount);
+        }
+    });
+}
+
+// Removes the first item (the last one added)
 function removeItem(e) {
     if (itemsCount > 1) {
         itemsCount--;
         $('.item').first().remove();
     }
 
+    if (e) { e.preventDefault(); }
+} 
+
+// Removes the item whose button called the function.
+// It does not decrement itemsCount, so that the absolute order is preserved.
+function removeThisItem(e, t) {
+    t.parentElement.remove();
     if (e) { e.preventDefault(); }
 } 
 

@@ -368,6 +368,16 @@ footer a:hover {
     display: block;
 }
 
+.meal-edit {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.meal-edit button {
+    margin-right: 10px;
+}
+
 
 
 /* --- PAGE SPECIFIC: Storage --- */

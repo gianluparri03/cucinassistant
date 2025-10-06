@@ -66,6 +66,7 @@ templ ShoppingListAppend() {
 			</div>
 		</div>
 	</form>
+	@templ.JSFuncCall("setItemsCount", 0)
 	@templ.JSFuncCall("addItem")
 }
 
