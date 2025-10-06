@@ -26,10 +26,10 @@ func GetPublicRecipe(c *utils.Context) (err error) {
 }
 
 func PostPublicRecipeSave(c *utils.Context) (err error) {
-	var recipe database.Recipe
+	var RID int
 
-	if recipe, err = c.U.Recipes().Save(mux.Vars(c.R)["code"]); err == nil {
-		utils.Redirect(c, "/recipes/"+strconv.Itoa(recipe.RID))
+	if RID, err = c.U.Recipes().Save(mux.Vars(c.R)["code"]); err == nil {
+		utils.Redirect(c, "/recipes/"+strconv.Itoa(RID))
 	}
 
 	return
@@ -51,10 +51,10 @@ func GetRecipesNew(c *utils.Context) (err error) {
 }
 
 func PostRecipesNew(c *utils.Context) (err error) {
-	var recipe database.Recipe
+	var RID int
 
-	if recipe, err = c.U.Recipes().New(c.R.FormValue("name")); err == nil {
-		utils.Redirect(c, "/recipes/"+strconv.Itoa(recipe.RID)+"/edit")
+	if RID, err = c.U.Recipes().New(c.R.FormValue("name")); err == nil {
+		utils.Redirect(c, "/recipes/"+strconv.Itoa(RID)+"/edit")
 	}
 
 	return
@@ -99,7 +99,7 @@ func PostRecipeEdit(c *utils.Context) (err error) {
 			Notes:       c.R.FormValue("notes"),
 		}
 
-		if _, err = c.U.Recipes().Edit(RID, newData); err == nil {
+		if err = c.U.Recipes().Edit(RID, newData); err == nil {
 			utils.Redirect(c, "/recipes/"+strconv.Itoa(RID))
 		}
 	}

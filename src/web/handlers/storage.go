@@ -44,10 +44,10 @@ func GetStorageNew(c *utils.Context) (err error) {
 }
 
 func PostStorageNew(c *utils.Context) (err error) {
-	var s database.Section
+	var SID int
 
-	if s, err = c.U.Storage().NewSection(c.R.FormValue("name")); err == nil {
-		utils.Redirect(c, "/storage/"+strconv.Itoa(s.SID))
+	if SID, err = c.U.Storage().NewSection(c.R.FormValue("name")); err == nil {
+		utils.Redirect(c, "/storage/"+strconv.Itoa(SID))
 	}
 
 	return

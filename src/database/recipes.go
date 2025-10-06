@@ -60,13 +60,13 @@ func (r Recipes) Delete(RID int) error {
 }
 
 // Edit replaces all the recipes's data, except for the RID
-func (r Recipes) Edit(RID int, updated Recipe) (Recipe, error) {
+func (r Recipes) Edit(RID int, updated Recipe) error {
 	var original Recipe
 	var err error
 
 	// Ensures the recipe (and the user) exist
 	if original, err = r.GetOne(RID); err != nil {
-		return Recipe{}, err
+		return err
 	}
 
 	// Ensures the stars are correct
@@ -80,7 +80,7 @@ func (r Recipes) Edit(RID int, updated Recipe) (Recipe, error) {
 	updated.RID = RID
 	updated.Code = original.Code
 	if reflect.DeepEqual(original, updated) {
-		return original, nil
+		return nil
 	}
 
 	// Executes the query
@@ -88,13 +88,13 @@ func (r Recipes) Edit(RID int, updated Recipe) (Recipe, error) {
 		RID, updated.Name, updated.Stars, updated.Ingredients, updated.Directions, updated.Notes)
 	if err != nil {
 		if pqe, ok := err.(*pq.Error); ok && pqe.Code == "23505" {
-			return Recipe{}, ERR_RECIPE_DUPLICATED
+			return ERR_RECIPE_DUPLICATED
 		} else {
-			return Recipe{}, ERR_UNKNOWN
+			return ERR_UNKNOWN
 		}
 	}
 
-	return updated, nil
+	return nil
 }
 
 // GetAll returns a list of recipes (with only RID and Name),
@@ -154,43 +154,46 @@ func GetPublicRecipe(code string) (Recipe, error) {
 	return recipe, nil
 }
 
-// NewRecipe creates a new recipe
-func (r Recipes) New(name string) (Recipe, error) {
+// NewRecipe creates a new recipe and returns its RID
+func (r Recipes) New(name string) (int, error) {
+	var RID int
+
 	// Ensures the user exists
 	if _, err := GetUser("UID", r.uid); err != nil {
-		return Recipe{}, err
+		return RID, err
 	}
 
 	// Creates the new recipe
-	recipe := Recipe{Name: name}
-	err := db.QueryRow(`INSERT INTO recipes (uid, name) VALUES ($1, $2) RETURNING rid;`, r.uid, recipe.Name).Scan(&recipe.RID)
+	err := db.QueryRow(`INSERT INTO recipes (uid, name) VALUES ($1, $2) RETURNING rid;`, r.uid, name).Scan(&RID)
 	if err != nil {
 		if pqe, ok := err.(*pq.Error); ok && pqe.Code == "23505" {
-			return Recipe{}, ERR_RECIPE_DUPLICATED
+			return RID, ERR_RECIPE_DUPLICATED
 		} else {
-			return Recipe{}, ERR_UNKNOWN
+			return RID, ERR_UNKNOWN
 		}
 	}
 
-	return recipe, nil
+	return RID, nil
 }
 
-// Save creates a copy of a public recipe
-func (r Recipes) Save(code string) (Recipe, error) {
+// Save creates a copy of a public recipe and returns its RID
+func (r Recipes) Save(code string) (int, error) {
+	var RID int
+
 	// Gets the original
 	original, err := GetPublicRecipe(code)
 	if err != nil {
-		return Recipe{}, err
+		return RID, err
 	}
 
 	// Creates a new one
-	copied, err := r.New(original.Name)
+	copiedRID, err := r.New(original.Name)
 	if err != nil {
-		return copied, err
+		return copiedRID, err
 	}
 
 	// Saves the content
-	return r.Edit(copied.RID, original)
+	return copiedRID, r.Edit(copiedRID, original)
 }
 
 // Share creates a code for a recipe

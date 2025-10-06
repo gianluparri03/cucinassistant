@@ -24,7 +24,9 @@ func (sl ShoppingList) generate() (entry Entry) {
 }
 
 func TestShoppingListAppend(t *testing.T) {
-	user, _ := getTestingUser(t)
+	u, _ := getTestingUser(t)
+	s := u.ShoppingList()
+
 	entry1 := Entry{EID: testingEntriesN + 1, Name: "appended-1"}
 	entry2 := Entry{EID: testingEntriesN + 2, Name: "appended-2"}
 	entry3 := Entry{EID: testingEntriesN + 3, Name: "appended-3"}
@@ -34,7 +36,7 @@ func TestShoppingListAppend(t *testing.T) {
 	list := []Entry{entry1, entry2, entry3}
 
 	type data struct {
-		User  User
+		S     ShoppingList
 		Names []string
 
 		ExpectedErr  error
@@ -43,11 +45,11 @@ func TestShoppingListAppend(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			err := d.User.ShoppingList().Append(d.Names...)
+			err := d.S.Append(d.Names...)
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
 			} else {
-				list, _ := d.User.ShoppingList().GetAll()
+				list, _ := d.S.GetAll()
 				if !reflect.DeepEqual(list, d.ExpectedList) {
 					t.Errorf("%s: expected list <%v>, got <%v>", msg, d.ExpectedList, list)
 				}
@@ -57,21 +59,23 @@ func TestShoppingListAppend(t *testing.T) {
 		Cases: []testCase[data]{
 			{
 				"unknown user appended entries",
-				data{User: unknownUser, Names: names, ExpectedErr: ERR_USER_UNKNOWN},
+				data{S: unknownUser.ShoppingList(), Names: names, ExpectedErr: ERR_USER_UNKNOWN},
 			},
 			{
 				"",
-				data{User: user, Names: names, ExpectedList: list},
+				data{S: s, Names: names, ExpectedList: list},
 			},
 		},
 	}.Run(t)
 }
 
 func TestShoppingListClear(t *testing.T) {
-	user, _ := getTestingUser(t)
-	e1 := user.ShoppingList().generate()
-	e2 := user.ShoppingList().generate()
-	e3 := user.ShoppingList().generate()
+	u, _ := getTestingUser(t)
+	s := u.ShoppingList()
+
+	e1 := s.generate()
+	e2 := s.generate()
+	e3 := s.generate()
 
 	var list []Entry
 	for _, e := range []Entry{e1, e2, e3} {
@@ -80,11 +84,12 @@ func TestShoppingListClear(t *testing.T) {
 		}
 	}
 
-	otherUser, _ := getTestingUser(t)
-	otherEntry := otherUser.ShoppingList().generate()
+	otherU, _ := getTestingUser(t)
+	otherS := otherU.ShoppingList()
+	otherEntry := otherS.generate()
 
 	type data struct {
-		User User
+		S ShoppingList
 
 		ExpectedErr  error
 		ExpectedList []Entry
@@ -92,10 +97,10 @@ func TestShoppingListClear(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			if err := d.User.ShoppingList().Clear(); err != d.ExpectedErr {
+			if err := d.S.Clear(); err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
 			} else if err == nil {
-				list, _ := d.User.ShoppingList().GetAll()
+				list, _ := d.S.GetAll()
 				if !reflect.DeepEqual(list, d.ExpectedList) {
 					t.Errorf("%s: expected list <%v>, got <%v>", msg, d.ExpectedList, list)
 				}
@@ -105,30 +110,33 @@ func TestShoppingListClear(t *testing.T) {
 		Cases: []testCase[data]{
 			{
 				"unknown user cleared shopping list",
-				data{User: unknownUser, ExpectedErr: ERR_USER_UNKNOWN},
+				data{S: unknownUser.ShoppingList(), ExpectedErr: ERR_USER_UNKNOWN},
 			},
 			{
 				"",
-				data{User: user, ExpectedList: list},
+				data{S: s, ExpectedList: list},
 			},
 		},
 	}.Run(t)
 
-	list, _ = otherUser.ShoppingList().GetAll()
+	list, _ = otherS.GetAll()
 	if !reflect.DeepEqual(list, []Entry{otherEntry}) {
 		t.Errorf("cleared shopping list of everyone %v", list)
 	}
 }
 
 func TestShoppingListEdit(t *testing.T) {
-	user, _ := getTestingUser(t)
-	entry1 := user.ShoppingList().generate()
-	entry2 := user.ShoppingList().generate()
+	u, _ := getTestingUser(t)
+	s := u.ShoppingList()
 
-	otherUser, _ := getTestingUser(t)
+	entry1 := s.generate()
+	entry2 := s.generate()
+
+	otherU, _ := getTestingUser(t)
+	otherS := otherU.ShoppingList()
 
 	type data struct {
-		User    User
+		S       ShoppingList
 		EID     int
 		NewName string
 
@@ -137,11 +145,11 @@ func TestShoppingListEdit(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			err := d.User.ShoppingList().Edit(d.EID, d.NewName)
+			err := d.S.Edit(d.EID, d.NewName)
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
 			} else if err == nil {
-				entry, _ := d.User.ShoppingList().GetOne(d.EID)
+				entry, _ := d.S.GetOne(d.EID)
 				if entry.Name != d.NewName {
 					t.Errorf("%s: name not changed", msg)
 				}
@@ -151,42 +159,45 @@ func TestShoppingListEdit(t *testing.T) {
 		Cases: []testCase[data]{
 			{
 				"other user edited entry",
-				data{User: otherUser, EID: entry1.EID, NewName: entry1.Name + "+", ExpectedErr: ERR_ENTRY_NOT_FOUND},
+				data{S: otherS, EID: entry1.EID, NewName: entry1.Name + "+", ExpectedErr: ERR_ENTRY_NOT_FOUND},
 			},
 			{
 				"edited unknown entry",
-				data{User: user, NewName: entry1.Name + "+", ExpectedErr: ERR_ENTRY_NOT_FOUND},
+				data{S: s, NewName: entry1.Name + "+", ExpectedErr: ERR_ENTRY_NOT_FOUND},
 			},
 			{
 				"duplicated entry",
-				data{User: user, EID: entry1.EID, NewName: entry2.Name, ExpectedErr: ERR_ENTRY_DUPLICATED},
+				data{S: s, EID: entry1.EID, NewName: entry2.Name, ExpectedErr: ERR_ENTRY_DUPLICATED},
 			},
 			{
 				"(same)",
-				data{User: user, EID: entry1.EID, NewName: entry1.Name},
+				data{S: s, EID: entry1.EID, NewName: entry1.Name},
 			},
 			{
 				"(different)",
-				data{User: user, EID: entry1.EID, NewName: entry1.Name + "+"},
+				data{S: s, EID: entry1.EID, NewName: entry1.Name + "+"},
 			},
 		},
 	}.Run(t)
 }
 
 func TestShoppingListGetAll(t *testing.T) {
-	user, _ := getTestingUser(t)
-	entry1 := user.ShoppingList().generate()
-	entry2 := user.ShoppingList().generate()
-	entry3 := user.ShoppingList().generate()
+	u, _ := getTestingUser(t)
+	s := u.ShoppingList()
+
+	entry1 := s.generate()
+	entry2 := s.generate()
+	entry3 := s.generate()
 	list := []Entry{entry1, entry2, entry3}
 
-	otherUser, _ := getTestingUser(t)
+	otherU, _ := getTestingUser(t)
+	otherS := otherU.ShoppingList()
 
 	otherOtherUser, _ := getTestingUser(t)
 	otherOtherUser.ShoppingList().generate()
 
 	type data struct {
-		User User
+		S ShoppingList
 
 		ExpectedErr  error
 		ExpectedList []Entry
@@ -194,7 +205,7 @@ func TestShoppingListGetAll(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			list, err := d.User.ShoppingList().GetAll()
+			list, err := d.S.GetAll()
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
 			} else if !reflect.DeepEqual(list, d.ExpectedList) {
@@ -205,30 +216,33 @@ func TestShoppingListGetAll(t *testing.T) {
 		Cases: []testCase[data]{
 			{
 				"got entries of unknown user",
-				data{User: unknownUser, ExpectedErr: ERR_USER_UNKNOWN},
+				data{S: unknownUser.ShoppingList(), ExpectedErr: ERR_USER_UNKNOWN},
 			},
 			{
 				"(empty)",
-				data{User: otherUser},
+				data{S: otherS},
 			},
 			{
 				"(filled)",
-				data{User: user, ExpectedList: list},
+				data{S: s, ExpectedList: list},
 			},
 		},
 	}.Run(t)
 }
 
 func TestShoppingListGetOne(t *testing.T) {
-	user, _ := getTestingUser(t)
-	entry1 := user.ShoppingList().generate()
-	entry2 := user.ShoppingList().generate()
+	u, _ := getTestingUser(t)
+	s := u.ShoppingList()
 
-	otherUser, _ := getTestingUser(t)
+	entry1 := s.generate()
+	entry2 := s.generate()
+
+	otherU, _ := getTestingUser(t)
+	otherS := otherU.ShoppingList()
 
 	type data struct {
-		User User
-		EID  int
+		S   ShoppingList
+		EID int
 
 		ExpectedErr   error
 		ExpectedEntry Entry
@@ -236,7 +250,7 @@ func TestShoppingListGetOne(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			entry, err := d.User.ShoppingList().GetOne(d.EID)
+			entry, err := d.S.GetOne(d.EID)
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
 			} else if !reflect.DeepEqual(entry, d.ExpectedEntry) {
@@ -247,34 +261,37 @@ func TestShoppingListGetOne(t *testing.T) {
 		Cases: []testCase[data]{
 			{
 				"other user retrieved entry",
-				data{User: otherUser, EID: entry1.EID, ExpectedErr: ERR_ENTRY_NOT_FOUND},
+				data{S: otherS, EID: entry1.EID, ExpectedErr: ERR_ENTRY_NOT_FOUND},
 			},
 			{
 				"got data of unknown entry",
-				data{User: user, ExpectedErr: ERR_ENTRY_NOT_FOUND},
+				data{S: s, ExpectedErr: ERR_ENTRY_NOT_FOUND},
 			},
 			{
 				"(marked)",
-				data{User: user, EID: entry1.EID, ExpectedEntry: entry1},
+				data{S: s, EID: entry1.EID, ExpectedEntry: entry1},
 			},
 			{
 				"(unmarked)",
-				data{User: user, EID: entry2.EID, ExpectedEntry: entry2},
+				data{S: s, EID: entry2.EID, ExpectedEntry: entry2},
 			},
 		},
 	}.Run(t)
 }
 
 func TestShoppingListToggle(t *testing.T) {
-	user, _ := getTestingUser(t)
-	entry := user.ShoppingList().generate()
+	u, _ := getTestingUser(t)
+	s := u.ShoppingList()
+
+	entry := s.generate()
 	before := entry.Marked
 
-	otherUser, _ := getTestingUser(t)
+	otherU, _ := getTestingUser(t)
+	otherS := otherU.ShoppingList()
 
 	type data struct {
-		User User
-		EID  int
+		S   ShoppingList
+		EID int
 
 		ExpectedErr    error
 		ExpectedStatus bool
@@ -282,11 +299,11 @@ func TestShoppingListToggle(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			err := d.User.ShoppingList().Toggle(d.EID)
+			err := d.S.Toggle(d.EID)
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
 			} else if err == nil {
-				entry, _ := d.User.ShoppingList().GetOne(d.EID)
+				entry, _ := d.S.GetOne(d.EID)
 				if entry.Marked != d.ExpectedStatus {
 					t.Errorf("%s: expected status <%v>, got <%v>", msg, d.ExpectedStatus, entry.Marked)
 				}
@@ -296,19 +313,19 @@ func TestShoppingListToggle(t *testing.T) {
 		Cases: []testCase[data]{
 			{
 				"other user toggled entry",
-				data{User: otherUser, EID: entry.EID, ExpectedErr: ERR_ENTRY_NOT_FOUND},
+				data{S: otherS, EID: entry.EID, ExpectedErr: ERR_ENTRY_NOT_FOUND},
 			},
 			{
 				"toggled unknown entry",
-				data{User: user, ExpectedErr: ERR_ENTRY_NOT_FOUND},
+				data{S: s, ExpectedErr: ERR_ENTRY_NOT_FOUND},
 			},
 			{
 				"(first time)",
-				data{User: user, EID: entry.EID, ExpectedStatus: !before},
+				data{S: s, EID: entry.EID, ExpectedStatus: !before},
 			},
 			{
 				"(second time)",
-				data{User: user, EID: entry.EID, ExpectedStatus: before},
+				data{S: s, EID: entry.EID, ExpectedStatus: before},
 			},
 		},
 	}.Run(t)

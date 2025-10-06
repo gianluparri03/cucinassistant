@@ -429,26 +429,27 @@ func (s Storage) GetSections() ([]Section, error) {
 	return sections, nil
 }
 
-// NewSection tries to create a new section
-func (s Storage) NewSection(name string) (Section, error) {
+// NewSection tries to create a new section and returns its SID
+func (s Storage) NewSection(name string) (int, error) {
+	var SID int
+
 	// Ensures the user exists
 	if _, err := GetUser("UID", s.uid); err != nil {
-		return Section{}, err
+		return SID, err
 	}
 
 	// Checks if the name is used
 	var found bool
 	db.QueryRow(`SELECT 1 FROM sections WHERE uid=$1 AND name=$2;`, s.uid, name).Scan(&found)
 	if found {
-		return Section{}, ERR_SECTION_DUPLICATED
+		return SID, ERR_SECTION_DUPLICATED
 	}
 
 	// Tries to save it in the database
-	section := Section{Name: name}
-	err := db.QueryRow(`INSERT INTO sections (uid, name) VALUES ($1, $2) RETURNING sid;`, s.uid, name).Scan(&section.SID)
+	err := db.QueryRow(`INSERT INTO sections (uid, name) VALUES ($1, $2) RETURNING sid;`, s.uid, name).Scan(&SID)
 	if err != nil {
-		return Section{}, ERR_UNKNOWN
+		return SID, ERR_UNKNOWN
 	}
 
-	return section, nil
+	return SID, nil
 }

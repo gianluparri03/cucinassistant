@@ -6,14 +6,18 @@ import (
 )
 
 func TestRecipesDelete(t *testing.T) {
-	user, _ := getTestingUser(t)
-	recipe, _ := user.Recipes().New("")
+	u, _ := getTestingUser(t)
+	r := u.Recipes()
 
-	otherUser, _ := getTestingUser(t)
+	RID, _ := r.New("")
+	recipe, _ := r.GetOne(RID)
+
+	otherU, _ := getTestingUser(t)
+	otherR := otherU.Recipes()
 
 	type data struct {
-		User User
-		RID  int
+		R   Recipes
+		RID int
 
 		ExpectedErr error
 		ShouldExist bool
@@ -21,11 +25,11 @@ func TestRecipesDelete(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			if err := d.User.Recipes().Delete(d.RID); err != d.ExpectedErr {
+			if err := d.R.Delete(d.RID); err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
 			}
 
-			recipe, _ = user.Recipes().GetOne(d.RID)
+			recipe, _ = r.GetOne(d.RID)
 			if !d.ShouldExist && recipe.RID != 0 {
 				t.Errorf("%s, recipe wasn't deleted", msg)
 			} else if d.ShouldExist && recipe.RID == 0 {
@@ -36,36 +40,38 @@ func TestRecipesDelete(t *testing.T) {
 		Cases: []testCase[data]{
 			{
 				"deleted unknown recipe",
-				data{User: user, ExpectedErr: ERR_RECIPE_NOT_FOUND},
+				data{R: r, ExpectedErr: ERR_RECIPE_NOT_FOUND},
 			},
 			{
 				"other user deleted recipe",
-				data{User: otherUser, RID: recipe.RID, ExpectedErr: ERR_RECIPE_NOT_FOUND, ShouldExist: true},
+				data{R: otherR, RID: RID, ExpectedErr: ERR_RECIPE_NOT_FOUND, ShouldExist: true},
 			},
 			{
 				"",
-				data{User: user, RID: recipe.RID},
+				data{R: r, RID: RID},
 			},
 		},
 	}.Run(t)
 }
 
 func TestRecipesEdit(t *testing.T) {
-	user, _ := getTestingUser(t)
-	recipe, _ := user.Recipes().New("oldName")
-	user.Recipes().New("takenName")
+	u, _ := getTestingUser(t)
+	r := u.Recipes()
 
-	newDataSameName := Recipe{RID: recipe.RID, Name: "oldName"}
-	newDataTakenName := Recipe{RID: recipe.RID, Name: "takenName"}
-	newData := Recipe{RID: recipe.RID, Name: "newName", Stars: 4, Ingredients: "flour", Directions: "Mix", Notes: "-"}
+	RID, _ := r.New("oldName")
+	r.New("takenName")
 
-	otherUser, _ := getTestingUser(t)
-	otherUser.Recipes().New("newName")
+	newDataSameName := Recipe{RID: RID, Name: "oldName"}
+	newDataTakenName := Recipe{RID: RID, Name: "takenName"}
+	newData := Recipe{RID: RID, Name: "newName", Stars: 4, Ingredients: "flour", Directions: "Mix", Notes: "-"}
+
+	otherU, _ := getTestingUser(t)
+	otherR := otherU.Recipes()
+	otherR.New("newName")
 
 	type data struct {
-		User User
-		RID  int
-
+		R       Recipes
+		RID     int
 		NewData Recipe
 
 		ExpectedErr error
@@ -73,15 +79,17 @@ func TestRecipesEdit(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			got, err := d.User.Recipes().Edit(d.RID, d.NewData)
+			err := d.R.Edit(d.RID, d.NewData)
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
 			}
 
+			got, _ := d.R.GetOne(d.RID)
+
 			if d.ExpectedErr == nil {
 				if !reflect.DeepEqual(got, d.NewData) {
 					t.Errorf("%s: expected <%v>, got <%v>", msg, d.NewData, got)
-				} else if r, _ := d.User.Recipes().GetOne(d.RID); !reflect.DeepEqual(r, got) {
+				} else if r, _ := d.R.GetOne(d.RID); !reflect.DeepEqual(r, got) {
 					t.Errorf("%v, changes not saved", msg)
 				}
 			}
@@ -90,43 +98,50 @@ func TestRecipesEdit(t *testing.T) {
 		Cases: []testCase[data]{
 			{
 				"other user edited recipe",
-				data{User: otherUser, RID: recipe.RID, ExpectedErr: ERR_RECIPE_NOT_FOUND},
+				data{R: otherR, RID: RID, ExpectedErr: ERR_RECIPE_NOT_FOUND},
 			},
 			{
 				"replaced unknown recipe",
-				data{User: user, ExpectedErr: ERR_RECIPE_NOT_FOUND},
+				data{R: r, ExpectedErr: ERR_RECIPE_NOT_FOUND},
 			},
 			{
 				"(same name)",
-				data{User: user, RID: recipe.RID, NewData: newDataSameName},
+				data{R: r, RID: RID, NewData: newDataSameName},
 			},
 			{
 				"(taken name)",
-				data{User: user, RID: recipe.RID, NewData: newDataTakenName, ExpectedErr: ERR_RECIPE_DUPLICATED},
+				data{R: r, RID: RID, NewData: newDataTakenName, ExpectedErr: ERR_RECIPE_DUPLICATED},
 			},
 			{
 				"",
-				data{User: user, RID: recipe.RID, NewData: newData},
+				data{R: r, RID: RID, NewData: newData},
 			},
 		},
 	}.Run(t)
 }
 
 func TestRecipesGetAll(t *testing.T) {
-	user, _ := getTestingUser(t)
-	r1, _ := user.Recipes().New("r1")
-	r2, _ := user.Recipes().New("r2")
-	user.Recipes().Edit(r1.RID, Recipe{
+	u, _ := getTestingUser(t)
+	r := u.Recipes()
+
+	RID1, _ := r.New("r1")
+	recipe1, _ := r.GetOne(RID1)
+	r.Edit(RID1, Recipe{
 		Name: "r1", Stars: 4, Ingredients: "flour", Directions: "Mix", Notes: "-",
 	})
 
-	userWithoutRecipes, _ := getTestingUser(t)
+	RID2, _ := r.New("r2")
+	recipe2, _ := r.GetOne(RID2)
 
-	userWithRecipies, _ := getTestingUser(t)
-	userWithRecipies.Recipes().New("r")
+	uWithout, _ := getTestingUser(t)
+	rWithout := uWithout.Recipes()
+
+	uWith, _ := getTestingUser(t)
+	rWith := uWith.Recipes()
+	rWith.New("r")
 
 	type data struct {
-		User User
+		R Recipes
 
 		ExpectedErr     error
 		ExpectedRecipes []Recipe
@@ -134,7 +149,7 @@ func TestRecipesGetAll(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			recipes, err := d.User.Recipes().GetAll()
+			recipes, err := d.R.GetAll()
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
 			} else if !reflect.DeepEqual(recipes, d.ExpectedRecipes) {
@@ -144,33 +159,37 @@ func TestRecipesGetAll(t *testing.T) {
 
 		Cases: []testCase[data]{
 			{
-				"got recipies of unknown user",
-				data{User: unknownUser, ExpectedErr: ERR_USER_UNKNOWN},
+				"got recipes of unknown user",
+				data{R: unknownUser.Recipes(), ExpectedErr: ERR_USER_UNKNOWN},
 			},
 			{
-				"(no recipies)",
-				data{User: userWithoutRecipes},
+				"(no recipes)",
+				data{R: rWithout},
 			},
 			{
-				"(some recipies)",
-				data{User: user, ExpectedRecipes: []Recipe{r1, r2}},
+				"(some recipes)",
+				data{R: r, ExpectedRecipes: []Recipe{recipe1, recipe2}},
 			},
 		},
 	}.Run(t)
 }
 
 func TestRecipesGetOne(t *testing.T) {
-	user, _ := getTestingUser(t)
-	recipe, _ := user.Recipes().New("r")
-	recipe, _ = user.Recipes().Edit(recipe.RID, Recipe{
+	u, _ := getTestingUser(t)
+	r := u.Recipes()
+
+	RID, _ := r.New("r")
+	r.Edit(RID, Recipe{
 		Name: "newName", Stars: 4, Ingredients: "flour", Directions: "Mix", Notes: "-",
 	})
+	recipe, _ := r.GetOne(RID)
 
-	otherUser, _ := getTestingUser(t)
+	otherU, _ := getTestingUser(t)
+	otherR := otherU.Recipes()
 
 	type data struct {
-		User User
-		RID  int
+		R   Recipes
+		RID int
 
 		ExpectedErr    error
 		ExpectedRecipe Recipe
@@ -178,7 +197,7 @@ func TestRecipesGetOne(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			recipe, err := d.User.Recipes().GetOne(d.RID)
+			recipe, err := d.R.GetOne(d.RID)
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
 			} else if !reflect.DeepEqual(recipe, d.ExpectedRecipe) {
@@ -189,28 +208,30 @@ func TestRecipesGetOne(t *testing.T) {
 		Cases: []testCase[data]{
 			{
 				"got data of unkown recipe",
-				data{User: user, ExpectedErr: ERR_RECIPE_NOT_FOUND},
+				data{R: r, ExpectedErr: ERR_RECIPE_NOT_FOUND},
 			},
 			{
 				"other user retrieved recipe",
-				data{User: otherUser, RID: recipe.RID, ExpectedErr: ERR_RECIPE_NOT_FOUND},
+				data{R: otherR, RID: RID, ExpectedErr: ERR_RECIPE_NOT_FOUND},
 			},
 			{
 				"",
-				data{User: user, RID: recipe.RID, ExpectedRecipe: recipe},
+				data{R: r, RID: RID, ExpectedRecipe: recipe},
 			},
 		},
 	}.Run(t)
 }
 
 func TestRecipesGetPublic(t *testing.T) {
-	user, _ := getTestingUser(t)
-	recipe, _ := user.Recipes().New("r")
-	user.Recipes().Edit(recipe.RID, Recipe{
+	u, _ := getTestingUser(t)
+	r := u.Recipes()
+
+	RID, _ := r.New("r")
+	r.Edit(RID, Recipe{
 		Name: "newName", Stars: 4, Ingredients: "flour", Directions: "Mix", Notes: "-",
 	})
-	code, _ := user.Recipes().Share(recipe.RID)
-	recipe, _ = user.Recipes().GetOne(recipe.RID)
+	code, _ := r.Share(RID)
+	recipe, _ := r.GetOne(RID)
 
 	type data struct {
 		Code string
@@ -244,11 +265,14 @@ func TestRecipesGetPublic(t *testing.T) {
 }
 
 func TestRecipesNew(t *testing.T) {
-	user, _ := getTestingUser(t)
-	otherUser, _ := getTestingUser(t)
+	u, _ := getTestingUser(t)
+	r := u.Recipes()
+
+	otherU, _ := getTestingUser(t)
+	otherR := otherU.Recipes()
 
 	type data struct {
-		User User
+		R    Recipes
 		Name string
 
 		ExpectedErr  error
@@ -259,13 +283,13 @@ func TestRecipesNew(t *testing.T) {
 		Target: func(t *testing.T, msg string, d data) {
 			name := "testRecipe"
 
-			if r, err := d.User.Recipes().New(name); err != d.ExpectedErr {
+			if RID, err := d.R.New(name); err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
 			} else if err == nil {
-				if r.Name != name {
-					t.Errorf("%s: expected name <%s>, got <%v>", msg, name, r.Name)
-				} else if _, err = d.User.Recipes().GetOne(r.RID); err != nil {
-					t.Errorf("%s: recipe not saved", msg)
+				recipe, _ := d.R.GetOne(RID)
+
+				if recipe.Name != name {
+					t.Errorf("%s: expected name <%s>, got <%v>", msg, name, recipe.Name)
 				}
 			}
 		},
@@ -273,35 +297,41 @@ func TestRecipesNew(t *testing.T) {
 		Cases: []testCase[data]{
 			{
 				"unknown user created recipe",
-				data{User: unknownUser, ExpectedErr: ERR_USER_UNKNOWN},
+				data{R: unknownUser.Recipes(), ExpectedErr: ERR_USER_UNKNOWN},
 			},
 			{
 				"",
-				data{User: user},
+				data{R: r},
 			},
 			{
 				"created duplicated recipe",
-				data{User: user, ExpectedErr: ERR_RECIPE_DUPLICATED},
+				data{R: r, ExpectedErr: ERR_RECIPE_DUPLICATED},
 			},
 			{
 				"",
-				data{User: otherUser},
+				data{R: otherR},
 			},
 		},
 	}.Run(t)
 }
 
 func TestRecipesSave(t *testing.T) {
-	owner, _ := getTestingUser(t)
-	recipe, _ := owner.Recipes().New("recipe")
-	code, _ := owner.Recipes().Share(recipe.RID)
+	ownerU, _ := getTestingUser(t)
+	ownerR := ownerU.Recipes()
 
-	user, _ := getTestingUser(t)
-	userDup, _ := getTestingUser(t)
-	userDup.Recipes().New(recipe.Name)
+	RID, _ := ownerR.New("recipe")
+	code, _ := ownerR.Share(RID)
+	recipe, _ := ownerR.GetOne(RID)
+
+	u, _ := getTestingUser(t)
+	r := u.Recipes()
+
+	u2, _ := getTestingUser(t)
+	r2 := u2.Recipes()
+	r2.New("recipe")
 
 	type data struct {
-		User User
+		R    Recipes
 		Code string
 
 		ExpectedRecipe Recipe
@@ -310,16 +340,16 @@ func TestRecipesSave(t *testing.T) {
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			recipe, err := d.User.Recipes().Save(d.Code)
+			RID, err := d.R.Save(d.Code)
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
 			}
 
 			if d.ExpectedErr == nil {
-				r, _ := d.User.Recipes().GetOne(recipe.RID)
-				d.ExpectedRecipe.RID = r.RID
+				recipe, _ := d.R.GetOne(RID)
+				d.ExpectedRecipe.RID = RID
 				d.ExpectedRecipe.Code = nil
-				if !reflect.DeepEqual(r, d.ExpectedRecipe) {
+				if !reflect.DeepEqual(recipe, d.ExpectedRecipe) {
 					t.Errorf("%v, saved recipe not the same", msg)
 				}
 			}
@@ -332,46 +362,49 @@ func TestRecipesSave(t *testing.T) {
 			},
 			{
 				"saved unknown recipe",
-				data{User: user, ExpectedErr: ERR_RECIPE_NOT_FOUND},
+				data{R: r, ExpectedErr: ERR_RECIPE_NOT_FOUND},
 			},
 			{
 				"duplicated recipe (owner)",
-				data{User: owner, Code: code, ExpectedErr: ERR_RECIPE_DUPLICATED},
+				data{R: ownerR, Code: code, ExpectedErr: ERR_RECIPE_DUPLICATED},
 			},
 			{
 				"duplicated recipe (other user)",
-				data{User: userDup, Code: code, ExpectedErr: ERR_RECIPE_DUPLICATED},
+				data{R: r2, Code: code, ExpectedErr: ERR_RECIPE_DUPLICATED},
 			},
 			{
 				"",
-				data{User: user, Code: code, ExpectedRecipe: recipe},
+				data{R: r, Code: code, ExpectedRecipe: recipe},
 			},
 		},
 	}.Run(t)
 }
 
 func TestRecipesShare(t *testing.T) {
-	user, _ := getTestingUser(t)
-	recipe, _ := user.Recipes().New("recipe")
+	u, _ := getTestingUser(t)
+	r := u.Recipes()
 
-	otherUser, _ := getTestingUser(t)
+	RID, _ := r.New("recipe")
+
+	otherU, _ := getTestingUser(t)
+	otherR := otherU.Recipes()
 
 	type data struct {
-		User User
-		RID  int
+		R   Recipes
+		RID int
 
 		ExpectedErr error
 	}
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			code, err := d.User.Recipes().Share(d.RID)
+			code, err := d.R.Share(d.RID)
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
 			}
 
 			if d.ExpectedErr == nil {
-				if r, _ := d.User.Recipes().GetOne(d.RID); *r.Code != code {
+				if r, _ := d.R.GetOne(d.RID); *r.Code != code {
 					t.Errorf("%v, code not saved", msg)
 				}
 			}
@@ -380,44 +413,48 @@ func TestRecipesShare(t *testing.T) {
 		Cases: []testCase[data]{
 			{
 				"other user shared recipe",
-				data{User: otherUser, RID: recipe.RID, ExpectedErr: ERR_RECIPE_NOT_FOUND},
+				data{R: otherR, RID: RID, ExpectedErr: ERR_RECIPE_NOT_FOUND},
 			},
 			{
 				"(new)",
-				data{User: user, RID: recipe.RID},
+				data{R: r, RID: RID},
 			},
 			{
 				"(replace)",
-				data{User: user, RID: recipe.RID},
+				data{R: r, RID: RID},
 			},
 		},
 	}.Run(t)
 }
 
 func TestRecipesUnshare(t *testing.T) {
-	user, _ := getTestingUser(t)
-	recipe, _ := user.Recipes().New("recipe")
-	user.Recipes().Share(recipe.RID)
+	u, _ := getTestingUser(t)
+	r := u.Recipes()
 
-	otherUser, _ := getTestingUser(t)
-	otherRecipe, _ := otherUser.Recipes().New("otherRecipe")
+	RID, _ := r.New("recipe")
+	recipe, _ := r.GetOne(RID)
+	r.Share(recipe.RID)
+
+	otherU, _ := getTestingUser(t)
+	otherR := otherU.Recipes()
+	otherRID, _ := otherR.New("otherRecipe")
 
 	type data struct {
-		User User
-		RID  int
+		R   Recipes
+		RID int
 
 		ExpectedErr error
 	}
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			err := d.User.Recipes().Unshare(d.RID)
+			err := d.R.Unshare(d.RID)
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
 			}
 
 			if d.ExpectedErr == nil {
-				if r, _ := d.User.Recipes().GetOne(d.RID); r.Code != nil {
+				if r, _ := d.R.GetOne(d.RID); r.Code != nil {
 					t.Errorf("%v, code not saved", msg)
 				}
 			}
@@ -426,15 +463,15 @@ func TestRecipesUnshare(t *testing.T) {
 		Cases: []testCase[data]{
 			{
 				"other user unshared recipe",
-				data{User: otherUser, RID: recipe.RID, ExpectedErr: ERR_RECIPE_NOT_FOUND},
+				data{R: otherR, RID: RID, ExpectedErr: ERR_RECIPE_NOT_FOUND},
 			},
 			{
 				"(with code)",
-				data{User: user, RID: recipe.RID},
+				data{R: r, RID: RID},
 			},
 			{
 				"(without code)",
-				data{User: otherUser, RID: otherRecipe.RID},
+				data{R: otherR, RID: otherRID},
 			},
 		},
 	}.Run(t)
