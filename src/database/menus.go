@@ -57,6 +57,25 @@ func (m Menus) Delete(MID int) error {
 	return nil
 }
 
+// Duplicate creates a copy of the menu. It returns the MID of the copy
+func (m Menus) Duplicate(srcMID int) (int, error) {
+	var dstMID int
+
+	// Copies the menu
+	err := db.QueryRow(`INSERT INTO menus (uid, name) SELECT uid, name FROM menus WHERE uid=$1 AND mid=$2 returning mid;`, m.uid, srcMID).Scan(&dstMID)
+	if err != nil {
+		return 0, handleNoRowsError(err, m.uid, ERR_MENU_NOT_FOUND)
+	}
+
+	// Copies the days
+	_, err = db.Exec(`INSERT INTO days (mid, position, name, meals) SELECT $2, position, name, meals FROM days WHERE mid=$1;`, srcMID, dstMID)
+	if err != nil {
+		return dstMID, ERR_UNKNOWN
+	}
+
+	return dstMID, nil
+}
+
 // GetAll returns a list of menus (days not included) ordered by creation date
 func (m Menus) GetAll() ([]Menu, error) {
 	var menus []Menu
@@ -137,45 +156,43 @@ func (m Menus) GetOne(MID int) (Menu, error) {
 	return menu, nil
 }
 
-// New creates a new menu
-func (m Menus) New(name string, daysNames []string, mealsN int) (Menu, error) {
+// New creates a new menu and return its MID
+func (m Menus) New(name string, daysNames []string, mealsN int) (int, error) {
+	var MID int
+
 	// Ensures the user exists
 	if _, err := GetUser("UID", m.uid); err != nil {
-		return Menu{}, err
+		return MID, err
 	}
 
 	// Ensures the number of meals is valid
 	if mealsN < 0 {
-		return Menu{}, ERR_MEALS_NEGATIVE
+		return MID, ERR_MEALS_NEGATIVE
 	}
 
 	// Prepares the statement for the days
 	stmt, err := db.Prepare(`INSERT INTO days (mid, position, name, meals) VALUES ($1, $2, $3, $4);`)
 	if err != nil {
-		return Menu{}, ERR_UNKNOWN
+		return MID, ERR_UNKNOWN
 	}
 	defer stmt.Close()
 
 	// Adds the menu
-	menu := Menu{Name: name}
-	err = db.QueryRow(`INSERT INTO menus (uid, name) VALUES ($1, $2) RETURNING mid;`, m.uid, name).Scan(&menu.MID)
+	err = db.QueryRow(`INSERT INTO menus (uid, name) VALUES ($1, $2) RETURNING mid;`, m.uid, name).Scan(&MID)
 	if err != nil {
-		return Menu{}, ERR_UNKNOWN
+		return MID, ERR_UNKNOWN
 	}
 
 	// Adds the days
-	for p, n := range daysNames {
+	for dpos, dname := range daysNames {
 		meals := make([]string, mealsN)
-		_, err := stmt.Exec(menu.MID, p, n, pq.Array(meals))
+		_, err := stmt.Exec(MID, dpos, dname, pq.Array(meals))
 		if err != nil {
-			return menu, ERR_UNKNOWN
+			return MID, ERR_UNKNOWN
 		}
-
-		day := Day{MID: menu.MID, Name: n, Position: p, Meals: meals}
-		menu.Days = append(menu.Days, day)
 	}
 
-	return menu, nil
+	return MID, nil
 }
 
 // SetDayMeals is used to set a day's meals

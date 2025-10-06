@@ -156,10 +156,4 @@ templ MenuEditDay(day database.Day) {
 			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
 		</button>
 	</form>
-	<br/>
-	<b>{ langs.Translate(ctx, langs.STR_DELETE) }</b>
-	<br/>
-	<button class="icon-text" hx-post={ menuurl + "/" + strconv.Itoa(day.Position) + "/delete" } hx-push-url="false">
-		<i class="ph ph-trash"></i> { langs.Translate(ctx, langs.STR_DELETE) }
-	</button>
 }

@@ -42,14 +42,14 @@ func GetMenusNew(c *utils.Context) (err error) {
 }
 
 func PostMenusNew(c *utils.Context) (err error) {
-	var menu database.Menu
+	var MID int
 
 	name := c.R.FormValue("name")
 	meals, _ := strconv.Atoi(c.R.FormValue("meals"))
 	days := strings.Split(c.R.FormValue("days"), "\n")
 
-	if menu, err = c.U.Menus().New(name, days, meals); err == nil {
-		utils.Redirect(c, "/menus/"+strconv.Itoa(menu.MID)+"/edit")
+	if MID, err = c.U.Menus().New(name, days, meals); err == nil {
+		utils.Redirect(c, "/menus/"+strconv.Itoa(MID)+"/edit")
 	}
 
 	return
@@ -86,7 +86,7 @@ func PostMenuEdit(c *utils.Context) (err error) {
 
 	if MID, err = getMID(c); err == nil {
 		if err = c.U.Menus().SetName(MID, c.R.FormValue("name")); err == nil {
-			utils.Redirect(c, "/menus/"+strconv.Itoa(MID))
+			utils.Redirect(c, "/menus/"+strconv.Itoa(MID)+"/edit")
 		}
 	}
 
@@ -153,13 +153,13 @@ func PostMenuDelete(c *utils.Context) (err error) {
 }
 
 func PostMenuDuplicate(c *utils.Context) (err error) {
-	// var MID int
+	var MID int
 
-	// if MID, err = getMID(c); err == nil {
-	// 	if _, err = c.U.Menus().Duplicate(MID); err == nil {
-	// 		utils.Redirect(c, "/menus")
-	// 	}
-	// }
+	if MID, err = getMID(c); err == nil {
+		if _, err = c.U.Menus().Duplicate(MID); err == nil {
+			utils.Redirect(c, "/menus")
+		}
+	}
 
 	return
 }

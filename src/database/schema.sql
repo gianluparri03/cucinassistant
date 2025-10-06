@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS days (
     position INT NOT NULL,
 
     name VARCHAR(64) NOT NULL,
-    meals VARCHAR(512)[] NOT NULL,
+    meals VARCHAR(512)[],
 
     PRIMARY KEY (mid, position),
     FOREIGN KEY (mid) REFERENCES menus (mid) ON DELETE CASCADE
