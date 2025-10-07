@@ -83,7 +83,7 @@ textarea.big-text {
     }
 }
 
-#unmatching_passwords {
+.jserror {
     color: var(--red);
 }
 

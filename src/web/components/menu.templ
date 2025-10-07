@@ -27,27 +27,22 @@ templ Menus(menus []database.Menu) {
 templ MenusNew() {
 	@TemplateTitle(langs.Translate(ctx, langs.STR_NEW_MENU), "/menus")
 	<form method="POST">
-		<label>{ langs.Translate(ctx, langs.STR_NAME) }</label>
+		<input id="menu-name" name="name" hidden/>
+		<label>{ langs.Translate(ctx, langs.STR_DAYS) }</label>
+		<textarea id="menu-days" name="days" hidden></textarea>
 		<br/>
-		<input type="text" name="name" required/>
+		<span>{ langs.Translate(ctx, langs.STR_FROM) }</span>
+		<input type="date" id="days-from" required/>
 		<br/>
+		<span>{ langs.Translate(ctx, langs.STR_TO) }</span>
+		<input type="date" id="days-to" required/>
+		<br/>
+		<div id="invalid-dates" class="jserror hidden">{ langs.Translate(ctx, langs.STR_INVALID_DATES) }</div>
 		<label>{ langs.Translate(ctx, langs.STR_MEALS_NUMBER) }</label>
 		<br/>
 		<input type="number" name="meals" step="1" min="0" value="2" required/>
 		<br/>
-		<label>{ langs.Translate(ctx, langs.STR_DAYS) }</label>
-		<br/>
-		<textarea name="days">
-			{ langs.Translate(ctx, langs.STR_MONDAY) }
-			{ "\n" + langs.Translate(ctx, langs.STR_TUESDAY) }
-			{ "\n" + langs.Translate(ctx, langs.STR_WEDNESDAY) }
-			{ "\n" + langs.Translate(ctx, langs.STR_THURSDAY) }
-			{ "\n" + langs.Translate(ctx, langs.STR_FRIDAY) }
-			{ "\n" + langs.Translate(ctx, langs.STR_SATURDAY) }
-			{ "\n" + langs.Translate(ctx, langs.STR_SUNDAY) }
-		</textarea>
-		<br/>
-		<button class="icon-text">
+		<button class="icon-text" onclick="calcDates(event);">
 			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }
 		</button>
 	</form>

@@ -23,6 +23,7 @@ templ TemplateBase(lang string, body templ.Component, message templ.Component, t
 			<script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/response-targets.js"></script>
 			<script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"></script>
 			<script src="/assets/scripts.js"></script>
+			@templ.JSFuncCall("setLocale", lang)
 		</head>
 		<body
 			hx-ext="response-targets"

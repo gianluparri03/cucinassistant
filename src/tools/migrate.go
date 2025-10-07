@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/lib/pq"
 	"os"
 	"strings"
-	"github.com/lib/pq"
 
 	"cucinassistant/configs"
 	"cucinassistant/database"
@@ -56,7 +56,7 @@ Are you sure to run it? [CONFIRM] `)
 		for i := 0; i < 7; i++ {
 			dayName := langs.Translate(langs.Get(lang).Ctx(), daysNames[i])
 			dayMeals := []string{meals[2*i], meals[2*i+1]}
-			
+
 			stmt.Exec(MID, i, dayName, pq.Array(&dayMeals))
 		}
 	}

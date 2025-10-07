@@ -24,6 +24,7 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 		Path:        "/lang",
 		Unprotected: true,
 		GetHandler:  handlers.GetLang,
+		PostHandler: handlers.PostLang,
 	},
 	{
 		Path:        "/stats",

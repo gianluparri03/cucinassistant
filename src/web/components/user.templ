@@ -42,7 +42,7 @@ templ UserChangeEmailSettings(user *database.User, available map[string]*langs.L
 
 templ UserChangePassword() {
 	@TemplateTitle(langs.Translate(ctx, langs.STR_CHANGE_PASSWORD), "/user/settings")
-	<form method="POST" onsubmit={ templ.JSFuncCall("comparePasswords", langs.Translate(ctx, langs.STR_UNMATCHING_PASSWORDS)) }>
+	<form method="POST">
 		<label for="password-old">{ langs.Translate(ctx, langs.STR_OLD_PASSWORD) }</label>
 		<br/>
 		<input type="password" name="old-password" id="password-old" required/>
@@ -55,7 +55,8 @@ templ UserChangePassword() {
 		<br/>
 		<input type="password" id="password-2" required/>
 		<br/>
-		<button class="icon-text">
+		<div id="unmatching-passwords" class="jserror hidden">{ langs.Translate(ctx, langs.STR_UNMATCHING_PASSWORDS) }</div>
+		<button class="icon-text" onclick="comparePasswords(event);">
 			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
 		</button>
 	</form>
@@ -121,7 +122,7 @@ templ UserForgotPassword() {
 
 templ UserResetPassword(token string) {
 	<h1>{ langs.Translate(ctx, langs.STR_RESET_PASSWORD) }</h1>
-	<form method="POST" onsubmit={ templ.JSFuncCall("comparePasswords", langs.Translate(ctx, langs.STR_UNMATCHING_PASSWORDS)) }>
+	<form method="POST">
 		<input value={ token } name="token" hidden/>
 		<label for="email">{ langs.Translate(ctx, langs.STR_EMAIL) }</label>
 		<br/>
@@ -135,7 +136,8 @@ templ UserResetPassword(token string) {
 		<br/>
 		<input type="password" id="password-2" required/>
 		<br/>
-		<button class="icon-text">
+		<div id="unmatching-passwords" class="jserror hidden">{ langs.Translate(ctx, langs.STR_UNMATCHING_PASSWORDS) }</div>
+		<button class="icon-text" onclick="comparePasswords(event);">
 			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
 		</button>
 	</form>
@@ -204,7 +206,7 @@ templ UserSignIn() {
 
 templ UserSignUp() {
 	<h1>{ langs.Translate(ctx, langs.STR_SIGNUP) }</h1>
-	<form method="POST" onsubmit={ templ.JSFuncCall("comparePasswords", langs.Translate(ctx, langs.STR_UNMATCHING_PASSWORDS)) }>
+	<form method="POST">
 		<label for="username">{ langs.Translate(ctx, langs.STR_USERNAME) }</label>
 		<br/>
 		<input type="text" name="username" id="username" required/>
@@ -221,7 +223,8 @@ templ UserSignUp() {
 		<br/>
 		<input type="password" id="password-2" required/>
 		<br/>
-		<button class="icon-text">
+		<div id="unmatching-passwords" class="jserror hidden">{ langs.Translate(ctx, langs.STR_UNMATCHING_PASSWORDS) }</div>
+		<button class="icon-text" onclick="comparePasswords(event);">
 			<i class="ph ph-user-plus"></i> { langs.Translate(ctx, langs.STR_SIGNUP) }
 		</button>
 		<br/>

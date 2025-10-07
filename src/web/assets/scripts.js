@@ -1,8 +1,8 @@
 // Makes sure the fields password-1 and password-2 match,
 // otherwise shows an error.
-function comparePasswords(text) {
-    // Remove the previous warning
-    $('#unmatching_passwords').remove();
+function comparePasswords(event) {
+    // Remove the previous warnin
+    $('#unmatching-passwords').addClass('hidden');
 
     // Gets the fields
     let p1 = $('#password-1');
@@ -15,13 +15,10 @@ function comparePasswords(text) {
         p2.val("");
 
         // Shows the warning
-        $('button').before('<div id="unmatching_passwords">'+text+'</div>');
+        $('#unmatching-passwords').removeClass('hidden');
 
         // And stop the process
         event.preventDefault();
-        return false;
-    } else {
-        return true;
     }
 }
 
@@ -29,10 +26,7 @@ function comparePasswords(text) {
 
 let itemsCount;
 
-// Sets the new value for itemsCount
-function setItemsCount(n) {
-    itemsCount = n;
-}
+function setItemsCount(n) { itemsCount = n; }
 
 // Adds the inputs for a new item
 function addItem(e, last=false) {
@@ -101,3 +95,36 @@ function activateExpirationInput(i) {
 function activateQuantityInput(i) {
     i.type = 'number';
 } 
+
+
+let locale;
+
+function setLocale(l) { locale = l; }
+
+// Sets the menu's name and days according to the `from` and `to` inputs
+function calcDates(event) {
+    const nameDateOpt = {month: 'short', day: 'numeric'};
+    const dayDateOpt = {weekday: 'long', month: 'short', day: 'numeric'};
+
+    $('#invalid-dates').addClass('hidden');
+
+    var from = new Date($('#days-from').val());
+    var to = new Date($('#days-to').val());
+    if (isNaN(from.getTime()) || isNaN(to.getTime()) || to < from) {
+        $('#invalid-dates').removeClass('hidden');
+        event.preventDefault();
+        return;
+    }
+
+    $('#menu-name').val(
+        from.toLocaleDateString(locale, nameDateOpt) + ' - ' +
+        to.toLocaleDateString(locale, nameDateOpt)
+    );
+
+    var days = '';
+    for (var d = from; d <= to; d.setDate(d.getDate()+1)) {
+        if (days) days += '\n';
+        days += d.toLocaleDateString(locale, dayDateOpt);
+    }
+    $('#menu-days').val(days);
+}

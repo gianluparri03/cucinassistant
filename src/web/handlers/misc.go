@@ -47,11 +47,13 @@ func GetInfo(c *utils.Context) (err error) {
 }
 
 func GetLang(c *utils.Context) (err error) {
-	if tag := c.R.URL.Query().Get("tag"); tag == "" {
-		utils.RenderComponent(c, components.Lang(langs.Available, c.L))
-	} else {
-		utils.SetLang(c, tag, c.R.URL.Query().Has("silent"))
-	}
+	utils.RenderComponent(c, components.Lang(langs.Available, c.L))
+
+	return
+}
+
+func PostLang(c *utils.Context) (err error) {
+	utils.SetLang(c, c.R.FormValue("tag"))
 
 	return
 }
