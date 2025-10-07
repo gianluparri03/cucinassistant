@@ -36,4 +36,4 @@ jobs:
       - name: Run tests
         env:
             CA_ENV: "testing_ci"
-        run: go test cucinassistant/database
+        run: go test cucinassistant/database cucinassistant/langs

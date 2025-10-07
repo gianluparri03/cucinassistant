@@ -138,9 +138,7 @@ func GetResetPassword(c *utils.Context) (err error) {
 func PostResetPassword(c *utils.Context) (err error) {
 	token := c.R.FormValue("token")
 	newPassword := c.R.FormValue("password")
-	user := database.User{
-		Email: c.R.FormValue("email"),
-	}
+	user := database.User{Email: c.R.FormValue("email")}
 
 	if err = user.ResetPassword(token, newPassword); err == nil {
 		if user, err = database.GetUser("UID", user.UID); err == nil {
