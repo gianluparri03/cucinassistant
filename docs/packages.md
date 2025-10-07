@@ -75,3 +75,5 @@ This folder contains some tools that can be used in pair with CucinAssistant.
   It runs interactively, asking (for every language) a subject and a content.
   Then, after a confirm, it sends the email to users, in their language.
   As for the `main.go` file, it needs the `CA_ENV` variable to be set.
+- `migrate.go` is used to upgrade the database schema to the new version from
+  the previous one.

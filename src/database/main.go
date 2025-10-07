@@ -35,7 +35,7 @@ func handleNoRowsError(err error, UID int, ifExist error) error {
 }
 
 // Connect creates a connection to the database.
-func Connect() {
+func Connect() *sql.DB {
 	// Connects to the database
 	var err error
 	db, err = sql.Open("postgres", configs.Database)
@@ -49,6 +49,8 @@ func Connect() {
 		slog.Error("while pinging the db:", "err", err)
 		os.Exit(1)
 	}
+
+	return db
 }
 
 // Bootstrap makes sure that the database schema is ready

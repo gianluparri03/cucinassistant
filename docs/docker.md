@@ -7,12 +7,13 @@ docker compose.
 
 1. Create a config file (like `.env`) in your working directory, containing all
 the required variables (see [configs/configs.go](../src/configs/configs.go) for
-details), like this:
+details).
 ```
 CA_BASEURL="http://localhost:8080"
 CA_PORT=8080
 CA_SESSIONSECRET="random-string"
 CA_DATABASE="user=ca password=ca dbname=ca host=database sslmode=disable"
+CA_EMAIL_ENABLED=0
 # ...
 ```
 
@@ -58,10 +59,13 @@ volumes:
   database:
 ```
 
-3. Run `docker compose up` (with an optional `-d` to hide the output) and you're
-done!
+3. Run `docker compose up` (with an optional `-d` to hide the output).
 
-4. It may happen that you need to tell something to your users. To do that, you
+4. **Only the first time**, if you're upgrading from the previous version, run
+`docker exec -it cucinassistant-app-1 ca_migrate` to fix the database schema,
+and then `docker restart cucinassistant-app-1`.
+
+5. It may happen that you need to tell something to your users. To do that, you
 can simply execute `docker exec -it cucinassistant-app-1 ca_broadcast`. This 
 will run a wizard that will ask you for the email subject and body, and then
 (after a confirm) send it to everyone.
