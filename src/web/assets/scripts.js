@@ -94,6 +94,7 @@ function activateExpirationInput(i) {
 // Converts the quantity input to an actual number input
 function activateQuantityInput(i) {
     i.type = 'number';
+    i.step = 'any';
 } 
 
 

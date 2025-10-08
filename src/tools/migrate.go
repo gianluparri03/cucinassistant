@@ -8,8 +8,12 @@ import (
 
 	"cucinassistant/configs"
 	"cucinassistant/database"
-	"cucinassistant/langs"
 )
+
+var daysNames map[string][7]string = map[string][7]string{
+	"it": [7]string{"Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"},
+	"en": [7]string{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"},
+}
 
 func main() {
 	// // Prints a welcome text
@@ -36,9 +40,6 @@ Are you sure to run it? [CONFIRM] `)
 	// Prepares the insert statement
 	stmt, _ := db.Prepare(`INSERT INTO days (mid, position, name, meals) VALUES ($1, $2, $3, $4);`)
 
-	// Prepares the days order
-	daysNames := []langs.String{langs.STR_MONDAY, langs.STR_TUESDAY, langs.STR_WEDNESDAY, langs.STR_THURSDAY, langs.STR_FRIDAY, langs.STR_SATURDAY, langs.STR_SUNDAY}
-
 	// Queries the menus
 	rows, _ := db.Query(`SELECT m.mid, m.meals, u.email_lang FROM menus m INNER JOIN ca_users u ON m.uid = u.uid;`)
 
@@ -54,7 +55,7 @@ Are you sure to run it? [CONFIRM] `)
 
 		// Inserts the data into the days table
 		for i := 0; i < 7; i++ {
-			dayName := langs.Translate(langs.Get(lang).Ctx(), daysNames[i])
+			dayName := daysNames[lang][i]
 			dayMeals := []string{meals[2*i], meals[2*i+1]}
 
 			stmt.Exec(MID, i, dayName, pq.Array(&dayMeals))
