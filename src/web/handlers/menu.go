@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"strconv"
+	"slices"
 	"strings"
 
 	"cucinassistant/database"
@@ -86,7 +87,7 @@ func PostMenuEdit(c *utils.Context) (err error) {
 
 	if MID, err = getMID(c); err == nil {
 		if err = c.U.Menus().SetName(MID, c.R.FormValue("name")); err == nil {
-			utils.Redirect(c, "/menus/"+strconv.Itoa(MID)+"/edit")
+			utils.Redirect(c, "/menus/"+strconv.Itoa(MID))
 		}
 	}
 
@@ -108,18 +109,24 @@ func GetMenuEditDay(c *utils.Context) (err error) {
 
 func PostMenuEditDayMeals(c *utils.Context) (err error) {
 	var MID, DPos int
-	var meals []string
+	var keys, meals []string
 	c.R.ParseForm()
 
 	if MID, DPos, err = getDPos(c); err == nil {
-		for key, values := range c.R.PostForm {
+		for key, _ := range c.R.PostForm {
 			if strings.HasPrefix(key, "meal-") {
-				meals = append(meals, values[0])
+				keys = append(keys, key)
 			}
 		}
 
+		slices.Sort(keys)
+		for _, key := range keys {
+			meals = append(meals, c.R.FormValue(key))
+
+		}
+
 		if err = c.U.Menus().SetDayMeals(MID, DPos, meals); err == nil {
-			utils.Redirect(c, "/menus/"+strconv.Itoa(MID)+"/edit/"+strconv.Itoa(DPos))
+			utils.Redirect(c, "/menus/"+strconv.Itoa(MID)+"/edit")
 		}
 	}
 
@@ -133,7 +140,7 @@ func PostMenuEditDayName(c *utils.Context) (err error) {
 
 	if MID, DPos, err = getDPos(c); err == nil {
 		if err = c.U.Menus().SetDayName(MID, DPos, name); err == nil {
-			utils.Redirect(c, "/menus/"+strconv.Itoa(MID)+"/edit/"+strconv.Itoa(DPos))
+			utils.Redirect(c, "/menus/"+strconv.Itoa(MID)+"/edit")
 		}
 	}
 

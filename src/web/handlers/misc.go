@@ -54,7 +54,6 @@ func GetLang(c *utils.Context) (err error) {
 
 func PostLang(c *utils.Context) (err error) {
 	utils.SetLang(c, c.R.FormValue("tag"))
-
 	return
 }
 
