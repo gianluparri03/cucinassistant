@@ -49,7 +49,7 @@ func main() {
 
 		// And writes the email for each user
 		for _, user := range users {
-			bodies = append(bodies, email.Write(user, ""))
+			bodies = append(bodies, email.Write(user, "", newsletter))
 		}
 	}
 
@@ -74,12 +74,8 @@ func getUsers(newsletter bool) map[string][]*database.User {
 	// Adds each user in a group, based on the
 	// EmailLang value
 	for _, user := range database.GetUsersForBroadcast(newsletter) {
-		lang := user.EmailLang
-		if lang == "" {
-			lang = langs.Default.Tag
-		}
-
-		users[lang] = append(users[lang], &user)
+		l := (*langs.Get(user.EmailLang)).Tag
+		users[l] = append(users[l], &user)
 	}
 
 	return users

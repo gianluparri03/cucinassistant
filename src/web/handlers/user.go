@@ -29,12 +29,37 @@ func GetUserChangeEmailSettings(c *utils.Context) (err error) {
 	return
 }
 
-func PostUserChangeEmailSettings(c *utils.Context) (err error) {
+func PostUserChangeEmailLang(c *utils.Context) (err error) {
 	lang := c.R.FormValue("lang")
-	newsletter := c.R.FormValue("newsletter") == "on"
 
-	if err = c.U.ChangeEmailSettings(lang, newsletter); err == nil {
+	if err = c.U.ChangeEmailLang(lang); err == nil {
 		utils.ShowMessage(c, langs.STR_SETTINGS_SAVED, "/user/settings")
+	}
+
+	return
+}
+
+func PostUserChangeNewsletter(c *utils.Context) (err error) {
+	enabled := c.R.FormValue("newsletter") == "on"
+
+	if enabled {
+		err = c.U.EnableNewsletter()
+	} else if c.U.Newsletter != nil {
+		err = database.DisableNewsletter(*c.U.Newsletter)
+	}
+
+	if err == nil {
+		utils.ShowMessage(c, langs.STR_SETTINGS_SAVED, "/user/settings")
+	}
+
+	return
+}
+
+func GetDisableNewsletter(c *utils.Context) (err error) {
+	token := c.R.FormValue("token")
+
+	if err = database.DisableNewsletter(token); err == nil {
+		utils.ShowMessage(c, langs.STR_SETTINGS_SAVED, "/")
 	}
 
 	return
@@ -190,7 +215,7 @@ func PostUserSignUp(c *utils.Context) (err error) {
 	password := c.R.FormValue("password")
 
 	if user, err = database.SignUp(username, email_, password); err == nil {
-		user.ChangeEmailSettings(c.L, true)
+		user.ChangeEmailLang(c.L)
 		go email.Welcome.Write(&user, "").Send()
 		utils.SaveUID(c, user.UID, langs.STR_USER_CREATED)
 	}

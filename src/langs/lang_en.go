@@ -129,7 +129,7 @@ var english *Lang = &Lang{
 		STR_UNKNOWN_LANG:                        "Unknown language",
 		STR_UNKNOWN_REQUEST:                     "Unknown request",
 		STR_UNMATCHING_PASSWORDS:                "The two passwords do not match",
-		STR_UNSUBSCRIBE:                         "To unsubscribe, click here:",
+		STR_UNSUBSCRIBE:                         "To unsubscribe, ",
 		STR_USER_CREATED:                        "Account created succesfully",
 		STR_USER_DELETED:                        "Account deleted succesfully",
 		STR_USERNAME:                            "Username",

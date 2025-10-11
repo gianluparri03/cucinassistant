@@ -182,9 +182,21 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 		PostHandler: handlers.PostUserChangeEmail,
 	},
 	{
-		Path:        "/user/change_email_settings",
-		GetHandler:  handlers.GetUserChangeEmailSettings,
-		PostHandler: handlers.PostUserChangeEmailSettings,
+		Path:        "/user/change_newsletter",
+		PostHandler: handlers.PostUserChangeNewsletter,
+	},
+	{
+		Path:        "/disable_newsletter",
+		Unprotected: true,
+		PostHandler: handlers.GetDisableNewsletter,
+	},
+	{
+		Path:        "/user/change_email_lang",
+		PostHandler: handlers.PostUserChangeEmailLang,
+	},
+	{
+		Path:       "/user/change_email_settings",
+		GetHandler: handlers.GetUserChangeEmailSettings,
 	},
 	{
 		Path:        "/user/change_password",

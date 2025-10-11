@@ -27,8 +27,12 @@ type Lang struct {
 
 // Get returns the language with that tag.
 // If the language is not found, the default one is returned.
-func Get(tag string) *Lang {
-	l, ok := Available[tag]
+func Get(tag *string) *Lang {
+	if tag == nil {
+		return Default
+	}
+
+	l, ok := Available[*tag]
 	if ok {
 		return l
 	} else {

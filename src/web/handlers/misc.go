@@ -48,7 +48,6 @@ func GetInfo(c *utils.Context) (err error) {
 
 func GetLang(c *utils.Context) (err error) {
 	utils.RenderComponent(c, components.Lang(langs.Available, c.L))
-
 	return
 }
 

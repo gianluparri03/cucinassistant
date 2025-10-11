@@ -19,7 +19,7 @@ func render(c *Context, body, message, content templ.Component) {
 		content = components.TemplateBase(c.L, body, message, tutorial)
 	}
 
-	content.Render(langs.Get(c.L).Ctx(), c.W)
+	content.Render(langs.Get(&c.L).Ctx(), c.W)
 }
 
 // RenderComponent renders a component

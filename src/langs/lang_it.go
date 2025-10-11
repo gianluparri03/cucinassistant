@@ -129,7 +129,7 @@ var italian *Lang = &Lang{
 		STR_UNKNOWN_LANG:                        "Lingua sconosciuta",
 		STR_UNKNOWN_REQUEST:                     "Richiesta sconosciuta",
 		STR_UNMATCHING_PASSWORDS:                "Le due password non corrispondono",
-		STR_UNSUBSCRIBE:                         "Per disiscriverti, clicca qui:",
+		STR_UNSUBSCRIBE:                         "Per disiscriverti, ",
 		STR_USER_CREATED:                        "Account creato con successo",
 		STR_USER_DELETED:                        "Account eliminato con successo",
 		STR_USERNAME:                            "Nome utente",

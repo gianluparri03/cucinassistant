@@ -20,19 +20,23 @@ templ UserChangeEmail(current string) {
 
 templ UserChangeEmailSettings(user *database.User, available map[string]*langs.Lang) {
 	@TemplateTitle(langs.Translate(ctx, langs.STR_EMAIL_SETTINGS), "/user/settings")
-	<form method="POST">
+	<form method="POST" action="/user/change_email_lang">
 		{ langs.Translate(ctx, langs.STR_EMAIL_LANG) }
 		<select name="lang" id="languages">
 			for _, lang := range available {
-				<option value={ lang.Tag } selected?={ lang.Tag == user.EmailLang }>
+				<option value={ lang.Tag } selected?={ user.EmailLang != nil && lang.Tag == *user.EmailLang }>
 					{ lang.Name }
 				</option>
 			}
 		</select>
-		<br/>
-		<input type="checkbox" id="newsletter" name="newsletter" checked?={ user.Newsletter }/>
+		<button class="icon-text">
+			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }
+		</button>
+	</form>
+	<br/>
+	<form method="POST" action="/user/change_newsletter">
+		<input type="checkbox" id="newsletter" name="newsletter" checked?={ user.Newsletter != nil }/>
 		<label for="newsletter">{ langs.Translate(ctx, langs.STR_WANT_NEWSLETTER) }</label>
-		<br/>
 		<br/>
 		<button class="icon-text">
 			<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_SAVE) }

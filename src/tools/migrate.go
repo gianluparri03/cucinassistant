@@ -1,26 +1,20 @@
 package main
 
 import (
+	"crypto/rand"
 	"fmt"
-	"github.com/lib/pq"
 	"os"
-	"strings"
 
 	"cucinassistant/configs"
 	"cucinassistant/database"
 )
 
-var daysNames map[string][7]string = map[string][7]string{
-	"it": [7]string{"Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"},
-	"en": [7]string{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"},
-}
-
 func main() {
-	// // Prints a welcome text
+	// Prints a welcome text
 	fmt.Print(`CucinAssistant Migration Tool
 =============================
 This tool MUST BE used once and only once, as it will upgrade the database schema.
-It will upgrade it from version 7 (Ciliegia) to version 8 (Banana).
+It will upgrade it from version 8 (Banana) to version 9 (Maracuja).
 Are you sure to run it? [CONFIRM] `)
 
 	// Asks a confirm
@@ -32,38 +26,43 @@ Are you sure to run it? [CONFIRM] `)
 		fmt.Println("Confirmed.\n")
 	}
 
-	// Initializes all the modules (it will create the missing table)
+	// Initializes all the modules
 	configs.LoadAndParse()
 	db := database.Connect()
 	database.Bootstrap()
 
-	// Prepares the insert statement
-	stmt, _ := db.Prepare(`INSERT INTO days (mid, position, name, meals) VALUES ($1, $2, $3, $4);`)
-
-	// Queries the menus
-	rows, _ := db.Query(`SELECT m.mid, m.meals, u.email_lang FROM menus m INNER JOIN ca_users u ON m.uid = u.uid;`)
-
+	// Queries the users with newsletter enabled
+	rows, _ := db.Query(`SELECT uid FROM ca_users WHERE newsletter;`)
 	defer rows.Close()
+	var users []int
 	for rows.Next() {
-		// Parses the data
-		var MID int
-		var mealsStr string
-		var lang string
-		rows.Scan(&MID, &mealsStr, &lang)
-
-		meals := strings.Split(mealsStr, ";")
-
-		// Inserts the data into the days table
-		for i := 0; i < 7; i++ {
-			dayName := daysNames[lang][i]
-			dayMeals := []string{meals[2*i], meals[2*i+1]}
-
-			stmt.Exec(MID, i, dayName, pq.Array(&dayMeals))
-		}
+		var UID int
+		rows.Scan(&UID)
+		users = append(users, UID)
 	}
 
-	// Removes the meals column from the menus tables
-	db.Exec(`ALTER TABLE menus DROP COLUMN meals;`)
+	// Removes the old newsletter column
+	db.Exec(`ALTER TABLE ca_users DROP COLUMN newsletter;`)
+
+	// Creates the new newsletter column
+	db.Exec(`ALTER TABLE ca_users ADD COLUMN newsletter CHAR(16);`)
+
+	// Repopulates the newsletter column
+	stmt, _ := db.Prepare(`UPDATE ca_users SET newsletter=$2 WHERE uid=$1;`)
+	for _, u := range users {
+		buffer := make([]byte, 8)
+		rand.Read(buffer)
+		t := fmt.Sprintf("%x", buffer)
+
+		stmt.Exec(u, t)
+	}
+
+	// Sets the UNIQUE constraint
+	fmt.Println(db.Exec(`ALTER TABLE ca_users ADD CONSTRAINT ca_user_newsletter_unique UNIQUE (newsletter);`))
+
+	// Set the email_lang field nullable
+	db.Exec(`ALTER TABLE ca_users ALTER email_lang DROP NOT NULL;`)
+	db.Exec(`UPDATE ca_users SET email_lang=NULL WHERE email_lang='';`)
 
 	fmt.Println("Done.")
 }

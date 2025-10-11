@@ -77,8 +77,9 @@ func compareHash(plain string, hash string, noMatch error) error {
 	}
 }
 
-// generateToken generates a new token. It returns both the plaintext and the hash.
-func generateToken() (plain string, hash string, err error) {
+// generateUserToken generates a new token. It returns both the plaintext and the
+// hash.
+func generateUserToken() (plain string, hash string, err error) {
 	// Generates the token
 	buffer := make([]byte, 18)
 	rand.Read(buffer)
@@ -93,11 +94,19 @@ func generateToken() (plain string, hash string, err error) {
 	return
 }
 
+// genereateNewsletterToken returns a string of 16 characters to identify a
+// newsletter subscription.
+func generateNewsletterToken() string {
+	// Generates the token
+	buffer := make([]byte, 8)
+	rand.Read(buffer)
+	return fmt.Sprintf("%x", buffer)
+}
+
 // User represents a registered User
 type User struct {
 	// UID is the User ID.
-	// It is the only required fields when using
-	// receivers.
+	// It is the only required fields when using receivers.
 	UID int
 
 	// Username is the user's username
@@ -109,21 +118,19 @@ type User struct {
 	// Email is the user's email
 	Email string
 
-	// EmailLang is the language in which
-	// the users wishes to receive emails
-	EmailLang string
+	// EmailLang is the language in which the users wishes to receive emails
+	EmailLang *string
 
-	// Newsletter indicates if the user wants
-	// to receive the newsletter
-	Newsletter bool
+	// Newsletter is an unique subscription token to the newsletter.
+	// Can be null
+	Newsletter *string
 
-	// Token is an optional string, that
-	// can be generated to delete an user
-	// or to reset its password
+	// Token is an optional string, that can be generated to delete an user or
+	// to reset its password
 	Token string
 
-	// fetched is true if the user if fetched from
-	// the database, and not builded by hand
+	// fetched is true if the user if fetched from the database, and not
+	// builded by hand
 	fetched bool
 }
 
@@ -188,15 +195,15 @@ func GetUser(field string, value any) (User, error) {
 func GetUsersForBroadcast(newsletter bool) (users []User) {
 	var filter string
 	if newsletter {
-		filter = " WHERE newsletter "
+		filter = " WHERE newsletter IS NOT NULL "
 	}
 
-	rows, _ := db.Query(`SELECT username, email, email_lang FROM ca_users` + filter + `;`)
+	rows, _ := db.Query(`SELECT username, email, email_lang, newsletter FROM ca_users` + filter + `;`)
 	defer rows.Close()
 
 	for rows.Next() {
 		var user User
-		rows.Scan(&user.Username, &user.Email, &user.EmailLang)
+		rows.Scan(&user.Username, &user.Email, &user.EmailLang, &user.Newsletter)
 		users = append(users, user)
 	}
 
@@ -228,23 +235,43 @@ func (u *User) ChangeEmail(newEmail string) error {
 	return nil
 }
 
-// ChangeEmailSettings sets the EmailLang and Newsletter fields
-func (u *User) ChangeEmailSettings(lang string, newsletter bool) error {
+// ChangeEmailLang sets the EmailLang field
+func (u *User) ChangeEmailLang(lang string) error {
 	// Ensures all data is present
 	if err := u.fetch(); err != nil {
 		return err
 	}
 
 	// Saves the new value
-	_, err := db.Exec(`UPDATE ca_users SET email_lang=$2, newsletter=$3 WHERE uid=$1;`,
-		u.UID, lang, newsletter)
+	_, err := db.Exec(`UPDATE ca_users SET email_lang=$2 WHERE uid=$1;`, u.UID, lang)
 	if err != nil {
 		return ERR_UNKNOWN
 	}
 
 	// Updates struct
-	u.EmailLang = lang
-	u.Newsletter = newsletter
+	u.EmailLang = &lang
+	return nil
+}
+
+// EnableNewsletter sets the Newsletter field to true
+func (u *User) EnableNewsletter() error {
+	// Ensures all data is present
+	if err := u.fetch(); err != nil {
+		return err
+	}
+
+	// Generates a new newsletter token
+	token := generateNewsletterToken()
+
+	// Saves the new value
+	_, err := db.Exec(`UPDATE ca_users SET newsletter=$2 WHERE uid=$1;`,
+		u.UID, token)
+	if err != nil {
+		return ERR_UNKNOWN
+	}
+
+	// Updates struct
+	u.Newsletter = &token
 	return nil
 }
 
@@ -337,7 +364,7 @@ func (u *User) Delete(token string) error {
 // is returned.
 func (u *User) GenerateToken() (string, error) {
 	// Generates the token
-	token, hash, err := generateToken()
+	token, hash, err := generateUserToken()
 
 	// Saves it in the database
 	var res sql.Result
@@ -429,11 +456,21 @@ func SignUp(username string, email string, password string) (User, error) {
 	}
 
 	// Tries to save it in the database
-	_, err = db.Exec(`INSERT INTO ca_users (username, email, password) VALUES ($1, $2, $3);`, username, email, hash)
+	_, err = db.Exec(`INSERT INTO ca_users (username, email, password, newsletter) VALUES ($1, $2, $3, $4);`, username, email, hash, generateNewsletterToken())
 	if err != nil {
 		return User{}, ERR_UNKNOWN
 	}
 
 	// Retrieves the UID
 	return GetUser("email", email)
+}
+
+// DisableNewsletter disable a newsletter subscription
+func DisableNewsletter(token string) error {
+	_, err := db.Exec(`UPDATE ca_users SET newsletter=NULL WHERE newsletter=$1;`, token)
+	if err != nil {
+		return ERR_UNKNOWN
+	}
+
+	return nil
 }

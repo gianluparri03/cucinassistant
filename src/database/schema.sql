@@ -6,12 +6,13 @@ CREATE TABLE IF NOT EXISTS ca_users (
     email VARCHAR(250) NOT NULL,
     token VARCHAR(250),
 
-    email_lang CHAR(2) NOT NULL DEFAULT '',
-	newsletter BOOL NOT NULL DEFAULT TRUE,
+    email_lang CHAR(2),
+	newsletter CHAR(16),
 
     PRIMARY KEY (uid),
     UNIQUE (username),
-    UNIQUE (email)
+    UNIQUE (email),
+    UNIQUE (newsletter)
 );
 
 

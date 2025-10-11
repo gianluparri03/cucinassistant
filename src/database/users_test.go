@@ -87,30 +87,27 @@ func TestUserChangeEmail(t *testing.T) {
 	}.Run(t)
 }
 
-func TestUserChangeEmailSettings(t *testing.T) {
+func TestUserChangeEmailLang(t *testing.T) {
 	user, _ := getTestingUser(t)
 
 	type data struct {
-		User          User
-		NewLang       string
-		NewNewsletter bool
+		User    User
+		NewLang string
 
 		ExpectedErr error
 	}
 
 	testSuite[data]{
 		Target: func(t *testing.T, msg string, d data) {
-			err := d.User.ChangeEmailSettings(d.NewLang, d.NewNewsletter)
+			err := d.User.ChangeEmailLang(d.NewLang)
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
 			}
 
 			if d.ExpectedErr == nil {
 				user, _ := GetUser("UID", user.UID)
-				if user.EmailLang != d.NewLang {
+				if user.EmailLang == nil || *user.EmailLang != d.NewLang {
 					t.Errorf("%s, lang not saved", msg)
-				} else if user.Newsletter != d.NewNewsletter {
-					t.Errorf("%s, newsletter not saved", msg)
 				}
 			}
 		},
@@ -122,7 +119,49 @@ func TestUserChangeEmailSettings(t *testing.T) {
 			},
 			{
 				"",
-				data{User: user, NewLang: "it", NewNewsletter: false},
+				data{User: user, NewLang: "it"},
+			},
+		},
+	}.Run(t)
+}
+
+func TestUserEnableNewsletter(t *testing.T) {
+	user, _ := getTestingUser(t)
+	DisableNewsletter(*user.Newsletter)
+
+	type data struct {
+		User User
+
+		ExpectedErr error
+	}
+
+	testSuite[data]{
+		Target: func(t *testing.T, msg string, d data) {
+			err := d.User.EnableNewsletter()
+			if err != d.ExpectedErr {
+				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
+			}
+
+			if d.ExpectedErr == nil {
+				user, _ := GetUser("UID", user.UID)
+				if user.Newsletter == nil {
+					t.Errorf("%s, newsletter not saved", msg)
+				}
+			}
+		},
+
+		Cases: []testCase[data]{
+			{
+				"enabled newsletter to unknown user",
+				data{User: unknownUser, ExpectedErr: ERR_USER_UNKNOWN},
+			},
+			{
+				"(before disabled)",
+				data{User: user},
+			},
+			{
+				"(already enabled)",
+				data{User: user},
 			},
 		},
 	}.Run(t)
@@ -518,6 +557,44 @@ func TestUserSignup(t *testing.T) {
 			{
 				"",
 				data{Username: user.Username + "u", Email: user.Email + "e", Password: user.Password},
+			},
+		},
+	}.Run(t)
+}
+
+func TestDisableNewsletter(t *testing.T) {
+	user, _ := getTestingUser(t)
+
+	type data struct {
+		Token       string
+		ExpectedErr error
+	}
+
+	testSuite[data]{
+		Target: func(t *testing.T, msg string, d data) {
+			before := len(GetUsersForBroadcast(true))
+
+			err := DisableNewsletter(d.Token)
+			if err != d.ExpectedErr {
+				t.Errorf("%s: expected <%v>, got <%v>", msg, d.ExpectedErr, err)
+			}
+
+			if d.ExpectedErr == nil {
+				after := len(GetUsersForBroadcast(true))
+
+				user, _ := GetUser("UID", user.UID)
+				if user.Newsletter != nil {
+					t.Errorf("%s, newsletter not saved", msg)
+				} else if after != before-1 {
+					t.Errorf("%s, numbers does not match", msg)
+				}
+			}
+		},
+
+		Cases: []testCase[data]{
+			{
+				"",
+				data{Token: *user.Newsletter},
 			},
 		},
 	}.Run(t)

@@ -44,7 +44,7 @@ func (e Email) Write(user *database.User, link string) EmailBody {
 	return RawEmail{
 		Subject: langs.Translate(ctx, e.Subject),
 		Content: langs.Translate(ctx, e.Content),
-	}.Write(user, link)
+	}.Write(user, link, false)
 }
 
 // RawEmail is an email that has already been translated
@@ -61,16 +61,23 @@ type RawEmail struct {
 
 // Write executes the email template with the given data.
 // It reads from the user the username, the recipient and the language.
-func (e RawEmail) Write(user *database.User, link string) EmailBody {
+func (e RawEmail) Write(user *database.User, link string, newsletter bool) EmailBody {
+	var disableUrl string
+
 	// Prepares the headers of the body
 	var body bytes.Buffer
 	body.Write([]byte("Subject: " + e.Subject + "\n"))
 	body.Write([]byte("From: CucinAssistant <" + configs.EmailSender + ">\n"))
 	body.Write([]byte("To: " + user.Email + "\n"))
-	body.Write([]byte("MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n\n\n"))
+	if newsletter && user.Newsletter != nil {
+		disableUrl = configs.BaseURL + "/disable_newsletter?token=" + *user.Newsletter
+		body.Write([]byte("List-Unsubscribe: <" + disableUrl + ">\n"))
+		body.Write([]byte("List-Unsubscribe-Post: List-Unsubscribe=One-Click\n"))
+	}
+	body.Write([]byte("MIME-version: 1.0\nContent-Type: text/html; charset=\"UTF-8\"\n\n\n\n"))
 
 	// Executes the templates
-	Base(e.Subject, e.Content, user.Username, link, e.Newsletter).
+	Base(e.Subject, e.Content, user.Username, link, disableUrl).
 		Render(langs.Get(user.EmailLang).Ctx(), &body)
 	return EmailBody{Body: &body, Recipient: user.Email}
 }
