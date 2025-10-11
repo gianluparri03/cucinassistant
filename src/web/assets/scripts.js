@@ -85,18 +85,6 @@ function printRecipe() {
 	$("#back").click();
 }
 
-// Converts the expiration input to an actual date input
-function activateExpirationInput(i) {
-    i.type = 'date';
-    i.showPicker();
-} 
-
-// Converts the quantity input to an actual number input
-function activateQuantityInput(i) {
-    i.type = 'number';
-    i.step = 'any';
-} 
-
 
 let locale;
 

@@ -136,13 +136,13 @@ templ StorageSectionAdd(SID int, sections []database.Section) {
 				/>
 				<input
 					class="expiration"
-					onfocus="activateExpirationInput(this);"
+                    type="date"
 					placeholder={ langs.Translate(ctx, langs.STR_EXPIRATION) }
 					nametemplate="article-ID-expiration"
 				/>
 				<input
 					class="quantity"
-					onfocus="activateQuantityInput(this);"
+                    type="number" step="any"
 					placeholder={ langs.Translate(ctx, langs.STR_QUANTITY) }
 					nametemplate="article-ID-quantity"
 				/>
@@ -228,23 +228,19 @@ templ StorageArticle(SID int, article database.Article, prev int, next int, sect
 			<input
 				name="expiration"
 				class="expiration"
+                type="date"
 				placeholder={ langs.Translate(ctx, langs.STR_EXPIRATION) }
 				if article.Expiration != nil {
 					value={ article.FormatExpiration() }
-					type="date"
-				} else {
-					onfocus="activateExpirationInput(this);"
 				}
 			/>
 			<input
 				class="quantity"
 				name="quantity"
+                type="number" step="any"
 				placeholder={ langs.Translate(ctx, langs.STR_QUANTITY) }
 				if article.Quantity != nil {
 					value={ strconv.FormatFloat(float64(*article.Quantity), 'f', -1, 32) }
-					type="number"
-				} else {
-					onfocus="activateQuantityInput(this);"
 				}
 			/>
 			<select class="section" name="section">
