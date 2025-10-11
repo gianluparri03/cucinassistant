@@ -268,7 +268,7 @@ templ StorageArticle(SID int, article database.Article, prev int, next int, sect
 			</button>
 		}
 		<span></span>
-		<button class="icon-text pre-swap" hx-post={ art_url + "/delete" } hx-push-url="false">
+		<button class="icon-text pre-swap" hx-post={ art_url + "/delete" }>
 			<i class="ph ph-trash"></i> { langs.Translate(ctx, langs.STR_DELETE) }
 		</button>
 		<button class="icon-text post-swap hidden" hx-get={ art_url } hx-push-url="false">
