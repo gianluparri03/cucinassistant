@@ -1,25 +1,14 @@
-/* --- VARIABLES --------------------- */
 :root {
     --red: #d50000;
     --orange: #f90;
     --background: #f9f9f9;
-    --section: #e1e1e1;
+    --border: #e1e1e1;
     --text: #4a4a4a;
     --cursive: 'Satisfy', cursive;
     --sansserif: 'Inclusive Sans', sans-serif;
-    --base-size: 2rem;
 }
 
 
-
-/* --- GENERAL RULES ----------------- */
-* {
-    font-family: var(--sansserif);
-}
-
-p {
-    margin-bottom: 1.5rem;
-}
 
 a, a:visited {
     color: var(--orange);
@@ -28,31 +17,50 @@ a, a:visited {
 
 a:hover {
     color: var(--red);
-    border-bottom: none;
     cursor: pointer;
 }
 
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: stretch;
+
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+
+    font-size: 2rem;
+    font-family: var(--sansserif);
+
+    background-color: var(--background);
+    color: var(--text);
+}
+
 button {
+    display: inline-block;
+
     margin: 5px 0;
     border: 2px solid var(--text);
     border-radius: 8px;
+    padding: 5px 10px;
+
+    text-align: center;
+    text-decoration: none;
+
+    background-color: var(--red);
+    color: var(--background);
 }
 
 button:hover {
+    background-color: var(--orange);
     border-color: var(--text);
+    cursor: pointer;
 }
 
 button:disabled:hover {
     cursor: default;
-}
-
-label {
-    display: inline;
-    font-weight: normal;
-}
-
-input, select {
-    margin: 5px 0;
 }
 
 button.icon {
@@ -66,115 +74,9 @@ button.icon-text {
     color: white;
 }
 
-textarea {
-    resize: none;
-    margin-bottom: 0;
-    field-sizing: content;
-    min-height: 70px;
-}
-
-textarea.big-text {
-    min-height: 130px;
-}
-
-@media(orientation: landscape) {
-    textarea {
-        width: 48%;
-    }
-}
-
-.jserror {
-    color: var(--red);
-}
-
-.hidden {
-    display: none !important;
-}
-
-.empty-icon {
-    opacity: 0;
-}
-
-
-#languages {
-    display: block;
-    width: 30vmax;
-}
-
-
-
-/* --- NAV --------------------------- */
-nav {
-    position: absolute;
-    top: 0;
-    left: 0;
-
-    width: 100%;
-    height: 90px;
-    padding: 5px 0;
-
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-
-    text-align: center;
-    background-color: var(--red);
-}
-
-#home, #lang {
-    font-size: 35px;
-    color: white;
-    padding: 15px;
-    position: relative;
-}
-
-#home:hover, #lang:hover {
-    cursor: pointer;
-}
-
-#logo {
-    font-size: 45px;
-    color: white;
-    font-family: var(--cursive);
-    text-shadow: var(--orange) 2px 3px 2px;
-}
-
-
-
-/* --- MAIN and TITLE ---------------- */
-main {
-    margin: 130px auto;
-}
-
-h1 {
-    margin-top: 1vh;
-    margin-bottom: 3vh;
-    font-size: 2em;
-    display: flex;
-    align-items: center;
-}
-
-#back {
-    opacity: 0.5;
-    padding-right: 10px;
-}
-
-#back:hover {
-    cursor: pointer;
-    opacity: 1;
-}
-
-
-
-/* --- FOOTER ------------------------ */
 footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-
     width: 100%;
-    padding: 10px 30px;
+    padding: 20px 30px;
     box-sizing: border-box;
 
     color: white;
@@ -187,9 +89,196 @@ footer a:hover {
     cursor: pointer;
 }
 
+h1, h2, h3 {
+    margin-top: 3rem;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+}
+
+h1 {
+    margin-top: 1vh;
+    margin-bottom: 3vh;
+
+    display: flex;
+    align-items: center;
+
+    font-size: 2em;
+}
+
+h2 {
+  font-size: 2em;
+}
+
+h3 {
+  font-size: 1.75em;
+}
+
+html {
+    height: 100%;
+    font-size: 60%;
+    font-family: var(--sansserif);
+}
+
+input, select, textarea {
+    margin: 5px 0 10px 0;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 10px;
+    color: var(--text);
+    background-color: var(--border);
+}
+
+input:focus, select:focus, textarea:focus {
+    border: 1px solid var(--red);
+    outline: 0;
+}
+
+label {
+    margin-bottom: 0.5rem;
+    display: inline;
+    font-weight: normal;
+}
+
+li {
+    margin-bottom: 0.4em;
+}
+
+main {
+    flex-grow: 1;
+}
+
+nav {
+    width: 100%;
+    height: 90px;
+    padding: 5px 0;
+    flex-shrink: 0;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
+    text-align: center;
+    background-color: var(--red);
+}
+
+p {
+    margin-top: 0px;
+    margin-bottom: 1.5rem;
+}
+
+textarea {
+    margin-bottom: 0;
+    min-height: 70px;
+    resize: none;
+}
+
+textarea.big-text {
+    min-height: 130px;
+}
+
+ul {
+    margin-top: 0;
+    margin-bottom: 2.5rem;
+    padding-left: 1.4em;
+}
 
 
-/* --- MESSAGES ----------------- */
+
+.article {
+    margin: 10px auto;
+    display: flex;
+    border-left: 3px solid var(--orange);
+    padding-left: 5px;
+}
+
+.article, .article *:hover {
+    cursor: pointer;
+}
+
+.article.expired {
+    border-color: var(--red);
+}
+
+.dashboard {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.dashboard button {
+    background-color: var(--orange);
+    margin-right: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.dashboard button:enabled:hover {
+    cursor: pointer;
+    background-color: var(--red);
+}
+
+.dashboard button.transparent {
+    background-color: transparent;
+    border-style: dashed;
+    color: var(--text);
+}
+
+.dashboard button.transparent:enabled:hover {
+    background-color: rgba(0 0 0 / 20%);
+}
+
+.dashboard button i {
+    display: block;
+    font-size: 1.8em;
+    margin-bottom: .3em;
+}
+
+.dashboard button span {
+    display: block;
+    white-space: collapse;
+    overflow-wrap: anywhere;
+}
+
+.empty-icon {
+    opacity: 0;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.htmx-request#loader-container {
+    display: flex;
+}
+
+.jserror {
+    color: var(--red);
+}
+
+.meal-edit {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.meal-edit button {
+    margin-right: 10px;
+}
+
+.menu-day {
+    border-left: 3px solid var(--orange);
+    margin: 15px auto;
+    padding: 5px 0 10px 10px;
+
+    display: flex;
+    flex-flow: row wrap;
+    gap: 5px;
+}
+
+.menu-day b {
+    width: 100%;
+    display: block;
+}
+
 .message {
     width: 100%;
     height: 100%;
@@ -220,82 +309,50 @@ footer a:hover {
     margin: 5px;
 }
 
-
-
-/* --- DASHBOARD ---------------- */
-.dashboard {
+.shopping-item {
     display: flex;
-    flex-wrap: wrap;
 }
 
-.dashboard button {
-    background-color: var(--orange);
-    margin-right: 1.5rem;
-    margin-bottom: 1.5rem;
-}
-
-@media (orientation: portrait) {
-    .dashboard button {
-        height: 18.5vh;
-        width: 18.5vh;
-    }
-}
-
-@media (orientation: landscape) {
-    .dashboard button {
-        height: 12vw;
-        width: 12vw;
-    }
-}
-
-.dashboard button:enabled:hover {
+.shopping-list *:not(#empty-label):hover {
     cursor: pointer;
-    background-color: var(--red);
 }
 
-.dashboard button.transparent {
-    background-color: transparent;
-    border-style: dashed;
-    color: var(--text);
+.shopping-list input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
 }
 
-.dashboard button.transparent:enabled:hover {
-    background-color: rgba(0 0 0 / 20%);
+.shopping-list label {
+    margin-bottom: 0px;
+    margin-left: 8px;
 }
 
-.dashboard button i {
+
+
+#back {
+    opacity: 0.5;
+    padding-right: 10px;
+}
+
+#back:hover {
+    cursor: pointer;
+    opacity: 1;
+}
+
+#lang, #home {
+    font-size: 35px;
+    color: white;
+    padding: 15px;
+    position: relative;
+}
+
+#lang:hover, #home:hover {
+    cursor: pointer;
+}
+
+#languages {
     display: block;
-    font-size: 1.8em;
-    margin-bottom: .3em;
-}
-
-.dashboard button span {
-    display: block;
-    white-space: collapse;
-    overflow-wrap: anywhere;
-}
-
-
-
-/* --- LOADER ------------------- */
-#loader-container {
-    width: 100%;
-    height: 100%;
-
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 2;
-
-    background-color: rgba(0, 0, 0, 0.6);
-
-    display: none;
-    align-items: center;
-    justify-content: center;
-}
-
-.htmx-request#loader-container {
-    display: flex;
+    width: 30vmax;
 }
 
 #loader {
@@ -312,94 +369,82 @@ footer a:hover {
     animation: loader .7s linear infinite;
 }
 
+#loader-container {
+    width: 100%;
+    height: 100%;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+
+    background-color: rgba(0, 0, 0, 0.6);
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+#logo {
+    font-size: 45px;
+    color: white;
+    font-family: var(--cursive);
+    text-shadow: var(--orange) 2px 3px 2px;
+}
+
+#stars {
+    font-size: 1.5em;
+    display: flex;
+    margin-bottom: 10px;
+}
+
+
+
 @keyframes loader {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
 
+@media (orientation: landscape) {
+    .article input.expiration {
+        width: 15vw;
+    }
 
+    .article input.name {
+        width: 25vw;
+    }
 
-/* --- PRINTING ----------------- */
-@media print {
-	nav { display: none; }
-	main { margin: 0; }
-	body { background-color: white; }
-	#footer-links { display: none; }
-	#back, button { display: none !important; }
-	#loader-container { display: none !important; }
-}
+    .article input.quantity {
+        width: 10vw;
+    }
 
+    .article input+input, .article input+select {
+        margin-left: 5px;
+    }
 
+    .dashboard button {
+        height: 12vw;
+        width: 12vw;
+    }
+    
+    textarea {
+        width: 40%;
+    }
 
-/* --- PAGE SPECIFIC: Shopping -- */
-.shopping-list *:not(#empty-label):hover {
-    cursor: pointer;
-}
-
-.shopping-list input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-}
-
-.shopping-list label {
-    margin-bottom: 0px;
-    margin-left: 8px;
-}
-
-.shopping-item {
-    display: flex;
-}
-
-
-
-/* --- PAGE SPECIFIC: Menu ------ */
-.menu-day {
-    border-left: 3px solid var(--orange);
-    margin: 15px auto;
-    padding: 5px 0 10px 10px;
-
-    display: flex;
-    flex-flow: row wrap;
-    gap: 5px;
-}
-
-.menu-day b {
-    width: 100%;
-    display: block;
-}
-
-.meal-edit {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.meal-edit button {
-    margin-right: 10px;
-}
-
-
-
-/* --- PAGE SPECIFIC: Storage --- */
-.article {
-    margin: 10px auto;
-    display: flex;
-    border-left: 3px solid var(--orange);
-    padding-left: 5px;
-}
-
-.article.expired {
-    border-color: var(--red);
-}
-
-.article, .article *:hover {
-    cursor: pointer;
+    main {
+        margin: 30px;
+        width: 50em;
+    }
 }
 
 @media (orientation: portrait) {
     .article {
         flex-direction: column;
         align-items: flex-start;
+    }
+
+    .article input.expiration {
+        width: 50vw;
     }
 
     .article input.name {
@@ -410,34 +455,27 @@ footer a:hover {
         width: 30vw;
     }
 
-    .article input.expiration {
-        width: 50vw;
+    .dashboard button {
+        height: 18.5vh;
+        width: 18.5vh;
+    }
+
+    textarea {
+        width: 100%;
+    }
+
+    main {
+        margin: 13px;
+        width: 100%;
     }
 }
 
-@media (orientation: landscape) {
-    .article input.name {
-        width: 25vw;
-    }
-
-    .article input.quantity {
-        width: 10vw;
-    }
-
-    .article input.expiration {
-        width: 15vw;
-    }
-
-    .article input+input, .article input+select {
-        margin-left: 5px;
-    }
-}
-
-
-
-/* --- PAGE SPECIFIC: Recipes --- */
-#stars {
-    font-size: 1.5em;
-    display: flex;
-    margin-bottom: 10px;
+@media print {
+    body { background-color: white; }
+    footer { background-color: white; color: var(--text); }
+    main { margin: 0; }
+    nav { display: none; }
+    #back, button { display: none !important; }
+    #footer-links { display: none; }
+    #loader-container { display: none !important; }
 }

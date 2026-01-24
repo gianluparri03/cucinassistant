@@ -2,35 +2,29 @@
 
 ![production](https://up.gianlucaparri.me/api/badge/8/status)
 ![actions](https://img.shields.io/github/actions/workflow/status/gianluparri03/cucinassistant/push.yml)
-![translations](https://img.shields.io/badge/Translations-2-green)
+![langs](https://img.shields.io/badge/Langs-2-green)
 
 
 ## What is CucinAssistant
 
-CucinAssistant is an utility website, with which you - and your roommates - can
-keep track of things related to the kitchen.
+CucinAssistant is an utility website, with which you and your mates can
+manage your menus, keep the shopping list updated, write down groceries you have
+in storage and save your recipes (that can also be shared).
 
-Once you log in to CucinAssistant, every change you do is synced across your
-devices, so you'll never forget to buy something anymore!
+Once logged in, every change you make is synced across the account, so you'll
+never forget to buy something anymore!
 
-In particular, CucinAssistant features a section for the menus management, a
-shopping list (with a two-phase checking system), a storage section (where you
-can save the groceries you have, divided in groups), and a recipes section
-(that you can share with everyone!).
-
-Right now it is available in English and in Italian; if you wish to add the
-support for another message, you can contact me, or just open a pull request
-with the translations.
-
-For other informations, [see the info page](https://cucinassistant.com/info/en).
-
-### Public instances
-
-You can use it from your browser, at
+You can open CucinAssistant from your browser, at
 [https://cucinassistant.com](https://cucinassistant.com),
 (and eventually install it from the browser), or you can download the
 Trusted Web App from the Play Store
 ([here](https://play.google.com/store/apps/details?id=me.gianlucaparri.ca.twa)).
+
+Right now it is available in English and in Italian; if you wish to add the
+support for another language, you can contact me, or directly do it yourself and
+open a pull request with the translations.
+
+For other informations, [see the info page](https://cucinassistant.com/info/en).
 
 ## Documentation
 
@@ -49,8 +43,9 @@ informations, you can send an email at
 
 Otherwise, you can also open issues or pull requests in this repository.
 
-You can see a list of new features I'd like to implement
-[here](https://github.com/users/gianluparri03/projects/4).
+You can see a list of new features I'd like to from
+[the issues](https://github.com/gianluparri03/cucinassistant/issues) and
+[the project](https://github.com/users/gianluparri03/projects/4).
 
 ## Credits and license
 
@@ -62,6 +57,5 @@ CucinAssistant uses:
 - [HTMX](https://htmx.org/) (web rendering)
 - [Inclusive Sans](https://fonts.google.com/specimen/Inclusive+Sans) (font)
 - [Phosphor Icons](https://phosphoricons.com/) (icons)
-- [Sakura CSS](https://github.com/oxalorg/sakura) (stylesheets)
 - [Satisfy](https://fonts.google.com/specimen/Satisfy?query=satisfy) (font)
 - [Templ](https://templ.guide/) (html templating)

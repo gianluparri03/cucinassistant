@@ -39,27 +39,27 @@ templ Info(data map[string]string) {
 	<p>
 		@templ.Raw(langs.Translate(ctx, langs.STR_INFO_INTRO))
 	</p>
-	<h4><i class="ph ph-clock-counter-clockwise"></i> { langs.Translate(ctx, langs.STR_HISTORY) }</h4>
+	<h3><i class="ph ph-clock-counter-clockwise"></i> { langs.Translate(ctx, langs.STR_HISTORY) }</h3>
 	<p>
 		@templ.Raw(langs.Translate(ctx, langs.STR_INFO_HISTORY))
 	</p>
-	<h4><i class="ph ph-code"></i> { langs.Translate(ctx, langs.STR_CODE) }</h4>
+	<h3><i class="ph ph-code"></i> { langs.Translate(ctx, langs.STR_CODE) }</h3>
 	<p>
 		@templ.Raw(langs.TranslateArg(ctx, langs.STR_INFO_CODE, data["code"]))
 	</p>
-	<h4><i class="ph ph-git-branch"></i> { langs.Translate(ctx, langs.STR_VERSION) }</h4>
+	<h3><i class="ph ph-git-branch"></i> { langs.Translate(ctx, langs.STR_VERSION) }</h3>
 	<p>
 		@templ.Raw(langs.TranslateArg(ctx, langs.STR_INFO_VERSION, data["version"]))
 	</p>
-	<h4><i class="ph ph-chart-bar-horizontal"></i> { langs.Translate(ctx, langs.STR_STATS) }</h4>
+	<h3><i class="ph ph-chart-bar-horizontal"></i> { langs.Translate(ctx, langs.STR_STATS) }</h3>
 	<p>
 		@templ.Raw(langs.TranslateArg(ctx, langs.STR_INFO_STATS, "/stats"))
 	</p>
-	<h4><i class="ph ph-info"></i> { langs.Translate(ctx, langs.STR_TUTORIAL) }</h4>
+	<h3><i class="ph ph-info"></i> { langs.Translate(ctx, langs.STR_TUTORIAL) }</h3>
 	<p>
 		@templ.Raw(langs.TranslateArg(ctx, langs.STR_INFO_TUTORIAL, data["tutorial"]))
 	</p>
-	<h4><i class="ph ph-lifebuoy"></i> { langs.Translate(ctx, langs.STR_SUPPORT) }</h4>
+	<h3><i class="ph ph-lifebuoy"></i> { langs.Translate(ctx, langs.STR_SUPPORT) }</h3>
 	<p>
 		@templ.Raw(langs.TranslateArg(ctx, langs.STR_INFO_SUPPORT, data["support"]))
 	</p>

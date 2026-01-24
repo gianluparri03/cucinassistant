@@ -79,7 +79,7 @@ templ Recipe(recipe database.Recipe, ca_baseurl string) {
 		</button>
 	}
 	if recipe.Ingredients != "" {
-		<h4>{ langs.Translate(ctx, langs.STR_INGREDIENTS) }</h4>
+		<h3>{ langs.Translate(ctx, langs.STR_INGREDIENTS) }</h3>
 		<ul>
 			for _, i := range strings.Split(recipe.Ingredients, "\n") {
 				<li>{ i }</li>
@@ -87,7 +87,7 @@ templ Recipe(recipe database.Recipe, ca_baseurl string) {
 		</ul>
 	}
 	if recipe.Directions != "" {
-		<h4>{ langs.Translate(ctx, langs.STR_DIRECTIONS) }</h4>
+		<h3>{ langs.Translate(ctx, langs.STR_DIRECTIONS) }</h3>
 		<ol>
 			for _, d := range strings.Split(recipe.Directions, "\n") {
 				<li>{ d }</li>
@@ -95,7 +95,7 @@ templ Recipe(recipe database.Recipe, ca_baseurl string) {
 		</ol>
 	}
 	if recipe.Notes != "" {
-		<h4>{ langs.Translate(ctx, langs.STR_NOTES) }</h4>
+		<h3>{ langs.Translate(ctx, langs.STR_NOTES) }</h3>
 		<p>{ recipe.Notes }</p>
 	}
 }

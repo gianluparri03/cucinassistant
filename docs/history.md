@@ -1,11 +1,12 @@
 # History
 
-I began this project in September 2023.
+I began to work to this project in September 2023.
 The first version of CucinAssistant was written in Python (with Flask) and used MariaDB as its database; then,
 after some experiments, I've decided to rewrite it completely in Go, with PostgreSQL and HTMX.
 
 Here is a resume of all the versions available, with their major changes.
 
+- [8/Banana](https://github.com/gianluparri03/cucinassistant/releases/tag/v8): customizable menu structure, replaced icons
 - [7/Ciliegia](https://github.com/gianluparri03/cucinassistant/releases/tag/v7): recipe sharing, compiled pages and translations
 - [6/Zucchina](https://github.com/gianluparri03/cucinassistant/releases/tag/v6): multi language UI, recipes
 - [5/Patata](https://github.com/gianluparri03/cucinassistant/releases/tag/v5): complete rewrite
