@@ -409,6 +409,10 @@ ul {
     z-index: 20;
 }
 
+#neterror-container {
+    display: none;
+}
+
 #side {
     position: fixed;
     top: 0;

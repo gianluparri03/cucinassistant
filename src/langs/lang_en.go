@@ -73,6 +73,7 @@ var english *Lang = &Lang{
 		STR_MEALS_NUMBER:                        "Number of meals per day",
 		STR_MENUS:                               "Menus",
 		STR_NAME:                                "Name",
+		STR_NETWORK_ERROR:                       "Network error",
 		STR_NEW_EMAIL:                           "New email",
 		STR_NEW_MENU:                            "New menu",
 		STR_NEW_PASSWORD:                        "New password",

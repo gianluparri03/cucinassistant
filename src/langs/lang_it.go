@@ -73,6 +73,7 @@ var italian *Lang = &Lang{
 		STR_MEALS_NUMBER:                        "Numero di pasti giornaliero",
 		STR_MENUS:                               "Menù",
 		STR_NAME:                                "Nome",
+		STR_NETWORK_ERROR:                       "Errore di connessione",
 		STR_NEW_EMAIL:                           "Nuova email",
 		STR_NEW_MENU:                            "Nuovo menù",
 		STR_NEW_PASSWORD:                        "Nuova password",

@@ -84,6 +84,23 @@ templ TemplateBase(lang string, body templ.Component, message templ.Component, t
 			<div id="message-container">
 				@message
 			</div>
+			<div id="neterror-container">
+				<div class="message">
+					<div class="obscurer"></div>
+					<div class="message-content">
+						<p>{ langs.Translate(ctx, langs.STR_NETWORK_ERROR) }</p>
+						<div>
+							<button
+								class="icon-text"
+								hx-on:click="$('#neterror-container').hide();"
+								autofocus
+							>
+								<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_OK) }
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
 			<div id="loader-container">
 				<div class="obscurer"></div>
 				<span id="loader"></span>
