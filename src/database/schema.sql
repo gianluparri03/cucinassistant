@@ -1,4 +1,6 @@
-CREATE TABLE IF NOT EXISTS ca_users (
+CREATE TABLE ca_version (id INT NOT NULL);
+
+CREATE TABLE ca_users (
     uid SERIAL NOT NULL,
 
     username VARCHAR(250) NOT NULL,
@@ -16,7 +18,7 @@ CREATE TABLE IF NOT EXISTS ca_users (
 );
 
 
-CREATE TABLE IF NOT EXISTS menus (
+CREATE TABLE menus (
     uid INT NOT NULL,
     mid SERIAL NOT NULL,
 
@@ -26,9 +28,9 @@ CREATE TABLE IF NOT EXISTS menus (
     FOREIGN KEY (uid) REFERENCES ca_users (uid) ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS menus_uid_mid ON menus (uid, mid);
+CREATE INDEX menus_uid_mid ON menus (uid, mid);
 
-CREATE TABLE IF NOT EXISTS days (
+CREATE TABLE days (
     mid INT NOT NULL,
     position INT NOT NULL,
 
@@ -40,7 +42,7 @@ CREATE TABLE IF NOT EXISTS days (
 );
 
 
-CREATE TABLE IF NOT EXISTS sections (
+CREATE TABLE sections (
     uid INT NOT NULL,
     sid SERIAL NOT NULL,
 
@@ -51,9 +53,9 @@ CREATE TABLE IF NOT EXISTS sections (
     UNIQUE (uid, name)
 );
 
-CREATE INDEX IF NOT EXISTS sections_uid ON sections (uid);
+CREATE INDEX sections_uid ON sections (uid);
 
-CREATE TABLE IF NOT EXISTS articles (
+CREATE TABLE articles (
     sid INT NOT NULL,
     aid SERIAL NOT NULL,
 
@@ -66,10 +68,10 @@ CREATE TABLE IF NOT EXISTS articles (
     UNIQUE (sid, name, expiration)
 );
 
-CREATE INDEX IF NOT EXISTS articles_sid_expiration ON articles (sid, expiration, aid);
+CREATE INDEX articles_sid_expiration ON articles (sid, expiration, aid);
 
 
-CREATE TABLE IF NOT EXISTS entries (
+CREATE TABLE entries (
     uid INT NOT NULL,
     eid SERIAL NOT NULL,
 
@@ -81,10 +83,10 @@ CREATE TABLE IF NOT EXISTS entries (
     UNIQUE (uid, name)
 );
 
-CREATE INDEX IF NOT EXISTS entries_uid_name ON entries (uid, name);
+CREATE INDEX entries_uid_name ON entries (uid, name);
 
 
-CREATE TABLE IF NOT EXISTS recipes (
+CREATE TABLE recipes (
     uid INT NOT NULL,
     rid SERIAL NOT NULL,
 
@@ -103,5 +105,5 @@ CREATE TABLE IF NOT EXISTS recipes (
 	UNIQUE (code)
 );
 
-CREATE INDEX IF NOT EXISTS recipes_uid_name ON recipes (uid, name);
-CREATE INDEX IF NOT EXISTS recipes_code ON recipes (code);
+CREATE INDEX recipes_uid_name ON recipes (uid, name);
+CREATE INDEX recipes_code ON recipes (code);

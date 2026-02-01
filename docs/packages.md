@@ -77,5 +77,5 @@ This folder contains some tools that can be used in pair with CucinAssistant.
   As for the `main.go` file, it needs the `CA_ENV` variable to be set.
 - `icons.go` is used to generate the Phosphor icon pack according to the
   `icons.json` file.
-- `migrate.go` is used to upgrade the database schema to the new version from
-  the previous one.
+- `migrate.go` is used to set up the database schema, upgrading it from the
+  previous version or building it from scratch.

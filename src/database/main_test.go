@@ -29,7 +29,6 @@ func TestMain(m *testing.M) {
 	openTestDB()
 	defer closeTestDB()
 
-	Bootstrap()
 	m.Run()
 }
 
@@ -62,6 +61,7 @@ func openTestDB() {
 		"dbname="+dbName,
 		"dbname="+testingDBName)
 	Connect()
+	Bootstrap()
 }
 
 // closeTestDB drops the testing database

@@ -25,10 +25,7 @@ func main() {
 	// Connects to the database
 	slog.Warn("Connecting to the database...")
 	database.Connect()
-
-	// Checks the schema
-	slog.Warn("Checking schema...")
-	database.Bootstrap()
+	database.Check()
 
 	// Adds a listener for shutting down the server if it's on debug mode
 	slog.Warn("Starting web server...")

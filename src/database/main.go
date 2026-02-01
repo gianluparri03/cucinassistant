@@ -6,8 +6,8 @@ import (
 	"errors"
 	_ "github.com/lib/pq"
 	"log/slog"
-	"os"
 	"strings"
+	"os"
 
 	"cucinassistant/configs"
 )
@@ -53,9 +53,19 @@ func Connect() *sql.DB {
 	return db
 }
 
-// Bootstrap makes sure that the database schema is ready
+// Makes sure the database has the most recent schema
+func Check() {
+	var version int
+	db.QueryRow(`SELECT id FROM ca_version;`).Scan(&version)
+	if version != configs.VersionCode {
+		slog.Error("Database schema is not up to date.")
+		os.Exit(1)
+	}
+}
+
+// Bootstrap applies the schema file to the database
 func Bootstrap() {
-	// Splits it and executes it
+	// Splits it and applies it
 	for _, query := range strings.Split(string(schema), ";") {
 		if strings.TrimSpace(query) != "" {
 			if _, err := db.Exec(query + ";"); err != nil {
@@ -64,6 +74,9 @@ func Bootstrap() {
 			}
 		}
 	}
+
+	// Saves the version number
+	db.Exec(`INSERT INTO ca_version VALUES ($1);`, configs.VersionCode)
 }
 
 // Stats is a report of the current database population

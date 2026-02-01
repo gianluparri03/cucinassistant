@@ -1,68 +1,47 @@
 package main
 
 import (
-	"crypto/rand"
 	"fmt"
 	"os"
+	"log/slog"
 
 	"cucinassistant/configs"
 	"cucinassistant/database"
 )
 
 func main() {
+	slog.SetLogLoggerLevel(slog.LevelError)
+
 	// Prints a welcome text
 	fmt.Print(`CucinAssistant Migration Tool
 =============================
-This tool MUST BE used once and only once, as it will upgrade the database schema.
-It will upgrade it from version 8 (Banana) to version 9 (Maracuja).
-Are you sure to run it? [CONFIRM] `)
+This tool MUST BE used once and only once, as it will make changes the database schema.
+Type BOOTSTRAP to create it from scratch, or UPGRADE to upgrade it from the previous version
+(that is, from version 8 (Banana) to version 9 (Maracuja)). To upgrade from previous versions
+please perform each upgrade version by version.
+`)
 
 	// Asks a confirm
-	var confirm string
-	fmt.Scanln(&confirm)
-	if confirm != "CONFIRM" {
+	var command string
+	fmt.Scanln(&command)
+	if command != "BOOTSTRAP" && command != "UPGRADE" {
 		os.Exit(1)
 	} else {
-		fmt.Println("Confirmed.\n")
+		fmt.Printf("Running %s.\n", command)
 	}
 
 	// Initializes all the modules
 	configs.LoadAndParse()
 	db := database.Connect()
-	database.Bootstrap()
 
-	// Queries the users with newsletter enabled
-	rows, _ := db.Query(`SELECT uid FROM ca_users WHERE newsletter;`)
-	defer rows.Close()
-	var users []int
-	for rows.Next() {
-		var UID int
-		rows.Scan(&UID)
-		users = append(users, UID)
+	// Runs the command
+	if command == "BOOTSTRAP" {
+		database.Bootstrap()
+	} else {
+		// Adds the schema version
+		db.Exec(`CREATE TABLE ca_version (id INT NOT NULL);`)
+		db.Exec(`INSERT INTO ca_version VALUES ($1);`, configs.VersionCode)
 	}
-
-	// Removes the old newsletter column
-	db.Exec(`ALTER TABLE ca_users DROP COLUMN newsletter;`)
-
-	// Creates the new newsletter column
-	db.Exec(`ALTER TABLE ca_users ADD COLUMN newsletter CHAR(16);`)
-
-	// Repopulates the newsletter column
-	stmt, _ := db.Prepare(`UPDATE ca_users SET newsletter=$2 WHERE uid=$1;`)
-	for _, u := range users {
-		buffer := make([]byte, 8)
-		rand.Read(buffer)
-		t := fmt.Sprintf("%x", buffer)
-
-		stmt.Exec(u, t)
-	}
-
-	// Sets the UNIQUE constraint
-	fmt.Println(db.Exec(`ALTER TABLE ca_users ADD CONSTRAINT ca_user_newsletter_unique UNIQUE (newsletter);`))
-
-	// Set the email_lang field nullable
-	db.Exec(`ALTER TABLE ca_users ALTER email_lang DROP NOT NULL;`)
-	db.Exec(`UPDATE ca_users SET email_lang=NULL WHERE email_lang='';`)
 
 	fmt.Println("Done.")
 }
