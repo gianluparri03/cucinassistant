@@ -1,3 +1,16 @@
+// Sets the visibility of the sidebar
+function toggleSide(status) {
+    var side = $("#side-container");
+
+    if (status == true) side.show();
+    else if (status == false) side.hide();
+    else side.toggle();
+}
+
+
+htmx.on("#side", "htmx:afterRequest", () => toggleSide(false));
+
+
 // Makes sure the fields password-1 and password-2 match,
 // otherwise shows an error.
 function comparePasswords(event) {

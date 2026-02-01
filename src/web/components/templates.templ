@@ -25,29 +25,54 @@ templ TemplateBase(lang string, body templ.Component, message templ.Component, t
 			@templ.JSFuncCall("setLocale", lang)
 		</head>
 		<body
-			hx-ext="response-targets"
 			hx-boost="true"
-			hx-push-url="true"
+			hx-ext="response-targets"
 			hx-indicator="#loader-container"
-			hx-target="#body-container"
+			hx-push-url="true"
+			hx-target="main"
+			hx-target-201="#message-container"
+			hx-target-error="#message-container"
 		>
 			<nav>
-				<span><i id="home" class="ph ph-house" hx-get="/"></i></span>
+				<span><i id="side-open" class="ph ph-list" onclick={ templ.JSFuncCall("toggleSide", true) }></i></span>
 				<span id="logo">CucinAssistant</span>
 				<span><i id="lang" class="ph ph-translate" hx-get="/lang"></i></span>
 			</nav>
+			<div id="side-container">
+				<div class="obscurer"></div>
+				<div id="side">
+					<div id="side-icons">
+						<i class="ph ph-house" id="side-home" hx-get="/"></i>
+						<i class="ph ph-x" id="side-close" onclick={ templ.JSFuncCall("toggleSide", false) }></i>
+					</div>
+					<div class="side-item" hx-get="/menus">
+						<i class="ph ph-fork-knife"></i>
+						{ langs.Translate(ctx, langs.STR_MENUS) }
+					</div>
+					<div class="side-item" hx-get="/storage">
+						<i class="ph ph-package"></i>
+						{ langs.Translate(ctx, langs.STR_STORAGE) }
+					</div>
+					<div class="side-item" hx-get="/shopping_list">
+						<i class="ph ph-basket"></i>
+						{ langs.Translate(ctx, langs.STR_SHOPPINGLIST) }
+					</div>
+					<div class="side-item" hx-get="/recipes">
+						<i class="ph ph-notebook"></i>
+						{ langs.Translate(ctx, langs.STR_RECIPES) }
+					</div>
+					<div class="side-item" hx-get="/user/settings">
+						<i class="ph ph-gear"></i>
+						{ langs.Translate(ctx, langs.STR_SETTINGS) }
+					</div>
+				</div>
+			</div>
 			<main>
-				<div id="body-container">
-					@body
-				</div>
-				<div id="message-container">
-					@message
-				</div>
-				<div id="loader-container"><span id="loader"></span></div>
+				@body
 			</main>
 			<footer>
 				<div>
-					CucinAssistant &copy; 2023-2025, Gianluca Parri
+					CucinAssistant &copy; 2023-2026, Gianluca Parri
 				</div>
 				<div id="footer-links">
 					<a hx-get="/info">{ langs.Translate(ctx, langs.STR_INFO) }</a> &bullet;
@@ -56,6 +81,13 @@ templ TemplateBase(lang string, body templ.Component, message templ.Component, t
 					</a>
 				</div>
 			</footer>
+			<div id="message-container">
+				@message
+			</div>
+			<div id="loader-container">
+				<div class="obscurer"></div>
+				<span id="loader"></span>
+			</div>
 		</body>
 	</html>
 }
@@ -70,7 +102,8 @@ templ TemplateTitle(title string, backLink string) {
 
 templ TemplateMessage(msg langs.String, backLink string, isHx bool) {
 	<div class="message">
-		<div class="content">
+		<div class="obscurer"></div>
+		<div class="message-content">
 			<p>{ langs.Translate(ctx, msg) }</p>
 			<div>
 				<button

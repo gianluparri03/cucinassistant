@@ -30,14 +30,12 @@ func RenderComponent(c *Context, page templ.Component) {
 // ShowMessage shows a popup message to the user.
 // If path is set, it will redirects it to the given path
 func ShowMessage(c *Context, msg langs.String, path string) {
-	ShowError(c, msg, path, http.StatusOK)
+	ShowError(c, msg, path, http.StatusCreated)
 }
 
 // ShowError is like ShowMessage, but it also sets a status code
 func ShowError(c *Context, msg langs.String, path string, status int) {
-	c.W.Header().Set("HX-Retarget", "#message-container")
 	c.W.WriteHeader(status)
-
 	page := components.TemplateMessage(msg, path, c.h)
 	render(c, components.TemplateEmpty(), page, page)
 }
