@@ -48,6 +48,7 @@ templ Recipe(recipe database.Recipe, ca_baseurl string) {
 		@TemplateTitle(recipe.Name, "/recipes")
 	} else {
 		<h1>{ recipe.Name }</h1>
+        <title>{ recipe.Name }</title>
 	}
 	if recipe.Stars != 0 {
 		<div id="stars">
