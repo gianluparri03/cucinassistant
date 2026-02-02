@@ -61,7 +61,7 @@ volumes:
 
 3. Run `docker compose up` (with an optional `-d` to hide the output).
 
-4. **Only the first time**, if you're upgrading from the previous version, run
+4. **Only the first time**, run
 `docker exec -it cucinassistant-app-1 ca_migrate` to fix the database schema,
 and then `docker restart cucinassistant-app-1`.
 

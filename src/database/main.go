@@ -6,8 +6,8 @@ import (
 	"errors"
 	_ "github.com/lib/pq"
 	"log/slog"
-	"strings"
 	"os"
+	"strings"
 
 	"cucinassistant/configs"
 )
@@ -56,7 +56,7 @@ func Connect() *sql.DB {
 // Makes sure the database has the most recent schema
 func Check() {
 	var version int
-	db.QueryRow(`SELECT id FROM ca_version;`).Scan(&version)
+	db.QueryRow(`SELECT id FROM ca_version LIMIT 1;`).Scan(&version)
 	if version != configs.VersionCode {
 		slog.Error("Database schema is not up to date.")
 		os.Exit(1)
