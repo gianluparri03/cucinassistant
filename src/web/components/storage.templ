@@ -75,7 +75,7 @@ templ StorageSection(section database.Section, search string, secNames map[int]s
 			if article.IsExpired() {
 				{{ classes += " expired" }}
 			}
-			<div class={ classes } hx-get={ baseurl + "/" + strconv.Itoa(article.AID) }>
+			<div class={ classes } hx-get={ baseurl + "/" + strconv.Itoa(article.AID) + "?search=" + search }>
 				<input class="name" value={ article.Name } readonly/>
 				if article.Expiration != nil {
 					<input
@@ -210,8 +210,11 @@ templ StorageSectionSearch(target string) {
 	</form>
 }
 
-templ StorageArticle(SID int, article database.Article, prev int, next int, sections []database.Section) {
+templ StorageArticle(SID int, article database.Article, prev int, next int, search string, sections []database.Section) {
 	{{ sec_url := "/storage/" + strconv.Itoa(SID) }}
+	if search != "" {
+		{{ sec_url += "?search=" + search }}
+	}
 	{{ art_url := "/storage/" + strconv.Itoa(SID) + "/" + strconv.Itoa(article.AID) }}
 	@TemplateTitle(langs.Translate(ctx, langs.STR_EDIT_ARTICLE), sec_url)
 	<form method="POST">
@@ -266,7 +269,7 @@ templ StorageArticle(SID int, article database.Article, prev int, next int, sect
 			</button>
 		}
 		<span></span>
-		<button class="icon-text pre-swap" hx-post={ art_url + "/delete" }>
+		<button class="icon-text pre-swap" hx-post={ art_url + "/delete?next=" + strconv.Itoa(next) + "&search=" + search }>
 			<i class="ph ph-trash"></i> { langs.Translate(ctx, langs.STR_DELETE) }
 		</button>
 		<button class="icon-text post-swap hidden" hx-get={ art_url } hx-push-url="false">

@@ -172,11 +172,18 @@ func GetStorageArticle(c *utils.Context) (err error) {
 	var SID, AID int
 	var article database.Article
 
+	search := c.R.URL.Query().Get("search")
+
 	if SID, AID, err = getAID(c); err == nil {
 		if article, err = c.U.Storage().GetArticle(AID); err == nil {
-			prev, next := c.U.Storage().GetNeighbours(SID, AID)
+			var prev, next int
+			if search == "" {
+				prev, next = c.U.Storage().GetNeighbours(SID, AID)
+			}
+
 			sections, _ := c.U.Storage().GetSections()
-			utils.RenderComponent(c, components.StorageArticle(SID, article, prev, next, sections))
+
+			utils.RenderComponent(c, components.StorageArticle(SID, article, prev, next, search, sections))
 		}
 	}
 
@@ -195,15 +202,23 @@ func PostStorageArticle(c *utils.Context) (err error) {
 			Quantity:   c.R.PostFormValue("quantity"),
 		}
 
-		prev1, next1 := c.U.Storage().GetNeighbours(SID, AID)
+		search := c.R.URL.Query().Get("search")
+
+		var prev1, next1 int
+		if search == "" {
+			prev1, next1 = c.U.Storage().GetNeighbours(SID, AID)
+		}
 
 		if err = c.U.Storage().EditArticle(AID, newData); err == nil {
-			prev2, next2 := c.U.Storage().GetNeighbours(SID, AID)
+			var prev2, next2 int
+			if search == "" {
+				prev2, next2 = c.U.Storage().GetNeighbours(SID, AID)
+			}
 
 			if prev1 == prev2 && next1 == next2 {
-				utils.Redirect(c, "/storage/"+strconv.Itoa(SID)+"/"+strconv.Itoa(AID))
+				utils.Redirect(c, "/storage/"+strconv.Itoa(SID)+"/"+strconv.Itoa(AID)+"?search="+search)
 			} else {
-				utils.ShowMessage(c, langs.STR_ORDER_CHANGED, "/storage/"+strconv.Itoa(SID))
+				utils.ShowMessage(c, langs.STR_ORDER_CHANGED, "/storage/"+strconv.Itoa(SID)+"?search="+search)
 			}
 		}
 	}
@@ -215,12 +230,13 @@ func PostStorageArticleDelete(c *utils.Context) (err error) {
 	var SID, AID int
 
 	if SID, AID, err = getAID(c); err == nil {
-		_, next := c.U.Storage().GetNeighbours(SID, AID)
-
 		if err = c.U.Storage().DeleteArticle(AID); err == nil {
 			path := "/storage/" + strconv.Itoa(SID)
-			if next != 0 {
-				path += "/" + strconv.Itoa(next)
+			if next := c.R.URL.Query().Get("next"); next != "" && next != "0" {
+				path += "/" + next
+			}
+			if search := c.R.URL.Query().Get("search"); search != "" {
+				path += "?search=" + search
 			}
 
 			utils.Redirect(c, path)
