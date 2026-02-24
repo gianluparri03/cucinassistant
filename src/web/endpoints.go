@@ -90,6 +90,10 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 		PostHandler: handlers.PostRecipesNew,
 	},
 	{
+		Path:       "/recipes/tags",
+		GetHandler: handlers.GetRecipesTags,
+	},
+	{
 		Path:       "/recipes/{RID}",
 		GetHandler: handlers.GetRecipe,
 	},

@@ -62,6 +62,7 @@ func openTestDB() {
 		"dbname="+testingDBName)
 	Connect()
 	Bootstrap()
+	Check()
 }
 
 // closeTestDB drops the testing database

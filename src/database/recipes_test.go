@@ -2,8 +2,65 @@ package database
 
 import (
 	"reflect"
+	"slices"
 	"testing"
 )
+
+func compareRecipes(t *testing.T, msg string, expected, got Recipe) {
+	if got.Name != expected.Name {
+		t.Errorf("%s: expected name <%s>, got <%s>", msg, expected.Name, got.Name)
+	}
+	if got.Stars != expected.Stars {
+		t.Errorf("%s: expected stars <%d>, got <%d>", msg, expected.Stars, got.Stars)
+	}
+	if got.Ingredients != expected.Ingredients {
+		t.Errorf("%s: expected ingredients <%s>, got <%s>", msg, expected.Ingredients, got.Ingredients)
+	}
+	if got.Directions != expected.Directions {
+		t.Errorf("%s: expected directions <%s>, got <%s>", msg, expected.Directions, got.Directions)
+	}
+	if !reflect.DeepEqual(got.Code, expected.Code) {
+		t.Errorf("%s: expected code <%v>, got <%v>", msg, expected.Code, got.Code)
+	}
+	if got.Notes != expected.Notes {
+		t.Errorf("%s: expected notes <%s>, got <%s>", msg, expected.Notes, got.Notes)
+	}
+
+	for _, tag := range expected.Tags {
+		if !slices.Contains(got.Tags, tag) {
+			t.Errorf("%s: missing tag <%s>", msg, tag)
+		}
+	}
+
+	for _, tag := range got.Tags {
+		if !slices.Contains(expected.Tags, tag) {
+			t.Errorf("%s: unwanted tag <%s>", msg, tag)
+		}
+	}
+}
+
+func compareRecipesList(t *testing.T, msg string, expected, got []Recipe) {
+	if len(expected) != len(got) {
+		t.Errorf("%s: wrong number of recipes: expected <%d>, got <%d>", msg, len(expected), len(got))
+		return
+	}
+
+	for _, recipe1 := range expected {
+		found2 := false
+		for _, recipe2 := range got {
+			if recipe1.RID == recipe2.RID {
+				found2 = true
+				compareRecipes(t, msg+", recipe <"+recipe1.Name+">", recipe1, recipe2)
+				break
+			}
+		}
+
+		if !found2 {
+			t.Errorf("%s: recipe not found: name <%s>", msg, recipe1.Name)
+			return
+		}
+	}
+}
 
 func TestRecipesDelete(t *testing.T) {
 	u, _ := getTestingUser(t)
@@ -61,9 +118,9 @@ func TestRecipesEdit(t *testing.T) {
 	RID, _ := r.New("oldName")
 	r.New("takenName")
 
-	newDataSameName := Recipe{RID: RID, Name: "oldName"}
-	newDataTakenName := Recipe{RID: RID, Name: "takenName"}
-	newData := Recipe{RID: RID, Name: "newName", Stars: 4, Ingredients: "flour", Directions: "Mix", Notes: "-"}
+	newData := Recipe{Name: "newName", Stars: 4, Ingredients: "flour", Directions: "Mix", Notes: "-"}
+	newDataWithTags := Recipe{Name: "newName", Stars: 4, Ingredients: "flour", Directions: "Mix", Notes: "-", Tags: []string{"vegan", "gluten free"}}
+	newDataWithOneTag := Recipe{Name: "newName", Stars: 4, Ingredients: "flour", Directions: "Mix", Notes: "-", Tags: []string{"vegan"}}
 
 	otherU, _ := getTestingUser(t)
 	otherR := otherU.Recipes()
@@ -87,11 +144,7 @@ func TestRecipesEdit(t *testing.T) {
 			got, _ := d.R.GetOne(d.RID)
 
 			if d.ExpectedErr == nil {
-				if !reflect.DeepEqual(got, d.NewData) {
-					t.Errorf("%s: expected <%v>, got <%v>", msg, d.NewData, got)
-				} else if r, _ := d.R.GetOne(d.RID); !reflect.DeepEqual(r, got) {
-					t.Errorf("%v, changes not saved", msg)
-				}
+				compareRecipes(t, msg, d.NewData, got)
 			}
 		},
 
@@ -106,15 +159,23 @@ func TestRecipesEdit(t *testing.T) {
 			},
 			{
 				"(same name)",
-				data{R: r, RID: RID, NewData: newDataSameName},
+				data{R: r, RID: RID, NewData: Recipe{Name: "oldName"}},
 			},
 			{
-				"(taken name)",
-				data{R: r, RID: RID, NewData: newDataTakenName, ExpectedErr: ERR_RECIPE_DUPLICATED},
+				"taken name",
+				data{R: r, RID: RID, NewData: Recipe{Name: "takenName"}, ExpectedErr: ERR_RECIPE_DUPLICATED},
 			},
 			{
 				"",
 				data{R: r, RID: RID, NewData: newData},
+			},
+			{
+				"(added tags)",
+				data{R: r, RID: RID, NewData: newDataWithTags},
+			},
+			{
+				"(removed tag)",
+				data{R: r, RID: RID, NewData: newDataWithOneTag},
 			},
 		},
 	}.Run(t)
@@ -127,7 +188,7 @@ func TestRecipesGetAll(t *testing.T) {
 	RID1, _ := r.New("r1")
 	recipe1, _ := r.GetOne(RID1)
 	r.Edit(RID1, Recipe{
-		Name: "r1", Stars: 4, Ingredients: "flour", Directions: "Mix", Notes: "-",
+		Name: "r1", Stars: 4, Ingredients: "flour", Directions: "Mix", Notes: "-", Tags: []string{"vegan"},
 	})
 
 	RID2, _ := r.New("r2")
@@ -152,8 +213,8 @@ func TestRecipesGetAll(t *testing.T) {
 			recipes, err := d.R.GetAll()
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
-			} else if !reflect.DeepEqual(recipes, d.ExpectedRecipes) {
-				t.Errorf("%s: expected recipes <%v>, got <%v>", msg, d.ExpectedRecipes, recipes)
+			} else {
+				compareRecipesList(t, msg, d.ExpectedRecipes, recipes)
 			}
 		},
 
@@ -180,7 +241,7 @@ func TestRecipesGetOne(t *testing.T) {
 
 	RID, _ := r.New("r")
 	r.Edit(RID, Recipe{
-		Name: "newName", Stars: 4, Ingredients: "flour", Directions: "Mix", Notes: "-",
+		Name: "newName", Stars: 4, Ingredients: "flour", Directions: "Mix", Notes: "-", Tags: []string{"gluten free"},
 	})
 	recipe, _ := r.GetOne(RID)
 
@@ -200,8 +261,8 @@ func TestRecipesGetOne(t *testing.T) {
 			recipe, err := d.R.GetOne(d.RID)
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
-			} else if !reflect.DeepEqual(recipe, d.ExpectedRecipe) {
-				t.Errorf("%s: expected recipe <%v>, got <%v>", msg, d.ExpectedRecipe, recipe)
+			} else {
+				compareRecipes(t, msg, d.ExpectedRecipe, recipe)
 			}
 		},
 
@@ -228,7 +289,7 @@ func TestRecipesGetPublic(t *testing.T) {
 
 	RID, _ := r.New("r")
 	r.Edit(RID, Recipe{
-		Name: "newName", Stars: 4, Ingredients: "flour", Directions: "Mix", Notes: "-",
+		Name: "newName", Stars: 4, Ingredients: "flour", Directions: "Mix", Notes: "-", Tags: []string{"dairy free"},
 	})
 	code, _ := r.Share(RID)
 	recipe, _ := r.GetOne(RID)
@@ -246,8 +307,8 @@ func TestRecipesGetPublic(t *testing.T) {
 			recipe, err := GetPublicRecipe(d.Code)
 			if err != d.ExpectedErr {
 				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
-			} else if !reflect.DeepEqual(recipe, d.ExpectedRecipe) {
-				t.Errorf("%s: expected recipe <%v>, got <%v>", msg, d.ExpectedRecipe, recipe)
+			} else {
+				compareRecipes(t, msg, d.ExpectedRecipe, recipe)
 			}
 		},
 
@@ -259,6 +320,94 @@ func TestRecipesGetPublic(t *testing.T) {
 			{
 				"",
 				data{Code: code, ExpectedRecipe: recipe},
+			},
+		},
+	}.Run(t)
+}
+
+func TestRecipesGetTags(t *testing.T) {
+	u, _ := getTestingUser(t)
+	r := u.Recipes()
+
+	RID2, _ := r.New("r2")
+	recipe2, _ := r.GetOne(RID2)
+	r.Edit(RID2, Recipe{
+		Name: "r2", Stars: 2, Ingredients: "flour", Directions: "Mix", Notes: "-", Tags: []string{"gluten free"},
+	})
+
+	RID3, _ := r.New("r3")
+	recipe3, _ := r.GetOne(RID3)
+	r.Edit(RID3, Recipe{
+		Name: "r3", Stars: 3, Ingredients: "flour", Directions: "Mix", Notes: "-", Tags: []string{"vegan", "gluten free"},
+	})
+
+	RID4, _ := r.New("r4")
+	r.Edit(RID4, Recipe{
+		Name: "r4", Stars: 4, Ingredients: "flour", Directions: "Mix", Notes: "-",
+	})
+
+	RID1, _ := r.New("r1")
+	recipe1, _ := r.GetOne(RID1)
+	r.Edit(RID1, Recipe{
+		Name: "r1", Stars: 1, Ingredients: "flour", Directions: "Mix", Notes: "-", Tags: []string{"vegan"},
+	})
+
+	tags := []Tag{
+		{Name: "gluten free", Recipes: []Recipe{recipe2, recipe3}},
+		{Name: "vegan", Recipes: []Recipe{recipe1, recipe3}},
+	}
+
+	uWithout, _ := getTestingUser(t)
+	rWithout := uWithout.Recipes()
+
+	type data struct {
+		R Recipes
+
+		ExpectedErr  error
+		ExpectedTags []Tag
+	}
+
+	testSuite[data]{
+		Target: func(t *testing.T, msg string, d data) {
+			tags, err := d.R.GetTags()
+
+			if err != d.ExpectedErr {
+				t.Errorf("%s: expected err <%v>, got <%v>", msg, d.ExpectedErr, err)
+				return
+			} else if len(d.ExpectedTags) != len(tags) {
+				t.Errorf("%s: wrong number of tags: expected <%d>, got <%d>", msg, len(d.ExpectedTags), len(tags))
+				return
+			}
+
+			for _, tag1 := range d.ExpectedTags {
+				found := false
+				for _, tag2 := range tags {
+					if tag1.Name == tag2.Name {
+						found = true
+						compareRecipesList(t, msg+", tag <"+tag1.Name+">", tag1.Recipes, tag2.Recipes)
+						break
+					}
+				}
+
+				if !found {
+					t.Errorf("%s: tag <%s> not found", msg, tag1.Name)
+					return
+				}
+			}
+		},
+
+		Cases: []testCase[data]{
+			{
+				"got recipes of unknown user",
+				data{R: unknownUser.Recipes(), ExpectedErr: ERR_USER_UNKNOWN},
+			},
+			{
+				"(no recipes)",
+				data{R: rWithout},
+			},
+			{
+				"(some recipes)",
+				data{R: r, ExpectedTags: tags},
 			},
 		},
 	}.Run(t)
@@ -320,6 +469,9 @@ func TestRecipesSave(t *testing.T) {
 	ownerR := ownerU.Recipes()
 
 	RID, _ := ownerR.New("recipe")
+	ownerR.Edit(RID, Recipe{
+		Name: "recipe", Stars: 4, Ingredients: "flour", Directions: "Mix", Notes: "-", Tags: []string{"dairy free"},
+	})
 	code, _ := ownerR.Share(RID)
 	recipe, _ := ownerR.GetOne(RID)
 
@@ -349,9 +501,7 @@ func TestRecipesSave(t *testing.T) {
 				recipe, _ := d.R.GetOne(RID)
 				d.ExpectedRecipe.RID = RID
 				d.ExpectedRecipe.Code = nil
-				if !reflect.DeepEqual(recipe, d.ExpectedRecipe) {
-					t.Errorf("%v, saved recipe not the same", msg)
-				}
+				compareRecipes(t, msg, d.ExpectedRecipe, recipe)
 			}
 		},
 

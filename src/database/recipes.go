@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"reflect"
+	"slices"
 
 	"github.com/lib/pq"
 )
@@ -33,6 +34,18 @@ type Recipe struct {
 
 	// Code is a random code used by the user to share the recipe
 	Code *string
+
+	// Tags is a list of tags
+	Tags []string
+}
+
+// Tag is a group of recipes that have a common tag
+type Tag struct {
+	// Name is the tag name
+	Name string
+
+	// Recipes are the recipes
+	Recipes []Recipe
 }
 
 // Recipes is used to manage all the recipes
@@ -94,6 +107,26 @@ func (r Recipes) Edit(RID int, updated Recipe) error {
 		}
 	}
 
+	// Adds the missing tags
+	for _, tag := range updated.Tags {
+		if tag != "" && !slices.Contains(original.Tags, tag) {
+			_, err = db.Exec(`INSERT INTO tags (name, rid) VALUES ($1, $2);`, tag, RID)
+			if err != nil {
+				return ERR_UNKNOWN
+			}
+		}
+	}
+
+	// Removes the dropped tags
+	for _, tag := range original.Tags {
+		if !slices.Contains(updated.Tags, tag) {
+			_, err = db.Exec(`DELETE FROM tags WHERE name=$1 AND rid=$2;`, tag, RID)
+			if err != nil {
+				return ERR_UNKNOWN
+			}
+		}
+	}
+
 	return nil
 }
 
@@ -102,7 +135,7 @@ func (r Recipes) Edit(RID int, updated Recipe) error {
 func (r Recipes) GetAll() ([]Recipe, error) {
 	var recipes []Recipe
 
-	// Queries the recipies
+	// Queries the recipes
 	var rows *sql.Rows
 	rows, err := db.Query(`SELECT rid, name FROM recipes WHERE uid=$1 ORDER BY name;`, r.uid)
 	if err != nil {
@@ -137,21 +170,85 @@ func (r Recipes) GetOne(RID int) (Recipe, error) {
 		return recipe, handleNoRowsError(err, r.uid, ERR_RECIPE_NOT_FOUND)
 	}
 
+	// Scans the tags
+	rows, err := db.Query(`SELECT name FROM tags WHERE rid=$1 ORDER BY name;`, RID)
+	if err != nil {
+		return recipe, ERR_UNKNOWN
+	} else {
+		defer rows.Close()
+		for rows.Next() {
+			var tag string
+			rows.Scan(&tag)
+			recipe.Tags = append(recipe.Tags, tag)
+		}
+	}
+
 	return recipe, nil
 }
 
 // GetPublicRecipe returns a public recipe
 func GetPublicRecipe(code string) (Recipe, error) {
+	var RID int
 	var recipe Recipe
 
 	// Scans the recipe
-	err := db.QueryRow(`SELECT name, stars, ingredients, directions, notes, code FROM recipes WHERE code=$1;`, code).
-		Scan(&recipe.Name, &recipe.Stars, &recipe.Ingredients, &recipe.Directions, &recipe.Notes, &recipe.Code)
+	err := db.QueryRow(`SELECT rid, name, stars, ingredients, directions, notes, code FROM recipes WHERE code=$1;`, code).
+		Scan(&RID, &recipe.Name, &recipe.Stars, &recipe.Ingredients, &recipe.Directions, &recipe.Notes, &recipe.Code)
 	if err != nil {
 		return recipe, ERR_RECIPE_NOT_FOUND
 	}
 
+	// Scans the tags
+	rows, err := db.Query(`SELECT name FROM tags WHERE rid=$1 ORDER BY name;`, RID)
+	if err != nil {
+		return recipe, ERR_UNKNOWN
+	} else {
+		defer rows.Close()
+		for rows.Next() {
+			var tag string
+			rows.Scan(&tag)
+			recipe.Tags = append(recipe.Tags, tag)
+		}
+	}
+
 	return recipe, nil
+}
+
+// GetTags returns the recipes divided into tags
+func (r Recipes) GetTags() ([]Tag, error) {
+	var tags []Tag
+	var current string
+
+	// Queries the recipes
+	var rows *sql.Rows
+	rows, err := db.Query(`SELECT t.name, r.rid, r.name FROM recipes r INNER JOIN tags t ON t.rid = r.rid WHERE r.uid = $1 ORDER BY t.name, r.name;`, r.uid)
+	if err != nil {
+		return tags, ERR_UNKNOWN
+	}
+
+	// Appends them to the list
+	defer rows.Close()
+	for rows.Next() {
+		var recipe Recipe
+		var tag string
+
+		rows.Scan(&tag, &recipe.RID, &recipe.Name)
+
+		if tag != current {
+			tags = append(tags, Tag{Name: tag})
+			current = tag
+		}
+
+		tags[len(tags)-1].Recipes = append(tags[len(tags)-1].Recipes, recipe)
+	}
+
+	// If no recipes have been found, makes sure the user exists
+	if len(tags) == 0 {
+		_, err := GetUser("UID", r.uid)
+		return tags, err
+	}
+
+	return tags, nil
 }
 
 // NewRecipe creates a new recipe and returns its RID

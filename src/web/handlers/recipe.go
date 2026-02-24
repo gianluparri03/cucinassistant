@@ -3,6 +3,7 @@ package handlers
 import (
 	"github.com/gorilla/mux"
 	"strconv"
+	"strings"
 
 	"cucinassistant/configs"
 	"cucinassistant/database"
@@ -60,6 +61,16 @@ func PostRecipesNew(c *utils.Context) (err error) {
 	return
 }
 
+func GetRecipesTags(c *utils.Context) (err error) {
+	var tags []database.Tag
+
+	if tags, err = c.U.Recipes().GetTags(); err == nil {
+		utils.RenderComponent(c, components.RecipesTags(tags))
+	}
+
+	return
+}
+
 func GetRecipe(c *utils.Context) (err error) {
 	var RID int
 	var recipe database.Recipe
@@ -90,9 +101,11 @@ func PostRecipeEdit(c *utils.Context) (err error) {
 	var RID int
 
 	if RID, err = getRID(c); err == nil {
+		tags := strings.Split(strings.ToUpper(c.R.FormValue("tags")), "\n")
 		stars, _ := strconv.ParseFloat(c.R.FormValue("stars"), 32)
 		newData := database.Recipe{
 			Name:        c.R.FormValue("name"),
+			Tags:        tags,
 			Stars:       int(stars * 2),
 			Ingredients: c.R.FormValue("ingredients"),
 			Directions:  c.R.FormValue("directions"),

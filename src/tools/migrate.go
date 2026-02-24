@@ -80,4 +80,8 @@ func update8to9(db *sql.DB) {
 	// Adds the schema version
 	db.Exec(`CREATE TABLE ca_version (id INT NOT NULL);`)
 	db.Exec(`INSERT INTO ca_version VALUES ($1);`, configs.VersionCode)
+
+	// Adds the recipe tags
+	db.Exec(`CREATE TABLE tags (name VARCHAR NOT NULL, rid INT NOT NULL, PRIMARY KEY (name, rid), FOREIGN KEY (rid) REFERENCES recipes (rid) ON DELETE CASCADE);`)
+	db.Exec(`CREATE INDEX tags_name ON tags (name);`)
 }

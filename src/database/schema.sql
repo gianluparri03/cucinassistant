@@ -107,3 +107,13 @@ CREATE TABLE recipes (
 
 CREATE INDEX recipes_uid_name ON recipes (uid, name);
 CREATE INDEX recipes_code ON recipes (code);
+
+CREATE TABLE tags (
+    name VARCHAR NOT NULL, 
+    rid INT NOT NULL,
+
+    PRIMARY KEY (name, rid), 
+    FOREIGN KEY (rid) REFERENCES recipes (rid) ON DELETE CASCADE
+);
+
+CREATE INDEX tags_name ON tags (name);

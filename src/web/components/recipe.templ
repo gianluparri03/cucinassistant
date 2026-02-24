@@ -13,6 +13,9 @@ templ Recipes(recipes []database.Recipe) {
 	<button class="icon-text" hx-get="/recipes/new">
 		<i class="ph ph-plus"></i> { langs.Translate(ctx, langs.STR_NEW_RECIPE) }
 	</button>
+	<button class="icon-text" hx-get="/recipes/tags">
+		<i class="ph ph-tag"></i> { langs.Translate(ctx, langs.STR_SEE_TAGS) }
+	</button>
 	<br/>
 	if len(recipes) > 0 {
 		<ol>
@@ -42,6 +45,30 @@ templ RecipesNew() {
 	</form>
 }
 
+templ RecipesTags(tags []database.Tag) {
+	@TemplateTitle(langs.Translate(ctx, langs.STR_TAGS), "/recipes")
+	if len(tags) > 0 {
+		<ul>
+			for _, tag := range tags {
+				<li class="caret">
+					<span class="tag">{ tag.Name }</span>
+					<ul>
+						for _, recipe := range tag.Recipes {
+							{{ baseurl := "/recipes/" + strconv.Itoa(recipe.RID) }}
+							<li class="disc"><a hx-get={ baseurl }>{ recipe.Name }</a></li>
+						}
+					</ul>
+				</li>
+			}
+		</ul>
+	} else {
+		<br/>
+		<span id="empty-label">
+			{ langs.Translate(ctx, langs.STR_RECIPES_EMPTY) }
+		</span>
+	}
+}
+
 templ Recipe(recipe database.Recipe, ca_baseurl string) {
 	{{ baseurl := "/recipes/" + strconv.Itoa(recipe.RID) }}
 	if recipe.RID != 0 {
@@ -49,6 +76,13 @@ templ Recipe(recipe database.Recipe, ca_baseurl string) {
 	} else {
 		<h1>{ recipe.Name }</h1>
 		<title>{ recipe.Name }</title>
+	}
+	if len(recipe.Tags) > 0 {
+		<div id="tags">
+			for _, tag := range recipe.Tags {
+				<span class="tag">{ tag }</span>
+			}
+		</div>
 	}
 	if recipe.Stars != 0 {
 		<div id="stars">
@@ -109,6 +143,12 @@ templ RecipeEdit(recipe database.Recipe) {
 			<b>{ langs.Translate(ctx, langs.STR_NAME) }</b>
 			<br/>
 			<input name="name" value={ recipe.Name }/>
+		</div>
+		<br/>
+		<div>
+			<b>{ langs.Translate(ctx, langs.STR_TAGS) }</b>
+			<br/>
+			<textarea name="tags">{ strings.Join(recipe.Tags, "\n") }</textarea>
 		</div>
 		<br/>
 		<div>
