@@ -194,17 +194,24 @@ ul {
 
 .article {
     margin: 10px auto;
-    display: flex;
     border-left: 3px solid var(--orange);
     padding-left: 5px;
 }
 
-.article, .article *:hover {
-    cursor: pointer;
-}
-
 .article.expired {
     border-color: var(--red);
+}
+
+.article > div {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 10px;
+}
+
+.article > div > i {
+    font-size: 1.5em;
+    margin-right: 5px;
+
 }
 
 .dashboard {
@@ -478,23 +485,8 @@ ul {
 
     main {
         margin: 30px;
+        margin-left: 15%;
         width: 60%;
-    }
-
-    .article input.expiration {
-        width: 15vw;
-    }
-
-    .article input.name {
-        width: 25vw;
-    }
-
-    .article input.quantity {
-        width: 10vw;
-    }
-
-    .article input+input, .article input+select {
-        margin-left: 5px;
     }
 
     .dashboard button {
@@ -514,23 +506,6 @@ ul {
 
     main {
         margin: 13px;
-    }
-
-    .article {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .article input.expiration {
-        width: 50vw;
-    }
-
-    .article input.name {
-        width: 80vw;
-    }
-
-    .article input.quantity {
-        width: 30vw;
     }
 
     .dashboard button {

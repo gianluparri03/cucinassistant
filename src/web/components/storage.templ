@@ -76,27 +76,35 @@ templ StorageSection(section database.Section, search string, secNames map[int]s
 				{{ classes += " expired" }}
 			}
 			<div class={ classes } hx-get={ baseurl + "/" + strconv.Itoa(article.AID) + "?search=" + search }>
-				<input class="name" value={ article.Name } readonly/>
+                <div>
+                    <i class="ph ph-pencil"></i>
+                    <input class="name" value={ article.Name } readonly/>
+                </div>
 				if article.Expiration != nil {
-					<input
-						class="expiration"
-						type="date"
-						readonly
-						value={ article.FormatExpiration() }
-					/>
+                    <div>
+                        <i class="ph ph-calendar-dots"></i>
+                        <input
+                            class="expiration"
+                            readonly
+                            value={ article.FormatExpiration() }
+                        />
+                    </div>
 				}
 				if article.Quantity != nil {
-					<input
-						class="quantity"
-						type="number"
-						readonly
-						value={ strconv.FormatFloat(float64(*article.Quantity), 'f', -1, 32) }
-					/>
+                    <div>
+                        <i class="ph ph-scales"></i>
+                        <input
+                            class="quantity"
+                            readonly
+                            value={ strconv.FormatFloat(float64(*article.Quantity), 'f', -1, 32) }
+                        />
+                    </div>
 				}
 				if section.SID == 0 {
-					<select class="section" disabled>
-						<option>{ secNames[article.SID] }</option>
-					</select>
+                    <div>
+                        <i class="ph ph-package"></i>
+                        <input class="section" readonly value={ secNames[article.SID] }>
+                    </div>
 				}
 			</div>
 		}
@@ -128,36 +136,48 @@ templ StorageSectionAdd(SID int, sections []database.Section) {
 		</button>
 		<div id="new-items">
 			<div class="item article hidden">
-				<input
-					class="name"
-					type="text"
-					placeholder={ langs.Translate(ctx, langs.STR_NAME) }
-					nametemplate="article-ID-name"
-				/>
-				<input
-					class="expiration"
-					type="date"
-					placeholder={ langs.Translate(ctx, langs.STR_EXPIRATION) }
-					nametemplate="article-ID-expiration"
-				/>
-				<input
-					class="quantity"
-					type="number"
-					step="any"
-					placeholder={ langs.Translate(ctx, langs.STR_QUANTITY) }
-					nametemplate="article-ID-quantity"
-				/>
+                <div>
+                    <i class="ph ph-pencil"></i>
+                    <input
+                        class="name"
+                        type="text"
+                        placeholder={ langs.Translate(ctx, langs.STR_NAME) }
+                        nametemplate="article-ID-name"
+                    />
+                </div>
+                <div>
+                    <i class="ph ph-calendar-dots"></i>
+					<input
+						class="expiration"
+						type="date"
+						placeholder={ langs.Translate(ctx, langs.STR_EXPIRATION) }
+						nametemplate="article-ID-expiration"
+					/>
+				</div>
+				<div>
+                    <i class="ph ph-scales"></i>
+					<input
+						class="quantity"
+						type="number"
+						step="any"
+						placeholder={ langs.Translate(ctx, langs.STR_QUANTITY) }
+						nametemplate="article-ID-quantity"
+					/>
+				</div>
 				if SID == 0 {
-					<select class="section" nametemplate="article-ID-section">
-						<option selected disabled>
-							{ langs.Translate(ctx, langs.STR_SECTION) }
-						</option>
-						for _, section := range sections {
-							<option value={ strconv.Itoa(section.SID) }>
-								{ section.Name }
+					<div>
+                        <i class="ph ph-package"></i>
+						<select class="section" nametemplate="article-ID-section">
+							<option selected disabled>
+								{ langs.Translate(ctx, langs.STR_SECTION) }
 							</option>
-						}
-					</select>
+							for _, section := range sections {
+								<option value={ strconv.Itoa(section.SID) }>
+									{ section.Name }
+								</option>
+							}
+						</select>
+					</div>
 				} else {
 					<input
 						class="section hidden"
@@ -223,41 +243,53 @@ templ StorageArticle(SID int, article database.Article, prev int, next int, sear
 			{{ classes += " expired" }}
 		}
 		<div class={ classes } onchange="swapContent();">
-			<input
-				name="name"
-				class="name"
-				placeholder={ langs.Translate(ctx, langs.STR_NAME) }
-				value={ article.Name }
-			/>
-			<input
-				name="expiration"
-				class="expiration"
-				type="date"
-				placeholder={ langs.Translate(ctx, langs.STR_EXPIRATION) }
-				if article.Expiration != nil {
-					value={ article.FormatExpiration() }
-				}
-			/>
-			<input
-				class="quantity"
-				name="quantity"
-				type="number"
-				step="any"
-				placeholder={ langs.Translate(ctx, langs.STR_QUANTITY) }
-				if article.Quantity != nil {
-					value={ strconv.FormatFloat(float64(*article.Quantity), 'f', -1, 32) }
-				}
-			/>
-			<select class="section" name="section">
-				<option selected disabled>
-					{ langs.Translate(ctx, langs.STR_SECTION) }
-				</option>
-				for _, section := range sections {
-					<option value={ strconv.Itoa(section.SID) } selected?={ section.SID == article.SID }>
-						{ section.Name }
+			<div>
+	            <i class="ph ph-pencil"></i>
+				<input
+					name="name"
+					class="name"
+					placeholder={ langs.Translate(ctx, langs.STR_NAME) }
+					value={ article.Name }
+				/>
+			</div>
+			<div>
+	            <i class="ph ph-calendar-dots"></i>
+				<input
+					name="expiration"
+					class="expiration"
+					type="date"
+					placeholder={ langs.Translate(ctx, langs.STR_EXPIRATION) }
+					if article.Expiration != nil {
+						value={ article.FormatExpiration() }
+					}
+				/>
+			</div>
+			<div>
+	            <i class="ph ph-scales"></i>
+				<input
+					class="quantity"
+					name="quantity"
+					type="number"
+					step="any"
+					placeholder={ langs.Translate(ctx, langs.STR_QUANTITY) }
+					if article.Quantity != nil {
+						value={ strconv.FormatFloat(float64(*article.Quantity), 'f', -1, 32) }
+					}
+				/>
+			</div>
+			<div>
+	            <i class="ph ph-package"></i>
+				<select class="section" name="section">
+					<option selected disabled>
+						{ langs.Translate(ctx, langs.STR_SECTION) }
 					</option>
-				}
-			</select>
+					for _, section := range sections {
+						<option value={ strconv.Itoa(section.SID) } selected?={ section.SID == article.SID }>
+							{ section.Name }
+						</option>
+					}
+				</select>
+			</div>
 		</div>
 		if prev != 0 {
 			<button class="icon pre-swap" hx-get={ sec_url + "/" + strconv.Itoa(prev) }>
