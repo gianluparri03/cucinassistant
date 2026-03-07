@@ -76,35 +76,35 @@ templ StorageSection(section database.Section, search string, secNames map[int]s
 				{{ classes += " expired" }}
 			}
 			<div class={ classes } hx-get={ baseurl + "/" + strconv.Itoa(article.AID) + "?search=" + search }>
-                <div>
-                    <i class="ph ph-pencil"></i>
-                    <input class="name" value={ article.Name } readonly/>
-                </div>
+				<div>
+					<i class="ph ph-pencil"></i>
+					<input class="name" value={ article.Name } readonly/>
+				</div>
 				if article.Expiration != nil {
-                    <div>
-                        <i class="ph ph-calendar-dots"></i>
-                        <input
-                            class="expiration"
-                            readonly
-                            value={ article.FormatExpiration() }
-                        />
-                    </div>
+					<div>
+						<i class="ph ph-calendar-dots"></i>
+						<input
+							class="expiration"
+							readonly
+							value={ article.FormatExpiration() }
+						/>
+					</div>
 				}
 				if article.Quantity != nil {
-                    <div>
-                        <i class="ph ph-scales"></i>
-                        <input
-                            class="quantity"
-                            readonly
-                            value={ strconv.FormatFloat(float64(*article.Quantity), 'f', -1, 32) }
-                        />
-                    </div>
+					<div>
+						<i class="ph ph-scales"></i>
+						<input
+							class="quantity"
+							readonly
+							value={ strconv.FormatFloat(float64(*article.Quantity), 'f', -1, 32) }
+						/>
+					</div>
 				}
 				if section.SID == 0 {
-                    <div>
-                        <i class="ph ph-package"></i>
-                        <input class="section" readonly value={ secNames[article.SID] }>
-                    </div>
+					<div>
+						<i class="ph ph-package"></i>
+						<input class="section" readonly value={ secNames[article.SID] }/>
+					</div>
 				}
 			</div>
 		}
@@ -136,17 +136,17 @@ templ StorageSectionAdd(SID int, sections []database.Section) {
 		</button>
 		<div id="new-items">
 			<div class="item article hidden">
-                <div>
-                    <i class="ph ph-pencil"></i>
-                    <input
-                        class="name"
-                        type="text"
-                        placeholder={ langs.Translate(ctx, langs.STR_NAME) }
-                        nametemplate="article-ID-name"
-                    />
-                </div>
-                <div>
-                    <i class="ph ph-calendar-dots"></i>
+				<div>
+					<i class="ph ph-pencil"></i>
+					<input
+						class="name"
+						type="text"
+						placeholder={ langs.Translate(ctx, langs.STR_NAME) }
+						nametemplate="article-ID-name"
+					/>
+				</div>
+				<div>
+					<i class="ph ph-calendar-dots"></i>
 					<input
 						class="expiration"
 						type="date"
@@ -155,7 +155,7 @@ templ StorageSectionAdd(SID int, sections []database.Section) {
 					/>
 				</div>
 				<div>
-                    <i class="ph ph-scales"></i>
+					<i class="ph ph-scales"></i>
 					<input
 						class="quantity"
 						type="number"
@@ -163,10 +163,13 @@ templ StorageSectionAdd(SID int, sections []database.Section) {
 						placeholder={ langs.Translate(ctx, langs.STR_QUANTITY) }
 						nametemplate="article-ID-quantity"
 					/>
+					<button class="icon calculator" hx-on:click="calculateQuantity(this, event);">
+						<i class="ph ph-calculator"></i>
+					</button>
 				</div>
 				if SID == 0 {
 					<div>
-                        <i class="ph ph-package"></i>
+						<i class="ph ph-package"></i>
 						<select class="section" nametemplate="article-ID-section">
 							<option selected disabled>
 								{ langs.Translate(ctx, langs.STR_SECTION) }
@@ -244,7 +247,7 @@ templ StorageArticle(SID int, article database.Article, prev int, next int, sear
 		}
 		<div class={ classes } onchange="swapContent();">
 			<div>
-	            <i class="ph ph-pencil"></i>
+				<i class="ph ph-pencil"></i>
 				<input
 					name="name"
 					class="name"
@@ -253,7 +256,7 @@ templ StorageArticle(SID int, article database.Article, prev int, next int, sear
 				/>
 			</div>
 			<div>
-	            <i class="ph ph-calendar-dots"></i>
+				<i class="ph ph-calendar-dots"></i>
 				<input
 					name="expiration"
 					class="expiration"
@@ -265,7 +268,7 @@ templ StorageArticle(SID int, article database.Article, prev int, next int, sear
 				/>
 			</div>
 			<div>
-	            <i class="ph ph-scales"></i>
+				<i class="ph ph-scales"></i>
 				<input
 					class="quantity"
 					name="quantity"
@@ -276,9 +279,12 @@ templ StorageArticle(SID int, article database.Article, prev int, next int, sear
 						value={ strconv.FormatFloat(float64(*article.Quantity), 'f', -1, 32) }
 					}
 				/>
+				<button class="icon calculator" hx-on:click="calculateQuantity(this, event);">
+					<i class="ph ph-calculator"></i>
+				</button>
 			</div>
 			<div>
-	            <i class="ph ph-package"></i>
+				<i class="ph ph-package"></i>
 				<select class="section" name="section">
 					<option selected disabled>
 						{ langs.Translate(ctx, langs.STR_SECTION) }

@@ -211,7 +211,10 @@ ul {
 .article > div > i {
     font-size: 1.5em;
     margin-right: 5px;
+}
 
+.calculator {
+    margin-left: 10px;
 }
 
 .dashboard {

@@ -59,11 +59,13 @@ function addItem(e, last=false) {
         i.prependTo('#new-items');
     }
     
-    i.removeClass("hidden").children().each((ind, inp) => {
+    i.removeClass("hidden").find('input').each((ind, inp) => {
         if ((tmpl = $(inp).attr('nametemplate'))) {
             inp.name = tmpl.replace('ID', itemsCount);
         }
     });
+
+    htmx.process(i[0]);
 }
 
 // Removes the first item (the last one added)
@@ -134,4 +136,33 @@ function calcDates(event) {
         days += d.toLocaleDateString(locale, dayDateOpt);
     }
     $('#menu-days').val(days);
+}
+
+
+
+// Lets the user write an arithmetic expression evaluated at the second call.
+function calculateQuantity(button, event) {
+    event.preventDefault();
+
+    let icon = $(button).children(0);
+    let input = $(button).siblings('input');
+
+    if (icon.hasClass('ph-calculator')) {
+        icon.removeClass('ph-calculator');
+        icon.addClass('ph-equals');
+
+        input.attr('type', 'text');
+        input.attr('prevValue', input.val());
+    } else {
+        icon.addClass('ph-calculator');
+        icon.removeClass('ph-equals');
+
+        let value = input.attr('prevValue');
+        try {
+            value = eval(input.val());
+        } catch {}
+
+        input.attr('type', 'number');
+        input.val(value);
+    }
 }
