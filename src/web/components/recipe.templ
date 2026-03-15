@@ -148,7 +148,7 @@ templ RecipeEdit(recipe database.Recipe) {
 		<div>
 			<b>{ langs.Translate(ctx, langs.STR_TAGS) }</b>
 			<br/>
-			<textarea name="tags">{ strings.Join(recipe.Tags, "\n") }</textarea>
+			<textarea style="text-transform: uppercase" name="tags">{ strings.Join(recipe.Tags, "\n") }</textarea>
 		</div>
 		<br/>
 		<div>

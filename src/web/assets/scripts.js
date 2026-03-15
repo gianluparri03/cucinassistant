@@ -59,7 +59,7 @@ function addItem(e, last=false) {
         i.prependTo('#new-items');
     }
     
-    i.removeClass("hidden").find('input').each((ind, inp) => {
+    i.removeClass("hidden").find('input, select').each((ind, inp) => {
         if ((tmpl = $(inp).attr('nametemplate'))) {
             inp.name = tmpl.replace('ID', itemsCount);
         }
@@ -153,6 +153,7 @@ function calculateQuantity(button, event) {
 
         input.attr('type', 'text');
         input.attr('prevValue', input.val());
+        input.prop('onclick', null);
     } else {
         icon.addClass('ph-calculator');
         icon.removeClass('ph-equals');
