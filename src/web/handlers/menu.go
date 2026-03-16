@@ -82,31 +82,6 @@ func GetMenuEdit(c *utils.Context) (err error) {
 	return
 }
 
-func PostMenuEdit(c *utils.Context) (err error) {
-	var MID int
-
-	if MID, err = getMID(c); err == nil {
-		if err = c.U.Menus().SetName(MID, c.R.FormValue("name")); err == nil {
-			utils.Redirect(c, "/menus/"+strconv.Itoa(MID))
-		}
-	}
-
-	return
-}
-
-func GetMenuEditDay(c *utils.Context) (err error) {
-	var MID, DPos int
-	var day database.Day
-
-	if MID, DPos, err = getDPos(c); err == nil {
-		if day, err = c.U.Menus().GetDay(MID, DPos); err == nil {
-			utils.RenderComponent(c, components.MenuEditDay(day))
-		}
-	}
-
-	return
-}
-
 func PostMenuEditDayMeals(c *utils.Context) (err error) {
 	var MID, DPos int
 	var keys, meals []string
@@ -126,7 +101,49 @@ func PostMenuEditDayMeals(c *utils.Context) (err error) {
 		}
 
 		if err = c.U.Menus().SetDayMeals(MID, DPos, meals); err == nil {
-			utils.Redirect(c, "/menus/"+strconv.Itoa(MID)+"/edit")
+			utils.Redirect(c, "/menus/"+strconv.Itoa(MID)+"/edit/meals")
+		}
+	}
+
+	return
+}
+
+func PostMenuEditDayMealsAdd(c *utils.Context) (err error) {
+	var MID, DPos int
+	var day database.Day
+	c.R.ParseForm()
+
+	if MID, DPos, err = getDPos(c); err == nil {
+		if day, err = c.U.Menus().GetDay(MID, DPos); err == nil {
+			day.Meals = append(day.Meals, "")
+			if err = c.U.Menus().SetDayMeals(MID, DPos, day.Meals); err == nil {
+				utils.Redirect(c, "/menus/"+strconv.Itoa(MID)+"/edit/meals")
+			}
+		}
+	}
+
+	return
+}
+
+func PostMenuEditDayMealsRemove(c *utils.Context) (err error) {
+	var MID, DPos, MPos int
+	var day database.Day
+	c.R.ParseForm()
+
+	if MID, DPos, err = getDPos(c); err == nil {
+		if day, err = c.U.Menus().GetDay(MID, DPos); err == nil {
+			if MPos, err = getID(c, "MPos", database.ERR_MEAL_NOT_FOUND); err == nil {
+				if MPos < 0 || MPos >= len(day.Meals) {
+					err = database.ERR_MEAL_NOT_FOUND
+					return
+				}
+
+				day.Meals = append(day.Meals[:MPos], day.Meals[MPos+1:]...)
+
+				if err = c.U.Menus().SetDayMeals(MID, DPos, day.Meals); err == nil {
+					utils.Redirect(c, "/menus/"+strconv.Itoa(MID)+"/edit/meals")
+				}
+			}
 		}
 	}
 
@@ -140,6 +157,31 @@ func PostMenuEditDayName(c *utils.Context) (err error) {
 
 	if MID, DPos, err = getDPos(c); err == nil {
 		if err = c.U.Menus().SetDayName(MID, DPos, name); err == nil {
+			utils.Redirect(c, "/menus/"+strconv.Itoa(MID)+"/edit")
+		}
+	}
+
+	return
+}
+
+func GetMenuEditMeals(c *utils.Context) (err error) {
+	var MID int
+	var menu database.Menu
+
+	if MID, err = getMID(c); err == nil {
+		if menu, err = c.U.Menus().GetOne(MID); err == nil {
+			utils.RenderComponent(c, components.MenuEditMeals(menu))
+		}
+	}
+
+	return
+}
+
+func PostMenuEditName(c *utils.Context) (err error) {
+	var MID int
+
+	if MID, err = getMID(c); err == nil {
+		if err = c.U.Menus().SetName(MID, c.R.FormValue("name")); err == nil {
 			utils.Redirect(c, "/menus/"+strconv.Itoa(MID)+"/edit")
 		}
 	}

@@ -78,19 +78,13 @@ function removeItem(e) {
     if (e) { e.preventDefault(); }
 } 
 
-// Removes the item whose button called the function.
-// It does not decrement itemsCount, so that the absolute order is preserved.
-function removeThisItem(e, t) {
-    t.parentElement.remove();
-    if (e) { e.preventDefault(); }
-} 
 
 
-
-// Swaps two contents
-function swapContent() {
-    $('.pre-swap').remove();
-    $('.post-swap').removeClass("hidden");
+// Swaps two contents inside an area
+function swapContent(target) {
+    let area = $(target).parents('.swap-area');
+    area.find('.pre-swap').remove();
+    area.find('.post-swap').removeClass('post-swap');
 }
 
 

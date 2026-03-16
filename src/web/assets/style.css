@@ -221,6 +221,18 @@ ul {
     margin-left: 10px;
 }
 
+.day-edit {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.day-edit input {
+    flex-shrink: 1;
+}
+
 .dashboard {
     display: flex;
     flex-wrap: wrap;
@@ -263,8 +275,8 @@ ul {
     opacity: 0;
 }
 
-.hidden {
-    display: none !important;
+.hidden, .post-swap {
+    display: none;
 }
 
 .htmx-request#loader-container {
@@ -285,14 +297,16 @@ ul {
     margin-right: 10px;
 }
 
+.meals-compact {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 5px;
+}
+
 .menu-day {
     border-left: 3px solid var(--orange);
     margin: 15px auto;
     padding: 5px 0 10px 10px;
-
-    display: flex;
-    flex-flow: row wrap;
-    gap: 5px;
 }
 
 .menu-day b {
