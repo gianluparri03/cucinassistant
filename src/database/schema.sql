@@ -37,7 +37,7 @@ CREATE TABLE days (
     name VARCHAR(64) NOT NULL,
     meals VARCHAR(512)[],
 
-    PRIMARY KEY (mid, position),
+    PRIMARY KEY (mid, position) DEFERRABLE INITIALLY IMMEDIATE,
     FOREIGN KEY (mid) REFERENCES menus (mid) ON DELETE CASCADE
 );
 

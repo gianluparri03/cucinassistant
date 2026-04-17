@@ -84,4 +84,8 @@ func update8to9(db *sql.DB) {
 	// Adds the recipe tags
 	db.Exec(`CREATE TABLE tags (name VARCHAR NOT NULL, rid INT NOT NULL, PRIMARY KEY (name, rid), FOREIGN KEY (rid) REFERENCES recipes (rid) ON DELETE CASCADE);`)
 	db.Exec(`CREATE INDEX tags_name ON tags (name);`)
+
+	// Edits the days primary key
+	db.Exec(`ALTER TABLE days DROP CONSTRAINT days_pkey;`)
+	db.Exec(`ALTER TABLE days ADD CONSTRAINT days_pkey PRIMARY KEY (mid, position) DEFERRABLE INITIALLY IMMEDIATE;`)
 }

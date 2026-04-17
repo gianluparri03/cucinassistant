@@ -46,8 +46,16 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 		GetHandler: handlers.GetMenu,
 	},
 	{
+		Path:        "/menus/{MID}/add",
+		PostHandler: handlers.PostMenuAddDay,
+	},
+	{
 		Path:       "/menus/{MID}/edit",
 		GetHandler: handlers.GetMenuEdit,
+	},
+	{
+		Path:        "/menus/{MID}/edit/{DPos}/delete",
+		PostHandler: handlers.PostMenuEditDayDelete,
 	},
 	{
 		Path:        "/menus/{MID}/edit/{DPos}/meals",
@@ -60,6 +68,14 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 	{
 		Path:        "/menus/{MID}/edit/{DPos}/meals/{MPos}/remove",
 		PostHandler: handlers.PostMenuEditDayMealsRemove,
+	},
+	{
+		Path:        "/menus/{MID}/edit/{DPos}/movedown",
+		PostHandler: handlers.PostMenuEditDayMovedown,
+	},
+	{
+		Path:        "/menus/{MID}/edit/{DPos}/moveup",
+		PostHandler: handlers.PostMenuEditDayMoveup,
 	},
 	{
 		Path:        "/menus/{MID}/edit/{DPos}/name",

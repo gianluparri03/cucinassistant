@@ -27,6 +27,20 @@ func getDPos(c *utils.Context) (int, int, error) {
 	}
 }
 
+func PostMenuAddDay(c *utils.Context) (err error) {
+	var MID int
+
+	name := c.R.FormValue("name")
+
+	if MID, err = getMID(c); err == nil {
+		if err = c.U.Menus().AddDay(MID, name); err == nil {
+			utils.Redirect(c, "/menus/"+strconv.Itoa(MID)+"/edit")
+		}
+	}
+
+	return
+}
+
 func GetMenus(c *utils.Context) (err error) {
 	var menus []database.Menu
 
@@ -76,6 +90,18 @@ func GetMenuEdit(c *utils.Context) (err error) {
 	if MID, err = getMID(c); err == nil {
 		if menu, err = c.U.Menus().GetOne(MID); err == nil {
 			utils.RenderComponent(c, components.MenuEdit(menu))
+		}
+	}
+
+	return
+}
+
+func PostMenuEditDayDelete(c *utils.Context) (err error) {
+	var MID, DPos int
+
+	if MID, DPos, err = getDPos(c); err == nil {
+		if err = c.U.Menus().RemoveDay(MID, DPos); err == nil {
+			utils.Redirect(c, "/menus/"+strconv.Itoa(MID)+"/edit")
 		}
 	}
 
@@ -144,6 +170,30 @@ func PostMenuEditDayMealsRemove(c *utils.Context) (err error) {
 					utils.Redirect(c, "/menus/"+strconv.Itoa(MID)+"/edit/meals")
 				}
 			}
+		}
+	}
+
+	return
+}
+
+func PostMenuEditDayMovedown(c *utils.Context) (err error) {
+	var MID, DPos int
+
+	if MID, DPos, err = getDPos(c); err == nil {
+		if err = c.U.Menus().MoveDay(MID, DPos, +1); err == nil {
+			utils.Redirect(c, "/menus/"+strconv.Itoa(MID)+"/edit")
+		}
+	}
+
+	return
+}
+
+func PostMenuEditDayMoveup(c *utils.Context) (err error) {
+	var MID, DPos int
+
+	if MID, DPos, err = getDPos(c); err == nil {
+		if err = c.U.Menus().MoveDay(MID, DPos, -1); err == nil {
+			utils.Redirect(c, "/menus/"+strconv.Itoa(MID)+"/edit")
 		}
 	}
 

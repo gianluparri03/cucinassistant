@@ -42,6 +42,23 @@ func (u User) Menus() Menus {
 	return Menus{uid: u.UID}
 }
 
+// AddDay adds a new day in a menu
+func (m Menus) AddDay(MID int, name string) error {
+	// Gets the menu
+	_, err := m.GetOne(MID)
+	if err != nil {
+		return err
+	}
+
+	// Adds the new day
+	_, err = db.Exec(`INSERT INTO days (mid, position, name, meals) SELECT $1, max(position)+1, $2, $3 FROM days WHERE mid=$1;`, MID, name, pq.Array([]string{}))
+	if err != nil {
+		return ERR_UNKNOWN
+	}
+
+	return nil
+}
+
 // Delete deletes a menu
 func (m Menus) Delete(MID int) error {
 	// Deletes the menu
@@ -74,6 +91,35 @@ func (m Menus) Duplicate(srcMID int) (int, error) {
 	}
 
 	return dstMID, nil
+}
+
+// editDay is used by MoveDay, SetDayMeals and SetDayName
+func (m Menus) editDay(MID int, day int, fetch bool, editMeals bool, meals []string, editName bool, name string) error {
+	if fetch {
+		// Gets the menu
+		_, err := m.GetDay(MID, day)
+		if err != nil {
+			return err
+		}
+	}
+
+	if editMeals {
+		// Saves the new meals
+		_, err := db.Exec(`UPDATE days SET meals=$3 WHERE mid=$1 AND position=$2`, MID, day, pq.Array(meals))
+		if err != nil {
+			return ERR_UNKNOWN
+		}
+	}
+
+	if editName {
+		// Saves the new name
+		_, err := db.Exec(`UPDATE days SET name=$3 WHERE mid=$1 AND position=$2`, MID, day, name)
+		if err != nil {
+			return ERR_UNKNOWN
+		}
+	}
+
+	return nil
 }
 
 // GetAll returns a list of menus (days not included) ordered by creation date
@@ -156,6 +202,31 @@ func (m Menus) GetOne(MID int) (Menu, error) {
 	return menu, nil
 }
 
+// MoveDay moves a day in the list (+1 switches it down, -1 switches it up, etc.)
+func (m Menus) MoveDay(MID int, day int, delta int) error {
+	// Gets the days
+	dayA, err := m.GetDay(MID, day)
+	if err != nil {
+		return err
+	}
+	dayB, err := m.GetDay(MID, day+delta)
+	if err != nil {
+		return ERR_DAY_NOT_MOVED
+	}
+
+	// Switches the contents
+	if err = m.editDay(MID, day, false, true, dayB.Meals, true, dayB.Name); err == nil {
+		if err = m.editDay(MID, day+delta, false, true, dayA.Meals, true, dayA.Name); err == nil {
+			return nil
+		}
+	}
+
+	m.editDay(MID, day, false, true, dayA.Meals, true, dayA.Name)
+	m.editDay(MID, day+delta, false, true, dayB.Meals, true, dayB.Name)
+
+	return err
+}
+
 // New creates a new menu and return its MID
 func (m Menus) New(name string, daysNames []string, mealsN int) (int, error) {
 	var MID int
@@ -195,16 +266,22 @@ func (m Menus) New(name string, daysNames []string, mealsN int) (int, error) {
 	return MID, nil
 }
 
-// SetDayMeals is used to set a day's meals
-func (m Menus) SetDayMeals(MID int, day int, meals []string) error {
-	// Gets the menu
+// RemoveDay removes a day from a menu
+func (m Menus) RemoveDay(MID int, day int) error {
+	// Gets the day
 	_, err := m.GetDay(MID, day)
 	if err != nil {
 		return err
 	}
 
-	// Saves the new meals
-	_, err = db.Exec(`UPDATE days SET meals=$3 WHERE mid=$1 AND position=$2`, MID, day, pq.Array(meals))
+	// Removes the desired day
+	_, err = db.Exec(`DELETE FROM days WHERE mid=$1 AND position=$2;`, MID, day)
+	if err != nil {
+		return ERR_UNKNOWN
+	}
+
+	// Adjust the remaining positions
+	_, err = db.Exec(`UPDATE days SET position=position-1 WHERE mid=$1 AND position>$2;`, MID, day)
 	if err != nil {
 		return ERR_UNKNOWN
 	}
@@ -212,21 +289,14 @@ func (m Menus) SetDayMeals(MID int, day int, meals []string) error {
 	return nil
 }
 
+// SetDayMeals is used to set a day's meals
+func (m Menus) SetDayMeals(MID int, day int, meals []string) error {
+	return m.editDay(MID, day, true, true, meals, false, "")
+}
+
 // SetDayName is used to set a day's name
 func (m Menus) SetDayName(MID int, day int, name string) error {
-	// Gets the menu
-	_, err := m.GetDay(MID, day)
-	if err != nil {
-		return err
-	}
-
-	// Saves the new meals
-	_, err = db.Exec(`UPDATE days SET name=$3 WHERE mid=$1 AND position=$2`, MID, day, name)
-	if err != nil {
-		return ERR_UNKNOWN
-	}
-
-	return nil
+	return m.editDay(MID, day, true, false, nil, true, name)
 }
 
 // SetName is used to set the menu's name
