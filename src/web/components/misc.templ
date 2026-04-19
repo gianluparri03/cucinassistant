@@ -82,6 +82,85 @@ templ Lang(available map[string]*langs.Lang, current string) {
 	</form>
 }
 
+templ Side(menus []database.Menu, sections []database.Section, recipes []database.Recipe) {
+	<div class="obscurer"></div>
+	<div id="side">
+		<div id="side-icons">
+			<i class="ph ph-house" id="side-home" hx-get="/" hx-on::after-request="closeSide()"></i>
+			<i class="ph ph-x" id="side-close" onclick={ templ.JSFuncCall("closeSide") }></i>
+		</div>
+		<div class="side-item">
+			<div class="side-content" hx-get="/menus" hx-on::after-request="closeSide()">
+				<i class="ph ph-fork-knife"></i>
+				<span>{ langs.Translate(ctx, langs.STR_MENUS) }</span>
+			</div>
+			if menus == nil {
+				<i class="ph-fill ph-caret-down side-caret" hx-get="/side?open=menus" hx-push-url="false"></i>
+			} else {
+				<i class="ph-fill ph-caret-up side-caret" hx-get="/side" hx-push-url="false"></i>
+			}
+		</div>
+		for _, menu := range menus {
+			<div class="side-item">
+				<div class="side-content padded-side-content" hx-get={ "/menus/" + strconv.Itoa(menu.MID) } hx-on::after-request="closeSide()">
+					<i class="ph ph-fork-knife"></i>
+					<span>{ menu.Name }</span>
+				</div>
+			</div>
+		}
+		<div class="side-item">
+			<div class="side-content" hx-get="/storage" hx-on::after-request="closeSide()">
+				<i class="ph ph-package"></i>
+				<span>{ langs.Translate(ctx, langs.STR_STORAGE) }</span>
+			</div>
+			if sections == nil {
+				<i class="ph-fill ph-caret-down side-caret" hx-get="/side?open=sections" hx-push-url="false"></i>
+			} else {
+				<i class="ph-fill ph-caret-up side-caret" hx-get="/side" hx-push-url="false"></i>
+			}
+		</div>
+		for _, section := range sections {
+			<div class="side-item">
+				<div class="side-content padded-side-content" hx-get={ "/storage/" + strconv.Itoa(section.SID) } hx-on::after-request="closeSide()">
+					<i class="ph ph-fork-knife"></i>
+					<span>{ section.Name }</span>
+				</div>
+			</div>
+		}
+		<div class="side-item">
+			<div class="side-content" hx-get="/shopping_list" hx-on::after-request="closeSide()">
+				<i class="ph ph-basket"></i>
+				<span>{ langs.Translate(ctx, langs.STR_SHOPPINGLIST) }</span>
+			</div>
+		</div>
+		<div class="side-item">
+			<div class="side-content" hx-get="/recipes" hx-on::after-request="closeSide()">
+				<i class="ph ph-notebook"></i>
+				<span>{ langs.Translate(ctx, langs.STR_RECIPES) }</span>
+			</div>
+			if recipes == nil {
+				<i class="ph-fill ph-caret-down side-caret" hx-get="/side?open=recipes" hx-push-url="false"></i>
+			} else {
+				<i class="ph-fill ph-caret-up side-caret" hx-get="/side" hx-push-url="false"></i>
+			}
+		</div>
+		for _, recipe := range recipes {
+			<div class="side-item">
+				<div class="side-content padded-side-content" hx-get={ "/recipes/" + strconv.Itoa(recipe.RID) } hx-on::after-request="closeSide()">
+					<i class="ph ph-fork-knife"></i>
+					<span>{ recipe.Name }</span>
+				</div>
+			</div>
+		}
+		<div class="side-item">
+			<div class="side-content" hx-get="/user/settings" hx-on::after-request="closeSide()">
+				<i class="ph ph-gear"></i>
+				<span>{ langs.Translate(ctx, langs.STR_SETTINGS) }</span>
+			</div>
+		</div>
+	</div>
+}
+
 templ Stats(data database.Stats) {
 	@TemplateTitle(langs.Translate(ctx, langs.STR_STATS), "/info")
 	<div class="dashboard">

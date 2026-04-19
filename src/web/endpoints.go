@@ -167,6 +167,11 @@ var endpoints []utils.Endpoint = []utils.Endpoint{
 	},
 
 	{
+		Path:       "/side",
+		GetHandler: handlers.GetSide,
+	},
+
+	{
 		Path:       "/storage",
 		GetHandler: handlers.GetStorage,
 	},

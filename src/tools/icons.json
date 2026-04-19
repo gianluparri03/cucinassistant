@@ -49,6 +49,8 @@
 	],
 	"fill": [
 		"arrow-circle-left",
+        "caret-down",
+        "caret-up",
 		"star",
 		"star-half"
 	]

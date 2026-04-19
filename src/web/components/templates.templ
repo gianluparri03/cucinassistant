@@ -2,7 +2,7 @@ package components
 
 import "cucinassistant/langs"
 
-templ TemplateBase(lang string, body templ.Component, message templ.Component, tutorial string) {
+templ TemplateBase(signedin bool, lang string, body templ.Component, message templ.Component, tutorial string) {
 	<!DOCTYPE html>
 	<html>
 		<head>
@@ -19,7 +19,6 @@ templ TemplateBase(lang string, body templ.Component, message templ.Component, t
 			<link rel="stylesheet" href="/assets/phosphor.css"/>
 			<link rel="stylesheet" href="/assets/style.css"/>
 			<script src="https://unpkg.com/htmx.org@2.0.0/dist/htmx.min.js"></script>
-			<script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/response-targets.js"></script>
 			<script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"></script>
 			<script src="/assets/scripts.js"></script>
 			@templ.JSFuncCall("setLocale", lang)
@@ -30,43 +29,19 @@ templ TemplateBase(lang string, body templ.Component, message templ.Component, t
 			hx-indicator="#loader-container"
 			hx-push-url="true"
 			hx-target="main"
-			hx-target-201="#message-container"
-			hx-target-error="#message-container"
 		>
 			<nav>
-				<span><i id="side-open" class="ph ph-list" onclick={ templ.JSFuncCall("toggleSide", true) }></i></span>
+				<span>
+					if signedin {
+						<i id="side-open" class="ph ph-list" hx-get="/side" hx-push-url="false"></i>
+					} else {
+						<i id="home" class="ph ph-house" hx-get="/"></i>
+					}
+				</span>
 				<span id="logo">CucinAssistant</span>
 				<span><i id="lang" class="ph ph-translate" hx-get="/lang"></i></span>
 			</nav>
-			<div id="side-container">
-				<div class="obscurer"></div>
-				<div id="side">
-					<div id="side-icons">
-						<i class="ph ph-house" id="side-home" hx-get="/"></i>
-						<i class="ph ph-x" id="side-close" onclick={ templ.JSFuncCall("toggleSide", false) }></i>
-					</div>
-					<div class="side-item" hx-get="/menus">
-						<i class="ph ph-fork-knife"></i>
-						{ langs.Translate(ctx, langs.STR_MENUS) }
-					</div>
-					<div class="side-item" hx-get="/storage">
-						<i class="ph ph-package"></i>
-						{ langs.Translate(ctx, langs.STR_STORAGE) }
-					</div>
-					<div class="side-item" hx-get="/shopping_list">
-						<i class="ph ph-basket"></i>
-						{ langs.Translate(ctx, langs.STR_SHOPPINGLIST) }
-					</div>
-					<div class="side-item" hx-get="/recipes">
-						<i class="ph ph-notebook"></i>
-						{ langs.Translate(ctx, langs.STR_RECIPES) }
-					</div>
-					<div class="side-item" hx-get="/user/settings">
-						<i class="ph ph-gear"></i>
-						{ langs.Translate(ctx, langs.STR_SETTINGS) }
-					</div>
-				</div>
-			</div>
+			<div id="side-container"></div>
 			<main>
 				@body
 			</main>

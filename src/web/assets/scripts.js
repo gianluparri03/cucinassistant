@@ -1,17 +1,12 @@
 $(document).ready(function() {
-    htmx.on("#side", "htmx:afterRequest", () => toggleSide(false));
     htmx.on("htmx:sendError", () => $('#neterror-container').show());
 });
 
 
 
-// Sets the visibility of the sidebar
-function toggleSide(status) {
-    var side = $("#side-container");
-
-    if (status == true) side.show();
-    else if (status == false) side.hide();
-    else side.toggle();
+// Closes the side bar
+function closeSide() {
+    $("#side-container").children().remove();
 }
 
 

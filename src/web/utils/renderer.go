@@ -16,7 +16,7 @@ import (
 func render(c *Context, body, message, content templ.Component) {
 	if !c.h {
 		tutorial := fmt.Sprintf("%s/%d_%s.pdf", configs.TutorialsURL, configs.VersionCode, c.L)
-		content = components.TemplateBase(c.L, body, message, tutorial)
+		content = components.TemplateBase(c.U != nil, c.L, body, message, tutorial)
 	}
 
 	content.Render(langs.Get(&c.L).Ctx(), c.W)
@@ -27,6 +27,17 @@ func RenderComponent(c *Context, page templ.Component) {
 	render(c, page, components.TemplateEmpty(), page)
 }
 
+// RenderSide shows the sidebar. Can be accessed only via htmx.
+func RenderSide(c *Context, side templ.Component) {
+	if !c.h {
+		Redirect(c, "/")
+		return
+	}
+
+	c.W.Header().Add("HX-Retarget", "#side-container")
+	render(c, side, components.TemplateEmpty(), side)
+}
+
 // ShowMessage shows a popup message to the user.
 // If path is set, it will redirects it to the given path
 func ShowMessage(c *Context, msg langs.String, path string) {
@@ -35,6 +46,7 @@ func ShowMessage(c *Context, msg langs.String, path string) {
 
 // ShowError is like ShowMessage, but it also sets a status code
 func ShowError(c *Context, msg langs.String, path string, status int) {
+	c.W.Header().Add("HX-Retarget", "#message-container")
 	c.W.WriteHeader(status)
 	page := components.TemplateMessage(msg, path, c.h)
 	render(c, components.TemplateEmpty(), page, page)

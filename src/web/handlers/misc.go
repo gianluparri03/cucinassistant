@@ -56,6 +56,24 @@ func PostLang(c *utils.Context) (err error) {
 	return
 }
 
+func GetSide(c *utils.Context) (err error) {
+	var menus []database.Menu
+	var sections []database.Section
+	var recipes []database.Recipe
+
+	switch c.R.URL.Query().Get("open") {
+	case "menus":
+		menus, _ = c.U.Menus().GetAll()
+	case "sections":
+		sections, _ = c.U.Storage().GetSections()
+	case "recipes":
+		recipes, _ = c.U.Recipes().GetAll()
+	}
+
+	utils.RenderSide(c, components.Side(menus, sections, recipes))
+	return
+}
+
 func GetStats(c *utils.Context) (err error) {
 	utils.RenderComponent(c, components.Stats(database.GetStats()))
 	return
