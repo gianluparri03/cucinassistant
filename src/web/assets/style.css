@@ -479,6 +479,7 @@ ul {
     left: 0;
     height: 100%;
     background-color: var(--red);
+    overflow: auto;
 }
 
 #side-container {

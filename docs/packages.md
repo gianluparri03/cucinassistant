@@ -56,8 +56,8 @@ functions that can serve an HTTP page.
 - `endpoint.go` defines an `Endpoint`, which is a path with optional Get and
   Post handlers.
 
-- `renderer.go` contains `RenderComponent`, `ShowMessage`, `ShowError` and
-  `Redirect`.
+- `renderer.go` contains `RenderComponent`, `RenderSide`, `ShowMessage`,
+  `ShowError` and `Redirect`.
 
 - `sessions.go` adds the two functions `SaveUID` and `DropUID`, used to update
   the user's session, and `SetLang`.

@@ -7,11 +7,11 @@
 
 ## What is CucinAssistant
 
-CucinAssistant is an utility website, with which you and your mates can
+CucinAssistant is an utility website, with which you and your roommates can
 manage your menus, keep the shopping list updated, write down groceries you have
 in storage and save your recipes (that can also be shared).
 
-Once logged in, every change you make is synced across the account, so you'll
+Once logged in, every change you make is synced across your devices, so you'll
 never forget to buy something anymore!
 
 You can open CucinAssistant from your browser, at
@@ -55,7 +55,7 @@ CucinAssistant is released with the [MIT license](LICENSE).
 
 CucinAssistant uses:
 - [HTMX](https://htmx.org/) (web rendering)
-- [Inclusive Sans](https://fonts.google.com/specimen/Inclusive+Sans) (font)
-- [Phosphor Icons](https://phosphoricons.com/) (icons)
-- [Satisfy](https://fonts.google.com/specimen/Satisfy?query=satisfy) (font)
 - [Templ](https://templ.guide/) (html templating)
+- [Inclusive Sans](https://fonts.google.com/specimen/Inclusive+Sans) (font)
+- [Satisfy](https://fonts.google.com/specimen/Satisfy?query=satisfy) (font)
+- [Phosphor Icons](https://phosphoricons.com/) (icons)
