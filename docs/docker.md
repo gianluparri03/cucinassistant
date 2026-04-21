@@ -32,8 +32,6 @@ services:
         condition: service_healthy
 
     restart: always
-    healthcheck:
-      test: "curl --fail localhost/info || exit 1"
 
     env_file: ".env"
 
@@ -59,13 +57,21 @@ volumes:
   database:
 ```
 
-3. Run `docker compose up` (with an optional `-d` to hide the output).
+3. Then,
 
-4. **Only the first time**, run
-`docker exec -it cucinassistant-app-1 ca_migrate` to fix the database schema,
-and then `docker restart cucinassistant-app-1`.
+**for the first-time install or after an update:**
 
-5. It may happen that you need to tell something to your users. To do that, you
-can simply execute `docker exec -it cucinassistant-app-1 ca_broadcast`. This 
+a. Run `docker compose up -d database` to start the database
+
+b. Run `docker compose run --rm app ca_migrate` to update/create the database schema
+
+c. Run `docker compose up -d app` to start the app
+
+**otherwise:**
+
+Run `docker compose up -d`
+
+4. It may happen that you need to tell something to your users. To do that, you
+can simply execute `docker compose exec -it app ca_broadcast`. This 
 will run a wizard that will ask you for the email subject and body, and then
 (after a confirm) send it to everyone.

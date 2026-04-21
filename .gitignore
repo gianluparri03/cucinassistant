@@ -1,6 +1,10 @@
 .envrc
 
+**/*_templ.go
+**/*_string.go
+
 ignored/
 
 src/configs/*.local
+
 src/cover.out
