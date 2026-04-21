@@ -11,8 +11,8 @@ import (
 )
 
 const apiUrl = "https://rektdeckard-fontpack.web.val.run"
-const srcFile = "./icons.json"
-const dstFile = "../web/assets/phosphor.css"
+const srcFile = "tools/icons.json"
+const dstFile = "web/assets/phosphor.css"
 
 func main() {
 	fmt.Println("CucinAssistant Icons Packer")

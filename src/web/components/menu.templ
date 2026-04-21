@@ -90,6 +90,14 @@ templ MenuEdit(menu database.Menu) {
 	</div>
 	<br/>
 	<div>
+		<b>{ langs.Translate(ctx, langs.STR_MEALS) }</b>
+		<br/>
+		<button class="icon-text" hx-get={ baseurl + "/edit/meals" }>
+			<i class="ph ph-note-pencil"></i> { langs.Translate(ctx, langs.STR_EDIT_MEALS) }
+		</button>
+	</div>
+	<br/>
+	<div>
 		<b>{ langs.Translate(ctx, langs.STR_DAYS) }</b>
 		for _, day := range menu.Days {
 			{{ dayurl := baseurl + "/edit/" + strconv.Itoa(day.Position) }}
@@ -130,14 +138,6 @@ templ MenuEdit(menu database.Menu) {
 		<input hidden id="newday-name" name="name" value={ langs.Translate(ctx, langs.STR_NEW_DAY) }/>
 	</div>
 	<br/>
-	<div>
-		<b>{ langs.Translate(ctx, langs.STR_MEALS) }</b>
-		<br/>
-		<button class="icon-text" hx-get={ baseurl + "/edit/meals" }>
-			<i class="ph ph-note-pencil"></i> { langs.Translate(ctx, langs.STR_EDIT_MEALS) }
-		</button>
-	</div>
-	<br/>
 	<div class="swap-area">
 		<b>{ langs.Translate(ctx, langs.STR_DELETE) }</b>
 		<div class="pre-swap">
@@ -147,6 +147,10 @@ templ MenuEdit(menu database.Menu) {
 		</div>
 		<div class="post-swap">
 			{ langs.Translate(ctx, langs.STR_DELETE_MENU_TEXT) }
+			<br/>
+			<button class="icon-text" hx-get={ baseurl + "/edit" }>
+				<i class="ph ph-arrow-counter-clockwise"></i> { langs.Translate(ctx, langs.STR_CANCEL) }
+			</button>
 			<br/>
 			<button class="icon-text" hx-post={ baseurl + "/delete" } hx-push-url="false">
 				<i class="ph ph-check"></i> { langs.Translate(ctx, langs.STR_CONFIRM) }

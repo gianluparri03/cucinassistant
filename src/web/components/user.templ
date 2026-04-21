@@ -199,15 +199,15 @@ templ UserSignIn() {
 		<button class="icon-text">
 			<i class="ph ph-sign-in"></i> { langs.Translate(ctx, langs.STR_SIGNIN) }
 		</button>
-		<br/>
-		<a hx-get="/user/forgot_password">
-			{ langs.Translate(ctx, langs.STR_FORGOT_PASSWORD) }
-		</a>
-		<br/>
-		<a hx-get="/user/signup">
-			{ langs.Translate(ctx, langs.STR_SIGNUP) }
-		</a>
 	</form>
+	<br/>
+	<a hx-get="/user/forgot_password">
+		{ langs.Translate(ctx, langs.STR_FORGOT_PASSWORD) }
+	</a>
+	<br/>
+	<a hx-get="/user/signup">
+		{ langs.Translate(ctx, langs.STR_SIGNUP) }
+	</a>
 }
 
 templ UserSignUp() {
@@ -233,9 +233,9 @@ templ UserSignUp() {
 		<button class="icon-text" onclick="comparePasswords(event);">
 			<i class="ph ph-user-plus"></i> { langs.Translate(ctx, langs.STR_SIGNUP) }
 		</button>
-		<br/>
-		<a hx-get="/user/signin">
-			{ langs.Translate(ctx, langs.STR_SIGNIN) }
-		</a>
 	</form>
+	<br/>
+	<a hx-get="/user/signin">
+		{ langs.Translate(ctx, langs.STR_SIGNIN) }
+	</a>
 }

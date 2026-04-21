@@ -30,4 +30,5 @@ jobs:
         with:
           go-version: '1.26'
       - run: make install
+      - run: make gen
       - run: make test_ci
