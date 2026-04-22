@@ -156,3 +156,28 @@ function calculateQuantity(button, event) {
         input.val(value);
     }
 }
+
+
+
+// Transforms a text input into a date input
+function activateExpirationInput(input) {
+    input.value = input.attributes['innerValue'].value;
+    input.type = 'date';
+    input.showPicker();
+    input.onfocus = null;
+}
+
+// Transforms a text input into a number input
+function activateQuantityInput(input) {
+    input.type = 'number';
+    input.attributes['step'] = 'any';
+    input.onfocus = null;
+}
+
+// Shows expirations in the current locale
+function formatExpirationInputs() {
+    $('.expiration').each(function (_, i) {
+        if (i.type == 'date') return;
+        i.value = new Date(i.attributes['innervalue'].value).toLocaleDateString();
+    });
+}

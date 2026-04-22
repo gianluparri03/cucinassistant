@@ -89,7 +89,7 @@ templ StorageSection(section database.Section, search string, secNames map[int]s
 						<input
 							class="expiration"
 							readonly
-							value={ article.FormatExpiration() }
+							innervalue={ article.FormatExpiration() }
 						/>
 					</div>
 				}
@@ -99,7 +99,7 @@ templ StorageSection(section database.Section, search string, secNames map[int]s
 						<input
 							class="quantity"
 							readonly
-							value={ strconv.FormatFloat(float64(*article.Quantity), 'f', -1, 32) }
+							value={ article.FormatQuantity() }
 						/>
 					</div>
 				}
@@ -119,6 +119,7 @@ templ StorageSection(section database.Section, search string, secNames map[int]s
 			}
 		}
 	</div>
+	<script> formatExpirationInputs(); </script>
 }
 
 templ StorageSectionAdd(SID int, sections []database.Section) {
@@ -153,7 +154,7 @@ templ StorageSectionAdd(SID int, sections []database.Section) {
 					<input
 						class="expiration"
 						type="text"
-						onfocus="this.type = 'date'; this.showPicker(); this.onfocus = null;"
+						onfocus="activateExpirationInput(this);"
 						placeholder={ langs.Translate(ctx, langs.STR_EXPIRATION) }
 						nametemplate="article-ID-expiration"
 					/>
@@ -163,8 +164,7 @@ templ StorageSectionAdd(SID int, sections []database.Section) {
 					<input
 						class="quantity"
 						type="text"
-						step="any"
-						onfocus="this.type = 'number'; this.onfocus = null;"
+						onfocus="activateQuantityInput(this);"
 						placeholder={ langs.Translate(ctx, langs.STR_QUANTITY) }
 						nametemplate="article-ID-quantity"
 					/>
@@ -272,10 +272,10 @@ templ StorageArticle(SID int, article database.Article, prev int, next int, sear
 					name="expiration"
 					class="expiration"
 					type="text"
-					onfocus="this.type = 'date'; this.showPicker(); this.onfocus = null;"
+					onfocus="activateExpirationInput(this);"
 					placeholder={ langs.Translate(ctx, langs.STR_EXPIRATION) }
 					if article.Expiration != nil {
-						value={ article.FormatExpiration() }
+						innervalue={ article.FormatExpiration() }
 					}
 				/>
 			</div>
@@ -285,11 +285,10 @@ templ StorageArticle(SID int, article database.Article, prev int, next int, sear
 					class="quantity"
 					name="quantity"
 					type="text"
-					step="any"
-					onfocus="this.type = 'number'; this.onfocus = null;"
+					onfocus="activateQuantityInput(this);"
 					placeholder={ langs.Translate(ctx, langs.STR_QUANTITY) }
 					if article.Quantity != nil {
-						value={ strconv.FormatFloat(float64(*article.Quantity), 'f', -1, 32) }
+						value={ article.FormatQuantity() }
 					}
 				/>
 				<button class="icon calculator" hx-on:click="calculateQuantity(this, event);">
@@ -339,4 +338,5 @@ templ StorageArticle(SID int, article database.Article, prev int, next int, sear
 			</button>
 		}
 	</form>
+	<script> formatExpirationInputs(); </script>
 }

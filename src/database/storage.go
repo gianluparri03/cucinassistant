@@ -53,6 +53,10 @@ func (a Article) FormatExpiration() string {
 	return a.Expiration.Format(time.DateOnly)
 }
 
+func (a Article) FormatQuantity() string {
+	return strconv.FormatFloat(float64(*a.Quantity), 'f', -1, 32)
+}
+
 // IsExpired returns true if the article is expired
 func (a Article) IsExpired() bool {
 	return a.Expiration != nil && a.Expiration.Before(time.Now())
