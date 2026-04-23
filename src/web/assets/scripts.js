@@ -161,7 +161,11 @@ function calculateQuantity(button, event) {
 
 // Transforms a text input into a date input
 function activateExpirationInput(input) {
-    input.value = input.attributes['innerValue'].value;
+    let attribute = input.attributes.innerValue;
+    if (attribute) {
+        input.value = attribute.value;
+    }
+
     input.type = 'date';
     input.showPicker();
     input.onfocus = null;
@@ -178,6 +182,10 @@ function activateQuantityInput(input) {
 function formatExpirationInputs() {
     $('.expiration').each(function (_, i) {
         if (i.type == 'date') return;
-        i.value = new Date(i.attributes['innervalue'].value).toLocaleDateString();
+        
+        let attribute = i.attributes.innerValue;
+        if (attribute) {
+            i.value = new Date(attribute.value).toLocaleDateString();
+        }
     });
 }

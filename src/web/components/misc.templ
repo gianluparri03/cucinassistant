@@ -108,6 +108,14 @@ templ Side(menus []database.Menu, sections []database.Section, recipes []databas
 				</div>
 			</div>
 		}
+		if menus != nil {
+			<div class="side-item">
+				<div class="side-content padded-side-content" hx-get="/menus/new" hx-on::after-request="closeSide()">
+					<i class="ph ph-plus"></i>
+					<span>{ langs.Translate(ctx, langs.STR_NEW_MENU) }</span>
+				</div>
+			</div>
+		}
 		<div class="side-item">
 			<div class="side-content" hx-get="/storage" hx-on::after-request="closeSide()">
 				<i class="ph ph-package"></i>
@@ -122,8 +130,16 @@ templ Side(menus []database.Menu, sections []database.Section, recipes []databas
 		for _, section := range sections {
 			<div class="side-item">
 				<div class="side-content padded-side-content" hx-get={ "/storage/" + strconv.Itoa(section.SID) } hx-on::after-request="closeSide()">
-					<i class="ph ph-fork-knife"></i>
+					<i class="ph ph-package"></i>
 					<span>{ section.Name }</span>
+				</div>
+			</div>
+		}
+		if sections != nil {
+			<div class="side-item">
+				<div class="side-content padded-side-content" hx-get="/storage/0/add" hx-on::after-request="closeSide()">
+					<i class="ph ph-plus"></i>
+					<span>{ langs.Translate(ctx, langs.STR_ADD_ARTICLES) }</span>
 				</div>
 			</div>
 		}
@@ -147,8 +163,16 @@ templ Side(menus []database.Menu, sections []database.Section, recipes []databas
 		for _, recipe := range recipes {
 			<div class="side-item">
 				<div class="side-content padded-side-content" hx-get={ "/recipes/" + strconv.Itoa(recipe.RID) } hx-on::after-request="closeSide()">
-					<i class="ph ph-fork-knife"></i>
+					<i class="ph ph-notebook"></i>
 					<span>{ recipe.Name }</span>
+				</div>
+			</div>
+		}
+		if recipes != nil {
+			<div class="side-item">
+				<div class="side-content padded-side-content" hx-get="/recipes/new" hx-on::after-request="closeSide()">
+					<i class="ph ph-plus"></i>
+					<span>{ langs.Translate(ctx, langs.STR_NEW_RECIPE) }</span>
 				</div>
 			</div>
 		}
